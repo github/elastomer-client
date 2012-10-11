@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+# force use of gcc under mac due to hiredis issues under clang
+if [ $(uname) = Darwin ]; then
+    export CC=/usr/bin/gcc
+    export CXX=/usr/bin/g++
+    export LD=/usr/bin/gcc
+fi
+
+cd "$(dirname "$0")/.."
+if bundle check 1>/dev/null 2>&1; then
+    echo "Gem environment up-to-date"
+else
+    exec bundle install --binstubs --path vendor/gems "$@"
+fi

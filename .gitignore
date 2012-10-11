@@ -1,0 +1,5 @@
+/bin
+/vendor/gems
+/.bundle
+/.rbenv-version
+/vendor/cache/*.gem

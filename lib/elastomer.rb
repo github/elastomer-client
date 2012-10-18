@@ -331,3 +331,4 @@ end  # Elastomer
 require 'elastomer/adapter'
 require 'elastomer/index'
 require 'elastomer/loader'
+require 'elastomer/version'

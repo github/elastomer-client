@@ -17,12 +17,12 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.4.2'
 
   # runtime dependencies
-  s.add_dependency 'faraday',             '~> 0.8.7'
-  s.add_dependency 'faraday_middleware',  '~> 0.9.0'
+  s.add_dependency 'faraday',             '~> 0.8'
+  s.add_dependency 'faraday_middleware',  '~> 0.9'
   s.add_dependency 'net-http-persistent', '~> 2.8'
-  s.add_dependency 'hashie',              '~> 2.0.3'
+  s.add_dependency 'hashie',              '~> 2.0'
 
   # development dependencies
-  s.add_development_dependency 'rspec', '~> 2.13.0'
+  s.add_development_dependency 'minitest', '~> 4.7'
 end
 

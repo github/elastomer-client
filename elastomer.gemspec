@@ -17,6 +17,6 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.4.2'
 
   # tests
-  s.add_development_dependency 'minitest', '~> 4.1.0'
+  s.add_development_dependency 'rspec', '~> 2.13.0'
 end
 

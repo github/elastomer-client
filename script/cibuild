@@ -28,6 +28,6 @@ if [ $result -ne 0 ]; then
     exit $result
 fi
 
-echo
-echo "Running benchmarks"
-script/benchmark
+# echo
+# echo "Running benchmarks"
+# script/benchmark

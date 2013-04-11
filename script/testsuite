@@ -2,9 +2,9 @@
 set -e
 cd "$(dirname "$0")/.."
 
-# run entire test suite
+# run entire rspec suite
 ruby --version 1>&2
 exec ruby -I. -rubygems \
-    -r "$(pwd)/test/test_helper" \
+    -r "$(pwd)/spec/spec_helper" \
     -e "ARGV.each { |f| require(f) }" \
-    -- $(find test -name '*_test.rb')
+    -- $(find spec -name '*_spec.rb')

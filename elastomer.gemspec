@@ -19,8 +19,9 @@ Gem::Specification.new do |s|
   # runtime dependencies
   s.add_dependency 'faraday',             '~> 0.8'
   s.add_dependency 'faraday_middleware',  '~> 0.9'
-  s.add_dependency 'net-http-persistent', '~> 2.8'
   s.add_dependency 'hashie',              '~> 2.0'
+  s.add_dependency 'multi_json',          '~> 1.7'
+  s.add_dependency 'net-http-persistent', '~> 2.8'
 
   # development dependencies
   s.add_development_dependency 'minitest', '~> 4.7'

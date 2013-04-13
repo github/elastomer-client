@@ -21,4 +21,33 @@ describe Elastomer::Client::Cluster do
     assert_instance_of Hash, h['transient'], 'the transient settings are returned'
   end
 
+  it 'updates the cluster settings' do
+    settings = {:transient => { 'cluster.blocks.read_only' => true }}
+    $client.cluster.update_settings :body => settings
+
+    h = $client.cluster.settings
+    assert_equal({'cluster.blocks.read_only' => 'true'}, h['transient'])
+
+    settings = {:transient => { 'cluster.blocks.read_only' => false }}
+    $client.cluster.update_settings :body => settings
+
+    h = $client.cluster.settings
+    assert_equal({'cluster.blocks.read_only' => 'false'}, h['transient'])
+  end
+
+  it 'reroutes shards' do
+    skip 'need to figure out how to noop the test and assert the path is constructed correctly'
+
+    commands = [
+      { :move => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }},
+      { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
+    ]
+
+    h = $client.cluster.reroute :dry_run => true, :body => { :commands => commands }
+  end
+
+  it 'performas a shutdown of the cluster' do
+    skip 'need to figure out how to noop the test and assert the path is constructed correctly'
+  end
+
 end

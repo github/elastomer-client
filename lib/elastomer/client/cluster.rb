@@ -73,7 +73,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def reroute( params = {} )
-        response = client.post '/_cluster/settings', params
+        response = client.post '/_cluster/reroute', params
         response.body
       end
 

@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'net-http-persistent', '~> 2.8'
 
   # development dependencies
-  s.add_development_dependency 'json_pure', '~> 1.7'
-  s.add_development_dependency 'minitest',  '~> 4.7'
+  s.add_development_dependency 'json',     '~> 1.7'
+  s.add_development_dependency 'minitest', '~> 4.7'
 end
 

@@ -30,8 +30,8 @@ module Elastomer
 
     # Returns true if the server is available; returns false otherwise.
     def available?
-      head '/'
-      true
+      response = head '/'
+      response.success?
     rescue StandardError
       false
     end
@@ -57,7 +57,6 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
     def head( path, params = {} )
       request :head, path, params
     end
@@ -131,7 +130,7 @@ module Elastomer
             raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
           end
 
-      return response if response.success?
+      return response if response.success? || method == :head
       raise Elastomer::Error, response
     # ensure
     #   # FIXME: this is here until we get a real logger in place

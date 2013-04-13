@@ -26,4 +26,14 @@ describe Elastomer::Client::Nodes do
     skip 'need to figure out how to noop the test and assert the path is constructed correctly'
   end
 
+  it 'can be scoped to a single node' do
+    h = $client.nodes('node-with-no-name').info
+    assert_empty h['nodes']
+  end
+
+  it 'can be scoped to a multiple nodes' do
+    h = $client.nodes(%w[node1 node2 node3]).info
+    assert_empty h['nodes']
+  end
+
 end

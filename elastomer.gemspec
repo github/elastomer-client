@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.4.2'
 
   # runtime dependencies
+  s.add_dependency 'addressable',         '~> 2.3'
   s.add_dependency 'faraday',             '~> 0.8'
   s.add_dependency 'faraday_middleware',  '~> 0.9'
   s.add_dependency 'hashie',              '~> 2.0'

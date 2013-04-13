@@ -166,7 +166,7 @@ module Elastomer
 
       uri = template.expand(expansions)
       uri.query_values = params unless params.empty?
-      uri
+      uri.to_s
     end
 
   end  # Client

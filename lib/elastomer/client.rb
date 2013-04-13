@@ -122,7 +122,7 @@ module Elastomer
 
       response =
           case method
-          when :head;   connection.head path
+          when :head;   connection.head   path
           when :get;    connection.get    path, body
           when :put;    connection.put    path, body
           when :post;   connection.post   path, body
@@ -133,9 +133,9 @@ module Elastomer
 
       return response if response.success?
       raise Elastomer::Error, response
-    ensure
-      # FIXME: this is here until we get a real logger in place
-      STDERR.puts "[#{response.status}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
+    # ensure
+    #   # FIXME: this is here until we get a real logger in place
+    #   STDERR.puts "[#{response.status}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
     end
 
     # Internal: Apply path expansions to the `path` and append query

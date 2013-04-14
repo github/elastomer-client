@@ -2,6 +2,12 @@
 module Elastomer
   class Client
 
+    # Returns a Cluster instance.
+    def cluster
+      @cluster ||= Cluster.new self
+    end
+
+
     class Cluster
 
       # Create a new cluster client for making API requests that pertain to
@@ -54,11 +60,12 @@ module Elastomer
       #
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-update-settings/
       #
+      # body   - The new settings as a Hash
       # params - Parameters Hash
       #
       # Returns the response as a Hash
-      def update_settings( params = {} )
-        response = client.put '/_cluster/settings', params
+      def update_settings( body, params = {} )
+        response = client.put '/_cluster/settings', params.merge(:body => body)
         response.body
       end
 
@@ -69,11 +76,12 @@ module Elastomer
       #
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-reroute/
       #
+      # body   - The reroute commands as a Hash
       # params - Parameters Hash
       #
       # Returns the response as a Hash
-      def reroute( params = {} )
-        response = client.post '/_cluster/reroute', params
+      def reroute( body, params = {} )
+        response = client.post '/_cluster/reroute', params.merge(:body => body)
         response.body
       end
 
@@ -88,11 +96,5 @@ module Elastomer
         response.body
       end
     end  # Cluster
-
-    # Returns a Cluster instance.
-    def cluster
-      @cluster ||= Cluster.new self
-    end
-
   end  # Client
 end  # Elastomer

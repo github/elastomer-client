@@ -2,8 +2,17 @@
 module Elastomer
   class Client
 
-    class Nodes
+    # Provides access to node-level API commands.
+    #
+    # node_id - The node ID as a String or an Array of node IDs
+    #
+    # Returns a Nodes instance.
+    def nodes( node_id = '_all' )
+      Nodes.new self, node_id
+    end
 
+
+    class Nodes
       # Create a new nodes client for making API requests that pertain to
       # the health and management individual nodes.
       #
@@ -24,7 +33,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def info( params = {} )
-        response = client.get '/_nodes{/node_id}', defaults(params)
+        response = client.get '/_nodes{/node_id}', update(params)
         response.body
       end
 
@@ -35,7 +44,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get '/_nodes{/node_id}/stats', defaults(params)
+        response = client.get '/_nodes{/node_id}/stats', update(params)
         response.body
       end
 
@@ -46,7 +55,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def hot_threads( params = {} )
-        response = client.get '/_nodes{/node_id}/hot_threads', defaults(params)
+        response = client.get '/_nodes{/node_id}/hot_threads', update(params)
         response.body
       end
 
@@ -57,28 +66,22 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post '/_cluster/nodes{/node_id}/_shutdown', defaults(params)
+        response = client.post '/_cluster/nodes{/node_id}/_shutdown', update(params)
         response.body
       end
 
-      # Internal: Append default parameters to the given `params` Hash.
+      # Internal: Add default parameters to the `params` Hash and then apply
+      # `overrides` to the params if any are given.
       #
-      # params - Parameters Hash
+      # params    - Parameters Hash
+      # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def defaults( params )
-        { :node_id => node_id }.merge! params
+      def update( params, overrides = nil )
+        h = { :node_id => node_id }.update params
+        h.update overrides unless overrides.nil?
+        h
       end
-    end
-
-    # Provides access to node-level API commands.
-    #
-    # node_id - The node ID as a String or an Array of node IDs
-    #
-    # Returns a Nodes instance.
-    def nodes( node_id = '_all' )
-      Nodes.new self, node_id
-    end
-
+    end  # Nodes
   end  # Client
 end  # Elastomer

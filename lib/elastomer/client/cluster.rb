@@ -95,6 +95,53 @@ module Elastomer
         response = client.post '/_shutdown', params
         response.body
       end
+
+      # Perform an aliases action on the cluster. We are just a teensie bit
+      # clever here in that a single action can be given or an array of
+      # actions. This API method will wrap the request in the appropriate
+      # {:actions => [...]} body construct.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
+      #
+      # actions - An action Hash or an Array of action Hashes
+      # params  - Parameters Hash
+      #
+      # Examples
+      #
+      #   aliases(:add => { :index => 'users-1', :alias => 'users' })
+      #
+      #   aliases([
+      #     { :remove => { :index => 'users-1', :alias => users' }},
+      #     { :add    => { :index => 'users-2', :alias => users' }}
+      #   ])
+      #
+      # Returns the response body as a Hash
+      def aliases( actions, params = {} )
+        body = {:actions => Array(actions)}
+        response = client.post '/_aliases', params.merge(:body => body)
+        response.body
+      end
+
+      # Retreive the current aliases. An :index name can be given (or an
+      # aarray of index names) to get just the aliases for those indexes. You
+      # can also use the alias name here since it is acting the part of an
+      # idnex.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
+      #
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   get_aliases
+      #   get_aliases( :index => 'users' )
+      #
+      # Returns the response body as a Hash
+      def get_aliases( params = {} )
+        response = client.get '{/index}/_aliases', params
+        response.body
+      end
+
     end  # Cluster
   end  # Client
 end  # Elastomer

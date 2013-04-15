@@ -30,6 +30,7 @@ module Elastomer
 
       # Check for the existence of the index. If a :type option is given, then
       # we will check for the existence of the document type in the index.
+      #
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-indices-exists/
       # and http://www.elasticsearch.org/guide/reference/api/admin-indices-types-exists/
       #
@@ -42,6 +43,7 @@ module Elastomer
       end
       alias :exist? :exists?
 
+      # Create the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index/
       #
       # body   - The index settings and mappings as a Hash
@@ -53,6 +55,7 @@ module Elastomer
         response.body
       end
 
+      # Delete the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-delete-index/
       #
       # Returns the response body as a Hash
@@ -61,6 +64,7 @@ module Elastomer
         response.body
       end
 
+      # Open the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-open-close/
       #
       # Returns the response body as a Hash
@@ -69,6 +73,7 @@ module Elastomer
         response.body
       end
 
+      # Close the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-open-close/
       #
       # Returns the response body as a Hash
@@ -77,6 +82,7 @@ module Elastomer
         response.body
       end
 
+      # Retrieve the settings for the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-get-settings/
       #
       # Returns the response body as a Hash
@@ -85,6 +91,7 @@ module Elastomer
         response.body
       end
 
+      # Change specific index level settings in real time.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-update-settings/
       #
       # body   - The index settings as a Hash
@@ -96,6 +103,9 @@ module Elastomer
         response.body
       end
 
+      # Retrive one or more mappings from the index. To retrieve a specific
+      # mapping provide the name as the :type parameter.
+      #
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-get-mapping/
       #
       # params - Parameters Hash
@@ -106,6 +116,7 @@ module Elastomer
         response.body
       end
 
+      # Register specific mapping definition for a specific type.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-put-mapping/
       #
       # type   - Name of the mapping to update as a String
@@ -119,6 +130,9 @@ module Elastomer
       end
       alias :put_mapping :update_mapping
 
+      # Delete the mapping identified by `type`. This deletes all documents of
+      # that type from the index.
+      #
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-delete-mapping/
       #
       # type   - Name of the mapping to update as a String
@@ -129,6 +143,29 @@ module Elastomer
         response = client.delete '/{index}/{type}', update(params, :type => type)
         response.body
       end
+
+      # Return the aliases associated with this index.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
+      #
+      # Returns the response body as a Hash
+      def get_aliases
+        response = client.get '/{index}/_aliases', defaults
+        response.body
+      end
+
+=begin
+  Analyze
+  Refresh
+  Optimize
+  Flush
+  Snapshot
+  Templates
+  Warmers
+  Stats
+  Status
+  Segments
+  Clear Cache
+=end
 
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.

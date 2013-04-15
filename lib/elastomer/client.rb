@@ -121,11 +121,11 @@ module Elastomer
 
       response =
           case method
-          when :head;   connection.head   path
-          when :get;    connection.get    path, body
-          when :put;    connection.put    path, body
-          when :post;   connection.post   path, body
-          when :delete; connection.delete path, body
+          when :head;   connection.head(path)
+          when :get;    connection.get(path) { |req| req.body = body if body }
+          when :put;    connection.put(path, body)
+          when :post;   connection.post(path, body)
+          when :delete; connection.delete(path) { |req| req.body = body if body }
           else
             raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
           end

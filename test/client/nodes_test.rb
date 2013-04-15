@@ -22,10 +22,6 @@ describe Elastomer::Client::Nodes do
     assert_match %r/cpu usage by thread/, str
   end
 
-  it 'performas a shutdown of the node(s)' do
-    skip 'need to figure out how to noop the test and assert the path is constructed correctly'
-  end
-
   it 'can be scoped to a single node' do
     h = $client.nodes('node-with-no-name').info
     assert_empty h['nodes']

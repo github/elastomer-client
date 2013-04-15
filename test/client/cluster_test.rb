@@ -35,32 +35,6 @@ describe Elastomer::Client::Cluster do
     assert_equal({'cluster.blocks.read_only' => 'false'}, h['transient'])
   end
 
-  it 'reroutes shards' do
-    stubs = Faraday::Adapter.lookup_middleware(:test)::Stubs.new
-    client = Elastomer::Client.new :adapter => [:test, stubs]
-    @cluster = client.cluster
-
-    stubs.post '/_cluster/reroute?dry_run=true' do |env|
-      assert_match %r/^\{"commands":\[\{"move":\{[^\{\}]+\}\}\]\}$/, env[:body]
-
-      [200, {'Content-Type' => 'application/json'}, '{"ok" : true}']
-    end
-
-    commands = { :move => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }}
-    h = @cluster.reroute commands, :dry_run => true
-    assert h['ok']
-  end
-
-  it 'performas a shutdown of the cluster' do
-    stubs = Faraday::Adapter.lookup_middleware(:test)::Stubs.new
-    client = Elastomer::Client.new :adapter => [:test, stubs]
-    @cluster = client.cluster
-
-    stubs.post('/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"ok" : true}'] }
-    h = @cluster.shutdown
-    assert h['ok']
-  end
-
   it 'returns the list of nodes in the cluster' do
     nodes = @cluster.nodes
     assert !nodes.empty?, 'we have to have some nodes'

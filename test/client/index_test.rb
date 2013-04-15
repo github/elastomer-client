@@ -50,4 +50,14 @@ describe Elastomer::Client::Index do
     end
   end
 
+  it 'lists all aliases to the index' do
+    assert_empty @index.get_aliases, 'no aliases for an index that does not exist'
+
+    @index.create(nil)
+    assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
+
+    $client.cluster.aliases :add => {:index => @name, :alias => 'foofaloo'}
+    assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)
+  end
+
 end

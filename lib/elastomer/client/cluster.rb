@@ -76,11 +76,23 @@ module Elastomer
       #
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-reroute/
       #
-      # body   - The reroute commands as a Hash
-      # params - Parameters Hash
+      # commands - A command Hash or an Array of command Hashes
+      # params   - Parameters Hash
+      #
+      # Examples
+      #
+      #   reroute(:move => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' })
+      #
+      #   reroute([
+      #     { :move     => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }},
+      #     { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
+      #   ])
       #
       # Returns the response as a Hash
-      def reroute( body, params = {} )
+      def reroute( commands, params = {} )
+        commands = [commands] unless Array === commands
+        body = {:commands => commands}
+
         response = client.post '/_cluster/reroute', params.merge(:body => body)
         response.body
       end
@@ -117,7 +129,9 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def aliases( actions, params = {} )
-        body = {:actions => Array(actions)}
+        actions = [actions] unless Array === actions
+        body = {:actions => actions}
+
         response = client.post '/_aliases', params.merge(:body => body)
         response.body
       end

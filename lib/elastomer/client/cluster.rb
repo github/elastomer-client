@@ -165,7 +165,7 @@ module Elastomer
       def templates
         h = state(
           :filter_blocks        => true,
-          :filter_indices       => true,
+          # :filter_indices       => true,  # this is filtering out templates, too (grrr)
           :filter_nodes         => true,
           :filter_routing_table => true
         )

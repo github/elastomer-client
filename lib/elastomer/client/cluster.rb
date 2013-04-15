@@ -163,7 +163,6 @@ module Elastomer
       def templates
         h = state(
           :filter_blocks        => true,
-          # :filter_indices       => true,  # this is filtering out templates, too (grrr)
           :filter_nodes         => true,
           :filter_routing_table => true
         )
@@ -178,8 +177,7 @@ module Elastomer
         h = state(
           :filter_blocks        => true,
           :filter_nodes         => true,
-          :filter_routing_table => true,
-          :filter_templates     => true
+          :filter_routing_table => true
         )
         h['metadata']['indices']
       end
@@ -192,9 +190,8 @@ module Elastomer
       def nodes
         h = state(
           :filter_blocks        => true,
-          :filter_indices       => true,
-          :filter_routing_table => true,
-          :filter_templates     => true
+          :filter_metadata      => true,
+          :filter_routing_table => true
         )
         h['nodes']
       end

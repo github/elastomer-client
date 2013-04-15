@@ -170,7 +170,6 @@ module Elastomer
   Optimize
   Flush
   Snapshot
-  Templates
   Warmers
   Stats
   Status

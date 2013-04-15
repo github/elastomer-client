@@ -156,6 +156,60 @@ module Elastomer
         response.body
       end
 
+      # List all tempaltes currently defeined. This is just a convience method
+      # around the `state` call that extracts and returns the templates section.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      #
+      # Returns the template definitions as a Hash
+      def templates
+        h = state(
+          :filter_blocks        => true,
+          :filter_indices       => true,
+          :filter_nodes         => true,
+          :filter_routing_table => true
+        )
+        h['metadata']['templates']
+      end
+
+      # Get the named template from the cluster.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      #
+      # name   - The template name as a String
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def get_template( name, params = {} )
+        response = client.get '_template/{name}', params.merge(:name => name)
+        response.body
+      end
+
+      # Create a named template on the cluster.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      #
+      # name     - The template name as a String
+      # template - The template as a Hash
+      # params   - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def create_template( name, template, params = {} )
+        response = client.put '_template/{name}', params.merge(:name => name, :body => template)
+        response.body
+      end
+      alias :put_template :create_template
+
+      # Delete the named template from the cluster.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      #
+      # name   - The template name as a String
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def delete_template( name, params = {} )
+        response = client.delete '_template/{name}', params.merge(:name => name)
+        response.body
+      end
+
     end  # Cluster
   end  # Client
 end  # Elastomer

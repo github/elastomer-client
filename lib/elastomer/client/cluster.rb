@@ -196,7 +196,7 @@ module Elastomer
           :filter_routing_table => true,
           :filter_templates     => true
         )
-        h['metadata']['nodes']
+        h['nodes']
       end
 
     end  # Cluster

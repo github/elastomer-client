@@ -153,8 +153,19 @@ module Elastomer
         response.body
       end
 
+      # Performs the analysis process on a text and return the tokens breakdown of the text.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze/
+      #
+      # text   - The text to analyze as a String
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def analyze( text, params = {} )
+        response = client.get '{/index}/_analyze', update(params, :body => text.to_s)
+        response.body
+      end
+
 =begin
-  Analyze
   Refresh
   Optimize
   Flush

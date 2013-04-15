@@ -26,6 +26,7 @@ module Elastomer
 
       @read_timeout = opts.fetch :read_timeout, 4
       @open_timeout = opts.fetch :open_timeout, 2
+      @adapter      = opts.fetch :adapter, :net_http_persistent
     end
 
     # Returns true if the server is available; returns false otherwise.
@@ -44,7 +45,10 @@ module Elastomer
       @connection ||= Faraday.new(url) do |conn|
         conn.request  :json
         conn.response :json, :content_type => /\bjson$/i
-        conn.adapter  :net_http_persistent
+
+        Array === @adapter ?
+          conn.adapter(*@adapter) :
+          conn.adapter(@adapter)
 
         conn.options[:read_timeout] = read_timeout
         conn.options[:open_timeout] = open_timeout

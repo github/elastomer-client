@@ -43,7 +43,7 @@ module Elastomer
         response.body
       end
 
-      # Cluster wide settings that have been modifed via the update API.
+      # Cluster wide settings that have been modified via the update API.
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-update-settings/
       #
       # params - Parameters Hash
@@ -108,7 +108,7 @@ module Elastomer
         response.body
       end
 
-      # Perform an aliases action on the cluster. We are just a teensie bit
+      # Perform an aliases action on the cluster. We are just a teensy bit
       # clever here in that a single action can be given or an array of
       # actions. This API method will wrap the request in the appropriate
       # {:actions => [...]} body construct.
@@ -136,10 +136,10 @@ module Elastomer
         response.body
       end
 
-      # Retreive the current aliases. An :index name can be given (or an
-      # aarray of index names) to get just the aliases for those indexes. You
+      # Retrieve the current aliases. An :index name can be given (or an
+      # array of index names) to get just the aliases for those indexes. You
       # can also use the alias name here since it is acting the part of an
-      # idnex.
+      # index.
       #
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
       #
@@ -156,10 +156,8 @@ module Elastomer
         response.body
       end
 
-      # List all tempaltes currently defeined. This is just a convience method
+      # List all templates currently defined. This is just a convenience method
       # around the `state` call that extracts and returns the templates section.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
       #
       # Returns the template definitions as a Hash
       def templates
@@ -172,42 +170,33 @@ module Elastomer
         h['metadata']['templates']
       end
 
-      # Get the named template from the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      # List all indices currently defined. This is just a convenience method
+      # around the `state` call that extracts and returns the indices section.
       #
-      # name   - The template name as a String
-      # params - Parameters Hash
-      #
-      # Returns the response body as a Hash
-      def get_template( name, params = {} )
-        response = client.get '_template/{name}', params.merge(:name => name)
-        response.body
+      # Returns the indices definitions as a Hash
+      def indices
+        h = state(
+          :filter_blocks        => true,
+          :filter_nodes         => true,
+          :filter_routing_table => true,
+          :filter_templates     => true
+        )
+        h['metadata']['indices']
       end
 
-      # Create a named template on the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      # List all nodes currently part of the cluster. This is just a convenience
+      # method around the `state` call that extracts and returns the nodes
+      # section.
       #
-      # name     - The template name as a String
-      # template - The template as a Hash
-      # params   - Parameters Hash
-      #
-      # Returns the response body as a Hash
-      def create_template( name, template, params = {} )
-        response = client.put '_template/{name}', params.merge(:name => name, :body => template)
-        response.body
-      end
-      alias :put_template :create_template
-
-      # Delete the named template from the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
-      #
-      # name   - The template name as a String
-      # params - Parameters Hash
-      #
-      # Returns the response body as a Hash
-      def delete_template( name, params = {} )
-        response = client.delete '_template/{name}', params.merge(:name => name)
-        response.body
+      # Returns the nodes definitions as a Hash
+      def nodes
+        h = state(
+          :filter_blocks        => true,
+          :filter_indices       => true,
+          :filter_routing_table => true,
+          :filter_templates     => true
+        )
+        h['metadata']['nodes']
       end
 
     end  # Cluster

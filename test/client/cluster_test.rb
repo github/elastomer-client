@@ -2,10 +2,6 @@ require File.expand_path('../../test_helper', __FILE__)
 
 describe Elastomer::Client::Cluster do
 
-  after do
-    $client.cluster.delete_template('cluster-test') if $client.cluster.templates.key?('cluster-test')
-  end
-
   it 'gets the cluster health' do
     h = $client.cluster.health
     assert h.key?('cluster_name'), 'the cluster name is returned'
@@ -48,25 +44,6 @@ describe Elastomer::Client::Cluster do
 
   it 'performas a shutdown of the cluster' do
     skip 'need to figure out how to noop the test and assert the path is constructed correctly'
-  end
-
-  it 'creates templates' do
-    templates = $client.cluster.templates
-    assert !templates.key?('cluster-test'), ' we should not have a cluster-test template'
-
-    $client.cluster.create_template 'cluster-test', {
-      :template => 'test-*',
-      :settings => { :number_of_shards => 3 },
-      :mappings => {
-        :doco => { :_source => { :enabled => false }}
-      }
-    }
-
-    templates = $client.cluster.templates
-    assert templates.key?('cluster-test'), ' we now have a cluster-test template'
-
-    template = $client.cluster.get_template 'cluster-test'
-    assert_equal %w[cluster-test], template.keys
   end
 
 end

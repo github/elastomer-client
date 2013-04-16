@@ -84,6 +84,21 @@ module Elastomer
         response.body
       end
 
+      # Allows to get multiple documents based on an index, type, and id (and possibly routing).
+      # See http://www.elasticsearch.org/guide/reference/api/multi-get/
+      #
+      # docs   - The Hash describing the documents to get
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def multi_get( docs, params = {} )
+        overrides = from_document(docs)
+        overrides[:body] = docs
+
+        response = client.get '{/index}{/type}{/id}/_mget', update_params(params, overrides)
+        response.body
+      end
+
       # Update a document based on a script provided.
       # See http://www.elasticsearch.org/guide/reference/api/update/
       #
@@ -99,6 +114,51 @@ module Elastomer
         response.body
       end
 
+      # Allows you to execute a search query and get back search hits that
+      # match the query. This method supports both the "request body" query
+      # and the "URI request" query. When using the request body semantics,
+      # the query hash must contain the :query key. Otherwise we assume a URI
+      # request is being made.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/search/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   # request body query
+      #   search({:query => {:match_all => {}}}, :type => 'tweet', :search_type => 'count')
+      #
+      #   # same thing but using the URI request method
+      #   search(:q => '*:*', :type => 'tweet', :search_type => 'count')
+      #
+      # Returns the response body as a hash
+      def search( query, params = nil )
+        if params.nil?
+          if query.key? :query
+            params = {}
+          else
+            params, query = query, nil
+          end
+        end
+
+        response = client.get '/{index}{/type}/_search', update_params(params, :body => query)
+        response.body
+      end
+
+
+=begin
+Multi Search
+Percolate
+Bulk
+Bulk UDP
+Count
+Delete By Query
+More Like This
+Validate
+Explain
+=end
 
       #
       #

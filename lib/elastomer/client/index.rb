@@ -165,10 +165,32 @@ module Elastomer
         response.body
       end
 
+      # Explicitly refresh one or more index, making all operations performed
+      # since the last refresh available for search.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-refresh/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def refresh( params = {} )
+        response = client.post '{/index}/_refresh', update(params)
+        response.body
+      end
+
+      # Flush one or more indices to the index storage.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-flush/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def flush( params = {} )
+        response = client.post '{/index}/_flush', update(params)
+        response.body
+      end
+
 =begin
-  Refresh
   Optimize
-  Flush
   Snapshot
   Warmers
   Stats

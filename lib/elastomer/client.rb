@@ -71,7 +71,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Error on 5XX responses
     def get( path, params = {} )
       request :get, path, params
     end
@@ -82,7 +82,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Error on 5XX responses
     def put( path, params = {} )
       request :put, path, params
     end
@@ -93,7 +93,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Error on 5XX responses
     def post( path, params = {} )
       request :post, path, params
     end
@@ -104,7 +104,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Error on 5XX responses
     def delete( path, params = {} )
       request :delete, path, params
     end
@@ -118,7 +118,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Error on 5XX responses
     def request( method, path, params )
       body = params.delete :body
       path = expand_path path, params
@@ -134,11 +134,11 @@ module Elastomer
             raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
           end
 
-      return response if response.success? || method == :head
+      return response if response.status < 500
       raise Elastomer::Error, response
     # ensure
     #   # FIXME: this is here until we get a real logger in place
-    #   STDERR.puts "[#{response.status}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
+    #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
     end
 
     # Internal: Apply path expansions to the `path` and append query

@@ -4,7 +4,7 @@ module Elastomer
 
     # Provides access to index-level API commands.
     #
-    # index - The name of the index as a String or an Array of names
+    # name - The name of the index as a String or an Array of names
     #
     # Returns an Index instance.
     def index( name )

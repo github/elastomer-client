@@ -3,7 +3,7 @@ require File.expand_path('../../test_helper', __FILE__)
 describe Elastomer::Client::Cluster do
 
   before do
-    @name = 'template-test'
+    @name = 'elastomer-template-test'
     @template = $client.template @name
   end
 
@@ -15,7 +15,7 @@ describe Elastomer::Client::Cluster do
     assert !@template.exists?, 'the template should not exist'
 
     @template.create({
-      :template => 'test-*',
+      :template => 'test-elastomer*',
       :settings => { :number_of_shards => 3 },
       :mappings => {
         :doco => { :_source => { :enabled => false }}
@@ -26,7 +26,7 @@ describe Elastomer::Client::Cluster do
 
     template = @template.get
     assert_equal [@name], template.keys
-    assert_equal 'test-*', template[@name]['template']
+    assert_equal 'test-elastomer*', template[@name]['template']
     assert_equal '3', template[@name]['settings']['index.number_of_shards']
   end
 

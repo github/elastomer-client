@@ -147,6 +147,39 @@ module Elastomer
         response.body
       end
 
+      # Delete documents from one or more indices and one or more types based
+      # on a query. This method supports both the "request body" query and the
+      # "URI request" query. When using the request body semantics, the query
+      # hash must contain the :query key. Otherwise we assume a URI request is
+      # being made.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/delete-by-query/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   # request body query
+      #   delete_by_query({:query => {:match_all => {}}}, :type => 'tweet')
+      #
+      #   # same thing but using the URI request method
+      #   delete_by_query(:q => '*:*', :type => 'tweet')
+      #
+      # Returns the response body as a hash
+      def delete_by_query( query, params = nil )
+        if params.nil?
+          if query.key? :query
+            params = {}
+          else
+            params, query = query, nil
+          end
+        end
+
+        response = client.delete '/{index}{/type}/_query', update_params(params, :body => query)
+        response.body
+      end
+
 
 =begin
 Multi Search
@@ -154,7 +187,6 @@ Percolate
 Bulk
 Bulk UDP
 Count
-Delete By Query
 More Like This
 Validate
 Explain

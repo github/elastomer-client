@@ -3,35 +3,41 @@ require File.expand_path('../../test_helper', __FILE__)
 describe Elastomer::Client::Docs do
 
   before do
-    @name  = 'docs-test'
+    @name  = 'elastomer-docs-test'
     @index = $client.index(@name)
 
-    @index.create \
-      :settings => { 'index.number_of_shards' => 1, 'index.number_of_replicas' => 0 },
-      :mappings => {
-        :doc1 => {
-          :_source => { :enabled => true }, :_all => { :enabled => false },
-          :properties => {
-            :title  => { :type => 'string', :analyzer => 'standard' },
-            :author => { :type => 'string', :index => 'not_analyzed' }
-          }
-        },
-        :doc2 => {
-          :_source => { :enabled => true }, :_all => { :enabled => false },
-          :properties => {
-            :title  => { :type => 'string', :analyzer => 'standard' },
-            :author => { :type => 'string', :index => 'not_analyzed' }
+    unless @index.exists?
+      @index.create \
+        :settings => { 'index.number_of_shards' => 1, 'index.number_of_replicas' => 0 },
+        :mappings => {
+          :doc1 => {
+            :_source => { :enabled => true }, :_all => { :enabled => false },
+            :properties => {
+              :title  => { :type => 'string', :analyzer => 'standard' },
+              :author => { :type => 'string', :index => 'not_analyzed' }
+            }
+          },
+          :doc2 => {
+            :_source => { :enabled => true }, :_all => { :enabled => false },
+            :properties => {
+              :title  => { :type => 'string', :analyzer => 'standard' },
+              :author => { :type => 'string', :index => 'not_analyzed' }
+            }
           }
         }
-      }
 
-    $client.cluster.health :index => @name, :wait_for_status => 'green', :timeout => '5s'
+      $client.cluster.health \
+        :index           => @name,
+        :wait_for_status => 'green',
+        :timeout         => '5s'
+    end
 
     @docs = @index.docs
   end
 
   after do
-    @index.delete if @index.exists?
+    @docs.delete_by_query :q => '*:*'
+    @index.flush :refresh => true
   end
 
   it 'gets documents from the search index' do

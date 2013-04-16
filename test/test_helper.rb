@@ -20,3 +20,15 @@ $client = Elastomer::Client.new $client_params
 # ensure we have an ElasticSearch server to test with
 raise "No server available at #{$client.url}" unless $client.available?
 
+# remove any lingering test indices from the cluster
+MiniTest::Unit.after_tests do
+  $client.cluster.indices.keys.each do |name|
+    next unless name =~ /^elastomer-/i
+    $client.index(name).delete
+  end
+
+  $client.cluster.templates.keys.each do |name|
+    next unless name =~ /^elastomer-/i
+    $client.template(name).delete
+  end
+end

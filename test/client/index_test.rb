@@ -3,7 +3,7 @@ require File.expand_path('../../test_helper', __FILE__)
 describe Elastomer::Client::Index do
 
   before do
-    @name  = 'index-test'
+    @name  = 'elastomer-index-test'
     @index = $client.index @name
   end
 

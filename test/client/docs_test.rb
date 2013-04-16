@@ -25,7 +25,7 @@ describe Elastomer::Client::Docs do
         }
       }
 
-    @index.refresh
+    @index.flush :refresh => true
     @docs = @index.docs
   end
 

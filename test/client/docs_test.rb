@@ -37,6 +37,7 @@ describe Elastomer::Client::Docs do
 
   after do
     @docs.delete_by_query :q => '*:*'
+    @index.flush
     @index.refresh
   end
 
@@ -131,6 +132,7 @@ describe Elastomer::Client::Docs do
       :title  => 'the author of rubber-band',
       :author => 'grantr'
 
+    @index.flush
     @index.refresh
   end
 

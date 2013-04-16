@@ -25,7 +25,8 @@ describe Elastomer::Client::Docs do
         }
       }
 
-    @index.flush :refresh => true
+    $client.cluster.health :index => @name, :wait_for_status => 'green', :timeout => '5s'
+
     @docs = @index.docs
   end
 

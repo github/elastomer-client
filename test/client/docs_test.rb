@@ -36,13 +36,16 @@ describe Elastomer::Client::Docs do
   end
 
   after do
-    @docs.delete_by_query :q => '*:*'
-    @index.flush
-    @index.refresh
-    # @index.close; sleep 0.020; @index.open
+    # @docs.delete_by_query :q => '*:*'
+    # @index.flush
+    # @index.refresh
+    @index.delete if @index.exists?
   end
 
   it 'gets documents from the search index' do
+    h = @docs.get :id => '1', :type => 'doc1'
+    assert_equal false, h['exists']
+
     populate!
 
     h = @docs.get :id => '1', :type => 'doc1'

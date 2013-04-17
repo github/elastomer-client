@@ -133,7 +133,6 @@ describe Elastomer::Client::Docs do
       :title  => 'the author of rubber-band',
       :author => 'grantr'
 
-    @index.flush
     @index.refresh
   end
 

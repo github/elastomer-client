@@ -4,12 +4,12 @@ module Elastomer
 
     # Provides access to document-level API commands.
     #
-    # index_name - The name of the index as a String
-    # type       - The document type as a String
+    # name - The name of the index as a String
+    # type - The document type as a String
     #
     # Returns a Docs instance.
-    def docs( index_name, type = nil )
-      Docs.new self, index_name, type
+    def docs( name, type = nil )
+      Docs.new self, name, type
     end
 
     class Index
@@ -28,19 +28,19 @@ module Elastomer
       # Create a new document client for making API requests that pertain to
       # the indexing and searching of documents in a search index.
       #
-      # client     - Elastomer::Client used for HTTP requests to the server
-      # index_name - The name of the index as a String
-      # type       - The document type as a String
+      # client - Elastomer::Client used for HTTP requests to the server
+      # name   - The name of the index as a String
+      # type   - The document type as a String
       #
-      def initialize( client, index_name, type = nil )
-        raise ArgumentError, 'index name cannot be nil' if index_name.nil?
+      def initialize( client, name, type = nil )
+        raise ArgumentError, 'index name cannot be nil' if name.nil?
 
-        @client     = client
-        @index_name = index_name
-        @type       = type
+        @client = client
+        @name   = name
+        @type   = type
       end
 
-      attr_reader :client, :index_name, :type
+      attr_reader :client, :name, :type
 
       # Adds or updates a document in the index, making it searchable.
       # See http://www.elasticsearch.org/guide/reference/api/index_/
@@ -80,7 +80,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get '/{index}/{type}/{id}', update_params(params)
+        response = client.get '/{index}/{type}/{id}', update_params(params, :accept => 404)
         response.body
       end
 
@@ -222,7 +222,7 @@ Explain
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        { :index => index_name, :type => type }
+        { :index => name, :type => type }
       end
     end  # Docs
   end  # Client

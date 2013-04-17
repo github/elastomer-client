@@ -36,7 +36,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get '_template/{template}', update(params)
+        response = client.get '_template/{template}', update_params(params)
         response.body
       end
 
@@ -48,7 +48,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create( template, params = {} )
-        response = client.put '_template/{template}', update(params, :body => template)
+        response = client.put '_template/{template}', update_params(params, :body => template)
         response.body
       end
 
@@ -59,7 +59,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete '_template/{template}', update(params)
+        response = client.delete '_template/{template}', update_params(params)
         response.body
       end
 
@@ -70,7 +70,7 @@ module Elastomer
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update( params, overrides = nil )
+      def update_params( params, overrides = nil )
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h

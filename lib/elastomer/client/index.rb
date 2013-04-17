@@ -38,7 +38,7 @@ module Elastomer
       #
       # Returns true if the index (or type) exists
       def exists?( params = {} )
-        response = client.head '/{index}{/type}', update(params)
+        response = client.head '/{index}{/type}', update_params(params)
         response.success?
       end
       alias :exist? :exists?
@@ -51,7 +51,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create( body, params = {} )
-        response = client.post '/{index}', update(params, :body => body)
+        response = client.post '/{index}', update_params(params, :body => body)
         response.body
       end
 
@@ -99,7 +99,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_settings( body, params = {} )
-        response = client.put '/{index}/_settings', update(params, :body => body)
+        response = client.put '/{index}/_settings', update_params(params, :body => body)
         response.body
       end
 
@@ -112,7 +112,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def mapping( params = {} )
-        response = client.get '/{index}{/type}/_mapping', update(params)
+        response = client.get '/{index}{/type}/_mapping', update_params(params)
         response.body
       end
 
@@ -125,7 +125,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_mapping( type, body, params = {} )
-        response = client.put '/{index}/{type}/_mapping', update(params, :body => body, :type => type)
+        response = client.put '/{index}/{type}/_mapping', update_params(params, :body => body, :type => type)
         response.body
       end
       alias :put_mapping :update_mapping
@@ -140,7 +140,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete_mapping( type, params = {} )
-        response = client.delete '/{index}/{type}', update(params, :type => type)
+        response = client.delete '/{index}/{type}', update_params(params, :type => type)
         response.body
       end
 
@@ -161,7 +161,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def analyze( text, params = {} )
-        response = client.get '{/index}/_analyze', update(params, :body => text.to_s)
+        response = client.get '{/index}/_analyze', update_params(params, :body => text.to_s)
         response.body
       end
 
@@ -174,7 +174,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def refresh( params = {} )
-        response = client.post '{/index}/_refresh', update(params)
+        response = client.post '{/index}/_refresh', update_params(params)
         response.body
       end
 
@@ -185,7 +185,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def flush( params = {} )
-        response = client.post '{/index}/_flush', update(params)
+        response = client.post '{/index}/_flush', update_params(params)
         response.body
       end
 
@@ -206,7 +206,7 @@ module Elastomer
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update( params, overrides = nil )
+      def update_params( params, overrides = nil )
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h

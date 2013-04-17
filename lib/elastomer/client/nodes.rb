@@ -33,7 +33,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def info( params = {} )
-        response = client.get '/_nodes{/node_id}', update(params)
+        response = client.get '/_nodes{/node_id}', update_params(params)
         response.body
       end
 
@@ -44,7 +44,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get '/_nodes{/node_id}/stats', update(params)
+        response = client.get '/_nodes{/node_id}/stats', update_params(params)
         response.body
       end
 
@@ -55,7 +55,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def hot_threads( params = {} )
-        response = client.get '/_nodes{/node_id}/hot_threads', update(params)
+        response = client.get '/_nodes{/node_id}/hot_threads', update_params(params)
         response.body
       end
 
@@ -66,7 +66,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post '/_cluster/nodes{/node_id}/_shutdown', update(params)
+        response = client.post '/_cluster/nodes{/node_id}/_shutdown', update_params(params)
         response.body
       end
 
@@ -77,7 +77,7 @@ module Elastomer
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update( params, overrides = nil )
+      def update_params( params, overrides = nil )
         h = { :node_id => node_id }.update params
         h.update overrides unless overrides.nil?
         h

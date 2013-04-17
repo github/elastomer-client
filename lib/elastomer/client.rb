@@ -71,7 +71,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 5XX responses
+    # Raises an Elastomer::Error on 4XX and 5XX responses
     def get( path, params = {} )
       request :get, path, params
     end
@@ -82,7 +82,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 5XX responses
+    # Raises an Elastomer::Error on 4XX and 5XX responses
     def put( path, params = {} )
       request :put, path, params
     end
@@ -93,7 +93,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 5XX responses
+    # Raises an Elastomer::Error on 4XX and 5XX responses
     def post( path, params = {} )
       request :post, path, params
     end
@@ -104,7 +104,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 5XX responses
+    # Raises an Elastomer::Error on 4XX and 5XX responses
     def delete( path, params = {} )
       request :delete, path, params
     end
@@ -116,10 +116,15 @@ module Elastomer
     # method - The HTTP method to send [:head, :get, :put, :post, :delete]
     # path   - The path as a String
     # params - Parameters Hash
+    #   :body   - Will be used as the request body
+    #   :accpet - One or more acceptable HTTP status codes [402, 404]
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 5XX responses
+    # Raises an Elastomer::Error on 4XX and 5XX responses
     def request( method, path, params )
+      accept = params.delete :accept
+      accept = Array(accept) unless accept.nil?
+
       body = params.delete :body
       path = expand_path path, params
 
@@ -134,7 +139,10 @@ module Elastomer
             raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
           end
 
-      return response if response.status < 500
+      return response if response.success?                            ||
+                         (accept && accept.include?(response.status)) ||
+                         (:head == method && response.status < 500)
+
       raise Elastomer::Error, response
     # ensure
     #   # FIXME: this is here until we get a real logger in place

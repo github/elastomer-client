@@ -10,31 +10,34 @@ module Elastomer
     #
     # Returns a Docs instance.
     def bulk( body = nil, params = nil )
-
       if block_given?
-
         params, body = (body || {}), nil
-
         yield bulk_obj = Bulk.new(self, params)
         bulk_obj.call
 
       else
-
         raise 'bulk request body cannot be nil' if body.nil?
         params ||= {}
 
         response = self.post '{/index}{/type}/_bulk', params.merge(:body => body)
         response.body
       end
-
     end
 
+    #
+    #
     class Bulk
 
       # The target size for bulk requests: 9.9MB
       REQUEST_SIZE = 10*1024*1024 - 100*1024
 
+      # Create a new bulk client for handling some of the details of
+      # accumulating documents to index and then formatting them properly for
+      # the bulk API command.
       #
+      # client - Elastomer::Client used for HTTP requests to the server
+      # params - Parameters Hash to pass to the Client#bulk method
+      #   :request_size - the minimum request size in bytes
       #
       def initialize( client, params = {} )
         @client  = client
@@ -83,7 +86,7 @@ module Elastomer
       #
       # Returns the merged response body Hash.
       def call
-        return @response if @actions.empty
+        return @response if @actions.empty?
 
         body = @actions.join("\n") + "\n"
         response = client.bulk(body, @params)
@@ -92,7 +95,6 @@ module Elastomer
         @current_request_size = 0
         @actions.clear
       end
-
 
       # Internal: Extract special keys for bulk indexing from the given
       # `document`. The keys and their values are returned as a Hash from this

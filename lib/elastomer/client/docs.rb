@@ -51,7 +51,15 @@ module Elastomer
       # Returns the response body as a Hash
       def index( document, params = {} )
         overrides = from_document(document)
-        response = client.put '/{index}/{type}/{id}', update_params(params, overrides)
+        params = update_params(params, overrides)
+
+        response =
+            if params.key? :id
+              client.put '/{index}/{type}/{id}', params
+            else
+              client.post '/{index}/{type}', params
+            end
+
         response.body
       end
       alias :add :index
@@ -178,7 +186,6 @@ module Elastomer
 =begin
 Multi Search
 Percolate
-Bulk
 Bulk UDP
 Count
 More Like This

@@ -36,10 +36,45 @@ describe Elastomer::Client::Docs do
   end
 
   after do
-    # @docs.delete_by_query :q => '*:*'
-    # @index.flush
-    # @index.refresh
     @index.delete if @index.exists?
+  end
+
+  it 'autogenerates IDs for documents' do
+    h = @docs.index \
+          :_type  => 'doc2',
+          :title  => 'the author of logging',
+          :author => 'pea53'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_match %r/^\S{22}$/, h['_id']
+  end
+
+  it 'uses the provided document ID' do
+    h = @docs.index \
+          :_id    => '42',
+          :_type  => 'doc2',
+          :title  => 'the author of logging',
+          :author => 'pea53'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_equal '42', h['_id']
+  end
+
+  it 'accepts JSON encoded document strings' do
+    h = @docs.index \
+          '{"author":"pea53", "title":"the author of logging"}',
+          :id   => '42',
+          :type => 'doc2'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_equal '42', h['_id']
+
+    h = @docs.index \
+          '{"author":"grantr", "title":"the author of rubber-band"}',
+          :type => 'doc2'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_match %r/^\S{22}$/, h['_id']
   end
 
   it 'gets documents from the search index' do

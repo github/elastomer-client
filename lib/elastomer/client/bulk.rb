@@ -3,38 +3,126 @@ require 'json' unless defined? ::JSON
 module Elastomer
   class Client
 
-    # Provides access to bulk API command.
+    # The `bulk` method can be used in two ways. Without a block the method
+    # will perform an API call, and it requires a bulk request body and
+    # optional request parameters.
     #
-    # body   - The bulk requst body as a String
-    # params - The document type as a String
+    # body   - Request body as a String (required if a block is _not_ given)
+    # params - Optional request parameters as a Hash
+    # block  - A Bulk instance is passed to the block and is used to
+    #          accumulate bulk operations.
     #
-    # Returns a Docs instance.
+    # Examples
+    #
+    #   bulk( request_body, :index => 'default-index' )
+    #
+    #   bulk( :index => 'default-index' ) do |b|
+    #     b.index( document1 )
+    #     b.index( document2 )
+    #     b.delete( document3 )
+    #     ...
+    #   end
+    #
+    # Returns the response body as a Hash
     def bulk( body = nil, params = nil )
-
       if block_given?
-
         params, body = (body || {}), nil
-
         yield bulk_obj = Bulk.new(self, params)
         bulk_obj.call
 
       else
-
         raise 'bulk request body cannot be nil' if body.nil?
         params ||= {}
 
         response = self.post '{/index}{/type}/_bulk', params.merge(:body => body)
         response.body
       end
-
     end
 
+    class Index
+      # Perform bulk indexing and/or delete operations. The current index name
+      # will be passed to the bulk API call as part of the request parameters.
+      #
+      # params - Parameters Hash that will be passed to the bulk API call.
+      # block  - Required block that is used to accumulate bulk API operations.
+      #          All the operations will be passed to the search cluster via a
+      #          single API request.
+      #
+      # Yields a Bulk instance for building bulk API call bodies.
+      #
+      # Examples
+      #
+      #   index.bulk do |b|
+      #     b.index( document1 )
+      #     b.index( document2 )
+      #     b.delete( document3 )
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def bulk( params = {}, &block )
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name}.merge params
+        client.bulk params, &block
+      end
+    end  # Index
+
+    class Docs
+      # Perform bulk indexing and/or delete operations. The current index name
+      # and document type will be passed to the bulk API call as part of the
+      # request parameters.
+      #
+      # params - Parameters Hash that will be passed to the bulk API call.
+      # block  - Required block that is used to accumulate bulk API operations.
+      #          All the operations will be passed to the search cluster via a
+      #          single API request.
+      #
+      # Yields a Bulk instance for building bulk API call bodies.
+      #
+      # Examples
+      #
+      #   docs.bulk do |b|
+      #     b.index( document1 )
+      #     b.index( document2 )
+      #     b.delete( document3 )
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def bulk( params = {}, &block )
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name, :type => self.type}.merge params
+        client.bulk params, &block
+      end
+    end  # Docs
+
+    # The Bulk class provides some abstractions and helper methods for working
+    # with the ElasticSearch bulk API command. Instances of the Bulk class
+    # accumulate indexing and delete operations and then issue a single bulk
+    # API request to ElasticSearch. Those operations are then executed by the
+    # cluster.
+    #
+    # A minimum request size can be set. As soon as the size of the request
+    # body hits this threshold, a bulk request will be made to the search
+    # cluster. This happens as operations are added.
+    #
+    # You can also use the `call` method explicitly to send a bulk requestion
+    # immediately.
+    #
     class Bulk
 
       # The target size for bulk requests: 9.9MB
       REQUEST_SIZE = 10*1024*1024 - 100*1024
 
+      # Create a new bulk client for handling some of the details of
+      # accumulating documents to index and then formatting them properly for
+      # the bulk API command.
       #
+      # client - Elastomer::Client used for HTTP requests to the server
+      # params - Parameters Hash to pass to the Client#bulk method
+      #   :request_size - the minimum request size in bytes
       #
       def initialize( client, params = {} )
         @client  = client
@@ -83,7 +171,7 @@ module Elastomer
       #
       # Returns the merged response body Hash.
       def call
-        return @response if @actions.empty
+        return @response if @actions.empty?
 
         body = @actions.join("\n") + "\n"
         response = client.bulk(body, @params)
@@ -92,7 +180,6 @@ module Elastomer
         @current_request_size = 0
         @actions.clear
       end
-
 
       # Internal: Extract special keys for bulk indexing from the given
       # `document`. The keys and their values are returned as a Hash from this
@@ -153,6 +240,6 @@ module Elastomer
         @response
       end
 
-    end  # Docs
+    end  # Bulk
   end  # Client
 end  # Elastomer

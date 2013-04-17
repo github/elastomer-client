@@ -82,7 +82,7 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'supports a nice block syntax' do
-    h = $client.bulk(:index => @name) do |b|
+    h = @index.bulk do |b|
       b.index :_id => 1, :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet'
       b.index :_id => 1, :_type => 'book', :author => 'John Scalzi', :title => 'Old Mans War'
     end
@@ -102,7 +102,7 @@ describe Elastomer::Client::Bulk do
     assert_equal 'John Scalzi', h['_source']['author']
 
 
-    h = $client.bulk(:index => @name) do |b|
+    h = @index.bulk do |b|
       b.index  :_id => 2, :_type => 'book', :author => 'Tolkien', :title => 'The Silmarillion'
       b.delete :_id => 1, :_type => 'book'
     end
@@ -120,7 +120,7 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'allows documents to be JSON strings' do
-    h = $client.bulk(:index => @name) do |b|
+    h = @index.bulk do |b|
       b.index '{"author":"pea53", "message":"just a test tweet"}', :_id => 1, :_type => 'tweet'
       b.index '{"author":"John Scalzi", "title":"Old Mans War"}',  :_id => 1, :_type => 'book'
     end
@@ -140,7 +140,7 @@ describe Elastomer::Client::Bulk do
     assert_equal 'John Scalzi', h['_source']['author']
 
 
-    h = $client.bulk(:index => @name) do |b|
+    h = @index.bulk do |b|
       b.index '{"author":"Tolkien", "title":"The Silmarillion"}', :_id => 2, :_type => 'book'
       b.delete :_id => 1, :_type => 'book'
     end
@@ -158,7 +158,7 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'executes a bulk API call when a request size is reached' do
-    h = $client.bulk(:index => @name, :request_size => 1024) do |b|
+    h = @index.bulk(:request_size => 1024) do |b|
       20.times { |num|
         document = {:_id => num, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number #{num}"}
         b.index document

@@ -26,7 +26,7 @@ module Elastomer
 
       @read_timeout = opts.fetch :read_timeout, 4
       @open_timeout = opts.fetch :open_timeout, 2
-      @adapter      = opts.fetch :adapter, :net_http_persistent
+      @adapter      = opts.fetch :adapter, :excon
     end
 
     # Returns true if the server is available; returns false otherwise.

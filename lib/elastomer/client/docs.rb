@@ -193,6 +193,32 @@ Validate
 Explain
 =end
 
+
+      # Create a new Scan instance for scrolling all results from a `query`.
+      # The Scan will be scoped to the current index and document type.
+      #
+      # query  - The query to scan as a Hash or a JSON encoded String
+      # opts   - Options Hash
+      #   :index  - the name of the index to search
+      #   :type   - the document type to search
+      #   :scroll - the keep alive time of the scrolling request (5 minutes by default)
+      #   :size   - the number of documents per shard to fetch per scroll
+      #
+      # Examples
+      #
+      #   scan = docs.scan('{"query":{"match_all":{}}}')
+      #   scan.each_document do |document|
+      #     document['_id']
+      #     document['_source']
+      #   end
+      #
+      # Returns a new Scan instance
+      def scan( query, opts = {} )
+        opts = {:index => name, :type => type}.merge opts
+        client.scan query, opts
+      end
+
+
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document
       # will be returned as the value of the :body key.

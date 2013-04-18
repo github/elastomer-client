@@ -36,7 +36,7 @@ describe Elastomer::Client::Scan do
   end
 
   it 'scans over all documents in an index' do
-    scan = @index.scan '{"query":{"match_all":{}}}'
+    scan = @index.scan '{"query":{"match_all":{}}}', :size => 10
 
     counts = {'tweet' => 0, 'book' => 0}
     scan.each_document { |h| counts[h['_type']] += 1 }

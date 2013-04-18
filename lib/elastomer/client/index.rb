@@ -199,6 +199,31 @@ module Elastomer
   Clear Cache
 =end
 
+      # Create a new Scan instance for scrolling all results from a `query`.
+      # The Scan will be scoped to the current index.
+      #
+      # query  - The query to scan as a Hash or a JSON encoded String
+      # opts   - Options Hash
+      #   :index  - the name of the index to search
+      #   :type   - the document type to search
+      #   :scroll - the keep alive time of the scrolling request (5 minutes by default)
+      #   :size   - the number of documents per shard to fetch per scroll
+      #
+      # Examples
+      #
+      #   scan = index.scan('{"query":{"match_all":{}}}')
+      #   scan.each_document do |document|
+      #     document['_id']
+      #     document['_source']
+      #   end
+      #
+      # Returns a new Scan instance
+      def scan( query, opts = {} )
+        opts = {:index => name}.merge opts
+        client.scan query, opts
+      end
+
+
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.
       #

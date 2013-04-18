@@ -199,6 +199,16 @@ module Elastomer
   Clear Cache
 =end
 
+      # Provides access to document-level API commands. These commands will be
+      # scoped to this index and the give `type`, if any.
+      #
+      # type - The document type as a String
+      #
+      # Returns a Docs instance.
+      def docs( type = nil )
+        client.docs name, type
+      end
+
       # Create a new Scan instance for scrolling all results from a `query`.
       # The Scan will be scoped to the current index.
       #

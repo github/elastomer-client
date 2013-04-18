@@ -12,17 +12,6 @@ module Elastomer
       Docs.new self, name, type
     end
 
-    class Index
-      # Provides access to document-level API commands.
-      #
-      # type - The document type as a String
-      #
-      # Returns a Docs instance.
-      def docs( type = nil )
-        client.docs name, type
-      end
-    end
-
 
     class Docs
       # Create a new document client for making API requests that pertain to

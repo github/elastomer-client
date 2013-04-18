@@ -3,13 +3,29 @@ require 'json' unless defined? ::JSON
 module Elastomer
   class Client
 
+    # Create a new Scan instance for scrolling all results from a `query`.
+    #
+    # query  - The query to scan as a Hash or a JSON encoded String
+    # opts   - Options Hash
+    #   :index  - the name of the index to search
+    #   :type   - the document type to search
+    #   :scroll - the keep alive time of the scrolling request (5 minutes by default)
+    #   :size   - the number of documents per shard to fetch per scroll
+    #
+    # Examples
+    #
+    #   scan = client.scan('{"query":{"match_all":{}}}', :index => 'test')
+    #   scan.each_document do |document|
+    #     document['_id']
+    #     document['_source']
+    #   end
+    #
+    # Returns a new Scan instance
     def scan( query, opts = {} )
       Scan.new self, query, opts
     end
 
     class Index
-      #
-      #
       def scan( query, opts = {} )
         opts = {:index => name}.merge opts
         client.scan query, opts
@@ -17,8 +33,6 @@ module Elastomer
     end
 
     class Docs
-      #
-      #
       def scan( query, opts = {} )
         opts = {:index => name, :type => type}.merge opts
         client.scan query, opts

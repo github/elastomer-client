@@ -25,23 +25,32 @@ module Elastomer
       Scan.new self, query, opts
     end
 
-    class Index
-      def scan( query, opts = {} )
-        opts = {:index => name}.merge opts
-        client.scan query, opts
-      end
+    # Continue scrolling a scan query.
+    # See http://www.elasticsearch.org/guide/reference/api/search/scroll/
+    #
+    # scroll_id - The current scroll ID as a String
+    # scroll    - The keep alive time of the scrolling request (5 minutes by default)
+    #
+    # Examples
+    #
+    #   scroll_id = client.scan('{"query":{"match_all":{}}}', :index => 'test').scroll_id
+    #
+    #   h = client.scroll scroll_id   # scroll to get the next set of results
+    #   scroll_id = h['_scroll_id']   # and store the scroll_id to use later
+    #
+    #   h = client.scroll scroll_id   # scroll again to get the next set of results
+    #   scroll_id = h['_scroll_id']   # and store the scroll_id to use later
+    #
+    #   # repeat until the results are empty
+    #
+    # Returns the response body as a Hash.
+    def scroll( scroll_id, scroll = '5m' )
+      response = get '/_search/scroll', :scroll_id => scroll_id, :scroll => scroll
+      response.body
     end
-
-    class Docs
-      def scan( query, opts = {} )
-        opts = {:index => name, :type => type}.merge opts
-        client.scan query, opts
-      end
-    end  # Docs
 
 
     class Scan
-
       # Create a new scan client that can be used to iterate over all the
       # documents returned by the `query`.
       #
@@ -83,7 +92,7 @@ module Elastomer
       # block  - The block will be called for each set of matching documents
       #          returned from executing the scan query.
       #
-      # Yields a hits Hash containting the 'total' number of hits, current
+      # Yields a hits Hash containing the 'total' number of hits, current
       # 'offset' into that total, and the Array of 'hits' document Hashes.
       #
       # Examples
@@ -97,10 +106,10 @@ module Elastomer
       # Returns this Scan instance.
       def each
         loop do
-          response = client.get '/_search/scroll', :scroll => scroll, :body => scroll_id
-          @scroll_id = response.body['_scroll_id']
+          body = client.scroll scroll_id, scroll
+          @scroll_id = body['_scroll_id']
 
-          hits = response.body['hits']
+          hits = body['hits']
           break if hits['hits'].empty?
 
           hits['offset'] = @offset

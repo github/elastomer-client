@@ -3,9 +3,10 @@
 # and, subsequently, searching those documents.
 #
 module Elastomer
-  extend self
+
+  # Parent class for all Elastomer errors.
+  Error = Class.new StandardError
+
 end  # Elastomer
 
-require 'elastomer/client'
-require 'elastomer/error'
-require 'elastomer/version'
+require File.expand_path('../elastomer/version', __FILE__) unless defined? Elastomer::VERSION

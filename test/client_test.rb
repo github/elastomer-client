@@ -14,7 +14,7 @@ describe Elastomer::Client do
   it 'raises an error on 4XX responses' do
     begin
       $client.get '/_cluster/foo'
-    rescue Elastomer::Error => err
+    rescue Elastomer::Client::Error => err
       assert_equal 400, err.status
       assert_equal 'No handler found for uri [/_cluster/foo] and method [GET]', err.message
     end

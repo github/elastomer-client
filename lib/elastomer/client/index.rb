@@ -199,6 +199,68 @@ module Elastomer
   Clear Cache
 =end
 
+      # Provides access to document-level API commands. These commands will be
+      # scoped to this index and the give `type`, if any.
+      #
+      # type - The document type as a String
+      #
+      # Returns a Docs instance.
+      def docs( type = nil )
+        client.docs name, type
+      end
+
+      # Perform bulk indexing and/or delete operations. The current index name
+      # will be passed to the bulk API call as part of the request parameters.
+      #
+      # params - Parameters Hash that will be passed to the bulk API call.
+      # block  - Required block that is used to accumulate bulk API operations.
+      #          All the operations will be passed to the search cluster via a
+      #          single API request.
+      #
+      # Yields a Bulk instance for building bulk API call bodies.
+      #
+      # Examples
+      #
+      #   index.bulk do |b|
+      #     b.index( document1 )
+      #     b.index( document2 )
+      #     b.delete( document3 )
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def bulk( params = {}, &block )
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name}.merge params
+        client.bulk params, &block
+      end
+
+      # Create a new Scan instance for scrolling all results from a `query`.
+      # The Scan will be scoped to the current index.
+      #
+      # query  - The query to scan as a Hash or a JSON encoded String
+      # opts   - Options Hash
+      #   :index  - the name of the index to search
+      #   :type   - the document type to search
+      #   :scroll - the keep alive time of the scrolling request (5 minutes by default)
+      #   :size   - the number of documents per shard to fetch per scroll
+      #
+      # Examples
+      #
+      #   scan = index.scan('{"query":{"match_all":{}}}')
+      #   scan.each_document do |document|
+      #     document['_id']
+      #     document['_source']
+      #   end
+      #
+      # Returns a new Scan instance
+      def scan( query, opts = {} )
+        opts = {:index => name}.merge opts
+        client.scan query, opts
+      end
+
+
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.
       #

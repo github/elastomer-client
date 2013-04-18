@@ -27,6 +27,7 @@ API endpoints dealing with cluster level information and settings are found in
 the [Cluster](lib/elastomer/client/cluster.rb) class.
 
 ```ruby
+require 'elastomer/client'
 client = Elastomer::Client.new
 
 # the current health summary
@@ -47,6 +48,7 @@ and adjusting settings. The actual indexing and search of documents are
 handled by the Docs class (discussed next).
 
 ```ruby
+require 'elastomer/client'
 client = Elastomer::Client.new
 
 index = client.index('twitter')
@@ -79,6 +81,7 @@ of documents. Each instance is scoped to an index and optionally a document
 type.
 
 ```ruby
+require 'elastomer/client'
 client = Elastomer::Client.new
 
 docs = client.docs('twitter')

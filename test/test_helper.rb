@@ -6,7 +6,7 @@ require 'minitest/autorun'
 
 # push the lib folder onto the load path
 $LOAD_PATH.unshift 'lib'
-require 'elastomer'
+require 'elastomer/client'
 
 # we are going to use the same client instance everywhere!
 # the client should always be stateless

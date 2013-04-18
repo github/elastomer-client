@@ -12,17 +12,6 @@ module Elastomer
       Docs.new self, name, type
     end
 
-    class Index
-      # Provides access to document-level API commands.
-      #
-      # type - The document type as a String
-      #
-      # Returns a Docs instance.
-      def docs( type = nil )
-        client.docs name, type
-      end
-    end
-
 
     class Docs
       # Create a new document client for making API requests that pertain to
@@ -192,6 +181,59 @@ More Like This
 Validate
 Explain
 =end
+
+      # Perform bulk indexing and/or delete operations. The current index name
+      # and document type will be passed to the bulk API call as part of the
+      # request parameters.
+      #
+      # params - Parameters Hash that will be passed to the bulk API call.
+      # block  - Required block that is used to accumulate bulk API operations.
+      #          All the operations will be passed to the search cluster via a
+      #          single API request.
+      #
+      # Yields a Bulk instance for building bulk API call bodies.
+      #
+      # Examples
+      #
+      #   docs.bulk do |b|
+      #     b.index( document1 )
+      #     b.index( document2 )
+      #     b.delete( document3 )
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def bulk( params = {}, &block )
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name, :type => self.type}.merge params
+        client.bulk params, &block
+      end
+
+      # Create a new Scan instance for scrolling all results from a `query`.
+      # The Scan will be scoped to the current index and document type.
+      #
+      # query  - The query to scan as a Hash or a JSON encoded String
+      # opts   - Options Hash
+      #   :index  - the name of the index to search
+      #   :type   - the document type to search
+      #   :scroll - the keep alive time of the scrolling request (5 minutes by default)
+      #   :size   - the number of documents per shard to fetch per scroll
+      #
+      # Examples
+      #
+      #   scan = docs.scan('{"query":{"match_all":{}}}')
+      #   scan.each_document do |document|
+      #     document['_id']
+      #     document['_source']
+      #   end
+      #
+      # Returns a new Scan instance
+      def scan( query, opts = {} )
+        opts = {:index => name, :type => type}.merge opts
+        client.scan query, opts
+      end
+
 
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document

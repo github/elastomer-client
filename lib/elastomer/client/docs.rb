@@ -19,7 +19,7 @@ module Elastomer
       #
       # Returns a Docs instance.
       def docs( type = nil )
-        Docs.new client, name, type
+        client.docs name, type
       end
     end
 

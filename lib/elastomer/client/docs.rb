@@ -193,8 +193,16 @@ Validate
 Explain
 =end
 
+      # Internal: Given a `document` generate an options hash that will
+      # override parameters based on the content of the document. The document
+      # will be returned as the value of the :body key.
       #
+      # We only extract information from the document if it is given as a
+      # Hash. We do not parse JSON encoded Strings.
       #
+      # document - A document Hash or JSON encoded String.
+      #
+      # Returns an options Hash extracted from the document.
       def from_document( document )
         opts = {:body => document}
 

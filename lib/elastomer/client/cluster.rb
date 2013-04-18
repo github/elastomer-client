@@ -60,7 +60,7 @@ module Elastomer
       #
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-update-settings/
       #
-      # body   - The new settings as a Hash
+      # body   - The new settings as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
       # Returns the response as a Hash

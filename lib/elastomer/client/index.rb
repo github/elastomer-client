@@ -46,7 +46,7 @@ module Elastomer
       # Create the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-create-index/
       #
-      # body   - The index settings and mappings as a Hash
+      # body   - The index settings and mappings as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
@@ -94,7 +94,7 @@ module Elastomer
       # Change specific index level settings in real time.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-update-settings/
       #
-      # body   - The index settings as a Hash
+      # body   - The index settings as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
@@ -120,7 +120,7 @@ module Elastomer
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-put-mapping/
       #
       # type   - Name of the mapping to update as a String
-      # body   - The mapping values to update
+      # body   - The mapping values to update as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
       # Returns the response body as a Hash

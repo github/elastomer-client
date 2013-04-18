@@ -43,7 +43,7 @@ module Elastomer
       # Create the template on the cluster.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
       #
-      # template - The template as a Hash
+      # template - The template as a Hash or a JSON encoded String
       # params   - Parameters Hash
       #
       # Returns the response body as a Hash

@@ -182,6 +182,33 @@ Validate
 Explain
 =end
 
+      # Perform bulk indexing and/or delete operations. The current index name
+      # and document type will be passed to the bulk API call as part of the
+      # request parameters.
+      #
+      # params - Parameters Hash that will be passed to the bulk API call.
+      # block  - Required block that is used to accumulate bulk API operations.
+      #          All the operations will be passed to the search cluster via a
+      #          single API request.
+      #
+      # Yields a Bulk instance for building bulk API call bodies.
+      #
+      # Examples
+      #
+      #   docs.bulk do |b|
+      #     b.index( document1 )
+      #     b.index( document2 )
+      #     b.delete( document3 )
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def bulk( params = {}, &block )
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name, :type => self.type}.merge params
+        client.bulk params, &block
+      end
 
       # Create a new Scan instance for scrolling all results from a `query`.
       # The Scan will be scoped to the current index and document type.

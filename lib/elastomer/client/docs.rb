@@ -45,15 +45,21 @@ module Elastomer
       # Adds or updates a document in the index, making it searchable.
       # See http://www.elasticsearch.org/guide/reference/api/index_/
       #
-      # document - The document (as a Hash) to add to the index
+      # document - The document (as a Hash or JSON encoded String) to add to the index
       # params   - Parameters Hash
       #
       # Returns the response body as a Hash
       def index( document, params = {} )
         overrides = from_document(document)
-        overrides[:body] = document
+        params = update_params(params, overrides)
 
-        response = client.put '/{index}/{type}/{id}', update_params(params, overrides)
+        response =
+            if params.key? :id
+              client.put '/{index}/{type}/{id}', params
+            else
+              client.post '/{index}/{type}', params
+            end
+
         response.body
       end
       alias :add :index
@@ -93,8 +99,6 @@ module Elastomer
       # Returns the response body as a Hash
       def multi_get( docs, params = {} )
         overrides = from_document(docs)
-        overrides[:body] = docs
-
         response = client.get '{/index}{/type}{/id}/_mget', update_params(params, overrides)
         response.body
       end
@@ -108,8 +112,6 @@ module Elastomer
       # Returns the response body as a Hash
       def update( script, params = {} )
         overrides = from_document(script)
-        overrides[:body] = script
-
         response = client.put '/{index}/{type}/{id}/_update', update_params(params, overrides)
         response.body
       end
@@ -184,7 +186,6 @@ module Elastomer
 =begin
 Multi Search
 Percolate
-Bulk
 Bulk UDP
 Count
 More Like This
@@ -195,13 +196,15 @@ Explain
       #
       #
       def from_document( document )
-        opts = {}
+        opts = {:body => document}
 
-        %w[_id _type _routing _parent].each do |field|
-          key = field.sub(/^_/, '').to_sym
+        unless String === document
+          %w[_id _type _routing _parent].each do |field|
+            key = field.sub(/^_/, '').to_sym
 
-          opts[key] = document.delete field if document.key? field
-          opts[key] = document.delete field.to_sym if document.key? field.to_sym
+            opts[key] = document.delete field if document.key? field
+            opts[key] = document.delete field.to_sym if document.key? field.to_sym
+          end
         end
 
         opts

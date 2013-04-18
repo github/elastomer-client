@@ -2,12 +2,41 @@ require 'addressable/template'
 require 'faraday'
 require 'faraday_middleware'
 
+require File.expand_path('../../elastomer', __FILE__) unless defined? Elastomer::Error
+
 module Elastomer
 
   class Client
+    # General error response from client requests.
+    #
+    class Error < ::Elastomer::Error
+      # Construct a new Error from the given response object or a message
+      # String. If a response object is given, the error message will be
+      # extracted from the response body.
+      #
+      # response - Either a message String or a Faraday::Response
+      #
+      def initialize( response )
+        message =
+          if response.respond_to? :body
+            @response = response
+            response.body['error'] || response.body
+          else
+            response
+          end
 
-    attr_reader :host, :port, :url
-    attr_reader :read_timeout, :open_timeout
+        super(message)
+      end
+
+      attr_reader :response
+
+      # Returns the status code from the `response` or nil if the Error was not
+      # created with a response.
+      def status
+        response ? response.status : nil
+      end
+    end  # Error
+
 
     # Create a new client that can be used to make HTTP requests to the
     # ElasticSearch server.
@@ -28,6 +57,9 @@ module Elastomer
       @open_timeout = opts.fetch :open_timeout, 2
       @adapter      = opts.fetch :adapter, :excon
     end
+
+    attr_reader :host, :port, :url
+    attr_reader :read_timeout, :open_timeout
 
     # Returns true if the server is available; returns false otherwise.
     def available?
@@ -71,7 +103,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def get( path, params = {} )
       request :get, path, params
     end
@@ -82,7 +114,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def put( path, params = {} )
       request :put, path, params
     end
@@ -93,7 +125,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def post( path, params = {} )
       request :post, path, params
     end
@@ -104,7 +136,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def delete( path, params = {} )
       request :delete, path, params
     end
@@ -120,7 +152,7 @@ module Elastomer
     #   :accpet - One or more acceptable HTTP status codes [402, 404]
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Error on 4XX and 5XX responses
+    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def request( method, path, params )
       accept = params.delete :accept
       accept = Array(accept) unless accept.nil?
@@ -143,7 +175,7 @@ module Elastomer
                          (accept && accept.include?(response.status)) ||
                          (:head == method && response.status < 500)
 
-      raise Elastomer::Error, response
+      raise ::Elastomer::Client::Error, response
     # ensure
     #   # FIXME: this is here until we get a real logger in place
     #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?

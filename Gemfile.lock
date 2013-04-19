@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    elastomer (1.0.0)
+    elastomer (0.1.0)
       addressable (~> 2.3)
       excon (~> 0.20)
       faraday (~> 0.8)

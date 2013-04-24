@@ -199,6 +199,11 @@ module Elastomer
         response.body
       end
 
+      def clear_cache(params = {})
+        response = client.post '{/index}/_cache/clear', update_params(params)
+        response.body
+      end
+
       def stats(params = {})
         response = client.get '{/index}/_stats', update_params(params)
         response.body
@@ -209,11 +214,13 @@ module Elastomer
         response.body
       end
 
+      def segments(params = {})
+        response = client.get '{/index}/_segments', update_params(params)
+        response.body
+      end
 
 =begin
   Warmers
-  Segments
-  Clear Cache
 =end
 
       # Provides access to document-level API commands. These commands will be

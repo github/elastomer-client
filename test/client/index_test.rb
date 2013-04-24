@@ -178,6 +178,7 @@ describe Elastomer::Client::Index do
 
     it 'gets segments' do
       response = @index.segments
+      @index.flush
       assert_includes response["indices"], "elastomer-index-test"
     end
   end

@@ -189,31 +189,74 @@ module Elastomer
         response.body
       end
 
+      # Optimize one or more indices. Optimizing an index allows for faster
+      # search operations but can be resource intensive.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-optimize/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
       def optimize(params = {})
         response = client.post '{/index}/_optimize', update_params(params)
         response.body
       end
 
+      # Explicitly snapshot (backup) one or more indices to the gateway. By
+      # default this happens periodically (every 1 second) but the period
+      # can be changed or disabled completely.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-gateway-snapshot/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
       def snapshot(params = {})
         response = client.post '{/index}/_gateway/snapshot', update_params(params)
         response.body
       end
 
+      # Clear caches for one or more indices. Individual caches can be
+      # specified with parameters.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-clearcache/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
       def clear_cache(params = {})
         response = client.post '{/index}/_cache/clear', update_params(params)
         response.body
       end
 
+      # Retrieve statistics about one or more indices. Specific statistics
+      # can be retrieved with parameters.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-stats/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
       def stats(params = {})
         response = client.get '{/index}/_stats', update_params(params)
         response.body
       end
 
+      # Retrieve the status of one or more indices. Recovery and snapshot
+      # status can be retrieved with parameters.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-status/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
       def status(params = {})
         response = client.get '{/index}/_status', update_params(params)
         response.body
       end
 
+      # Retrieve low level Lucene segments information for shards of one
+      # or more indices.
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-segments/
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
       def segments(params = {})
         response = client.get '{/index}/_segments', update_params(params)
         response.body

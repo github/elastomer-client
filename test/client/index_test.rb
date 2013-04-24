@@ -120,4 +120,66 @@ describe Elastomer::Client::Index do
     assert_equal %w[just a few words to analyze], tokens
   end
 
+  describe "when an index exists" do
+    before do
+      @index.create(nil)
+    end
+
+    #TODO assert this only hits the desired index
+    it 'deletes' do
+      response = @index.delete
+      assert_equal true, response["ok"]
+    end
+
+    it 'opens' do
+      response = @index.open
+      assert_equal true, response["ok"]
+    end
+
+    it 'closes' do
+      response = @index.close
+      assert_equal true, response["ok"]
+    end
+
+    it 'refreshes' do
+      response = @index.refresh
+      assert_equal true, response["ok"]
+    end
+
+    it 'flushes' do
+      response = @index.flush
+      assert_equal true, response["ok"]
+    end
+
+    it 'optimizes' do
+      response = @index.optimize
+      assert_equal true, response["ok"]
+    end
+
+    it 'snapshots' do
+      response = @index.snapshot
+      assert_equal true, response["ok"]
+    end
+
+    it 'clears caches' do
+      response = @index.clear_cache
+      assert_equal true, response["ok"]
+    end
+
+    it 'gets stats' do
+      response = @index.stats
+      assert_includes response["_all"]["indices"], "elastomer-index-test"
+    end
+
+    it 'gets status' do
+      response = @index.status
+      assert_includes response["indices"], "elastomer-index-test"
+    end
+
+    it 'gets segments' do
+      @index.docs('foo').index("foo" => "bar")
+      response = @index.segments
+      assert_includes response["indices"], "elastomer-index-test"
+    end
+  end
 end

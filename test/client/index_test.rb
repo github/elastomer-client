@@ -125,6 +125,7 @@ describe Elastomer::Client::Index do
       @index.create(nil)
     end
 
+    #TODO assert this only hits the desired index
     it 'deletes' do
       response = @index.delete
       assert_equal true, response["ok"]
@@ -154,5 +155,21 @@ describe Elastomer::Client::Index do
       response = @index.optimize
       assert_equal true, response["ok"]
     end
+
+    it 'snapshots' do
+      response = @index.snapshot
+      assert_equal true, response["ok"]
+    end
+
+    it 'gets stats' do
+      response = @index.stats
+      assert_includes response["_all"]["indices"], "elastomer-index-test"
+    end
+
+    it 'gets status' do
+      response = @index.status
+      assert_includes response["indices"], "elastomer-index-test"
+    end
+
   end
 end

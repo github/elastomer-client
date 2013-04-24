@@ -199,10 +199,19 @@ module Elastomer
         response.body
       end
 
+      def stats(params = {})
+        response = client.get '{/index}/_stats', update_params(params)
+        response.body
+      end
+
+      def status(params = {})
+        response = client.get '{/index}/_status', update_params(params)
+        response.body
+      end
+
+
 =begin
   Warmers
-  Stats
-  Status
   Segments
   Clear Cache
 =end

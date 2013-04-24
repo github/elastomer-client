@@ -189,9 +189,17 @@ module Elastomer
         response.body
       end
 
+      def optimize(params = {})
+        response = client.post '{/index}/_optimize', update_params(params)
+        response.body
+      end
+
+      def snapshot(params = {})
+        response = client.post '{/index}/_gateway/snapshot', update_params(params)
+        response.body
+      end
+
 =begin
-  Optimize
-  Snapshot
   Warmers
   Stats
   Status

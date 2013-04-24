@@ -120,4 +120,39 @@ describe Elastomer::Client::Index do
     assert_equal %w[just a few words to analyze], tokens
   end
 
+  describe "when an index exists" do
+    before do
+      @index.create(nil)
+    end
+
+    it 'deletes' do
+      response = @index.delete
+      assert_equal true, response["ok"]
+    end
+
+    it 'opens' do
+      response = @index.open
+      assert_equal true, response["ok"]
+    end
+
+    it 'closes' do
+      response = @index.close
+      assert_equal true, response["ok"]
+    end
+
+    it 'refreshes' do
+      response = @index.refresh
+      assert_equal true, response["ok"]
+    end
+
+    it 'flushes' do
+      response = @index.flush
+      assert_equal true, response["ok"]
+    end
+
+    it 'optimizes' do
+      response = @index.optimize
+      assert_equal true, response["ok"]
+    end
+  end
 end

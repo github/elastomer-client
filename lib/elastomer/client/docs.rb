@@ -194,7 +194,24 @@ Bulk UDP
 More Like This
 Explain
 =end
-
+      # Validate a potentially expensive query before running it. The
+      # :explain parameter can be used to get detailed information about
+      # why a query failed.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/validate/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      # 
+      #   # request body query
+      #   validate(:query_string => {:query => "*:*"})
+      #
+      #   # same thing but using the URI query parameter
+      #   validate({:q => "post_date:foo"}, :explain => true)
+      #
+      # Returns the response body as a hash
       def validate(query, params = nil)
         query, params = extract_params(query, params)
         

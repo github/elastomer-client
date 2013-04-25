@@ -18,7 +18,12 @@ GEM
       faraday (>= 0.7.4, < 0.9)
     json (1.7.7)
     minitest (4.7.1)
+    multi_json (1.7.2)
     multipart-post (1.2.0)
+    simplecov (0.7.1)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.7.1)
+    simplecov-html (0.7.1)
 
 PLATFORMS
   ruby
@@ -27,3 +32,4 @@ DEPENDENCIES
   elastomer!
   json (~> 1.7)
   minitest (~> 4.7)
+  simplecov

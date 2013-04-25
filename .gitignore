@@ -3,3 +3,4 @@
 /.bundle
 /.rbenv-version
 /vendor/cache/*.gem
+coverage

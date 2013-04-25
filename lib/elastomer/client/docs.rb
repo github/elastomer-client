@@ -190,7 +190,6 @@ module Elastomer
 =begin
 Multi Search
 Percolate
-Bulk UDP
 More Like This
 Explain
 =end

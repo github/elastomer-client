@@ -179,6 +179,21 @@ describe Elastomer::Client::Docs do
     assert_equal true, h["valid"]
   end
 
+  it 'explains scoring' do
+    populate!
+
+    h = @docs.explain({
+      :filtered => {
+        :query => {:match_all => {}},
+        :filter => {:term => {:author => 'defunkt'}}
+      }
+    }, :type => 'doc1', :id => 2)
+    assert_equal true, h["matched"]
+
+    h = @docs.explain(:type => 'doc2', :id => 2, :q => "pea53")
+    assert_equal false, h["matched"]
+  end
+
   def populate!
     @docs.add \
       :_id    => 1,

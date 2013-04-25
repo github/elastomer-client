@@ -191,8 +191,31 @@ module Elastomer
 Multi Search
 Percolate
 More Like This
-Explain
 =end
+
+      # Compute a score explanation for a query and a specific document. This
+      # can give useful feedback about why a document matched or didn't match
+      # a query. The document :id is provided as part of the params hash.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/explain/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   explain({:query => {:term => {"message" => "search"}}}, :id => 1)
+      #
+      #   explain(:q => "message:search", :id => 1)
+      #
+      # Returns the response body as a hash
+      def explain(query, params = nil)
+        query, params = extract_params(query, params)
+
+        response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query)
+        response.body
+      end
+
       # Validate a potentially expensive query before running it. The
       # :explain parameter can be used to get detailed information about
       # why a query failed.

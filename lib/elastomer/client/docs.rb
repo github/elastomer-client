@@ -138,6 +138,39 @@ module Elastomer
         response.body
       end
 
+      # Executes a search query, but instead of returning results, returns
+      # the number of documents matched. This method supports both the
+      # "request body" query and the "URI request" query. When using the
+      # request body semantics, the query hash must contain the :query key.
+      # Otherwise we assume a URI request is being made.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/count/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   # request body query
+      #   count({:query => {:match_all => {}}}, :type => 'tweet')
+      #
+      #   # same thing but using the URI request method
+      #   count(:q => '*:*', :type => 'tweet')
+      #
+      # Returns the response body as a Hash
+      def count(query, params = nil)
+        if params.nil?
+          if query.key? :query
+            params = {}
+          else
+            params, query = query, nil
+          end
+        end
+
+        response = client.get '/{index}{/type}/_count', update_params(params, :body => query)
+        response.body
+      end
+
       # Delete documents from one or more indices and one or more types based
       # on a query. This method supports both the "request body" query and the
       # "URI request" query. When using the request body semantics, the query

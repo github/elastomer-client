@@ -143,6 +143,27 @@ describe Elastomer::Client::Docs do
     assert_equal 'the author of resque', hit['_source']['title']
   end
 
+  it 'counts documents' do
+    h = @docs.count :q => '*:*'
+    assert_equal 0, h['count']
+
+    populate!
+
+    h = @docs.count :q => '*:*'
+    assert_equal 4, h['count']
+
+    h = @docs.count :q => '*:*', :type => 'doc1'
+    assert_equal 2, h['count']
+
+    h = @docs.count({
+      :filtered => {
+        :query => {:match_all => {}},
+        :filter => {:term => {:author => 'defunkt'}}
+      }
+    }, :type => %w[doc1 doc2] )
+    assert_equal 1, h['count']
+  end
+
   def populate!
     @docs.add \
       :_id    => 1,

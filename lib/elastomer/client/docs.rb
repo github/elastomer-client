@@ -146,7 +146,7 @@ module Elastomer
       # Examples
       #
       #   # request body query
-      #   count({:query => {:match_all => {}}}, :type => 'tweet')
+      #   count({:match_all => {}}, :type => 'tweet')
       #
       #   # same thing but using the URI request method
       #   count(:q => '*:*', :type => 'tweet')

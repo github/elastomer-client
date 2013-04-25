@@ -126,13 +126,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def search( query, params = nil )
-        if params.nil?
-          if query.key? :query
-            params = {}
-          else
-            params, query = query, nil
-          end
-        end
+        query, params = extract_params(query, params)
 
         response = client.get '/{index}{/type}/_search', update_params(params, :body => query)
         response.body
@@ -159,13 +153,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def count(query, params = nil)
-        if params.nil?
-          if query.key? :query
-            params = {}
-          else
-            params, query = query, nil
-          end
-        end
+        query, params = extract_params(query, params)
 
         response = client.get '/{index}{/type}/_count', update_params(params, :body => query)
         response.body
@@ -192,13 +180,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def delete_by_query( query, params = nil )
-        if params.nil?
-          if query.key? :query
-            params = {}
-          else
-            params, query = query, nil
-          end
-        end
+        query, params = extract_params(query, params)
 
         response = client.delete '/{index}{/type}/_query', update_params(params, :body => query)
         response.body
@@ -310,6 +292,25 @@ Explain
       def defaults
         { :index => name, :type => type }
       end
+
+      # Internal: Allow params to be passed as the first argument to
+      # methods that take both an optional query hash and params.
+      #
+      # query  - query hash OR params hash
+      # params - params hash OR nil if no query
+      #
+      # Returns an array of the query (possibly nil) and params Hash.
+      def extract_params(query, params)
+        if params.nil?
+          if query.key? :query
+            params = {}
+          else
+            params, query = query, nil
+          end
+        end
+        [query, params]
+      end
+
     end  # Docs
   end  # Client
 end  # Elastomer

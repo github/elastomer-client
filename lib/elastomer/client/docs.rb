@@ -119,10 +119,10 @@ module Elastomer
       # Examples
       #
       #   # request body query
-      #   search({:query => {:match_all => {}}}, :type => 'tweet', :search_type => 'count')
+      #   search({:query => {:match_all => {}}}, :type => 'tweet')
       #
       #   # same thing but using the URI request method
-      #   search(:q => '*:*', :type => 'tweet', :search_type => 'count')
+      #   search(:q => '*:*', :type => 'tweet')
       #
       # Returns the response body as a hash
       def search( query, params = nil )

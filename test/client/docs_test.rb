@@ -164,6 +164,21 @@ describe Elastomer::Client::Docs do
     assert_equal 1, h['count']
   end
 
+  it 'validates queries' do
+    populate!
+
+    h = @docs.validate :q => '*:*'
+    assert_equal true, h["valid"]
+
+    h = @docs.validate({
+      :filtered => {
+        :query => {:match_all => {}},
+        :filter => {:term => {:author => 'defunkt'}}
+      }
+    }, :type => %w[doc1 doc2] )
+    assert_equal true, h["valid"]
+  end
+
   def populate!
     @docs.add \
       :_id    => 1,

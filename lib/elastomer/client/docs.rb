@@ -191,11 +191,16 @@ module Elastomer
 Multi Search
 Percolate
 Bulk UDP
-Count
 More Like This
-Validate
 Explain
 =end
+
+      def validate(query, params = nil)
+        query, params = extract_params(query, params)
+        
+        response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query)
+        response.body
+      end
 
       # Perform bulk indexing and/or delete operations. The current index name
       # and document type will be passed to the bulk API call as part of the

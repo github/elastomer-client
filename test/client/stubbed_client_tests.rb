@@ -15,18 +15,18 @@ describe 'stubbed client tests' do
 
       commands = { :move => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }}
       h = @client.cluster.reroute commands, :dry_run => true
-      assert h['ok']
+      assert_equal true, h['ok']
     end
 
-    it 'performas a shutdown of the cluster' do
+    it 'performs a shutdown of the cluster' do
       @stubs.post('/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"ok" : true}'] }
       h = @client.cluster.shutdown
-      assert h['ok']
+      assert_equal true, h['ok']
     end
   end
 
   describe Elastomer::Client::Nodes do
-    it 'performas a shutdown of the node(s)' do
+    it 'performs a shutdown of the node(s)' do
       @stubs.post('/_cluster/nodes/_shutdown')       { [200, {'Content-Type' => 'application/json'}, '{"ok":true}'] }
       @stubs.post('/_cluster/nodes/node1/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"ok":"node1"}'] }
 

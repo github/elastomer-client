@@ -36,7 +36,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get '_template/{template}', update_params(params)
+        response = client.get '/_template/{template}', update_params(params, :action => 'template.get')
         response.body
       end
 
@@ -48,7 +48,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create( template, params = {} )
-        response = client.put '_template/{template}', update_params(params, :body => template)
+        response = client.put '/_template/{template}', update_params(params, :body => template, :action => 'tempate.create')
         response.body
       end
 
@@ -59,7 +59,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete '_template/{template}', update_params(params)
+        response = client.delete '/_template/{template}', update_params(params, :action => 'template.delete')
         response.body
       end
 

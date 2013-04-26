@@ -65,7 +65,7 @@ module Elastomer
 
     # Returns true if the server is available; returns false otherwise.
     def available?
-      response = head '/'
+      response = head '/', :action => 'cluster.available'
       response.success?
     rescue StandardError
       false
@@ -79,8 +79,6 @@ module Elastomer
       @connection ||= Faraday.new(url) do |conn|
         conn.request  :json
         conn.response :json, :content_type => /\bjson$/i
-
-        conn.use :instrumentation
 
         Array === @adapter ?
           conn.adapter(*@adapter) :
@@ -164,16 +162,17 @@ module Elastomer
       body = params.delete :body
       path = expand_path path, params
 
-      response =
-          case method
-          when :head;   connection.head(path)
-          when :get;    connection.get(path) { |req| req.body = body if body }
-          when :put;    connection.put(path, body)
-          when :post;   connection.post(path, body)
-          when :delete; connection.delete(path) { |req| req.body = body if body }
-          else
-            raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
-          end
+      response = instrument(path, params) do
+        case method
+        when :head;   connection.head(path)
+        when :get;    connection.get(path) { |req| req.body = body if body }
+        when :put;    connection.put(path, body)
+        when :post;   connection.post(path, body)
+        when :delete; connection.delete(path) { |req| req.body = body if body }
+        else
+          raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
+        end
+      end
 
       return response if response.success?                            ||
                          (accept && accept.include?(response.status)) ||
@@ -207,13 +206,53 @@ module Elastomer
       template = Addressable::Template.new path
 
       expansions = {}
+      query_values = params.dup
+      query_values.delete :action
+
       template.keys.map(&:to_sym).each do |key|
-        expansions[key] = params.delete(key) if params.key? key
+        expansions[key] = query_values.delete(key) if query_values.key? key
       end
 
       uri = template.expand(expansions)
-      uri.query_values = params unless params.empty?
+      uri.query_values = query_values unless query_values.empty?
       uri.to_s
+    end
+
+    # Internal:
+    #
+    # path   - The full request path as a String
+    # params - The request params Hash
+    #
+    # Returns the response from the block
+    def instrument( path, params )
+      action = params[:action]
+
+      if action.nil?
+        ary = []
+        m = /^([^?]*)/.match path
+        m[1].split('?').first.split('/').each do |str|
+          if str =~ /^_(.*)$/
+            ary.clear
+            ary << $1
+          else
+            ary << str
+          end
+        end
+        action = ary.join '.' unless ary.empty?
+      end
+
+      payload = {
+        :index  => params[:index],
+        :type   => params[:type],
+        :url    => "#{@url}#{path}",
+        :action => action
+      }
+
+      ActiveSupport::Notifications.instrument('request.client.elastomer', payload) do
+        response = yield
+        payload[:status] = response.status
+        response
+      end
     end
 
   end  # Client

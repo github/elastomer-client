@@ -28,7 +28,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def health( params = {} )
-        response = client.get '/_cluster/health{/index}', params
+        response = client.get '/_cluster/health{/index}', params.merge(:action => 'cluster.health')
         response.body
       end
 

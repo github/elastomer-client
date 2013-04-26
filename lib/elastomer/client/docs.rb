@@ -41,6 +41,7 @@ module Elastomer
       def index( document, params = {} )
         overrides = from_document(document)
         params = update_params(params, overrides)
+        params[:action] = 'document.index'
 
         response =
             if params.key? :id
@@ -62,7 +63,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete '/{index}/{type}/{id}', update_params(params)
+        response = client.delete '/{index}/{type}/{id}', update_params(params, :action => 'document.delete')
         response.body
       end
 
@@ -75,7 +76,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get '/{index}/{type}/{id}', update_params(params, :accept => 404)
+        response = client.get '/{index}/{type}/{id}', update_params(params, :accept => 404, :action => 'document.get')
         response.body
       end
 

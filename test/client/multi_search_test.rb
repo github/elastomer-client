@@ -71,9 +71,9 @@ describe Elastomer::Client::MultiSearch do
   it 'supports a nice block syntax' do
     populate!
 
-    h = $client.multi_search do |b|
-      b.search({:query => { :match_all => {}}}, :index => @name, :search_type => :count)
-      b.search({:query => { :field => { "title" => "author" }}}, :index => @name, :type => 'doc2')
+    h = $client.multi_search do |m|
+      m.search({:query => { :match_all => {}}}, :index => @name, :search_type => :count)
+      m.search({:query => { :field => { "title" => "author" }}}, :index => @name, :type => 'doc2')
     end
 
     response1, response2 = h["responses"]
@@ -81,9 +81,9 @@ describe Elastomer::Client::MultiSearch do
     assert_equal 4, response1["hits"]["total"]
     assert_equal 2, response2["hits"]["total"]
 
-    h = @index.multi_search do |b|
-      b.search({:query => { :match_all => {}}}, :search_type => :count)
-      b.search({:query => { :field => { "title" => "author" }}}, :type => 'doc2')
+    h = @index.multi_search do |m|
+      m.search({:query => { :match_all => {}}}, :search_type => :count)
+      m.search({:query => { :field => { "title" => "author" }}}, :type => 'doc2')
     end
 
     response1, response2 = h["responses"]
@@ -91,9 +91,9 @@ describe Elastomer::Client::MultiSearch do
     assert_equal 4, response1["hits"]["total"]
     assert_equal 2, response2["hits"]["total"]
 
-    h = @index.docs('doc1').multi_search do |b|
-      b.search({:query => { :match_all => {}}}, :search_type => :count)
-      b.search({:query => { :field => { "title" => "logging" }}}, :type => 'doc2')
+    h = @index.docs('doc1').multi_search do |m|
+      m.search({:query => { :match_all => {}}}, :search_type => :count)
+      m.search({:query => { :field => { "title" => "logging" }}}, :type => 'doc2')
     end
 
     response1, response2 = h["responses"]

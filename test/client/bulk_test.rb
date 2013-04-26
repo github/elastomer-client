@@ -39,14 +39,14 @@ describe Elastomer::Client::Bulk do
 
   it 'performs bulk index actions' do
     body = [
-      '{"index" : {"_id":"1", "_type":"tweet"}}',
+      '{"index" : {"_id":"1", "_type":"tweet", "_index":"elastomer-bulk-test"}}',
       '{"author":"pea53", "message":"just a test tweet"}',
-      '{"index" : {"_id":"1", "_type":"book"}}',
+      '{"index" : {"_id":"1", "_type":"book", "_index":"elastomer-bulk-test"}}',
       '{"author":"John Scalzi", "title":"Old Mans War"}',
       nil
     ]
     body = body.join "\n"
-    h = $client.bulk body, :index => @name
+    h = $client.bulk body
 
     ok = h['items'].map {|a| a['index']['ok']}
     assert_equal [true, true], ok

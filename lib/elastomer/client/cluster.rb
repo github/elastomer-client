@@ -152,7 +152,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get '{/index}/_aliases', params
+        response = client.get '{/index}/_aliases', params.merge(:action => 'aliases.get')
         response.body
       end
 

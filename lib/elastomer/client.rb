@@ -222,6 +222,7 @@ module Elastomer
     #
     # path   - The full request path as a String
     # params - The request params Hash
+    # block  - The block that will be instrumented
     #
     # Returns the response from the block
     def instrument( path, params )
@@ -250,6 +251,7 @@ module Elastomer
 
       ActiveSupport::Notifications.instrument('request.client.elastomer', payload) do
         response = yield
+        payload[:method] = response.env[:method]
         payload[:status] = response.status
         response
       end

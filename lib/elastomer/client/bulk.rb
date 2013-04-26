@@ -11,8 +11,8 @@ module Elastomer
     #
     # body   - Request body as a String (required if a block is _not_ given)
     # params - Optional request parameters as a Hash
-    # block  - A Bulk instance is passed to the block and is used to
-    #          accumulate bulk operations.
+    # block  - Passed to a Bulk instance which assembles the operations
+    #          into one or more bulk requests.
     #
     # Examples
     #

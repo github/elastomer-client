@@ -317,6 +317,30 @@ Percolate
         client.scan query, opts
       end
 
+      # Execute an array of searches in bulk. Results are returned in an
+      # array in the order the queries were sent. The current index name
+      # and document type will be passed to the multi_search API call as
+      # part of the request parameters.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/multi-search/
+      #
+      # params - Parameters Hash that will be passed to the API call.
+      # block  - Required block that is used to accumulate searches.
+      #          All the operations will be passed to the search cluster
+      #          via a single API request.
+      #
+      # Yields a MultiSearch instance for building multi_search API call
+      # bodies.
+      #
+      # Examples
+      #
+      #   docs.multi_search do |m|
+      #     m.search({:query => {:match_all => {}}, :search_type => :count)
+      #     m.search({:query => {:field => {"foo" => "bar"}}})
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
       def multi_search(params = {}, &block)
         raise 'a block is required' if block.nil?
 

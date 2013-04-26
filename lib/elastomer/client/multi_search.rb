@@ -1,19 +1,34 @@
 module Elastomer
   class Client
 
-    # Executes an array of searches in bulk and returns the results in
-    # an array.
+    # Execute an array of searches in bulk. Results are returned in an
+    # array in the order the queries were sent.
+    #
+    # The `multi_search` method can be used in two ways. Without a block
+    # the method will perform an API call, and it requires a bulk request
+    # body and optional request parameters.
     #
     # See http://www.elasticsearch.org/guide/reference/api/multi-search/
+    #
+    # body   - Request body as a String (required if a block is not given)
+    # params - Optional request parameters as a Hash
+    # block  - Passed to a MultiSearch instance which assembles the searches
+    #          into a single request.
     #
     # Examples
     #
     #   # index and type in request body
     #   multi_search(request_body)
     #
-    #  # index in URI
-    #  multi_search(request_body, :index => 'default-index')
+    #   # index in URI
+    #   multi_search(request_body, :index => 'default-index')
     #
+    #   # block form
+    #   multi_search(:index => 'default-index') do |m|
+    #     m.search({:query => {:match_all => {}}, :search_type => :count)
+    #     m.search({:query => {:field => {"foo" => "bar"}}}, :type => 'default-type')
+    #     ...
+    #   end
     #
     # Returns the response body as a Hash
     def multi_search(body = nil, params = nil)

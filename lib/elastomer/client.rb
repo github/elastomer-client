@@ -1,8 +1,6 @@
-require 'active_support/notifications'
 require 'addressable/template'
 require 'faraday'
 require 'faraday_middleware'
-require 'securerandom'
 
 require File.expand_path('../../elastomer', __FILE__) unless defined? Elastomer::Error
 
@@ -218,7 +216,8 @@ module Elastomer
       uri.to_s
     end
 
-    # Internal:
+    # Internal: A noop method that simply yields to the block. This method
+    # will be repalced when the 'elastomer/notifications' module is included.
     #
     # path   - The full request path as a String
     # params - The request params Hash
@@ -226,35 +225,7 @@ module Elastomer
     #
     # Returns the response from the block
     def instrument( path, params )
-      action = params[:action]
-
-      if action.nil?
-        ary = []
-        m = /^([^?]*)/.match path
-        m[1].split('?').first.split('/').each do |str|
-          if str =~ /^_(.*)$/
-            ary.clear
-            ary << $1
-          else
-            ary << str
-          end
-        end
-        action = ary.join '.' unless ary.empty?
-      end
-
-      payload = {
-        :index  => params[:index],
-        :type   => params[:type],
-        :url    => "#{@url}#{path}",
-        :action => action
-      }
-
-      ActiveSupport::Notifications.instrument('request.client.elastomer', payload) do
-        response = yield
-        payload[:method] = response.env[:method]
-        payload[:status] = response.status
-        response
-      end
+      yield
     end
 
   end  # Client

@@ -44,7 +44,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get '/_nodes{/node_id}/stats', update_params(params, :aciton => 'nodes.stats')
+        response = client.get '/_nodes{/node_id}/stats', update_params(params, :action => 'nodes.stats')
         response.body
       end
 

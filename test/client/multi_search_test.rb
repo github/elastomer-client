@@ -77,9 +77,29 @@ describe Elastomer::Client::MultiSearch do
     end
 
     response1, response2 = h["responses"]
-    
+
     assert_equal 4, response1["hits"]["total"]
     assert_equal 2, response2["hits"]["total"]
+
+    h = @index.multi_search do |b|
+      b.search({:query => { :match_all => {}}}, :search_type => :count)
+      b.search({:query => { :field => { "title" => "author" }}}, :type => 'doc2')
+    end
+
+    response1, response2 = h["responses"]
+
+    assert_equal 4, response1["hits"]["total"]
+    assert_equal 2, response2["hits"]["total"]
+
+    h = @index.docs('doc1').multi_search do |b|
+      b.search({:query => { :match_all => {}}}, :search_type => :count)
+      b.search({:query => { :field => { "title" => "logging" }}}, :type => 'doc2')
+    end
+
+    response1, response2 = h["responses"]
+
+    assert_equal 2, response1["hits"]["total"]
+    assert_equal 1, response2["hits"]["total"]
   end
 
   def populate!

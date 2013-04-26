@@ -317,6 +317,12 @@ Percolate
         client.scan query, opts
       end
 
+      def multi_search(params = {}, &block)
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name, :type => self.type}.merge params
+        client.multi_search params, &block
+      end
 
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document

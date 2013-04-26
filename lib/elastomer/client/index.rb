@@ -327,6 +327,13 @@ module Elastomer
         client.scan query, opts
       end
 
+      def multi_search(params = {}, &block)
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name}.merge params
+        client.multi_search params, &block
+      end
+
 
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.

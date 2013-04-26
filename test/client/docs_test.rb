@@ -210,9 +210,10 @@ describe Elastomer::Client::Docs do
     populate!
 
     h = @docs.explain({
-      :filtered => {
-        :query => {:match_all => {}},
-        :filter => {:term => {:author => 'defunkt'}}
+      :query => {
+        :field => {
+          "author" => "defunkt"
+        }
       }
     }, :type => 'doc1', :id => 2)
     assert_equal true, h["matched"]

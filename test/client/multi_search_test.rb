@@ -62,10 +62,24 @@ describe Elastomer::Client::MultiSearch do
       nil
     ]
     body = body.join "\n"
-    h = $client.multi_search body, :index => 'elastomer-msearch-test'
+    h = $client.multi_search body, :index => @name
     response1 = h["responses"].first
     assert_equal 1, response1["hits"]["total"]
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
+  end
+
+  it 'supports a nice block syntax' do
+    populate!
+
+    h = $client.multi_search do |b|
+      b.search({:query => { :match_all => {}}}, :index => @name, :search_type => :count)
+      b.search({:query => { :field => { "title" => "author" }}}, :index => @name, :type => 'doc2')
+    end
+
+    response1, response2 = h["responses"]
+    
+    assert_equal 4, response1["hits"]["total"]
+    assert_equal 2, response2["hits"]["total"]
   end
 
   def populate!

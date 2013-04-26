@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.4.2'
 
   # runtime dependencies
+  s.add_dependency 'activesupport'
   s.add_dependency 'addressable',         '~> 2.3'
   s.add_dependency 'excon',               '~> 0.20'
   s.add_dependency 'faraday',             '~> 0.8'

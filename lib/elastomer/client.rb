@@ -1,6 +1,8 @@
+require 'active_support/notifications'
 require 'addressable/template'
 require 'faraday'
 require 'faraday_middleware'
+require 'securerandom'
 
 require File.expand_path('../../elastomer', __FILE__) unless defined? Elastomer::Error
 
@@ -77,6 +79,8 @@ module Elastomer
       @connection ||= Faraday.new(url) do |conn|
         conn.request  :json
         conn.response :json, :content_type => /\bjson$/i
+
+        conn.use :instrumentation
 
         Array === @adapter ?
           conn.adapter(*@adapter) :

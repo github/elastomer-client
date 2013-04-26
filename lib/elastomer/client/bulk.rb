@@ -7,6 +7,8 @@ module Elastomer
     # will perform an API call, and it requires a bulk request body and
     # optional request parameters.
     #
+    # See http://www.elasticsearch.org/guide/reference/api/bulk/
+    #
     # body   - Request body as a String (required if a block is _not_ given)
     # params - Optional request parameters as a Hash
     # block  - A Bulk instance is passed to the block and is used to

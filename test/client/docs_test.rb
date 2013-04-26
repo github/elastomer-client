@@ -155,6 +155,9 @@ describe Elastomer::Client::Docs do
     h = @docs.count :q => '*:*', :type => 'doc1'
     assert_equal 2, h['count']
 
+    h = @docs.count :q => '*:*', :type => 'doc1,doc2'
+    assert_equal 4, h['count']
+
     h = @docs.count({
       :filtered => {
         :query => {:match_all => {}},

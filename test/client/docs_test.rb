@@ -164,19 +164,43 @@ describe Elastomer::Client::Docs do
     assert_equal 1, h['count']
   end
 
-  it 'validates queries' do
+  it 'searches for more like this' do
     populate!
 
-    h = @docs.validate :q => '*:*'
-    assert_equal true, h["valid"]
+    # for some reason, if there's no document indexed here all the mlt
+    # queries return zero results
+    @docs.add \
+      :_id    => 3,
+      :_type  => 'doc1',
+      :title  => 'the author of faraday',
+      :author => 'technoweenie'
 
-    h = @docs.validate({
-      :filtered => {
-        :query => {:match_all => {}},
-        :filter => {:term => {:author => 'defunkt'}}
+    @index.refresh
+
+    h = @docs.more_like_this({
+      :type => 'doc1',
+      :id   => 1,
+      :mlt_fields    => 'title',
+      :min_term_freq => 1
+    })
+    assert_equal 2, h["hits"]["total"]
+
+    h = @docs.more_like_this({
+      :facets => {
+        "author" => {
+          :terms => {
+            :field => "author"
+          }
+        }
       }
-    }, :type => %w[doc1 doc2] )
-    assert_equal true, h["valid"]
+    }, {
+      :type => 'doc1',
+      :id   => 1,
+      :mlt_fields    => 'title,author',
+      :min_term_freq => 1
+    })
+    assert_equal 2, h["hits"]["total"]
+    assert_equal 2, h["facets"]["author"]["total"]
   end
 
   it 'explains scoring' do
@@ -192,6 +216,21 @@ describe Elastomer::Client::Docs do
 
     h = @docs.explain(:type => 'doc2', :id => 2, :q => "pea53")
     assert_equal false, h["matched"]
+  end
+
+  it 'validates queries' do
+    populate!
+
+    h = @docs.validate :q => '*:*'
+    assert_equal true, h["valid"]
+
+    h = @docs.validate({
+      :filtered => {
+        :query => {:match_all => {}},
+        :filter => {:term => {:author => 'defunkt'}}
+      }
+    }, :type => %w[doc1 doc2] )
+    assert_equal true, h["valid"]
   end
 
   def populate!

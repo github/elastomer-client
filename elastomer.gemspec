@@ -23,7 +23,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'faraday_middleware',  '~> 0.9'
 
   # development dependencies
-  s.add_development_dependency 'json',     '~> 1.7'
-  s.add_development_dependency 'minitest', '~> 4.7'
+  s.add_development_dependency 'activesupport'
+  s.add_development_dependency 'json',          '~> 1.7'
+  s.add_development_dependency 'minitest',      '~> 4.7'
 end
 

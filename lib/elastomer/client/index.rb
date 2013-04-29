@@ -69,7 +69,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def open
-        response = client.post '/{index}/_open', defaults
+        response = client.post '/{index}/_open', defaults.merge(:action => 'open')
         response.body
       end
 
@@ -78,7 +78,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def close
-        response = client.post '/{index}/_close', defaults
+        response = client.post '/{index}/_close', defaults.merge(:action => 'close')
         response.body
       end
 
@@ -149,7 +149,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases
-        response = client.get '/{index}/_aliases', defaults
+        response = client.get '/{index}/_aliases', defaults.merge(:action => 'aliases.get')
         response.body
       end
 
@@ -161,7 +161,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def analyze( text, params = {} )
-        response = client.get '{/index}/_analyze', update_params(params, :body => text.to_s)
+        response = client.get '{/index}/_analyze', update_params(params, :body => text.to_s, :action => 'analyze')
         response.body
       end
 
@@ -174,7 +174,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def refresh( params = {} )
-        response = client.post '{/index}/_refresh', update_params(params)
+        response = client.post '{/index}/_refresh', update_params(params, :action => 'refresh')
         response.body
       end
 
@@ -185,7 +185,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def flush( params = {} )
-        response = client.post '{/index}/_flush', update_params(params)
+        response = client.post '{/index}/_flush', update_params(params, :action => 'flush')
         response.body
       end
 
@@ -197,7 +197,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def optimize(params = {})
-        response = client.post '{/index}/_optimize', update_params(params)
+        response = client.post '{/index}/_optimize', update_params(params, :action => 'optimize')
         response.body
       end
 
@@ -210,7 +210,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def snapshot(params = {})
-        response = client.post '{/index}/_gateway/snapshot', update_params(params)
+        response = client.post '{/index}/_gateway/snapshot', update_params(params, :action => 'gateway.snapshot')
         response.body
       end
 
@@ -222,7 +222,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def clear_cache(params = {})
-        response = client.post '{/index}/_cache/clear', update_params(params)
+        response = client.post '{/index}/_cache/clear', update_params(params, :action => 'cache.clear')
         response.body
       end
 
@@ -234,7 +234,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def stats(params = {})
-        response = client.get '{/index}/_stats', update_params(params)
+        response = client.get '{/index}/_stats', update_params(params, :action => 'stats')
         response.body
       end
 
@@ -246,7 +246,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def status(params = {})
-        response = client.get '{/index}/_status', update_params(params)
+        response = client.get '{/index}/_status', update_params(params, :action => 'status')
         response.body
       end
 
@@ -258,7 +258,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def segments(params = {})
-        response = client.get '{/index}/_segments', update_params(params)
+        response = client.get '{/index}/_segments', update_params(params, :action => 'segments')
         response.body
       end
 

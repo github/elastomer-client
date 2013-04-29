@@ -53,26 +53,10 @@ module Elastomer
     #
     # Returns the response from the block
     def instrument( path, params )
-      action = params[:action]
-
-      if action.nil?
-        ary = []
-        m = /^([^?]*)/.match path
-        m[1].split('/').each do |str|
-          if str =~ /^_(.*)$/
-            ary.clear
-            ary << $1
-          else
-            ary << str
-          end
-        end
-        action = ary.join '.' unless ary.empty?
-      end
-
       payload = {
         :index  => params[:index],
         :type   => params[:type],
-        :action => action
+        :action => params[:action]
       }
 
       ::Elastomer::Notifications.service.instrument(NAME, payload) do

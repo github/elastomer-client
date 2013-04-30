@@ -78,7 +78,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get '/{index}/{type}/{id}', update_params(params, :accept => 404, :action => 'document.get')
+        response = client.get '/{index}/{type}/{id}', update_params(params, :action => 'document.get')
         response.body
       end
 

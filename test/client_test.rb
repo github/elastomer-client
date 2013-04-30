@@ -11,12 +11,13 @@ describe Elastomer::Client do
     assert_raises(ArgumentError) { $client.request :foo, '/', {} }
   end
 
-  it 'raises an error on 4XX responses' do
+  it 'raises an error on 4XX responses with an `error` field' do
     begin
-      $client.get '/_cluster/foo'
+      $client.get '/non-existent-index/_search?q=*:*'
+      assert false, 'exception was not raised when it should have been'
     rescue Elastomer::Client::Error => err
-      assert_equal 400, err.status
-      assert_equal 'No handler found for uri [/_cluster/foo] and method [GET]', err.message
+      assert_equal 404, err.status
+      assert_equal 'IndexMissingException[[non-existent-index] missing]', err.message
     end
   end
 

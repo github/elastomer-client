@@ -139,6 +139,14 @@ describe Elastomer::Client::Docs do
     assert_equal [false, true], exists
   end
 
+  it 'does not care if you delete a document that is not there' do
+    @docs = @index.docs('doc2')
+    h = @docs.delete :id => 42
+
+    assert true == h['ok'], 'failed to perform delete operation'
+    assert false == h['found'], 'that document was not there'
+  end
+
   it 'searches for documents' do
     h = @docs.search :q => '*:*'
     assert_equal 0, h['hits']['total']

@@ -148,15 +148,11 @@ module Elastomer
     # method - The HTTP method to send [:head, :get, :put, :post, :delete]
     # path   - The path as a String
     # params - Parameters Hash
-    #   :body   - Will be used as the request body
-    #   :accpet - One or more acceptable HTTP status codes [402, 404]
+    #   :body - Will be used as the request body
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def request( method, path, params )
-      accept = params.delete :accept
-      accept = Array(accept) unless accept.nil?
-
       body = params.delete :body
       path = expand_path path, params
 
@@ -172,11 +168,14 @@ module Elastomer
         end
       end
 
-      return response if response.success?                            ||
-                         (accept && accept.include?(response.status)) ||
-                         (:head == method && response.status < 500)
+      # a 5XX response is always an exception
+      raise ::Elastomer::Client::Error, response if response.status >= 500
 
-      raise ::Elastomer::Client::Error, response
+      # if the response body has an 'error' field, then raise an exception
+      raise ::Elastomer::Client::Error, response if Hash === response.body && response.body['error']
+
+      response
+
     # ensure
     #   # FIXME: this is here until we get a real logger in place
     #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?

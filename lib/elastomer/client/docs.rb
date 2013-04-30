@@ -43,8 +43,10 @@ module Elastomer
         params = update_params(params, overrides)
         params[:action] = 'document.index'
 
+        params.delete :id if params[:id].to_s.empty?
+
         response =
-            if params.key? :id
+            if params[:id]
               client.put '/{index}/{type}/{id}', params
             else
               client.post '/{index}/{type}', params
@@ -275,6 +277,7 @@ Explain
       def update_params( params, overrides = nil )
         h = defaults.update params
         h.update overrides unless overrides.nil?
+        h[:routing] = h[:routing].join(',') if Array === h[:routing]
         h
       end
 

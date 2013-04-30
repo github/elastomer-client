@@ -43,7 +43,7 @@ module Elastomer
         params = update_params(params, overrides)
         params[:action] = 'document.index'
 
-        params.delete :id if params[:id].to_s.empty?
+        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
 
         response =
             if params[:id]

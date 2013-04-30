@@ -93,7 +93,7 @@ module Elastomer
           overrides = from_document(document)
           params = params.merge overrides
         end
-        params.delete(:_id) if params[:_id].to_s.empty?
+        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
 
         add_to_actions({:index => params}, document)
       end
@@ -112,7 +112,7 @@ module Elastomer
           overrides = from_document(document)
           params = params.merge overrides
         end
-        params.delete(:_id) if params[:_id].to_s.empty?
+        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
 
         add_to_actions({:create => params}, document)
       end

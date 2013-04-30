@@ -47,6 +47,24 @@ describe Elastomer::Client::Docs do
 
     assert h['ok'], 'everything is NOT ok'
     assert_match %r/^\S{22}$/, h['_id']
+
+    h = @docs.index \
+          :_id    => nil,
+          :_type  => 'doc3',
+          :title  => 'the author of rubber-band',
+          :author => 'grantr'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_match %r/^\S{22}$/, h['_id']
+
+    h = @docs.index \
+          :_id    => '',
+          :_type  => 'doc4',
+          :title  => 'the author of toml',
+          :author => 'mojombo'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_match %r/^\S{22}$/, h['_id']
   end
 
   it 'uses the provided document ID' do
@@ -119,6 +137,14 @@ describe Elastomer::Client::Docs do
     h = @docs.multi_get :ids => [1, 2]
     exists = h['docs'].map { |d| d['exists'] }
     assert_equal [false, true], exists
+  end
+
+  it 'does not care if you delete a document that is not there' do
+    @docs = @index.docs('doc2')
+    h = @docs.delete :id => 42
+
+    assert true == h['ok'], 'failed to perform delete operation'
+    assert false == h['found'], 'that document was not there'
   end
 
   it 'searches for documents' do

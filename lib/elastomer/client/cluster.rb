@@ -28,7 +28,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def health( params = {} )
-        response = client.get '/_cluster/health{/index}', params
+        response = client.get '/_cluster/health{/index}', params.merge(:action => 'cluster.health')
         response.body
       end
 
@@ -39,7 +39,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def state( params = {} )
-        response = client.get '/_cluster/state', params
+        response = client.get '/_cluster/state', params.merge(:action => 'cluster.state')
         response.body
       end
 
@@ -50,7 +50,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def settings( params = {} )
-        response = client.get '/_cluster/settings', params
+        response = client.get '/_cluster/settings', params.merge(:action => 'cluster.settings.get')
         response.body
       end
 
@@ -65,7 +65,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
-        response = client.put '/_cluster/settings', params.merge(:body => body)
+        response = client.put '/_cluster/settings', params.merge(:body => body, :action => 'cluster.settings.update')
         response.body
       end
 
@@ -93,7 +93,7 @@ module Elastomer
         commands = [commands] unless Array === commands
         body = {:commands => commands}
 
-        response = client.post '/_cluster/reroute', params.merge(:body => body)
+        response = client.post '/_cluster/reroute', params.merge(:body => body, :action => 'cluster.reroute')
         response.body
       end
 
@@ -104,7 +104,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post '/_shutdown', params
+        response = client.post '/_shutdown', params.merge(:action => 'shutdown')
         response.body
       end
 
@@ -132,7 +132,7 @@ module Elastomer
         actions = [actions] unless Array === actions
         body = {:actions => actions}
 
-        response = client.post '/_aliases', params.merge(:body => body)
+        response = client.post '/_aliases', params.merge(:body => body, :action => 'aliases.update')
         response.body
       end
 
@@ -152,7 +152,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get '{/index}/_aliases', params
+        response = client.get '{/index}/_aliases', params.merge(:action => 'aliases.get')
         response.body
       end
 

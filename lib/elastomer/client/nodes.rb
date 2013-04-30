@@ -33,7 +33,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def info( params = {} )
-        response = client.get '/_nodes{/node_id}', update_params(params)
+        response = client.get '/_nodes{/node_id}', update_params(params, :action => 'nodes.info')
         response.body
       end
 
@@ -44,7 +44,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get '/_nodes{/node_id}/stats', update_params(params)
+        response = client.get '/_nodes{/node_id}/stats', update_params(params, :action => 'nodes.stats')
         response.body
       end
 
@@ -55,7 +55,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def hot_threads( params = {} )
-        response = client.get '/_nodes{/node_id}/hot_threads', update_params(params)
+        response = client.get '/_nodes{/node_id}/hot_threads', update_params(params, :action => 'nodes.hot_threads')
         response.body
       end
 
@@ -66,7 +66,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post '/_cluster/nodes{/node_id}/_shutdown', update_params(params)
+        response = client.post '/_cluster/nodes{/node_id}/_shutdown', update_params(params, :action => 'nodes.shutdown')
         response.body
       end
 

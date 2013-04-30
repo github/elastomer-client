@@ -63,7 +63,7 @@ module Elastomer
 
     # Returns true if the server is available; returns false otherwise.
     def available?
-      response = head '/'
+      response = head '/', :action => 'cluster.available'
       response.success?
     rescue StandardError
       false
@@ -148,34 +148,34 @@ module Elastomer
     # method - The HTTP method to send [:head, :get, :put, :post, :delete]
     # path   - The path as a String
     # params - Parameters Hash
-    #   :body   - Will be used as the request body
-    #   :accpet - One or more acceptable HTTP status codes [402, 404]
+    #   :body - Will be used as the request body
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def request( method, path, params )
-      accept = params.delete :accept
-      accept = Array(accept) unless accept.nil?
-
       body = params.delete :body
       path = expand_path path, params
 
-      response =
-          case method
-          when :head;   connection.head(path)
-          when :get;    connection.get(path) { |req| req.body = body if body }
-          when :put;    connection.put(path, body)
-          when :post;   connection.post(path, body)
-          when :delete; connection.delete(path) { |req| req.body = body if body }
-          else
-            raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
-          end
+      response = instrument(path, params) do
+        case method
+        when :head;   connection.head(path)
+        when :get;    connection.get(path) { |req| req.body = body if body }
+        when :put;    connection.put(path, body)
+        when :post;   connection.post(path, body)
+        when :delete; connection.delete(path) { |req| req.body = body if body }
+        else
+          raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
+        end
+      end
 
-      return response if response.success?                            ||
-                         (accept && accept.include?(response.status)) ||
-                         (:head == method && response.status < 500)
+      # a 5XX response is always an exception
+      raise ::Elastomer::Client::Error, response if response.status >= 500
 
-      raise ::Elastomer::Client::Error, response
+      # if the response body has an 'error' field, then raise an exception
+      raise ::Elastomer::Client::Error, response if Hash === response.body && response.body['error']
+
+      response
+
     # ensure
     #   # FIXME: this is here until we get a real logger in place
     #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
@@ -203,13 +203,28 @@ module Elastomer
       template = Addressable::Template.new path
 
       expansions = {}
+      query_values = params.dup
+      query_values.delete :action
+
       template.keys.map(&:to_sym).each do |key|
-        expansions[key] = params.delete(key) if params.key? key
+        expansions[key] = query_values.delete(key) if query_values.key? key
       end
 
       uri = template.expand(expansions)
-      uri.query_values = params unless params.empty?
+      uri.query_values = query_values unless query_values.empty?
       uri.to_s
+    end
+
+    # Internal: A noop method that simply yields to the block. This method
+    # will be repalced when the 'elastomer/notifications' module is included.
+    #
+    # path   - The full request path as a String
+    # params - The request params Hash
+    # block  - The block that will be instrumented
+    #
+    # Returns the response from the block
+    def instrument( path, params )
+      yield
     end
 
   end  # Client

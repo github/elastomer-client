@@ -47,6 +47,24 @@ describe Elastomer::Client::Docs do
 
     assert h['ok'], 'everything is NOT ok'
     assert_match %r/^\S{22}$/, h['_id']
+
+    h = @docs.index \
+          :_id    => nil,
+          :_type  => 'doc3',
+          :title  => 'the author of rubber-band',
+          :author => 'grantr'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_match %r/^\S{22}$/, h['_id']
+
+    h = @docs.index \
+          :_id    => '',
+          :_type  => 'doc4',
+          :title  => 'the author of toml',
+          :author => 'mojombo'
+
+    assert h['ok'], 'everything is NOT ok'
+    assert_match %r/^\S{22}$/, h['_id']
   end
 
   it 'uses the provided document ID' do

@@ -32,3 +32,12 @@ MiniTest::Unit.after_tests do
     $client.template(name).delete
   end
 end
+
+# require 'elastomer/notifications'
+# require 'pp'
+
+# ActiveSupport::Notifications.subscribe('request.client.elastomer') do |name, start_time, end_time, transaction_id, payload|
+#   $stdout.puts '-'*100
+#   #$stdout.puts "-- #{payload[:action].inspect}"
+#   pp payload #if payload[:action].nil?
+# end

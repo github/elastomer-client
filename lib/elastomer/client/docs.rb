@@ -43,8 +43,10 @@ module Elastomer
         params = update_params(params, overrides)
         params[:action] = 'document.index'
 
+        params.delete :id if params[:id].to_s.empty?
+
         response =
-            if params.key? :id
+            if params[:id]
               client.put '/{index}/{type}/{id}', params
             else
               client.post '/{index}/{type}', params
@@ -89,6 +91,8 @@ module Elastomer
       # Returns the response body as a Hash
       def multi_get( docs, params = {} )
         overrides = from_document(docs)
+        overrides[:action] = 'mget'
+
         response = client.get '{/index}{/type}{/id}/_mget', update_params(params, overrides)
         response.body
       end
@@ -102,6 +106,8 @@ module Elastomer
       # Returns the response body as a Hash
       def update( script, params = {} )
         overrides = from_document(script)
+        overrides[:action] = 'document.update'
+
         response = client.put '/{index}/{type}/{id}/_update', update_params(params, overrides)
         response.body
       end
@@ -135,7 +141,7 @@ module Elastomer
           end
         end
 
-        response = client.get '/{index}{/type}/_search', update_params(params, :body => query)
+        response = client.get '/{index}{/type}/_search', update_params(params, :body => query, :action => 'search')
         response.body
       end
 
@@ -168,7 +174,7 @@ module Elastomer
           end
         end
 
-        response = client.delete '/{index}{/type}/_query', update_params(params, :body => query)
+        response = client.delete '/{index}{/type}/_query', update_params(params, :body => query, :action => 'delete_by_query')
         response.body
       end
 
@@ -271,6 +277,7 @@ Explain
       def update_params( params, overrides = nil )
         h = defaults.update params
         h.update overrides unless overrides.nil?
+        h[:routing] = h[:routing].join(',') if Array === h[:routing]
         h
       end
 

@@ -80,7 +80,9 @@ module Elastomer
       attr_reader :client, :response, :request_size
 
       # Add an index action to the list of bulk actions to be performed when
-      # the bulk API call is made.
+      # the bulk API call is made. The `_id` of the document cannot be `nil`
+      # or empty. If this is the case then we remove the `_id` and allow
+      # ElasticSearch to generate one.
       #
       # document - The document to index as a Hash or JSON encoded String
       # params   - Parameters for the index action (as a Hash)
@@ -91,9 +93,29 @@ module Elastomer
           overrides = from_document(document)
           params = params.merge overrides
         end
+        params.delete(:_id) if params[:_id].to_s.empty?
+
         add_to_actions({:index => params}, document)
       end
       alias :add :index
+
+      # Add a create action to the list of bulk actions to be performed when
+      # the bulk API call is made. The `_id` of the document cannot be `nil`
+      # or empty.
+      #
+      # document - The document to create as a Hash or JSON encoded String
+      # params   - Parameters for the index action (as a Hash)
+      #
+      # Returns this Bulk instance.
+      def create( document, params )
+        unless String === document
+          overrides = from_document(document)
+          params = params.merge overrides
+        end
+        params.delete(:_id) if params[:_id].to_s.empty?
+
+        add_to_actions({:create => params}, document)
+      end
 
       # Add a delete action to the list of bulk actions to be performed when
       # the bulk API call is made.
@@ -125,7 +147,7 @@ module Elastomer
 
       # Internal: Extract special keys for bulk indexing from the given
       # `document`. The keys and their values are returned as a Hash from this
-      # method.
+      # method. If a value is `nil` then it will be ignored.
       #
       # document - The document Hash
       #
@@ -135,8 +157,8 @@ module Elastomer
 
         %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl].each do |field|
           key = field.to_sym
-          opts[key] = document.delete field if document.key? field
-          opts[key] = document.delete key   if document.key? key
+          opts[key] = document.delete field if document[field]
+          opts[key] = document.delete key   if document[key]
         end
 
         opts

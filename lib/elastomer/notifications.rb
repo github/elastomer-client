@@ -1,7 +1,6 @@
 require 'active_support/notifications'
 require 'securerandom'
-
-require File.expand_path('../client', __FILE__) unless defined? Elastomer::Client
+require 'elastomer/client'
 
 module Elastomer
 
@@ -27,7 +26,18 @@ module Elastomer
   # * :method - request method (:head, :get, :put, :post, :delete)
   # * :status - response status code
   #
+  # If you want to use your own notifications service then you will need to
+  # let Elastomer know by setting the `service` here in the Notifications
+  # module. The service should adhere to the ActiveSupport::Notifications
+  # specification.
+  #
+  #   Elastomer::Notifications.service = your_own_service
+  #
   module Notifications
+
+    class << self
+      attr_accessor :service
+    end
 
     # The name to subscribe to for notifications
     NAME = 'request.client.elastomer'.freeze
@@ -43,31 +53,15 @@ module Elastomer
     #
     # Returns the response from the block
     def instrument( path, params )
-      action = params[:action]
-
-      if action.nil?
-        ary = []
-        m = /^([^?]*)/.match path
-        m[1].split('?').first.split('/').each do |str|
-          if str =~ /^_(.*)$/
-            ary.clear
-            ary << $1
-          else
-            ary << str
-          end
-        end
-        action = ary.join '.' unless ary.empty?
-      end
-
       payload = {
         :index  => params[:index],
         :type   => params[:type],
-        :url    => "#{@url}#{path}",
-        :action => action
+        :action => params[:action]
       }
 
-      ActiveSupport::Notifications.instrument(NAME, payload) do
+      ::Elastomer::Notifications.service.instrument(NAME, payload) do
         response = yield
+        payload[:url]    = response.env[:url]
         payload[:method] = response.env[:method]
         payload[:status] = response.status
         response
@@ -75,6 +69,10 @@ module Elastomer
     end
   end
 
+  # use ActiveSupport::Notifications as the default instrumentaiton service
+  Notifications.service = ActiveSupport::Notifications
+
+  # inject our instrument method into the Client class
   class Client
     remove_method :instrument
     include ::Elastomer::Notifications

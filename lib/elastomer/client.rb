@@ -47,11 +47,16 @@ module Elastomer
     #   :url  - the URL as a String (overrides :host and :port)
     #   :read_timeout - the timeout in seconds when reading from an HTTP connection
     #   :open_timeout - the timeout in seconds when opening an HTTP connection
+    #   :adapter      - the Faraday adapter to use (defaults to :excon)
     #
     def initialize( opts = {} )
-      @host = opts.fetch :host, 'localhost'
-      @port = opts.fetch :port, 9200
-      @url  = opts.fetch :url,  "http://#@host:#@port"
+      host = opts.fetch :host, 'localhost'
+      port = opts.fetch :port, 9200
+      @url = opts.fetch :url,  "http://#{host}:#{port}"
+
+      uri = Addressable::URI.parse @url
+      @host = uri.host
+      @port = uri.port
 
       @read_timeout = opts.fetch :read_timeout, 4
       @open_timeout = opts.fetch :open_timeout, 2

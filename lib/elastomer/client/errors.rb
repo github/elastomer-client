@@ -49,7 +49,7 @@ module Elastomer
     def self.create_error( message, response )
       return Error.new(message) if response.nil?
 
-      m = /\A(.*?Exception)\[(.*)\]\z/.match message
+      m = /\A(.*?Exception)(\[.*\];?)\s*\z/.match message
       return Error.new(message, response) if m.nil?
 
       message = m[2]

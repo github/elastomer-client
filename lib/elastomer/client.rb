@@ -2,41 +2,11 @@ require 'addressable/template'
 require 'faraday'
 require 'faraday_middleware'
 
-require File.expand_path('../../elastomer', __FILE__) unless defined? Elastomer::Error
+require 'elastomer/version'
 
 module Elastomer
 
   class Client
-    # General error response from client requests.
-    #
-    class Error < ::Elastomer::Error
-      # Construct a new Error from the given response object or a message
-      # String. If a response object is given, the error message will be
-      # extracted from the response body.
-      #
-      # response - Either a message String or a Faraday::Response
-      #
-      def initialize( response )
-        message =
-          if response.respond_to? :body
-            @response = response
-            response.body['error'] || response.body
-          else
-            response
-          end
-
-        super(message)
-      end
-
-      attr_reader :response
-
-      # Returns the status code from the `response` or nil if the Error was not
-      # created with a response.
-      def status
-        response ? response.status : nil
-      end
-    end  # Error
-
 
     # Create a new client that can be used to make HTTP requests to the
     # ElasticSearch server.
@@ -174,10 +144,10 @@ module Elastomer
       end
 
       # a 5XX response is always an exception
-      raise ::Elastomer::Client::Error, response if response.status >= 500
+      raise self.class, response if response.status >= 500
 
       # if the response body has an 'error' field, then raise an exception
-      raise ::Elastomer::Client::Error, response if Hash === response.body && response.body['error']
+      raise self.class, response if Hash === response.body && response.body['error']
 
       response
 

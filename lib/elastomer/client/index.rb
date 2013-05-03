@@ -87,7 +87,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def settings
-        response = client.get '/{index}/_settings', defaults.merge(:action => 'index.settings.get')
+        response = client.get '{/index}/_settings', defaults.merge(:action => 'index.settings.get')
         response.body
       end
 
@@ -99,7 +99,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_settings( body, params = {} )
-        response = client.put '/{index}/_settings', update_params(params, :body => body, :action => 'index.settings.update')
+        response = client.put '{/index}/_settings', update_params(params, :body => body, :action => 'index.settings.update')
         response.body
       end
 

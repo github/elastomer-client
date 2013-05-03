@@ -230,6 +230,9 @@ module Elastomer
   end  # Client
 end  # Elastomer
 
+# require all files in the `core_ext` sub-directory
+Dir.glob(File.expand_path('../core_ext/*.rb', __FILE__)).each { |fn| require fn }
+
 # require all files in the `client` sub-directory
 Dir.glob(File.expand_path('../client/*.rb', __FILE__)).each { |fn| require fn }
 

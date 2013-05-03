@@ -1,4 +1,5 @@
 require File.expand_path('../../test_helper', __FILE__)
+require 'elastomer/core_ext/time'
 
 describe 'JSON conversions for Time' do
   before do

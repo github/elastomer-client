@@ -143,14 +143,7 @@ module Elastomer
         end
       end
 
-      # a 5XX response is always an exception
-      raise self.class, response if response.status >= 500
-
-      # if the response body has an 'error' field, then raise an exception
-      raise self.class, response if Hash === response.body && response.body['error']
-
-      response
-
+      handle_errors response
     # ensure
     #   # FIXME: this is here until we get a real logger in place
     #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
@@ -191,7 +184,7 @@ module Elastomer
     end
 
     # Internal: A noop method that simply yields to the block. This method
-    # will be repalced when the 'elastomer/notifications' module is included.
+    # will be replaced when the 'elastomer/notifications' module is included.
     #
     # path   - The full request path as a String
     # params - The request params Hash
@@ -200,6 +193,27 @@ module Elastomer
     # Returns the response from the block
     def instrument( path, params )
       yield
+    end
+
+    # Internal: Inspect the Faraday::Response and raise an error if the status
+    # is in the 5XX range or if the response body contains an 'error' field.
+    # In the latter case, the value of the 'error' field becomes our exception
+    # message. In the absence of an 'error' field the response body is used
+    # as the exception message.
+    #
+    # The raised exception will contain the response object.
+    #
+    # response - The Faraday::Response object.
+    #
+    # Returns the response.
+    # Raises an Elastomer::Client::Error on 500 responses or responses
+    # containing and 'error' field.
+    def handle_errors( response )
+      raise Error, response if response.status >= 500
+
+      raise Error, response if Hash === response.body && response.body['error']
+
+      response
     end
 
   end  # Client

@@ -81,7 +81,7 @@ describe Elastomer::Client::MultiSearch do
     assert_equal 4, response1["hits"]["total"]
     assert_equal 2, response2["hits"]["total"]
 
-    h = @index.multi_search do |m|
+    h = @index.docs.multi_search do |m|
       m.search({:query => { :match_all => {}}}, :search_type => :count)
       m.search({:query => { :field => { "title" => "author" }}}, :type => 'doc2')
     end

@@ -15,9 +15,9 @@ describe Elastomer::Client do
     begin
       $client.get '/non-existent-index/_search?q=*:*'
       assert false, 'exception was not raised when it should have been'
-    rescue Elastomer::Client::IndexMissingException => err
+    rescue Elastomer::Client::Error => err
       assert_equal 404, err.status
-      assert_equal '[[non-existent-index] missing]', err.message
+      assert_equal 'IndexMissingException[[non-existent-index] missing]', err.message
     end
   end
 

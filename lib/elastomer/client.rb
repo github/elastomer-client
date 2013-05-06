@@ -143,11 +143,7 @@ module Elastomer
         end
       end
 
-      # a 5XX response is always an exception
-      raise self.class, response if response.status >= 500
-
-      # if the response body has an 'error' field, then raise an exception
-      raise self.class, response if Hash === response.body && response.body['error']
+      handle_errors response
 
       response
 
@@ -200,6 +196,30 @@ module Elastomer
     # Returns the response from the block
     def instrument( path, params )
       yield
+    end
+
+    # Internal: Inspect the Faraday::Response and raise an error if the status
+    # is in the 5XX range or if the response body contains an 'error' field.
+    # In the latter case, the value of the 'error' field becomes our exception
+    # message. In the abasense of an 'error' field the response body is used
+    # as the exception message.
+    #
+    # The raised exception will contain the resposne object.
+    #
+    # response - The Faraday::Response object.
+    #
+    # Returns the response.
+    # Raises an Elastomer::Client::Error on 500 responses or responses
+    # containing and 'error' field.
+    def handle_errors( response )
+      error = response.body['error'].to_s if Hash === response.body && response.body['error']
+
+      if error || response.status >= 500
+        error = response.body.to_s if !error || error.empty?
+        raise Error, [error, response]
+      end
+
+      response
     end
 
   end  # Client

@@ -126,7 +126,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def search( query, params = nil )
-        query, params = extract_params(query, params) if params.nil?
+        query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}{/type}/_search', update_params(params, :body => query)
         response.body
@@ -153,7 +153,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def count(query, params = nil)
-        query, params = extract_params(query, params) if params.nil?
+        query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}{/type}/_count', update_params(params, :body => query)
         response.body
@@ -180,7 +180,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def delete_by_query( query, params = nil )
-        query, params = extract_params(query, params) if params.nil?
+        query, params = extract_params(query) if params.nil?
 
         response = client.delete '/{index}{/type}/_query', update_params(params, :body => query)
         response.body
@@ -211,7 +211,7 @@ Percolate
       #
       # Returns the response body as a hash
       def more_like_this(query, params = nil)
-        query, params = extract_params(query, params) if params.nil?
+        query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}/{type}/{id}/_mlt', update_params(params, :body => query)
         response.body
@@ -234,7 +234,7 @@ Percolate
       #
       # Returns the response body as a hash
       def explain(query, params = nil)
-        query, params = extract_params(query, params) if params.nil?
+        query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query)
         response.body
@@ -259,7 +259,7 @@ Percolate
       #
       # Returns the response body as a hash
       def validate(query, params = nil)
-        query, params = extract_params(query, params) if params.nil?
+        query, params = extract_params(query) if params.nil?
         
         response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query)
         response.body
@@ -398,7 +398,7 @@ Percolate
       # params - params hash OR nil if no query
       #
       # Returns an array of the query (possibly nil) and params Hash.
-      def extract_params(query, params)
+      def extract_params(query, params=nil)
         if params.nil?
           if query.key? :query
             params = {}

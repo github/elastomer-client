@@ -187,7 +187,7 @@ module Elastomer
     end
 
     # Internal: A noop method that simply yields to the block. This method
-    # will be repalced when the 'elastomer/notifications' module is included.
+    # will be replaced when the 'elastomer/notifications' module is included.
     #
     # path   - The full request path as a String
     # params - The request params Hash
@@ -201,10 +201,10 @@ module Elastomer
     # Internal: Inspect the Faraday::Response and raise an error if the status
     # is in the 5XX range or if the response body contains an 'error' field.
     # In the latter case, the value of the 'error' field becomes our exception
-    # message. In the abasense of an 'error' field the response body is used
+    # message. In the absence of an 'error' field the response body is used
     # as the exception message.
     #
-    # The raised exception will contain the resposne object.
+    # The raised exception will contain the response object.
     #
     # response - The Faraday::Response object.
     #

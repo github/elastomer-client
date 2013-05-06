@@ -123,8 +123,8 @@ module Elastomer
       #   aliases(:add => { :index => 'users-1', :alias => 'users' })
       #
       #   aliases([
-      #     { :remove => { :index => 'users-1', :alias => users' }},
-      #     { :add    => { :index => 'users-2', :alias => users' }}
+      #     { :remove => { :index => 'users-1', :alias => 'users' }},
+      #     { :add    => { :index => 'users-2', :alias => 'users' }}
       #   ])
       #
       # Returns the response body as a Hash

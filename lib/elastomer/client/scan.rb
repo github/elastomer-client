@@ -1,5 +1,3 @@
-require 'json' unless defined? ::JSON
-
 module Elastomer
   class Client
 

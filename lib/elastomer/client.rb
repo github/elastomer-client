@@ -144,9 +144,6 @@ module Elastomer
       end
 
       handle_errors response
-
-      response
-
     # ensure
     #   # FIXME: this is here until we get a real logger in place
     #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
@@ -212,12 +209,9 @@ module Elastomer
     # Raises an Elastomer::Client::Error on 500 responses or responses
     # containing and 'error' field.
     def handle_errors( response )
-      error = response.body['error'].to_s if Hash === response.body && response.body['error']
+      raise Error, response if response.status >= 500
 
-      if error || response.status >= 500
-        error = response.body.to_s if !error || error.empty?
-        raise Error, [error, response]
-      end
+      raise Error, response if Hash === response.body && response.body['error']
 
       response
     end

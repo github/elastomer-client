@@ -14,20 +14,16 @@ module Elastomer
       # String. If a response object is given, the error message will be
       # extracted from the response body.
       #
-      # args - A two element array containing an error message String followed
-      #        by an optional Faraday::Response object
+      # response - Faraday::Response object or a simple error message String
       #
-      # Examples
-      #
-      #   raise Elastomer::Client::Error, [message, response]
-      #
-      def initialize( args )
-        if Array === args
-          message, @response = args
+      def initialize( response )
+        if response.respond_to? :body
+          message = Hash === response.body && response.body['error'] || response.body.to_s
         else
-          message = args
+          message, response = response.to_s, nil
         end
 
+        @response = response
         super message
       end
 

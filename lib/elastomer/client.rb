@@ -1,6 +1,7 @@
 require 'addressable/template'
 require 'faraday'
 require 'faraday_middleware'
+require 'multi_json'
 
 require 'elastomer/version'
 

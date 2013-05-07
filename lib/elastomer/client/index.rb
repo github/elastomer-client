@@ -327,6 +327,10 @@ module Elastomer
         client.scan query, opts
       end
 
+      # XXX docs
+      def warmer(warmer_name)
+        client.warmer(name, warmer_name)
+      end
 
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.

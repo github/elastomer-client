@@ -46,8 +46,23 @@ module Elastomer
     end
     alias :msearch :multi_search
 
+    # The MultiSearch class is a helper for accumulating and submitting
+    # multi_search API requests. Instances of the MultiSearch class
+    # accumulate searches and then issue a single API request to
+    # ElasticSearch, which runs all accumulated searches in parallel
+    # and returns each result hash aggregated into an array of result
+    # hashes.
+    #
+    # Instead of instantiating this class directly, use
+    # the block form of Client#multi_search.
+    #
     class MultiSearch
 
+      # Create a new MultiSearch instance for accumulating searches and
+      # submitting them all as a single request.
+      #
+      # client - Elastomer::Client used for HTTP requests to the server
+      # params - Parameters Hash to pass to the Client#multi_search method
       def initialize(client, params = {})
         @client  = client
         @params  = params
@@ -57,25 +72,43 @@ module Elastomer
 
       attr_reader :client
 
+      # Add a search to the multi search request. This search will not
+      # be executed until the multi_search API call is made.
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Returns this MultiSearch instance.
       def search(query, params = {})
         add_to_actions(params)
         add_to_actions(query)
-
-        self
       end
 
+      # Execute the multi_search call with the accumulated searches. If
+      # the accumulated actions list is empty then no action is taken.
+      #
+      # Returns the response body Hash.
       def call
         return if @actions.empty?
 
         body = @actions.join("\n") + "\n"
-        response = client.multi_search(body, @params)
+        client.multi_search(body, @params)
       ensure
         @actions.clear
       end
 
+      # Internal: Add an action to the pending request. Actions can be
+      # either search params or query bodies. The first action must be
+      # a search params hash, followed by a query body, then alternating
+      # params and queries.
+      #
+      # action - the Hash (params or query) to add to the pending request
+      #
+      # Returns this MultiSearch instance.
       def add_to_actions(action)
         action = ::JSON.dump action
         @actions << action
+        self
       end
     end
   end

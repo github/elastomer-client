@@ -67,6 +67,26 @@ module Elastomer
         response.body
       end
 
+      # Check whether a warmer exists. Also aliased as exist?
+      #
+      # Since there is no native warmer exists api, this method executes
+      # a get and watches for an IndexWarmerMissingException error.
+      #
+      # Returns true if the warmer exists, false if not.
+      def exists?
+        begin
+          get
+          true
+        rescue Elastomer::Client::Error => exception
+          if exception.message =~ /IndexWarmerMissingException/
+            false
+          else
+            raise exception
+          end
+        end
+      end
+      alias :exist? :exists?
+
       # Internal: Returns a Hash containing default parameters.
       def defaults
         {:index => index_name, :warmer => name}

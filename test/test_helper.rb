@@ -1,7 +1,6 @@
 require 'rubygems' unless defined? Gem
 require 'bundler'
 Bundler.require(:default, :development)
-require 'multi_json'
 
 if ENV['COVERAGE'] == 'true'
   require 'simplecov'

@@ -1,5 +1,3 @@
-require 'json' unless defined? ::JSON
-
 module Elastomer
   class Client
 
@@ -179,12 +177,12 @@ module Elastomer
       #
       # Returns this Bulk instance.
       def add_to_actions( action, document = nil )
-        action = ::JSON.dump action
+        action = MultiJson.dump action
         @actions << action
         @current_request_size += action.length
 
         unless document.nil?
-          document = ::JSON.dump document unless String === document
+          document = MultiJson.dump document unless String === document
           @actions << document
           @current_request_size += document.length
         end

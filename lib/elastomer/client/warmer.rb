@@ -46,7 +46,7 @@ module Elastomer
       end
 
       # Delete a warmer.
-      # See http://www.elasticsearch.org/guide/reference/api/index_/
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
       #
       # params   - Parameters Hash
       #
@@ -57,7 +57,7 @@ module Elastomer
       end
 
       # Get a warmer.
-      # See http://www.elasticsearch.org/guide/reference/api/index_/
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
       #
       # params   - Parameters Hash
       #

@@ -106,7 +106,7 @@ module Elastomer
       #
       # Returns this MultiSearch instance.
       def add_to_actions(action)
-        action = ::JSON.dump action
+        action = MultiJson.dump action
         @actions << action
         self
       end

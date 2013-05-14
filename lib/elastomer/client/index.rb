@@ -358,6 +358,25 @@ module Elastomer
         client.multi_search params, &block
       end
 
+      # Provides access to warmer API commands. Index warmers run search
+      # requests to warm up the index before it is available for
+      # searching. Warmers are useful for searches that require heavy
+      # data loading, such as faceting or sorting.
+      #
+      # The warmer api allows creating, deleting, and retrieving
+      # registered warmers.
+      #
+      # warmer_name - The name of the warmer to operate on.
+      #
+      # Examples
+      #   index.warmer('warmer1').create(:query => {:match_all => {}})
+      #   index.warmer('warmer1').get
+      #   index.warmer('warmer1').delete
+      #
+      # Returns a new Warmer instance
+      def warmer(warmer_name)
+        client.warmer(name, warmer_name)
+      end
 
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.

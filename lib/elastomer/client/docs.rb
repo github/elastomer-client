@@ -126,22 +126,43 @@ module Elastomer
       # Examples
       #
       #   # request body query
-      #   search({:query => {:match_all => {}}}, :type => 'tweet', :search_type => 'count')
+      #   search({:query => {:match_all => {}}}, :type => 'tweet')
       #
       #   # same thing but using the URI request method
-      #   search(:q => '*:*', :type => 'tweet', :search_type => 'count')
+      #   search(:q => '*:*', :type => 'tweet')
       #
       # Returns the response body as a hash
       def search( query, params = nil )
-        if params.nil?
-          if query.key? :query
-            params = {}
-          else
-            params, query = query, nil
-          end
-        end
+        query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}{/type}/_search', update_params(params, :body => query, :action => 'search')
+        response.body
+      end
+
+      # Executes a search query, but instead of returning results, returns
+      # the number of documents matched. This method supports both the
+      # "request body" query and the "URI request" query. When using the
+      # request body semantics, the query hash must contain the :query key.
+      # Otherwise we assume a URI request is being made.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/count/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   # request body query
+      #   count({:match_all => {}}, :type => 'tweet')
+      #
+      #   # same thing but using the URI request method
+      #   count(:q => '*:*', :type => 'tweet')
+      #
+      # Returns the response body as a Hash
+      def count(query, params = nil)
+        query, params = extract_params(query) if params.nil?
+
+        response = client.get '/{index}{/type}/_count', update_params(params, :body => query)
         response.body
       end
 
@@ -166,28 +187,90 @@ module Elastomer
       #
       # Returns the response body as a hash
       def delete_by_query( query, params = nil )
-        if params.nil?
-          if query.key? :query
-            params = {}
-          else
-            params, query = query, nil
-          end
-        end
+        query, params = extract_params(query) if params.nil?
 
         response = client.delete '/{index}{/type}/_query', update_params(params, :body => query, :action => 'delete_by_query')
         response.body
       end
 
-
 =begin
 Multi Search
 Percolate
-Bulk UDP
-Count
-More Like This
-Validate
-Explain
 =end
+
+      # Search for documents similar to a specific document. The document
+      # :id is provided as part of the params hash. If the _all field is
+      # not enabled, :mlt_fields must be passed. A query cannot be present
+      # in the query body, but other fields like :size and :facets are
+      # allowed.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/more-like-this/
+      #
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   more_like_this(:mlt_fields => "title", :min_term_freq => 1, :type => "doc1", :id => 1)
+      #
+      #   # with query hash
+      #   more_like_this({:from => 5, :size => 10}, :mlt_fields => "title",
+      #                   :min_term_freq => 1, :type => "doc1", :id => 1)
+      #
+      # Returns the response body as a hash
+      def more_like_this(query, params = nil)
+        query, params = extract_params(query) if params.nil?
+
+        response = client.get '/{index}/{type}/{id}/_mlt', update_params(params, :body => query)
+        response.body
+      end
+
+      # Compute a score explanation for a query and a specific document. This
+      # can give useful feedback about why a document matched or didn't match
+      # a query. The document :id is provided as part of the params hash.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/explain/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   explain({:query => {:term => {"message" => "search"}}}, :id => 1)
+      #
+      #   explain(:q => "message:search", :id => 1)
+      #
+      # Returns the response body as a hash
+      def explain(query, params = nil)
+        query, params = extract_params(query) if params.nil?
+
+        response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query)
+        response.body
+      end
+
+      # Validate a potentially expensive query before running it. The
+      # :explain parameter can be used to get detailed information about
+      # why a query failed.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/validate/
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      # 
+      #   # request body query
+      #   validate(:query_string => {:query => "*:*"})
+      #
+      #   # same thing but using the URI query parameter
+      #   validate({:q => "post_date:foo"}, :explain => true)
+      #
+      # Returns the response body as a hash
+      def validate(query, params = nil)
+        query, params = extract_params(query) if params.nil?
+        
+        response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query)
+        response.body
+      end
 
       # Perform bulk indexing and/or delete operations. The current index name
       # and document type will be passed to the bulk API call as part of the
@@ -241,6 +324,36 @@ Explain
         client.scan query, opts
       end
 
+      # Execute an array of searches in bulk. Results are returned in an
+      # array in the order the queries were sent. The current index name
+      # and document type will be passed to the multi_search API call as
+      # part of the request parameters.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/multi-search/
+      #
+      # params - Parameters Hash that will be passed to the API call.
+      # block  - Required block that is used to accumulate searches.
+      #          All the operations will be passed to the search cluster
+      #          via a single API request.
+      #
+      # Yields a MultiSearch instance for building multi_search API call
+      # bodies.
+      #
+      # Examples
+      #
+      #   docs.multi_search do |m|
+      #     m.search({:query => {:match_all => {}}, :search_type => :count)
+      #     m.search({:query => {:field => {"foo" => "bar"}}})
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def multi_search(params = {}, &block)
+        raise 'a block is required' if block.nil?
+
+        params = {:index => self.name, :type => self.type}.merge params
+        client.multi_search params, &block
+      end
 
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document
@@ -285,6 +398,25 @@ Explain
       def defaults
         { :index => name, :type => type }
       end
+
+      # Internal: Allow params to be passed as the first argument to
+      # methods that take both an optional query hash and params.
+      #
+      # query  - query hash OR params hash
+      # params - params hash OR nil if no query
+      #
+      # Returns an array of the query (possibly nil) and params Hash.
+      def extract_params(query, params=nil)
+        if params.nil?
+          if query.key? :query
+            params = {}
+          else
+            params, query = query, nil
+          end
+        end
+        [query, params]
+      end
+
     end  # Docs
   end  # Client
 end  # Elastomer

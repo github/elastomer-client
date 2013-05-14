@@ -52,7 +52,7 @@ module Elastomer
     # body hits this threshold, a bulk request will be made to the search
     # cluster. This happens as operations are added.
     #
-    # You can also use the `call` method explicitly to send a bulk requestion
+    # You can also use the `call` method explicitly to send a bulk request
     # immediately.
     #
     class Bulk

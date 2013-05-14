@@ -262,10 +262,6 @@ module Elastomer
         response.body
       end
 
-=begin
-  Warmers
-=end
-
       # Provides access to document-level API commands. These commands will be
       # scoped to this index and the give `type`, if any.
       #

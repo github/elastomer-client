@@ -194,7 +194,6 @@ module Elastomer
       end
 
 =begin
-Multi Search
 Percolate
 =end
 

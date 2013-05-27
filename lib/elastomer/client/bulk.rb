@@ -55,9 +55,6 @@ module Elastomer
     #
     class Bulk
 
-      # The target size for bulk requests: 9.9MB
-      REQUEST_SIZE = 10*1024*1024 - 100*1024
-
       # Create a new bulk client for handling some of the details of
       # accumulating documents to index and then formatting them properly for
       # the bulk API command.
@@ -72,12 +69,25 @@ module Elastomer
 
         @actions = []
         @current_request_size = 0
-        @request_size = params.delete(:request_size) || REQUEST_SIZE
+        self.request_size = params.delete(:request_size)
 
         @response = {'took' => [], 'items' => []}
       end
 
       attr_reader :client, :response, :request_size
+
+      # Set the request size in bytes. If the value is nil, then a bulk
+      # request will be made for each action - index / create / delete - as
+      # they are called. If the value is a number great than zero, then
+      # actions will be buffered until the request size is met or exceeded; a
+      # single bulk request will be made for all buffered actions.
+      def request_size=( value )
+        if value.nil?
+          @request_size = nil
+        else
+          @request_size = value.to_i <= 0 ? nil : value.to_i
+        end
+      end
 
       # Add an index action to the list of bulk actions to be performed when
       # the bulk API call is made. The `_id` of the document cannot be `nil`
@@ -187,7 +197,7 @@ module Elastomer
           @current_request_size += document.length
         end
 
-        call if @current_request_size >= request_size
+        call if request_size.nil? || @current_request_size >= request_size
 
         self
       end

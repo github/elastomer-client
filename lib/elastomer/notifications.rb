@@ -63,6 +63,7 @@ module Elastomer
         response = yield
         payload[:url]    = response.env[:url]
         payload[:method] = response.env[:method]
+        payload[:body]   = response.env[:body]
         payload[:status] = response.status
         response
       end

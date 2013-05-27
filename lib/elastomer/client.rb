@@ -130,9 +130,11 @@ module Elastomer
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def request( method, path, params )
       body = params.delete :body
+      body = MultiJson.dump body if Hash === body
+
       path = expand_path path, params
 
-      response = instrument(path, params) do
+      response = instrument(path, body, params) do
         case method
         when :head;   connection.head(path)
         when :get;    connection.get(path) { |req| req.body = body if body }
@@ -188,11 +190,12 @@ module Elastomer
     # will be replaced when the 'elastomer/notifications' module is included.
     #
     # path   - The full request path as a String
+    # body   - The request body as a String or `nil`
     # params - The request params Hash
     # block  - The block that will be instrumented
     #
     # Returns the response from the block
-    def instrument( path, params )
+    def instrument( path, body, params )
       yield
     end
 

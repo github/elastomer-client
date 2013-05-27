@@ -48,22 +48,23 @@ module Elastomer
     # more information about the specific ElasticSearch request.
     #
     # path   - The full request path as a String
+    # body   - The request body as a String or `nil`
     # params - The request params Hash
     # block  - The block that will be instrumented
     #
     # Returns the response from the block
-    def instrument( path, params )
+    def instrument( path, body, params )
       payload = {
         :index  => params[:index],
         :type   => params[:type],
-        :action => params[:action]
+        :action => params[:action],
+        :body   => body
       }
 
       ::Elastomer::Notifications.service.instrument(NAME, payload) do
         response = yield
         payload[:url]    = response.env[:url]
         payload[:method] = response.env[:method]
-        payload[:body]   = response.env[:body]
         payload[:status] = response.status
         response
       end

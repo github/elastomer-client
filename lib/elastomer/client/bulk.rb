@@ -197,7 +197,7 @@ module Elastomer
           @current_request_size += document.length
         end
 
-        call if request_size.nil? || @current_request_size >= request_size
+        call if request_size && @current_request_size >= request_size
 
         self
       end

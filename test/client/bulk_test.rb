@@ -168,20 +168,60 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'executes a bulk API call when a request size is reached' do
-    h = @index.bulk(:request_size => 1024) do |b|
-      20.times { |num|
-        document = {:_id => num, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number #{num}"}
+    h = @index.bulk(:request_size => 300) do |b|
+      2.times { |num|
+        document = {:_id => num, :_type => 'tweet', :author => 'pea53', :message => "tweet #{num} is a 100 character request"}
         b.index document
       }
+
+      assert_equal 0, b.response['took'].length
+
+      7.times { |num|
+        document = {:_id => num+2, :_type => 'tweet', :author => 'pea53', :message => "tweet #{num+2} is a 100 character request"}
+        b.index document
+      }
+
+      assert_equal 3, b.response['took'].length
+
+      document = {:_id => 10, :_type => 'tweet', :author => 'pea53', :message => "tweet 10 is a 102 character request"}
+      b.index document
     end
 
-    assert_equal 2, h['took'].length
+    assert_equal 4, h['took'].length
     assert h['items'].all? { |a| a['index']['ok'] }, 'all documents were not indexed properly'
 
     @index.refresh
     h = @index.docs.search :q => '*:*', :search_type => 'count'
 
-    assert_equal 20, h['hits']['total']
+    assert_equal 10, h['hits']['total']
   end
 
+  it 'executes a bulk API call when an action count is reached' do
+    h = @index.bulk(:action_count => 3) do |b|
+      2.times { |num|
+        document = {:_id => num, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number #{num}"}
+        b.index document
+      }
+
+      assert_equal 0, b.response['took'].length
+
+      7.times { |num|
+        document = {:_id => num+2, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number #{num+2}"}
+        b.index document
+      }
+
+      assert_equal 3, b.response['took'].length
+
+      document = {:_id => 10, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number 10"}
+      b.index document
+    end
+
+    assert_equal 4, h['took'].length
+    assert h['items'].all? { |a| a['index']['ok'] }, 'all documents were not indexed properly'
+
+    @index.refresh
+    h = @index.docs.search :q => '*:*', :search_type => 'count'
+
+    assert_equal 10, h['hits']['total']
+  end
 end

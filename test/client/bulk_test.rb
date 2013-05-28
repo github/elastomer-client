@@ -82,7 +82,7 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'supports a nice block syntax' do
-    h = @index.bulk(:request_size => 1024) do |b|
+    h = @index.bulk do |b|
       b.index :_id => 1,   :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet'
       b.index :_id => nil, :_type => 'book', :author => 'John Scalzi', :title => 'Old Mans War'
     end
@@ -128,7 +128,7 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'allows documents to be JSON strings' do
-    h = @index.bulk(:request_size => 1024) do |b|
+    h = @index.bulk do |b|
       b.index  '{"author":"pea53", "message":"just a test tweet"}', :_id => 1, :_type => 'tweet'
       b.create '{"author":"John Scalzi", "title":"Old Mans War"}',  :_id => 1, :_type => 'book'
     end

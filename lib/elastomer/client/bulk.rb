@@ -3,12 +3,16 @@ module Elastomer
 
     # The `bulk` method can be used in two ways. Without a block the method
     # will perform an API call, and it requires a bulk request body and
-    # optional request parameters.
+    # optional request parameters. If given a block, the method will use a
+    # Bulk instance to assemble the operations called in the block into a
+    # bulk request and dispatch it at the end of the block.
     #
     # See http://www.elasticsearch.org/guide/reference/api/bulk/
     #
     # body   - Request body as a String (required if a block is _not_ given)
     # params - Optional request parameters as a Hash
+    #   :request_size - Optional maximum request size in bytes
+    #   :action_count - Optional maximum action size
     # block  - Passed to a Bulk instance which assembles the operations
     #          into one or more bulk requests.
     #
@@ -46,9 +50,16 @@ module Elastomer
     # API request to ElasticSearch. Those operations are then executed by the
     # cluster.
     #
-    # A minimum request size can be set. As soon as the size of the request
+    # A maximum request size can be set. As soon as the size of the request
     # body hits this threshold, a bulk request will be made to the search
     # cluster. This happens as operations are added.
+    #
+    # Additionally, a maximum action count can be set. As soon as the number
+    # of actions equals the action count, a bulk request will be made.
+    #
+    # When setting request limits, multiple responses from ElasticSearch will
+    # be aggregated into a single response. This is accessible through
+    # the response accessor.
     #
     # You can also use the `call` method explicitly to send a bulk request
     # immediately.
@@ -61,8 +72,8 @@ module Elastomer
       #
       # client - Elastomer::Client used for HTTP requests to the server
       # params - Parameters Hash to pass to the Client#bulk method
-      #   :request_size - the minimum request size in bytes
-      #
+      #   :request_size - the maximum request size in bytes
+      #   :action_count - the maximum number of actions
       def initialize( client, params = {} )
         @client  = client
         @params  = params

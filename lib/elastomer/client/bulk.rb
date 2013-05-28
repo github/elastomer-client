@@ -80,23 +80,46 @@ module Elastomer
 
         @actions = []
         @current_request_size = 0
+        @current_action_count = 0
         self.request_size = params.delete(:request_size)
+        self.action_count = params.delete(:action_count)
 
         @response = {'took' => [], 'items' => []}
       end
 
-      attr_reader :client, :response, :request_size
+      attr_reader :client, :response, :request_size, :action_count
 
-      # Set the request size in bytes. If the value is nil, then a bulk
-      # request will be made for each action - index / create / delete - as
-      # they are called. If the value is a number great than zero, then
-      # actions will be buffered until the request size is met or exceeded; a
-      # single bulk request will be made for all buffered actions.
+      # Set the request size in bytes. If the value is nil, then request size
+      # limiting will not be used and a request will only be made when the call
+      # method is called. It is up to the user to ensure that the request does
+      # not exceed ElasticSearch request size limits.
+      #
+      # If the value is a number greater than zero, then actions will be
+      # buffered until the request size is met or exceeded. When this happens a
+      # bulk request is issued, queued actions are cleared, and the response
+      # from ElasticSearch is merged into previous responses.
       def request_size=( value )
         if value.nil?
           @request_size = nil
         else
           @request_size = value.to_i <= 0 ? nil : value.to_i
+        end
+      end
+
+      # Set the action count. If the value is nil, then action count limiting
+      # will not be used and a request will only be made when the call method
+      # is called. It is up to the user to ensure that the request does not
+      # exceed ElasticSearch request size limits.
+      #
+      # If the value is a number greater than zero, then actions will be
+      # buffered until the action count is met. When this happens a bulk
+      # request is issued, queued actions are cleared, and the response from
+      # ElasticSearch is merged into previous responses.
+      def action_count=(value)
+        if value.nil?
+          @action_count = nil
+        else
+          @action_count = value.to_i <= 0 ? nil : value.to_i
         end
       end
 
@@ -163,6 +186,7 @@ module Elastomer
         merge_response response
       ensure
         @current_request_size = 0
+        @current_action_count = 0
         @actions.clear
       end
 
@@ -201,6 +225,7 @@ module Elastomer
         action = MultiJson.dump action
         @actions << action
         @current_request_size += action.length
+        @current_action_count += 1
 
         unless document.nil?
           document = MultiJson.dump document unless String === document
@@ -208,7 +233,8 @@ module Elastomer
           @current_request_size += document.length
         end
 
-        call if request_size && @current_request_size >= request_size
+        call if (request_size && @current_request_size >= request_size) ||
+                (action_count && @current_action_count >= action_count)
 
         self
       end

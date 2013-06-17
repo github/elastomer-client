@@ -46,7 +46,7 @@ module Elastomer
       end
 
       # Delete a warmer.
-      # See http://www.elasticsearch.org/guide/reference/api/index_/
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
       #
       # params   - Parameters Hash
       #
@@ -57,7 +57,7 @@ module Elastomer
       end
 
       # Get a warmer.
-      # See http://www.elasticsearch.org/guide/reference/api/index_/
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
       #
       # params   - Parameters Hash
       #
@@ -66,6 +66,24 @@ module Elastomer
         response = client.get '/{index}{/type}/_warmer/{warmer}', defaults.update(params)
         response.body
       end
+
+      # Check whether a warmer exists. Also aliased as exist?
+      #
+      # Since there is no native warmer exists api, this method executes
+      # a get and watches for an IndexWarmerMissingException error.
+      #
+      # Returns true if the warmer exists, false if not.
+      def exists?
+        get
+        true
+      rescue Elastomer::Client::Error => exception
+        if exception.message =~ /IndexWarmerMissingException/
+          false
+        else
+          raise exception
+        end
+      end
+      alias :exist? :exists?
 
       # Internal: Returns a Hash containing default parameters.
       def defaults

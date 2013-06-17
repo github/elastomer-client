@@ -49,4 +49,12 @@ describe Elastomer::Client::Warmer do
     h = @index.warmer('test1').get
     assert_equal body, h[@name]["warmers"]["test1"]["source"]
   end
+
+  it 'knows when warmers exist' do
+    assert_equal false, @index.warmer('test1').exists?
+    assert_equal false, @index.warmer('test1').exist?
+
+    h = @index.warmer('test1').create(:query => { :match_all => {}})
+    assert_equal true, @index.warmer('test1').exists?
+  end
 end

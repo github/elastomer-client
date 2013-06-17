@@ -74,15 +74,13 @@ module Elastomer
       #
       # Returns true if the warmer exists, false if not.
       def exists?
-        begin
-          get
-          true
-        rescue Elastomer::Client::Error => exception
-          if exception.message =~ /IndexWarmerMissingException/
-            false
-          else
-            raise exception
-          end
+        get
+        true
+      rescue Elastomer::Client::Error => exception
+        if exception.message =~ /IndexWarmerMissingException/
+          false
+        else
+          raise exception
         end
       end
       alias :exist? :exists?

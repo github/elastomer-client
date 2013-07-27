@@ -88,8 +88,7 @@ describe Elastomer::Client::Bulk do
     end
     items = h['items']
 
-    assert_instance_of Array, h['took']
-    assert_equal 1, h['took'].length
+    assert_instance_of Fixnum, h['took']
 
     assert items.first['index']['ok'], 'indexing failed'
     assert items.last['create']['ok'], 'creation failed'
@@ -134,8 +133,7 @@ describe Elastomer::Client::Bulk do
     end
     items = h['items']
 
-    assert_instance_of Array, h['took']
-    assert_equal 1, h['took'].length
+    assert_instance_of Fixnum, h['took']
 
     assert items.first['index']['ok'], 'indexing failed'
     assert items.last['create']['ok'], 'creation failed'
@@ -168,27 +166,29 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'executes a bulk API call when a request size is reached' do
-    h = @index.bulk(:request_size => 300) do |b|
+    ary = []
+    ary << @index.bulk(:request_size => 300) do |b|
       2.times { |num|
         document = {:_id => num, :_type => 'tweet', :author => 'pea53', :message => "tweet #{num} is a 100 character request"}
-        b.index document
+        ary << b.index(document)
       }
-
-      assert_equal 0, b.response['took'].length
+      ary.compact!
+      assert_equal 0, ary.length
 
       7.times { |num|
         document = {:_id => num+2, :_type => 'tweet', :author => 'pea53', :message => "tweet #{num+2} is a 100 character request"}
-        b.index document
+        ary << b.index(document)
       }
-
-      assert_equal 3, b.response['took'].length
+      ary.compact!
+      assert_equal 3, ary.length
 
       document = {:_id => 10, :_type => 'tweet', :author => 'pea53', :message => "tweet 10 is a 102 character request"}
-      b.index document
+      ary << b.index(document)
     end
+    ary.compact!
 
-    assert_equal 4, h['took'].length
-    assert h['items'].all? { |a| a['index']['ok'] }, 'all documents were not indexed properly'
+    assert_equal 4, ary.length
+    assert ary.all? { |a| a['items'].all? { |b| b['index']['ok'] }}, 'all documents were not indexed properly'
 
     @index.refresh
     h = @index.docs.search :q => '*:*', :search_type => 'count'
@@ -197,27 +197,29 @@ describe Elastomer::Client::Bulk do
   end
 
   it 'executes a bulk API call when an action count is reached' do
-    h = @index.bulk(:action_count => 3) do |b|
+    ary = []
+    ary << @index.bulk(:action_count => 3) do |b|
       2.times { |num|
         document = {:_id => num, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number #{num}"}
-        b.index document
+        ary << b.index(document)
       }
-
-      assert_equal 0, b.response['took'].length
+      ary.compact!
+      assert_equal 0, ary.length
 
       7.times { |num|
         document = {:_id => num+2, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number #{num+2}"}
-        b.index document
+        ary << b.index(document)
       }
-
-      assert_equal 3, b.response['took'].length
+      ary.compact!
+      assert_equal 3, ary.length
 
       document = {:_id => 10, :_type => 'tweet', :author => 'pea53', :message => "this is tweet number 10"}
-      b.index document
+      ary << b.index(document)
     end
+    ary.compact!
 
-    assert_equal 4, h['took'].length
-    assert h['items'].all? { |a| a['index']['ok'] }, 'all documents were not indexed properly'
+    assert_equal 4, ary.length
+    assert ary.all? { |a| a['items'].all? { |b| b['index']['ok'] }}, 'all documents were not indexed properly'
 
     @index.refresh
     h = @index.docs.search :q => '*:*', :search_type => 'count'

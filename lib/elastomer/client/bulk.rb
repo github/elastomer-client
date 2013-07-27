@@ -57,10 +57,6 @@ module Elastomer
     # Additionally, a maximum action count can be set. As soon as the number
     # of actions equals the action count, a bulk request will be made.
     #
-    # When setting request limits, multiple responses from ElasticSearch will
-    # be aggregated into a single response. This is accessible through
-    # the response accessor.
-    #
     # You can also use the `call` method explicitly to send a bulk request
     # immediately.
     #
@@ -83,11 +79,9 @@ module Elastomer
         @current_action_count = 0
         self.request_size = params.delete(:request_size)
         self.action_count = params.delete(:action_count)
-
-        @response = {'took' => [], 'items' => []}
       end
 
-      attr_reader :client, :response, :request_size, :action_count
+      attr_reader :client, :request_size, :action_count
 
       # Set the request size in bytes. If the value is nil, then request size
       # limiting will not be used and a request will only be made when the call
@@ -97,7 +91,7 @@ module Elastomer
       # If the value is a number greater than zero, then actions will be
       # buffered until the request size is met or exceeded. When this happens a
       # bulk request is issued, queued actions are cleared, and the response
-      # from ElasticSearch is merged into previous responses.
+      # from ElasticSearch is returned.
       def request_size=( value )
         if value.nil?
           @request_size = nil
@@ -114,7 +108,7 @@ module Elastomer
       # If the value is a number greater than zero, then actions will be
       # buffered until the action count is met. When this happens a bulk
       # request is issued, queued actions are cleared, and the response from
-      # ElasticSearch is merged into previous responses.
+      # ElasticSearch is returned.
       def action_count=(value)
         if value.nil?
           @action_count = nil
@@ -131,7 +125,7 @@ module Elastomer
       # document - The document to index as a Hash or JSON encoded String
       # params   - Parameters for the index action (as a Hash)
       #
-      # Returns this Bulk instance.
+      # Returns the response from the bulk call if one was made or nil.
       def index( document, params = {} )
         unless String === document
           overrides = from_document(document)
@@ -150,7 +144,7 @@ module Elastomer
       # document - The document to create as a Hash or JSON encoded String
       # params   - Parameters for the index action (as a Hash)
       #
-      # Returns this Bulk instance.
+      # Returns the response from the bulk call if one was made or nil.
       def create( document, params )
         unless String === document
           overrides = from_document(document)
@@ -166,7 +160,7 @@ module Elastomer
       #
       # params - Parameters for the delete action (as a Hash)
       #
-      # Returns this Bulk instance.
+      # Returns the response from the bulk call if one was made or nil.
       def delete( params )
         add_to_actions :delete => params
       end
@@ -177,13 +171,12 @@ module Elastomer
       #
       # If the accumulated actions list is empty then no action is taken.
       #
-      # Returns the merged response body Hash.
+      # Returns the response body Hash.
       def call
-        return @response if @actions.empty?
+        return nil if @actions.empty?
 
         body = @actions.join("\n") + "\n"
-        response = client.bulk(body, @params)
-        merge_response response
+        client.bulk(body, @params)
       ensure
         @current_request_size = 0
         @current_action_count = 0
@@ -220,7 +213,7 @@ module Elastomer
       # action   - The bulk action (as a Hash) to perform
       # document - Optional document for the action as a Hash or JSON encoded String
       #
-      # Returns this Bulk instance.
+      # Returns the response from the bulk call if one was made or nil.
       def add_to_actions( action, document = nil )
         action = MultiJson.dump action
         @actions << action
@@ -233,22 +226,12 @@ module Elastomer
           @current_request_size += document.length
         end
 
-        call if (request_size && @current_request_size >= request_size) ||
-                (action_count && @current_action_count >= action_count)
-
-        self
-      end
-
-      # Internal: Consolidate the given `response` Hash with all the other
-      # responses received from previous bulk requests.
-      #
-      # response - The response body (as a Hash) from the balk API call
-      #
-      # Returns our consolidated response Hash.
-      def merge_response( response )
-        @response['took'] << response['took']
-        @response['items'].concat response['items']
-        @response
+        if (request_size && @current_request_size >= request_size) ||
+           (action_count && @current_action_count >= action_count)
+          call
+        else
+          nil
+        end
       end
 
     end  # Bulk

@@ -5,6 +5,7 @@ describe Elastomer::Client::Index do
   before do
     @name  = 'elastomer-index-test'
     @index = $client.index @name
+    @index.delete if @index.exists?
   end
 
   after do

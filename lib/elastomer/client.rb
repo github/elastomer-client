@@ -214,7 +214,6 @@ module Elastomer
     # containing and 'error' field.
     def handle_errors( response )
       raise Error, response if response.status >= 500
-
       raise Error, response if Hash === response.body && response.body['error']
 
       response

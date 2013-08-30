@@ -7,7 +7,6 @@ module Elastomer
   class Client
 
     # General error response from client requests.
-    #
     class Error < ::Elastomer::Error
 
       # Construct a new Error from the given response object or a message
@@ -15,7 +14,6 @@ module Elastomer
       # extracted from the response body.
       #
       # response - Faraday::Response object or a simple error message String
-      #
       def initialize( response )
         if response.respond_to? :body
           message = Hash === response.body && response.body['error'] || response.body.to_s
@@ -23,17 +21,15 @@ module Elastomer
           message, response = response.to_s, nil
         end
 
-        @response = response
+        @status = response.nil? ? nil : response.status
+
         super message
       end
 
-      attr_reader :response
-
       # Returns the status code from the `response` or nil if the Error was not
       # created with a response.
-      def status
-        response ? response.status : nil
-      end
+      attr_reader :status
+
     end  # Error
 
   end  # Client

@@ -147,6 +147,10 @@ module Elastomer
       end
 
       handle_errors response
+
+    rescue Faraday::Error::TimeoutError => boom
+      raise ::Elastomer::Client::TimeoutError, boom, path
+
     # ensure
     #   # FIXME: this is here until we get a real logger in place
     #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?

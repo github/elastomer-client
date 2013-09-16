@@ -32,5 +32,20 @@ module Elastomer
 
     end  # Error
 
+    # Timeout specific error class.
+    class TimeoutError < ::Elastomer::Error
+
+      # Wrap a Farday TimeoutError with our own class and include the HTTP
+      # path where the error originated.
+      #
+      # exception - The originating Faraday::Error::TimeoutError
+      # path      - The path portion of the HTTP request
+      #
+      def initialize( exception, path )
+        super "#{exception.message}: #{path}"
+        set_backtrace exception.backtrace
+      end
+    end  # TimeoutError
+
   end  # Client
 end  # Elastomer

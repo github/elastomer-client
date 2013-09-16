@@ -149,7 +149,7 @@ module Elastomer
       handle_errors response
 
     rescue Faraday::Error::TimeoutError => boom
-      raise ::Elastomer::Client::TimeoutError, boom, path
+      raise ::Elastomer::Client::TimeoutError.new(boom, path)
 
     # ensure
     #   # FIXME: this is here until we get a real logger in place

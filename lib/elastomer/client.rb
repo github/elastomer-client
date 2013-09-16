@@ -16,7 +16,7 @@ module Elastomer
     #   :host - the host as a String
     #   :port - the port number of the server
     #   :url  - the URL as a String (overrides :host and :port)
-    #   :read_timeout - the timeout in seconds when reading from an HTTP connection
+    #   :timeout - the timeout in seconds when reading from an HTTP connection
     #   :open_timeout - the timeout in seconds when opening an HTTP connection
     #   :adapter      - the Faraday adapter to use (defaults to :excon)
     #
@@ -29,13 +29,13 @@ module Elastomer
       @host = uri.host
       @port = uri.port
 
-      @read_timeout = opts.fetch :read_timeout, 4
+      @timeout      = opts.fetch :timeout, 5
       @open_timeout = opts.fetch :open_timeout, 2
       @adapter      = opts.fetch :adapter, :excon
     end
 
     attr_reader :host, :port, :url
-    attr_reader :read_timeout, :open_timeout
+    attr_reader :timeout, :open_timeout
 
     # Returns true if the server is available; returns false otherwise.
     def available?
@@ -58,7 +58,7 @@ module Elastomer
           conn.adapter(*@adapter) :
           conn.adapter(@adapter)
 
-        conn.options[:read_timeout] = read_timeout
+        conn.options[:timeout]      = timeout
         conn.options[:open_timeout] = open_timeout
       end
     end

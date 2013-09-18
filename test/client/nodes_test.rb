@@ -17,7 +17,7 @@ describe Elastomer::Client::Nodes do
   end
 
   it 'gets the hot threads for the node(s)' do
-    str = $client.nodes.hot_threads
+    str = $client.nodes.hot_threads :read_timeout => 2
     assert_instance_of String, str
     assert_match %r/cpu usage by thread/, str
   end

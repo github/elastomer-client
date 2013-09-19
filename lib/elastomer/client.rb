@@ -16,7 +16,7 @@ module Elastomer
     #   :host - the host as a String
     #   :port - the port number of the server
     #   :url  - the URL as a String (overrides :host and :port)
-    #   :timeout - the timeout in seconds when reading from an HTTP connection
+    #   :read_timeout - the timeout in seconds when reading from an HTTP connection
     #   :open_timeout - the timeout in seconds when opening an HTTP connection
     #   :adapter      - the Faraday adapter to use (defaults to :excon)
     #
@@ -29,13 +29,13 @@ module Elastomer
       @host = uri.host
       @port = uri.port
 
-      @timeout      = opts.fetch :timeout, 5
+      @read_timeout = opts.fetch :read_timeout, 5
       @open_timeout = opts.fetch :open_timeout, 2
       @adapter      = opts.fetch :adapter, :excon
     end
 
     attr_reader :host, :port, :url
-    attr_reader :timeout, :open_timeout
+    attr_reader :read_timeout, :open_timeout
 
     # Returns true if the server is available; returns false otherwise.
     def available?
@@ -58,7 +58,7 @@ module Elastomer
           conn.adapter(*@adapter) :
           conn.adapter(@adapter)
 
-        conn.options[:timeout]      = timeout
+        conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout
       end
     end
@@ -124,7 +124,8 @@ module Elastomer
     # method - The HTTP method to send [:head, :get, :put, :post, :delete]
     # path   - The path as a String
     # params - Parameters Hash
-    #   :body - Will be used as the request body
+    #   :body         - Will be used as the request body
+    #   :read_timeout - Optional read timeout (in seconds) for the request
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
@@ -132,15 +133,33 @@ module Elastomer
       body = params.delete :body
       body = MultiJson.dump body if Hash === body
 
+      read_timeout = params.delete :read_timeout
+
       path = expand_path path, params
 
       response = instrument(path, body, params) do
         case method
-        when :head;   connection.head(path)
-        when :get;    connection.get(path) { |req| req.body = body if body }
-        when :put;    connection.put(path, body)
-        when :post;   connection.post(path, body)
-        when :delete; connection.delete(path) { |req| req.body = body if body }
+        when :head
+          connection.head(path) { |req| req.options[:timeout] = read_timeout if read_timeout }
+
+        when :get
+          connection.get(path) { |req|
+            req.body = body if body
+            req.options[:timeout] = read_timeout if read_timeout
+          }
+
+        when :put
+          connection.put(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+
+        when :post
+          connection.post(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+
+        when :delete
+          connection.delete(path) { |req|
+            req.body = body if body
+            req.options[:timeout] = read_timeout if read_timeout
+          }
+
         else
           raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
         end

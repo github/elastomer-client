@@ -53,6 +53,7 @@ module Elastomer
       @connection ||= Faraday.new(url) do |conn|
         conn.request  :json
         conn.response :json, :content_type => /\bjson$/i
+        conn.request  :opaque_id
 
         Array === @adapter ?
           conn.adapter(*@adapter) :
@@ -248,3 +249,5 @@ end  # Elastomer
 # require all files in the `client` sub-directory
 Dir.glob(File.expand_path('../client/*.rb', __FILE__)).each { |fn| require fn }
 
+# require all files in the `middleware` sub-directory
+Dir.glob(File.expand_path('../middleware/*.rb', __FILE__)).each { |fn| require fn }

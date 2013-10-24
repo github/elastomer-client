@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'faraday',             '~> 0.8'
   s.add_dependency 'faraday_middleware',  '~> 0.9'
   s.add_dependency 'multi_json',          '~> 1.7'
+  s.add_dependency 'simple_uuid',         '~> 0.3'
 
   # development dependencies
   s.add_development_dependency 'activesupport'

@@ -22,7 +22,8 @@ require 'elastomer/client'
 $client_params = {
   :port => ENV['GH_ELASTICSEARCH_PORT'] || 9200,
   :read_timeout => 0.5,
-  :open_timeout => 0.5
+  :open_timeout => 0.5,
+  :opaque_id => true
 }
 $client = Elastomer::Client.new $client_params
 

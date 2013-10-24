@@ -1,4 +1,4 @@
-require 'simple_uuid'
+require 'securerandom'
 
 module Elastomer
   module Middleware
@@ -9,7 +9,7 @@ module Elastomer
     # useful in environments which reuse connections to ensure that cross-talk
     # does not occur between two requests.
     #
-    # The SimpleUUID gem is used to generate a UUID string for each request.
+    # The SecureRandom lib is used to generate a UUID string for each request.
     # This value is used as the content for the "X-Opaque-Id" header. If the
     # value is different between the request and the response, then an
     # `Elastomer::Client::OpaqueIdError` is raised. In this case no response
@@ -27,7 +27,7 @@ module Elastomer
       #
       # Returns the environment Hash
       def call( env )
-        uuid = get_uuid.freeze
+        uuid = SecureRandom.uuid.freeze
         env[:request_headers][X_OPAQUE_ID] = uuid
 
         @app.call(env).on_complete do |renv|
@@ -35,11 +35,6 @@ module Elastomer
             raise ::Elastomer::Client::OpaqueIdError, "conflicting 'X-Opaque-Id' headers"
           end
         end
-      end
-
-      # Returns a UUID String in guid format.
-      def get_uuid
-        SimpleUUID::UUID.new.to_guid
       end
 
     end  # OpaqueId

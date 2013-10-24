@@ -19,6 +19,7 @@ module Elastomer
     #   :read_timeout - the timeout in seconds when reading from an HTTP connection
     #   :open_timeout - the timeout in seconds when opening an HTTP connection
     #   :adapter      - the Faraday adapter to use (defaults to :excon)
+    #   :opaque_id    - set to `true` to use the 'X-Opaque-Id' request header
     #
     def initialize( opts = {} )
       host = opts.fetch :host, 'localhost'
@@ -32,6 +33,7 @@ module Elastomer
       @read_timeout = opts.fetch :read_timeout, 5
       @open_timeout = opts.fetch :open_timeout, 2
       @adapter      = opts.fetch :adapter, :excon
+      @opaque_id    = opts.fetch :opaque_id, false
     end
 
     attr_reader :host, :port, :url
@@ -53,6 +55,7 @@ module Elastomer
       @connection ||= Faraday.new(url) do |conn|
         conn.request  :json
         conn.response :json, :content_type => /\bjson$/i
+        conn.request  :opaque_id if @opaque_id
 
         Array === @adapter ?
           conn.adapter(*@adapter) :
@@ -248,3 +251,5 @@ end  # Elastomer
 # require all files in the `client` sub-directory
 Dir.glob(File.expand_path('../client/*.rb', __FILE__)).each { |fn| require fn }
 
+# require all files in the `middleware` sub-directory
+Dir.glob(File.expand_path('../middleware/*.rb', __FILE__)).each { |fn| require fn }

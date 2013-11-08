@@ -21,13 +21,19 @@ module Elastomer
     class OpaqueId < ::Faraday::Middleware
       X_OPAQUE_ID = 'X-Opaque-Id'.freeze
 
+      # Just an initializer.
+      def initialize( *args, &block )
+        @counter = 0
+        super(*args, &block)
+      end
+
       # Faraday middleware implementation.
       #
       # env - Faraday environment Hash
       #
       # Returns the environment Hash
       def call( env )
-        uuid = SecureRandom.uuid.freeze
+        uuid = generate_uuid.freeze
         env[:request_headers][X_OPAQUE_ID] = uuid
 
         @app.call(env).on_complete do |renv|
@@ -35,6 +41,22 @@ module Elastomer
             raise ::Elastomer::Client::OpaqueIdError, "conflicting 'X-Opaque-Id' headers"
           end
         end
+      end
+
+      # Generate a UUID using the built-in SecureRandom class. This can be a
+      # little slow at times, so we will reuse the same UUID and append an
+      # incrementing counter. This code is definitely not thread safe, so the
+      # Faraday connection should not be shared amongst threads.
+      #
+      # Returns the UUID string.
+      def generate_uuid
+        if 0 == @counter % 0xffff
+          @counter = 0
+          @base_uuid = (SecureRandom.uuid + '-%04x').freeze
+        end
+
+        @counter += 1
+        @base_uuid % @counter
       end
 
     end  # OpaqueId

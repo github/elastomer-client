@@ -52,7 +52,7 @@ module Elastomer
         end
 
         t[:opaque_id_counter] += 1
-        sprintf(t[:opaque_id_uuid], t[:opaque_id_counter])
+        t[:opaque_id_uuid] % t[:opaque_id_counter]
       end
 
     end  # OpaqueId

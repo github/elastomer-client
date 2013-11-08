@@ -45,8 +45,11 @@ module Elastomer
       # Returns the UUID string.
       def generate_uuid
         t = Thread.current
-        t[:opaque_id_base] ||= (SecureRandom.urlsafe_base64(12) + '%08x').freeze
-        t[:opaque_id_counter] ||= -1
+
+        unless t.key? :opaque_id_base
+          t[:opaque_id_base]    = (SecureRandom.urlsafe_base64(12) + '%08x').freeze
+          t[:opaque_id_counter] = -1
+        end
 
         t[:opaque_id_counter] += 1
         t[:opaque_id_counter] = 0 if t[:opaque_id_counter] > COUNTER_MAX

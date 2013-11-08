@@ -20,6 +20,7 @@ module Elastomer
     # for more details.
     class OpaqueId < ::Faraday::Middleware
       X_OPAQUE_ID = 'X-Opaque-Id'.freeze
+      COUNTER_MAX = 2**32 - 1
 
       # Faraday middleware implementation.
       #
@@ -44,15 +45,12 @@ module Elastomer
       # Returns the UUID string.
       def generate_uuid
         t = Thread.current
-        t[:opaque_id_counter] ||= 0
-
-        if 0 == t[:opaque_id_counter] % 0xffff
-          t[:opaque_id_counter] = 0
-          t[:opaque_id_uuid] = (SecureRandom.uuid + '-%04x').freeze
-        end
+        t[:opaque_id_base] ||= (SecureRandom.urlsafe_base64(12) + '%08x').freeze
+        t[:opaque_id_counter] ||= -1
 
         t[:opaque_id_counter] += 1
-        t[:opaque_id_uuid] % t[:opaque_id_counter]
+        t[:opaque_id_counter] = 0 if t[:opaque_id_counter] > COUNTER_MAX
+        t[:opaque_id_base] % t[:opaque_id_counter]
       end
 
     end  # OpaqueId

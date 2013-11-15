@@ -2,6 +2,17 @@ require File.expand_path('../test_helper', __FILE__)
 
 describe Elastomer::Client do
 
+  it 'uses the adapter specified at creation' do
+    c = Elastomer::Client.new(:adapter => :test)
+    assert_includes c.connection.builder.handlers, Faraday::Adapter::Test
+  end
+
+  it "use Faraday's default adapter if none is specified" do
+    c = Elastomer::Client.new
+    adapter = Faraday::Adapter.lookup_middleware(Faraday.default_adapter)
+    assert_includes c.connection.builder.handlers, adapter
+  end
+
   it 'uses the same connection for all requests' do
     c = $client.connection
     assert_same c, $client.connection

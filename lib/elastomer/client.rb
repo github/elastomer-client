@@ -32,7 +32,7 @@ module Elastomer
 
       @read_timeout = opts.fetch :read_timeout, 5
       @open_timeout = opts.fetch :open_timeout, 2
-      @adapter      = opts.fetch :adapter, :excon
+      @adapter      = opts.fetch :adapter, Faraday.default_adapter
       @opaque_id    = opts.fetch :opaque_id, false
     end
 

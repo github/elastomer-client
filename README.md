@@ -96,3 +96,13 @@ docs.index({
 docs.search({:query => {:match_all => {}}}, :search_type => 'count')
 ```
 
+#### Performance
+
+By default Elastomer uses Net::HTTP (via Faraday) to communicate with
+ElasticSearch. You may find that Excon performs better for your use. To enable
+Excon, add it to your bundle and then change your Elastomer initialization
+thusly:
+
+```
+Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
+```

@@ -55,10 +55,11 @@ module Elastomer
     # Returns the response from the block
     def instrument( path, body, params )
       payload = {
-        :index  => params[:index],
-        :type   => params[:type],
-        :action => params[:action],
-        :body   => body
+        :index   => params[:index],
+        :type    => params[:type],
+        :action  => params[:action],
+        :context => params[:context],
+        :body    => body
       }
 
       ::Elastomer::Notifications.service.instrument(NAME, payload) do

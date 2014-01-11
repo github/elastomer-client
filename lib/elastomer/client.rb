@@ -202,6 +202,7 @@ module Elastomer
       expansions = {}
       query_values = params.dup
       query_values.delete :action
+      query_values.delete :context
 
       template.keys.map(&:to_sym).each do |key|
         expansions[key] = query_values.delete(key) if query_values.key? key

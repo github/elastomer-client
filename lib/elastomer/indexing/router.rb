@@ -10,6 +10,8 @@ module Elastomer
     attr_accessor :clients
 
     #TODO should adapter and index routing be delegated to sub-objects?
+    #
+    # Is there any reason to have a single object handle both index and adapter routing?
 
     # What local maps do we need?
     # cluster name => uri maybe?
@@ -22,10 +24,9 @@ module Elastomer
     #TODO use HashWithIndifferentAccess?
 
     def initialize
-      @index_classes = {}
-      @adapter_classes = {}
-      @indices = {}
       @cluster_clients = {}
+      @index_factory   = CachingFactory.new
+      @adapter_factory = Factory.new
     end
 
     def register_cluster(name, url)
@@ -37,30 +38,26 @@ module Elastomer
     end
 
     def register_index_class(name, klass)
-      @index_classes[name] = klass
+      @index_factory.register(name, klass)
     end
 
     def index_for(name)
-      @indices[name] ||= begin
-        if klass = @index_classes[name]
+      if klass = @index_factory.class_for(name)
 
-          #TODO determine proper client and physical name
-          client = client_for('default') || Elastomer::Client.new
-          physical_name = klass.physical_name
+        #TODO determine proper client and physical name
+        client = client_for('default')
+        physical_name = klass.physical_name
 
-          klass.new(client.index(name))
-        end
+        @index_factory.object_for(name, client.index(name))
       end
     end
 
     def register_adapter_class(type, klass)
-      @adapter_classes[type] = klass
+      @adapter_factory.register(type, klass)
     end
 
     def adapter_for(type)
-      if klass = @adapter_classes[type]
-        klass.new
-      end
+      @adapter_factory.object_for(type)
     end
   end
 end

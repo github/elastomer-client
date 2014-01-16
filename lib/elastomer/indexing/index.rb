@@ -89,5 +89,28 @@ module Elastomer
       #ES1.0 change the query body to use :query
       docs(type).delete_by_query(:match_all => {})
     end
+
+    module Naming
+      # logical name should, by default, be the demodulized class name.
+      # physical name should, by default, be the logical name.
+      # TODO can avoid activesupport here with simpler defaults, or an easier way
+      # to specify the logical name at the class level.
+      require 'active_support/inflector'
+      def logical_name
+        name.demodulize.downcase
+      end
+
+      def physical_name
+        logical_name
+      end
+    end
+    extend Naming
+
+    module Routing
+      def register_as(name=logical_name)
+        Elastomer.router.register_index_class(name, self)
+      end
+    end
+    extend Routing
   end
 end

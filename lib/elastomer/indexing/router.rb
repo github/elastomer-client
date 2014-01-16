@@ -23,6 +23,7 @@ module Elastomer
 
     def initialize
       @index_classes = {}
+      @adapter_classes = {}
       @indices = {}
     end
 
@@ -40,6 +41,16 @@ module Elastomer
 
           klass.new(client.index(name))
         end
+      end
+    end
+
+    def register_adapter_class(type, klass)
+      @adapter_classes[type] = klass
+    end
+
+    def adapter_for(type)
+      if klass = @adapter_classes[type]
+        klass.new
       end
     end
   end

@@ -25,6 +25,15 @@ module Elastomer
       @index_classes = {}
       @adapter_classes = {}
       @indices = {}
+      @cluster_clients = {}
+    end
+
+    def register_cluster(name, url)
+      @cluster_clients[name] = Elastomer::Client.new(:url => url)
+    end
+
+    def client_for(cluster_name)
+      @cluster_clients[cluster_name]
     end
 
     def register_index_class(name, klass)
@@ -36,7 +45,7 @@ module Elastomer
         if klass = @index_classes[name]
 
           #TODO determine proper client and physical name
-          client = Elastomer::Client.new
+          client = client_for('default') || Elastomer::Client.new
           physical_name = klass.physical_name
 
           klass.new(client.index(name))

@@ -24,17 +24,23 @@ module Elastomer
     #TODO use HashWithIndifferentAccess?
 
     def initialize
-      @cluster_clients = {}
       @index_factory   = CachingFactory.new
       @adapter_factory = Factory.new
+      @clients = {
+        'default' => Elastomer::Client.new
+      }
     end
 
+#TODO initialize with a default cluster.
+#TODO allow defining cluster connect parameters like timeouts
+#TODO add a Cluster class to encapsulate the client, parameters, and runtime state
+#TODO allow registering a client directly
     def register_cluster(name, url)
-      @cluster_clients[name] = Elastomer::Client.new(:url => url)
+      @clients[name] = Elastomer::Client.new(:url => url)
     end
 
     def client_for(cluster_name)
-      @cluster_clients[cluster_name]
+      @clients[cluster_name]
     end
 
     def register_index_class(name, klass)

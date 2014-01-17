@@ -7,7 +7,7 @@ module Elastomer
   class Router
     include Singleton
 
-    attr_accessor :clients
+    attr_accessor :clusters
 
     #TODO should adapter and index routing be delegated to sub-objects?
     #
@@ -26,9 +26,8 @@ module Elastomer
     def initialize
       @index_factory   = CachingFactory.new
       @adapter_factory = Factory.new
-      @clients = {
-        'default' => Elastomer::Client.new
-      }
+      @clusters = {}
+      register_cluster('default', 'http://localhost:19200') #TODO placeholder
     end
 
 #TODO initialize with a default cluster.
@@ -36,11 +35,13 @@ module Elastomer
 #TODO add a Cluster class to encapsulate the client, parameters, and runtime state
 #TODO allow registering a client directly
     def register_cluster(name, url)
-      @clients[name] = Elastomer::Client.new(:url => url)
+      @clusters[name] = Cluster.new(name, :url => url)
     end
 
     def client_for(cluster_name)
-      @clients[cluster_name]
+      if cluster = @clusters[cluster_name]
+        cluster.client
+      end
     end
 
     def register_index_class(name, klass)

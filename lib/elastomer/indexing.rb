@@ -4,6 +4,7 @@ require 'forwardable'
 require 'elastomer/client'
 
 require 'elastomer/indexing/index'
+require 'elastomer/indexing/cluster'
 
 require 'elastomer/indexing/factory'
 require 'elastomer/indexing/caching_factory'

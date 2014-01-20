@@ -27,7 +27,7 @@ module Elastomer
       @index_factory   = CachingFactory.new
       @adapter_factory = Factory.new
       @clusters = {}
-      register_cluster('default', 'http://localhost:19200') #TODO placeholder
+      register_cluster(Cluster.default_name, 'http://localhost:19200') #TODO placeholder
     end
 
 #TODO initialize with a default cluster.

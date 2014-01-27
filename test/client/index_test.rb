@@ -16,6 +16,12 @@ describe Elastomer::Client::Index do
     assert_raises(ArgumentError) { $client.index }
   end
 
+  it 'disallows blank index names' do
+    assert_raises(ArgumentError) { $client.index }
+    assert_raises(ArgumentError) { $client.index(nil) }
+    assert_raises(ArgumentError) { $client.index("") }
+  end
+
   it 'determines if an index exists' do
     assert !@index.exists?, 'the index should not yet exist'
   end

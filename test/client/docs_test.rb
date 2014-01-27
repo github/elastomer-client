@@ -39,15 +39,6 @@ describe Elastomer::Client::Docs do
     @index.delete if @index.exists?
   end
 
-  it 'requires an index name' do
-    assert_raises(ArgumentError) { $client.docs }
-  end
-
-  it 'disallows blank index names' do
-    assert_raises(ArgumentError) { $client.docs(nil) }
-    assert_raises(ArgumentError) { $client.docs("") }
-  end
-
   it 'autogenerates IDs for documents' do
     h = @docs.index \
           :_type  => 'doc2',

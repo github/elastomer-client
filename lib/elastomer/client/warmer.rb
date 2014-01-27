@@ -20,8 +20,7 @@ module Elastomer
       # index_name - The name of the index as a String
       # name       - The name of the warmer as a String
       def initialize(client, index_name, name)
-        raise ArgumentError, 'index name cannot be blank' if index_name.blank?
-        raise ArgumentError, 'warmer name cannot be blank' if name.blank?
+        raise ArgumentError, 'index name cannot be nil' if index_name.nil?
 
         @client = client
         @index_name = index_name

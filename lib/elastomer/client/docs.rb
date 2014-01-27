@@ -22,7 +22,7 @@ module Elastomer
       # type   - The document type as a String
       #
       def initialize( client, name, type = nil )
-        raise ArgumentError, 'index name cannot be blank' if name.blank?
+        raise ArgumentError, 'index name cannot be nil' if name.nil?
 
         @client = client
         @name   = name

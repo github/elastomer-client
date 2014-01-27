@@ -3,9 +3,6 @@ require 'faraday'
 require 'faraday_middleware'
 require 'multi_json'
 
-require 'active_support'
-require 'active_support/core_ext/object/blank'
-
 require 'elastomer/version'
 
 module Elastomer

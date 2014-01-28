@@ -17,6 +17,8 @@ module Elastomer
       # Parse the response body.
       def parse(body)
         MultiJson.load(body)
+      rescue StandardError, SyntaxError => e
+        raise Faraday::Error::ParsingError, e
       end
 
       def process_response?(env)

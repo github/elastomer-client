@@ -47,5 +47,5 @@ module Elastomer
   end
 end
 
-Faraday.register_middleware :request,
+Faraday::Request.register_middleware \
   :encode_json => ::Elastomer::Middleware::EncodeJson

@@ -16,18 +16,14 @@ module Elastomer
 
       # Parse the response body.
       def parse(body)
-        MultiJson.load(body)
+        MultiJson.load(body) if body.respond_to?(:to_str) and !body.strip.empty?
       rescue StandardError, SyntaxError => e
         raise Faraday::Error::ParsingError, e
       end
 
       def process_response?(env)
         type = response_type(env)
-        has_body?(env) and type == MIME_TYPE
-      end
-
-      def has_body?(env)
-        body = env[:body] and !(body.respond_to?(:to_str) and body.empty?)
+        type.empty? or type == MIME_TYPE
       end
 
       def response_type(env)
@@ -39,5 +35,5 @@ module Elastomer
   end
 end
 
-Faraday.register_middleware :response,
+Faraday::Response.register_middleware \
   :parse_json => ::Elastomer::Middleware::ParseJson

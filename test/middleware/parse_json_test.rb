@@ -37,15 +37,18 @@ describe Elastomer::Middleware::ParseJson do
 
   it 'ignores json body if incorrect type' do
     response = process('{"a":1}', 'application/xml; charset=utf-8')
-    assert_equal({'a' => 1}, response.body)
+    assert_equal('{"a":1}', response.body)
   end
 
   it 'chokes on invalid json' do
-    ['{!', '"a"', 'true', 'null', '1'].each do |data|
-      assert_raises(Faraday::Error::ParsingError) do
-        process(data)
-      end
-    end
-  end
+    assert_raises(Faraday::Error::ParsingError) { process '{!'      }
+    assert_raises(Faraday::Error::ParsingError) { process 'invalid' }
 
+    # surprisingly these are all valid according to MultiJson
+    #
+    # assert_raises(Faraday::Error::ParsingError) { process '"a"'  }
+    # assert_raises(Faraday::Error::ParsingError) { process 'true' }
+    # assert_raises(Faraday::Error::ParsingError) { process 'null' }
+    # assert_raises(Faraday::Error::ParsingError) { process '1'    }
+  end
 end

@@ -65,5 +65,5 @@ module Elastomer
 
 end  # Elastomer
 
-Faraday.register_middleware :request,
+Faraday::Request.register_middleware \
   :opaque_id => ::Elastomer::Middleware::OpaqueId

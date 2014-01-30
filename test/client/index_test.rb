@@ -169,7 +169,7 @@ describe Elastomer::Client::Index do
 
     it 'gets stats' do
       response = @index.stats
-      assert_includes response["_all"]["indices"], "elastomer-index-test"
+      assert_includes response["indices"], "elastomer-index-test"
     end
 
     it 'gets status' do

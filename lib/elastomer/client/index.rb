@@ -20,7 +20,7 @@ module Elastomer
       # name   - The name of the index as a String or an Array of names
       #
       def initialize( client, name )
-        raise ArgumentError, 'index name cannot be nil' if name.nil?
+        raise ArgumentError, 'index name cannot be blank' if name.blank?
 
         @client = client
         @name   = name.to_s

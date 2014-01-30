@@ -30,6 +30,21 @@ describe Elastomer::Client::Warmer do
     @index.delete if @index.exists?
   end
 
+  it 'requires an index name and a warmer name' do
+    assert_raises(ArgumentError) { $client.warmer }
+    assert_raises(ArgumentError) { $client.warmer('test1') }
+  end
+
+  it 'disallows blank index names' do
+    assert_raises(ArgumentError) { $client.warmer(nil, 'warmer1') }
+    assert_raises(ArgumentError) { $client.warmer("", 'warmer1') }
+  end
+
+  it 'disallows blank warmer names' do
+    assert_raises(ArgumentError) { $client.warmer('test1', nil) }
+    assert_raises(ArgumentError) { $client.warmer('test1', "") }
+  end
+
   it 'creates warmers' do
     h = @index.warmer('test1').create(:query => { :match_all => {}})
     assert_equal true, h["ok"]

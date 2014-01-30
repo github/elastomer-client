@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   # runtime dependencies
   s.add_dependency 'addressable',         '~> 2.3'
   s.add_dependency 'faraday',             '~> 0.8'
-  s.add_dependency 'faraday_middleware',  '~> 0.9'
   s.add_dependency 'multi_json',          '~> 1.7'
 
   # development dependencies

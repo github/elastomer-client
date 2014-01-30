@@ -1,6 +1,5 @@
 require 'addressable/template'
 require 'faraday'
-require 'faraday_middleware'
 require 'multi_json'
 
 require 'elastomer/version'
@@ -53,8 +52,8 @@ module Elastomer
     # Returns a Faraday::Connection
     def connection
       @connection ||= Faraday.new(url) do |conn|
-        conn.request  :json
-        conn.response :json, :content_type => /\bjson$/i
+        conn.request  :encode_json
+        conn.response :parse_json
         conn.request  :opaque_id if @opaque_id
 
         Array === @adapter ?

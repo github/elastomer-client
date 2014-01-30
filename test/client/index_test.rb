@@ -169,7 +169,11 @@ describe Elastomer::Client::Index do
 
     it 'gets stats' do
       response = @index.stats
-      assert_includes response["indices"], "elastomer-index-test"
+      if response.key? 'indices'
+        assert_includes response["indices"], "elastomer-index-test"
+      else
+        assert_includes response["_all"]["indices"], "elastomer-index-test"
+      end
     end
 
     it 'gets status' do

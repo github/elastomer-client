@@ -45,6 +45,16 @@ describe Elastomer::Client do
     assert_equal '/_cluster/health?level=shards', uri
   end
 
+  it 'validates path expansions' do
+    assert_raises(ArgumentError) {
+      $client.expand_path '/{foo}/{bar}', :foo => '_cluster', :bar => nil
+    }
+
+    assert_raises(ArgumentError) {
+      $client.expand_path '/{foo}/{bar}', :foo => '_cluster', :bar => ''
+    }
+  end
+
   describe 'when validating parameters' do
     it 'rejects nil values' do
       assert_raises(ArgumentError) { $client.validate_param nil }

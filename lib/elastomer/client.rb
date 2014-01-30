@@ -197,6 +197,7 @@ module Elastomer
     # Returns an Addressable::Uri
     def expand_path( path, params )
       template = Addressable::Template.new path
+      params = validate_params(params, path)
 
       expansions = {}
       query_values = params.dup
@@ -243,6 +244,56 @@ module Elastomer
       raise Error, response if Hash === response.body && response.body['error']
 
       response
+    end
+
+    #
+    # param - The param Object to validate
+    # name  - Optional param name as a String (used in exception messages)
+    #
+    # Returns the validated param as a String or an Array.
+    # Raises an ArgumentError if the param is not valid.
+    def validate_param( param, name = 'input value' )
+      case param
+      when String, Numeric
+          param = param.to_s.strip
+          raise ArgumentError, "#{name} cannot be blank: #{param.inspect}" if param =~ /\A\s*\z/
+          param
+
+      when Array
+        param.flatten.map { |item|
+          raise ArgumentError, "#{name} cannot be nil" if item.nil?
+          item = item.to_s.strip
+          raise ArgumentError, "#{name} cannot be blank: #{item.inspect}" if item =~ /\A\s*\z/
+          item
+        }.join(',')
+
+      when nil
+        raise ArgumentError, "#{name} cannot be nil"
+
+      else
+        raise ArgumentError, "#{name} is invalid: #{param.inspect}"
+      end
+    end
+
+    #
+    # params - The paramaters Hash to validate
+    # path   -
+    #
+    # Returns the paramters Hash.
+    def validate_params( params, path )
+      if path =~ /{index}/ || path =~ /{\/index}/ && params[:index]
+        params[:index] = validate_param(params[:index], 'index name')
+      end
+
+      if path =~ /{type}/ || path =~ /{\/type}/ && params[:type]
+        params[:type] = validate_param(params[:type], 'document type')
+      end
+
+      if path =~ /{id}/ || path =~ /{\/id}/ && params[:id]
+        params[:id] = validate_param(params[:id], 'document id')
+      end
+
+      params
     end
 
   end  # Client

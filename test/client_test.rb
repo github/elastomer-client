@@ -44,4 +44,33 @@ describe Elastomer::Client do
     uri = $client.expand_path '/_cluster/health', :level => 'shards'
     assert_equal '/_cluster/health?level=shards', uri
   end
+
+  describe 'when validating parameters' do
+    it 'rejects nil values' do
+      assert_raises(ArgumentError) { $client.validate_param nil }
+    end
+
+    it 'rejects empty strings' do
+      assert_raises(ArgumentError) { $client.validate_param "" }
+      assert_raises(ArgumentError) { $client.validate_param " " }
+      assert_raises(ArgumentError) { $client.validate_param " \t \r \n " }
+    end
+
+    it 'rejects empty strings and nil values found in arrays' do
+      assert_raises(ArgumentError) { $client.validate_param ['foo', nil, 'bar'] }
+      assert_raises(ArgumentError) { $client.validate_param ['baz', " \t \r \n "] }
+    end
+
+    it 'strips whitespace from strings' do
+      assert_equal 'foo', $client.validate_param("  foo  \t")
+    end
+
+    it 'joins array values into a string' do
+      assert_equal 'foo,bar', $client.validate_param(%w[foo bar])
+    end
+
+    it 'flattens arrays' do
+      assert_equal 'foo,bar,baz,buz', $client.validate_param(["  foo  \t", %w[bar baz buz]])
+    end
+  end
 end

@@ -197,7 +197,6 @@ module Elastomer
     # Returns an Addressable::Uri
     def expand_path( path, params )
       template = Addressable::Template.new path
-      params = validate_params(params, path)
 
       expansions = {}
       query_values = params.dup
@@ -205,7 +204,9 @@ module Elastomer
       query_values.delete :context
 
       template.keys.map(&:to_sym).each do |key|
-        expansions[key] = query_values.delete(key) if query_values.key? key
+        value = query_values.delete key
+        value = validate_param(value, key) unless path =~ /{\/#{key}}/ && value.nil?
+        expansions[key] = value
       end
 
       uri = template.expand(expansions)
@@ -273,27 +274,6 @@ module Elastomer
       else
         raise ArgumentError, "#{name} is invalid: #{param.inspect}"
       end
-    end
-
-    #
-    # params - The paramaters Hash to validate
-    # path   -
-    #
-    # Returns the paramters Hash.
-    def validate_params( params, path )
-      if path =~ /{index}/ || path =~ /{\/index}/ && params[:index]
-        params[:index] = validate_param(params[:index], 'index name')
-      end
-
-      if path =~ /{type}/ || path =~ /{\/type}/ && params[:type]
-        params[:type] = validate_param(params[:type], 'document type')
-      end
-
-      if path =~ /{id}/ || path =~ /{\/id}/ && params[:id]
-        params[:id] = validate_param(params[:id], 'document id')
-      end
-
-      params
     end
 
   end  # Client

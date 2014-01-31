@@ -269,12 +269,7 @@ module Elastomer
           param
 
       when Array
-        param.flatten.map { |item|
-          raise ArgumentError, "#{name} cannot be nil" if item.nil?
-          item = item.to_s.strip
-          raise ArgumentError, "#{name} cannot be blank: #{item.inspect}" if item =~ /\A\s*\z/
-          item
-        }.join(',')
+        param.flatten.map { |item| assert_param_presence(item, name) }.join(',')
 
       when nil
         raise ArgumentError, "#{name} cannot be nil"

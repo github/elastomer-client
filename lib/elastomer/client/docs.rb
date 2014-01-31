@@ -23,8 +23,8 @@ module Elastomer
       #
       def initialize( client, name, type = nil )
         @client = client
-        @name   = @client.validate_param(name, 'index name')
-        @type   = @client.validate_param(type, 'document type') unless type.nil?
+        @name   = @client.assert_param_presence(name, 'index name')
+        @type   = @client.assert_param_presence(type, 'document type') unless type.nil?
       end
 
       attr_reader :client, :name, :type

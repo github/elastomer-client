@@ -205,7 +205,7 @@ module Elastomer
 
       template.keys.map(&:to_sym).each do |key|
         value = query_values.delete key
-        value = validate_param(value, key) unless path =~ /{\/#{key}}/ && value.nil?
+        value = assert_param_presence(value, key) unless path =~ /{\/#{key}}/ && value.nil?
         expansions[key] = value
       end
 
@@ -247,13 +247,21 @@ module Elastomer
       response
     end
 
+    # Internal: Ensure that the parameter has a valid value. Things like `nil`
+    # and empty strings are right out. This method also performs a little
+    # formating on the parameter:
+    #
+    # * leading and trailing whitespace is removed
+    # * arrays are flattend
+    # * and then joined into a String
+    # * numerics are converted to their string equivalents
     #
     # param - The param Object to validate
     # name  - Optional param name as a String (used in exception messages)
     #
-    # Returns the validated param as a String or an Array.
+    # Returns the validated param as a String.
     # Raises an ArgumentError if the param is not valid.
-    def validate_param( param, name = 'input value' )
+    def assert_param_presence( param, name = 'input value' )
       case param
       when String, Numeric
           param = param.to_s.strip

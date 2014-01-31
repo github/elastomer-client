@@ -21,8 +21,8 @@ module Elastomer
       # name       - The name of the warmer as a String
       def initialize(client, index_name, name)
         @client     = client
-        @index_name = @client.validate_param(index_name, 'index name')
-        @name       = @client.validate_param(name, 'warmer name')
+        @index_name = @client.assert_param_presence(index_name, 'index name')
+        @name       = @client.assert_param_presence(name, 'warmer name')
       end
 
       attr_reader :client, :index_name, :name

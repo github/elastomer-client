@@ -57,30 +57,30 @@ describe Elastomer::Client do
 
   describe 'when validating parameters' do
     it 'rejects nil values' do
-      assert_raises(ArgumentError) { $client.validate_param nil }
+      assert_raises(ArgumentError) { $client.assert_param_presence nil }
     end
 
     it 'rejects empty strings' do
-      assert_raises(ArgumentError) { $client.validate_param "" }
-      assert_raises(ArgumentError) { $client.validate_param " " }
-      assert_raises(ArgumentError) { $client.validate_param " \t \r \n " }
+      assert_raises(ArgumentError) { $client.assert_param_presence "" }
+      assert_raises(ArgumentError) { $client.assert_param_presence " " }
+      assert_raises(ArgumentError) { $client.assert_param_presence " \t \r \n " }
     end
 
     it 'rejects empty strings and nil values found in arrays' do
-      assert_raises(ArgumentError) { $client.validate_param ['foo', nil, 'bar'] }
-      assert_raises(ArgumentError) { $client.validate_param ['baz', " \t \r \n "] }
+      assert_raises(ArgumentError) { $client.assert_param_presence ['foo', nil, 'bar'] }
+      assert_raises(ArgumentError) { $client.assert_param_presence ['baz', " \t \r \n "] }
     end
 
     it 'strips whitespace from strings' do
-      assert_equal 'foo', $client.validate_param("  foo  \t")
+      assert_equal 'foo', $client.assert_param_presence("  foo  \t")
     end
 
     it 'joins array values into a string' do
-      assert_equal 'foo,bar', $client.validate_param(%w[foo bar])
+      assert_equal 'foo,bar', $client.assert_param_presence(%w[foo bar])
     end
 
     it 'flattens arrays' do
-      assert_equal 'foo,bar,baz,buz', $client.validate_param(["  foo  \t", %w[bar baz buz]])
+      assert_equal 'foo,bar,baz,buz', $client.assert_param_presence(["  foo  \t", %w[bar baz buz]])
     end
   end
 end

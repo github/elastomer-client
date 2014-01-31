@@ -264,9 +264,9 @@ module Elastomer
     def assert_param_presence( param, name = 'input value' )
       case param
       when String, Numeric
-          param = param.to_s.strip
-          raise ArgumentError, "#{name} cannot be blank: #{param.inspect}" if param =~ /\A\s*\z/
-          param
+        param = param.to_s.strip
+        raise ArgumentError, "#{name} cannot be blank: #{param.inspect}" if param =~ /\A\s*\z/
+        param
 
       when Array
         param.flatten.map { |item| assert_param_presence(item, name) }.join(',')

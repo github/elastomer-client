@@ -102,8 +102,6 @@ describe Elastomer::Client::Index do
   end
 
   it 'lists all aliases to the index' do
-    assert_empty @index.get_aliases, 'no aliases for an index that does not exist'
-
     @index.create(nil)
     assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
 
@@ -124,6 +122,10 @@ describe Elastomer::Client::Index do
   describe "when an index exists" do
     before do
       @index.create(nil)
+      $client.cluster.health \
+        :index           => @name,
+        :wait_for_status => 'green',
+        :timeout         => '5s'
     end
 
     #TODO assert this only hits the desired index
@@ -169,7 +171,11 @@ describe Elastomer::Client::Index do
 
     it 'gets stats' do
       response = @index.stats
-      assert_includes response["_all"]["indices"], "elastomer-index-test"
+      if response.key? 'indices'
+        assert_includes response["indices"], "elastomer-index-test"
+      else
+        assert_includes response["_all"]["indices"], "elastomer-index-test"
+      end
     end
 
     it 'gets status' do

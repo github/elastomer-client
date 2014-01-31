@@ -44,4 +44,43 @@ describe Elastomer::Client do
     uri = $client.expand_path '/_cluster/health', :level => 'shards'
     assert_equal '/_cluster/health?level=shards', uri
   end
+
+  it 'validates path expansions' do
+    assert_raises(ArgumentError) {
+      $client.expand_path '/{foo}/{bar}', :foo => '_cluster', :bar => nil
+    }
+
+    assert_raises(ArgumentError) {
+      $client.expand_path '/{foo}/{bar}', :foo => '_cluster', :bar => ''
+    }
+  end
+
+  describe 'when validating parameters' do
+    it 'rejects nil values' do
+      assert_raises(ArgumentError) { $client.assert_param_presence nil }
+    end
+
+    it 'rejects empty strings' do
+      assert_raises(ArgumentError) { $client.assert_param_presence "" }
+      assert_raises(ArgumentError) { $client.assert_param_presence " " }
+      assert_raises(ArgumentError) { $client.assert_param_presence " \t \r \n " }
+    end
+
+    it 'rejects empty strings and nil values found in arrays' do
+      assert_raises(ArgumentError) { $client.assert_param_presence ['foo', nil, 'bar'] }
+      assert_raises(ArgumentError) { $client.assert_param_presence ['baz', " \t \r \n "] }
+    end
+
+    it 'strips whitespace from strings' do
+      assert_equal 'foo', $client.assert_param_presence("  foo  \t")
+    end
+
+    it 'joins array values into a string' do
+      assert_equal 'foo,bar', $client.assert_param_presence(%w[foo bar])
+    end
+
+    it 'flattens arrays' do
+      assert_equal 'foo,bar,baz,buz', $client.assert_param_presence(["  foo  \t", %w[bar baz buz]])
+    end
+  end
 end

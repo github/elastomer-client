@@ -20,11 +20,9 @@ module Elastomer
       # index_name - The name of the index as a String
       # name       - The name of the warmer as a String
       def initialize(client, index_name, name)
-        raise ArgumentError, 'index name cannot be nil' if index_name.nil?
-
-        @client = client
-        @index_name = index_name
-        @name = name
+        @client     = client
+        @index_name = @client.assert_param_presence(index_name, 'index name')
+        @name       = @client.assert_param_presence(name, 'warmer name')
       end
 
       attr_reader :client, :index_name, :name

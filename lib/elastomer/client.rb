@@ -204,7 +204,9 @@ module Elastomer
       query_values.delete :context
 
       template.keys.map(&:to_sym).each do |key|
-        expansions[key] = query_values.delete(key) if query_values.key? key
+        value = query_values.delete key
+        value = assert_param_presence(value, key) unless path =~ /{\/#{key}}/ && value.nil?
+        expansions[key] = value
       end
 
       uri = template.expand(expansions)
@@ -243,6 +245,38 @@ module Elastomer
       raise Error, response if Hash === response.body && response.body['error']
 
       response
+    end
+
+    # Internal: Ensure that the parameter has a valid value. Things like `nil`
+    # and empty strings are right out. This method also performs a little
+    # formating on the parameter:
+    #
+    # * leading and trailing whitespace is removed
+    # * arrays are flattend
+    # * and then joined into a String
+    # * numerics are converted to their string equivalents
+    #
+    # param - The param Object to validate
+    # name  - Optional param name as a String (used in exception messages)
+    #
+    # Returns the validated param as a String.
+    # Raises an ArgumentError if the param is not valid.
+    def assert_param_presence( param, name = 'input value' )
+      case param
+      when String, Numeric
+        param = param.to_s.strip
+        raise ArgumentError, "#{name} cannot be blank: #{param.inspect}" if param =~ /\A\s*\z/
+        param
+
+      when Array
+        param.flatten.map { |item| assert_param_presence(item, name) }.join(',')
+
+      when nil
+        raise ArgumentError, "#{name} cannot be nil"
+
+      else
+        raise ArgumentError, "#{name} is invalid: #{param.inspect}"
+      end
     end
 
   end  # Client

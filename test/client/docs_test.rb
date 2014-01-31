@@ -137,6 +137,10 @@ describe Elastomer::Client::Docs do
     h = @docs.multi_get :ids => [1, 2]
     exists = h['docs'].map { |d| d['exists'] }
     assert_equal [false, true], exists
+
+    assert_raises(ArgumentError) { @docs.delete :id => nil }
+    assert_raises(ArgumentError) { @docs.delete :id => '' }
+    assert_raises(ArgumentError) { @docs.delete :id => "\t" }
   end
 
   it 'does not care if you delete a document that is not there' do

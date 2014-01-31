@@ -22,11 +22,9 @@ module Elastomer
       # type   - The document type as a String
       #
       def initialize( client, name, type = nil )
-        raise ArgumentError, 'index name cannot be nil' if name.nil?
-
         @client = client
-        @name   = name
-        @type   = type
+        @name   = @client.assert_param_presence(name, 'index name')
+        @type   = @client.assert_param_presence(type, 'document type') unless type.nil?
       end
 
       attr_reader :client, :name, :type
@@ -43,7 +41,7 @@ module Elastomer
         params = update_params(params, overrides)
         params[:action] = 'document.index'
 
-        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
+        params.delete(:id) if params[:id].nil? || params[:id].to_s =~ /\A\s*\z/
 
         response =
             if params[:id]

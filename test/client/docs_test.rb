@@ -283,19 +283,22 @@ describe Elastomer::Client::Docs do
     assert_equal true, h['exists']
     assert_equal 'TwP', h['_source']['author']
 
-    @docs.update({
-      :_id   => '42',
-      :_type => 'doc1',
-      :doc   => {
-        :author => 'TwP',
-        :title  => 'the ineffable beauty of search'
-      },
-      :doc_as_upsert => true
-    })
-    h = @docs.get :id => '42', :type => 'doc1'
-    assert_equal true, h['exists']
-    assert_equal 'TwP', h['_source']['author']
-    assert_equal 'the ineffable beauty of search', h['_source']['title']
+    if $client.version >= "0.90"
+      @docs.update({
+        :_id   => '42',
+        :_type => 'doc1',
+        :doc   => {
+          :author => 'TwP',
+          :title  => 'the ineffable beauty of search'
+        },
+        :doc_as_upsert => true
+      })
+
+      h = @docs.get :id => '42', :type => 'doc1'
+      assert_equal true, h['exists']
+      assert_equal 'TwP', h['_source']['author']
+      assert_equal 'the ineffable beauty of search', h['_source']['title']
+    end
   end
 
   def populate!

@@ -46,6 +46,17 @@ module Elastomer
       false
     end
 
+    # Returns the version String of the attached ElasticSearch instance.
+    def version
+      info['version']['number']
+    end
+
+    # Returns the information Hash from the attached ElasticSearch instance.
+    def info
+      response = get '/', :action => 'cluster.info'
+      response.body
+    end
+
     # Internal: Provides access to the Faraday::Connection used by this client
     # for all requests to the server.
     #

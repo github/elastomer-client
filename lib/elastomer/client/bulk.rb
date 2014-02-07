@@ -142,7 +142,7 @@ module Elastomer
       # or empty.
       #
       # document - The document to create as a Hash or JSON encoded String
-      # params   - Parameters for the index action (as a Hash)
+      # params   - Parameters for the create action (as a Hash)
       #
       # Returns the response from the bulk call if one was made or nil.
       def create( document, params )
@@ -153,6 +153,24 @@ module Elastomer
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
 
         add_to_actions({:create => params}, document)
+      end
+
+      # Add an update action to the list of bulk actions to be performed when
+      # the bulk API call is made. The `_id` of the document cannot be `nil`
+      # or empty.
+      #
+      # document - The document to update as a Hash or JSON encoded String
+      # params   - Parameters for the update action (as a Hash)
+      #
+      # Returns the response from the bulk call if one was made or nil.
+      def update( document, params )
+        unless String === document
+          overrides = from_document(document)
+          params = params.merge overrides
+        end
+        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
+
+        add_to_actions({:update => params}, document)
       end
 
       # Add a delete action to the list of bulk actions to be performed when
@@ -193,7 +211,7 @@ module Elastomer
       def from_document( document )
         opts = {}
 
-        %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl].each do |field|
+        %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl _retry_on_conflict].each do |field|
           key = field.to_sym
           opts[key] = document.delete field if document[field]
           opts[key] = document.delete key   if document[key]
@@ -217,13 +235,13 @@ module Elastomer
       def add_to_actions( action, document = nil )
         action = MultiJson.dump action
         @actions << action
-        @current_request_size += action.length
+        @current_request_size += action.bytesize
         @current_action_count += 1
 
         unless document.nil?
           document = MultiJson.dump document unless String === document
           @actions << document
-          @current_request_size += document.length
+          @current_request_size += document.bytesize
         end
 
         if (request_size && @current_request_size >= request_size) ||

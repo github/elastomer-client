@@ -43,7 +43,7 @@ module Elastomer
     #
     # Returns the response body as a Hash.
     def scroll( scroll_id, scroll = '5m' )
-      response = get '/_search/scroll', :scroll_id => scroll_id, :scroll => scroll, :action => 'search.scroll'
+      response = get '/_search/scroll', :body => scroll_id, :scroll => scroll, :action => 'search.scroll'
       response.body
     end
 

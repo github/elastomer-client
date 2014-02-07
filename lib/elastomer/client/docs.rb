@@ -80,6 +80,19 @@ module Elastomer
         response.body
       end
 
+      # Retrieve the document source from the index based on the ID and type.
+      # The :id is provided as part of the params hash.
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#_source
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def source( params = {} )
+        response = client.get '/{index}/{type}/{id}/_source', update_params(params, :action => 'document.source')
+        response.body
+      end
+
       # Allows to get multiple documents based on an index, type, and id (and possibly routing).
       # See http://www.elasticsearch.org/guide/reference/api/multi-get/
       #
@@ -106,7 +119,7 @@ module Elastomer
         overrides = from_document(script)
         overrides[:action] = 'document.update'
 
-        response = client.put '/{index}/{type}/{id}/_update', update_params(params, overrides)
+        response = client.post '/{index}/{type}/{id}/_update', update_params(params, overrides)
         response.body
       end
 

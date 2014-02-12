@@ -379,7 +379,7 @@ Percolate
         opts = {:body => document}
 
         unless String === document
-          %w[_id _type _routing _parent].each do |field|
+          %w[_id _type _routing _parent _ttl _timestamp _retry_on_conflict].each do |field|
             key = field.sub(/^_/, '').to_sym
 
             opts[key] = document.delete field if document.key? field

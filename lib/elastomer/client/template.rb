@@ -48,7 +48,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create( template, params = {} )
-        response = client.put '/_template/{template}', update_params(params, :body => template, :action => 'tempate.create')
+        response = client.put '/_template/{template}', update_params(params, :body => template, :action => 'template.create')
         response.body
       end
 

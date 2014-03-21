@@ -26,13 +26,13 @@ describe Elastomer::Client::Cluster do
   end
 
   it 'updates the cluster settings' do
-    @cluster.update_settings :transient => { 'cluster.blocks.read_only' => true }
+    @cluster.update_settings :transient => { 'indices.ttl.interval' => "30" }
     h = @cluster.settings
-    assert_equal({'cluster.blocks.read_only' => 'true'}, h['transient'])
+    assert_equal "30", h['transient']['indices.ttl.interval']
 
-    @cluster.update_settings :transient => { 'cluster.blocks.read_only' => false }
+    @cluster.update_settings :transient => { 'indices.ttl.interval' => "60" }
     h = @cluster.settings
-    assert_equal({'cluster.blocks.read_only' => 'false'}, h['transient'])
+    assert_equal "60", h['transient']['indices.ttl.interval']
   end
 
   it 'returns the list of nodes in the cluster' do

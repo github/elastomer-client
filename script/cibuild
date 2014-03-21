@@ -14,8 +14,8 @@ echo
 
 result=0
 
-RUBY_VERSION="$(cat .ruby-version)"
-echo "Building under $RUBY_VERSION"
+export RBENV_VERSION="$(cat .ruby-version)"
+echo "Building under $RBENV_VERSION"
 script/bootstrap
 script/testsuite || result=$?
 

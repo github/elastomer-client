@@ -1,4 +1,3 @@
-
 module Elastomer
   class Client
 
@@ -10,7 +9,6 @@ module Elastomer
     def index( name )
       Index.new self, name
     end
-
 
     class Index
       # Create a new index client for making API requests that pertain to
@@ -56,36 +54,44 @@ module Elastomer
       # Delete the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-delete-index/
       #
+      # params - Parameters Hash
+      #
       # Returns the response body as a Hash
-      def delete
-        response = client.delete '/{index}', defaults.merge(:action => 'index.delete')
+      def delete( params = {} )
+        response = client.delete '/{index}', update_params(params, :action => 'index.delete')
         response.body
       end
 
       # Open the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-open-close/
       #
+      # params - Parameters Hash
+      #
       # Returns the response body as a Hash
-      def open
-        response = client.post '/{index}/_open', defaults.merge(:action => 'open')
+      def open( params = {} )
+        response = client.post '/{index}/_open', update_params(params, :action => 'index.open')
         response.body
       end
 
       # Close the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-open-close/
       #
+      # params - Parameters Hash
+      #
       # Returns the response body as a Hash
-      def close
-        response = client.post '/{index}/_close', defaults.merge(:action => 'close')
+      def close( params = {} )
+        response = client.post '/{index}/_close', update_params(params, :action => 'index.close')
         response.body
       end
 
       # Retrieve the settings for the index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-get-settings/
       #
+      # params - Parameters Hash
+      #
       # Returns the response body as a Hash
-      def settings
-        response = client.get '{/index}/_settings', defaults.merge(:action => 'index.settings.get')
+      def settings( params = {} )
+        response = client.get '{/index}/_settings', update_params(params, :action => 'index.settings')
         response.body
       end
 
@@ -97,7 +103,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_settings( body, params = {} )
-        response = client.put '{/index}/_settings', update_params(params, :body => body, :action => 'index.settings.update')
+        response = client.put '{/index}/_settings', update_params(params, :body => body, :action => 'index.update_settings')
         response.body
       end
 
@@ -110,7 +116,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def mapping( params = {} )
-        response = client.get '/{index}{/type}/_mapping', update_params(params, :action => 'index.mapping.get')
+        response = client.get '/{index}{/type}/_mapping', update_params(params, :action => 'index.mapping')
         response.body
       end
 
@@ -123,7 +129,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_mapping( type, body, params = {} )
-        response = client.put '/{index}/{type}/_mapping', update_params(params, :body => body, :type => type, :action => 'index.mapping.update')
+        response = client.put '/{index}/{type}/_mapping', update_params(params, :body => body, :type => type, :action => 'index.update_mapping')
         response.body
       end
       alias :put_mapping :update_mapping
@@ -138,16 +144,18 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete_mapping( type, params = {} )
-        response = client.delete '/{index}/{type}', update_params(params, :type => type, :action => 'index.mapping.delete')
+        response = client.delete '/{index}/{type}', update_params(params, :type => type, :action => 'index.delete_mapping')
         response.body
       end
 
       # Return the aliases associated with this index.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
       #
+      # params - Parameters Hash
+      #
       # Returns the response body as a Hash
-      def get_aliases
-        response = client.get '/{index}/_aliases', defaults.merge(:action => 'aliases.get')
+      def get_aliases( params = {} )
+        response = client.get '/{index}/_aliases', update_params(:action => 'index.get_aliases')
         response.body
       end
 
@@ -159,7 +167,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def analyze( text, params = {} )
-        response = client.get '{/index}/_analyze', update_params(params, :body => text.to_s, :action => 'analyze')
+        response = client.get '{/index}/_analyze', update_params(params, :body => text.to_s, :action => 'index.analyze')
         response.body
       end
 
@@ -172,7 +180,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def refresh( params = {} )
-        response = client.post '{/index}/_refresh', update_params(params, :action => 'refresh')
+        response = client.post '{/index}/_refresh', update_params(params, :action => 'index.refresh')
         response.body
       end
 
@@ -183,7 +191,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def flush( params = {} )
-        response = client.post '{/index}/_flush', update_params(params, :action => 'flush')
+        response = client.post '{/index}/_flush', update_params(params, :action => 'index.flush')
         response.body
       end
 
@@ -194,8 +202,8 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
-      def optimize(params = {})
-        response = client.post '{/index}/_optimize', update_params(params, :action => 'optimize')
+      def optimize( params = {} )
+        response = client.post '{/index}/_optimize', update_params(params, :action => 'index.optimize')
         response.body
       end
 
@@ -207,8 +215,8 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
-      def snapshot(params = {})
-        response = client.post '{/index}/_gateway/snapshot', update_params(params, :action => 'gateway.snapshot')
+      def snapshot( params = {} )
+        response = client.post '{/index}/_gateway/snapshot', update_params(params, :action => 'index.snapshot')
         response.body
       end
 
@@ -219,8 +227,8 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
-      def clear_cache(params = {})
-        response = client.post '{/index}/_cache/clear', update_params(params, :action => 'cache.clear')
+      def clear_cache( params = {} )
+        response = client.post '{/index}/_cache/clear', update_params(params, :action => 'index.clear_cache')
         response.body
       end
 
@@ -231,8 +239,8 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
-      def stats(params = {})
-        response = client.get '{/index}/_stats', update_params(params, :action => 'stats')
+      def stats( params = {} )
+        response = client.get '{/index}/_stats', update_params(params, :action => 'index.stats')
         response.body
       end
 
@@ -243,8 +251,8 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
-      def status(params = {})
-        response = client.get '{/index}/_status', update_params(params, :action => 'status')
+      def status( params = {} )
+        response = client.get '{/index}/_status', update_params(params, :action => 'index.status')
         response.body
       end
 
@@ -255,8 +263,8 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
-      def segments(params = {})
-        response = client.get '{/index}/_segments', update_params(params, :action => 'segments')
+      def segments( params = {} )
+        response = client.get '{/index}/_segments', update_params(params, :action => 'index.segments')
         response.body
       end
 
@@ -345,7 +353,7 @@ module Elastomer
       #   end
       #
       # Returns the response body as a Hash
-      def multi_search(params = {}, &block)
+      def multi_search( params = {}, &block )
         raise 'a block is required' if block.nil?
 
         params = {:index => self.name}.merge params
@@ -368,7 +376,7 @@ module Elastomer
       #   index.warmer('warmer1').delete
       #
       # Returns a new Warmer instance
-      def warmer(warmer_name)
+      def warmer( warmer_name )
         client.warmer(name, warmer_name)
       end
 
@@ -389,6 +397,7 @@ module Elastomer
       def defaults
         { :index => name }
       end
-    end  # Index
-  end  # Client
-end  # Elastomer
+
+    end
+  end
+end

@@ -155,7 +155,7 @@ describe Elastomer::Client::Docs do
     @docs = @index.docs('doc2')
     h = @docs.delete :id => 42
 
-    assert_false h['found'], 'expected document to not be found'
+    refute h['found'], 'expected document to not be found'
   end
 
   it 'searches for documents' do

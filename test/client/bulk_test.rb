@@ -37,6 +37,7 @@ describe Elastomer::Client::Bulk do
     @index.delete if @index.exists?
   end
 
+  #COMPATIBILITY
   # ES 1.0 replaced the 'ok' attribute in the bulk response item with a
   # 'status' attribute. Here we check for either one for compatibility
   # with 0.90 and 1.0.

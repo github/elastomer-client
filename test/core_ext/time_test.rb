@@ -41,6 +41,7 @@ describe 'JSON conversions for Time' do
     time = Time.utc(2013, 5, 3, 10, 1, 31)
     h = @docs.index({:title => 'test document', :created_at => time}, :type => 'doc1')
 
+    #COMPATIBILITY
     # ES 1.0 replaced the 'ok' attribute with a 'created' attribute
     # in index responses. Check for either one so we are compatible
     # with 0.90 and 1.0.

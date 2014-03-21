@@ -39,14 +39,6 @@ describe Elastomer::Client::Docs do
     @index.delete if @index.exists?
   end
 
-  #COMPATIBILITY
-  # ES 1.0 replaced the 'ok' attribute with a 'created' attribute
-  # in index responses. Check for either one so we are compatible
-  # with 0.90 and 1.0.
-  def assert_created(response)
-    assert response['created'] || response['ok'], 'document was not created'
-  end
-
   it 'autogenerates IDs for documents' do
     h = @docs.index \
           :_type  => 'doc2',

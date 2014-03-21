@@ -39,9 +39,9 @@ describe 'JSON conversions for Time' do
 
   it 'indexes time fields' do
     time = Time.utc(2013, 5, 3, 10, 1, 31)
-    h = @docs.add({:title => 'test document', :created_at => time}, :type => 'doc1')
+    h = @docs.index({:title => 'test document', :created_at => time}, :type => 'doc1')
 
-    assert h['ok'], 'everything is NOT ok'
+    assert h['created'], 'document was not created'
 
     doc = @docs.get(:type => 'doc1', :id => h['_id'])
     assert_equal '2013-05-03T10:01:31Z', doc['_source']['created_at']

@@ -39,13 +39,20 @@ describe Elastomer::Client::Docs do
     @index.delete if @index.exists?
   end
 
+  def assert_created(response)
+    # ES 1.0 replaced the 'ok' attribute with a 'created' attribute
+    # in index responses. Check for either one so we are compatible
+    # with 0.90 and 1.0.
+    assert response['created'] || response['ok'], 'document was not created'
+  end
+
   it 'autogenerates IDs for documents' do
     h = @docs.index \
           :_type  => 'doc2',
           :title  => 'the author of logging',
           :author => 'pea53'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
 
     h = @docs.index \
@@ -54,7 +61,7 @@ describe Elastomer::Client::Docs do
           :title  => 'the author of rubber-band',
           :author => 'grantr'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
 
     h = @docs.index \
@@ -63,7 +70,7 @@ describe Elastomer::Client::Docs do
           :title  => 'the author of toml',
           :author => 'mojombo'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
   end
 
@@ -74,7 +81,7 @@ describe Elastomer::Client::Docs do
           :title  => 'the author of logging',
           :author => 'pea53'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_equal '42', h['_id']
   end
 
@@ -84,14 +91,14 @@ describe Elastomer::Client::Docs do
           :id   => '42',
           :type => 'doc2'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_equal '42', h['_id']
 
     h = @docs.index \
           '{"author":"grantr", "title":"the author of rubber-band"}',
           :type => 'doc2'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
   end
 

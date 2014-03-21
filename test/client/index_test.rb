@@ -146,27 +146,27 @@ describe Elastomer::Client::Index do
 
     it 'refreshes' do
       response = @index.refresh
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'flushes' do
       response = @index.flush
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'optimizes' do
       response = @index.optimize
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'snapshots' do
       response = @index.snapshot
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'clears caches' do
       response = @index.clear_cache
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'gets stats' do

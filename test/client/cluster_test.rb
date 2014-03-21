@@ -26,13 +26,25 @@ describe Elastomer::Client::Cluster do
   end
 
   it 'updates the cluster settings' do
-    @cluster.update_settings :transient => { 'cluster.blocks.read_only' => true }
-    h = @cluster.settings :flat_settings => true
-    assert_equal 'true', h['transient']['cluster.blocks.read_only']
+    @cluster.update_settings :transient => { 'indices.ttl.interval' => "30" }
+    h = @cluster.settings
 
-    @cluster.update_settings :transient => { 'cluster.blocks.read_only' => false }
-    h = @cluster.settings :flat_settings => true
-    assert_equal 'false', h['transient']['cluster.blocks.read_only']
+    # ES 1.0 changed the default return format of cluster settings to always
+    # expand nested properties, e.g.
+    # {"indices.ttl.interval": "30"} changed to
+    # {"indices": {"ttl": {"interval":"30"}}}
+
+    # To support both versions, we check for either return format.
+    value = h['transient']['indices.ttl.interval'] ||
+            h['transient']['indices']['ttl']['interval']
+    assert_equal "30", value
+
+    @cluster.update_settings :transient => { 'indices.ttl.interval' => "60" }
+    h = @cluster.settings
+
+    value = h['transient']['indices.ttl.interval'] ||
+            h['transient']['indices']['ttl']['interval']
+    assert_equal "60", value
   end
 
   it 'returns the list of nodes in the cluster' do

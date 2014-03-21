@@ -27,11 +27,11 @@ describe Elastomer::Client::Cluster do
 
   it 'updates the cluster settings' do
     @cluster.update_settings :transient => { 'cluster.blocks.read_only' => true }
-    h = @cluster.settings
+    h = @cluster.settings :flat_settings => true
     assert_equal 'true', h['transient']['cluster.blocks.read_only']
 
     @cluster.update_settings :transient => { 'cluster.blocks.read_only' => false }
-    h = @cluster.settings
+    h = @cluster.settings :flat_settings => true
     assert_equal 'false', h['transient']['cluster.blocks.read_only']
   end
 

@@ -10,31 +10,31 @@ describe 'stubbed client tests' do
     it 'reroutes shards' do
       @stubs.post '/_cluster/reroute?dry_run=true' do |env|
         assert_match %r/^\{"commands":\[\{"move":\{[^\{\}]+\}\}\]\}$/, env[:body]
-        [200, {'Content-Type' => 'application/json'}, '{"ok" : true}']
+        [200, {'Content-Type' => 'application/json'}, '{"acknowledged" : true}']
       end
 
       commands = { :move => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }}
       h = @client.cluster.reroute commands, :dry_run => true
-      assert_equal true, h['ok']
+      assert_equal true, h['acknowledged']
     end
 
     it 'performs a shutdown of the cluster' do
-      @stubs.post('/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"ok" : true}'] }
+      @stubs.post('/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"cluster_name":"elasticsearch"}'] }
       h = @client.cluster.shutdown
-      assert_equal true, h['ok']
+      assert_equal "elasticsearch", h['cluster_name']
     end
   end
 
   describe Elastomer::Client::Nodes do
     it 'performs a shutdown of the node(s)' do
-      @stubs.post('/_cluster/nodes/_shutdown')       { [200, {'Content-Type' => 'application/json'}, '{"ok":true}'] }
-      @stubs.post('/_cluster/nodes/node1/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"ok":"node1"}'] }
+      @stubs.post('/_cluster/nodes/_shutdown')       { [200, {'Content-Type' => 'application/json'}, '{"nodes":{"1":{"name":"Node1"}}}'] }
+      @stubs.post('/_cluster/nodes/node2/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"nodes":{"2":{"name":"Node2"}}}'] }
 
       h = @client.nodes.shutdown
-      assert_equal true, h['ok']
+      assert_equal "Node1", h['nodes']['1']['name']
 
-      h = @client.nodes('node1').shutdown
-      assert_equal 'node1', h['ok']
+      h = @client.nodes('node2').shutdown
+      assert_equal 'Node2', h['nodes']['2']['name']
     end
   end
 end

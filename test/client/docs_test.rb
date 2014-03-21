@@ -140,7 +140,8 @@ describe Elastomer::Client::Docs do
     authors = h['docs'].map { |d| d['_source']['author'] }
     assert_equal %w[pea53 grantr], authors
 
-    @docs.delete :id => 1
+    h = @docs.delete :id => 1
+    assert h['found'], "expected document to be found"
     h = @docs.multi_get :ids => [1, 2]
     exists = h['docs'].map { |d| d['exists'] }
     assert_equal [false, true], exists
@@ -154,8 +155,7 @@ describe Elastomer::Client::Docs do
     @docs = @index.docs('doc2')
     h = @docs.delete :id => 42
 
-    assert true == h['ok'], 'failed to perform delete operation'
-    assert false == h['found'], 'that document was not there'
+    assert_false h['found'], 'expected document to not be found'
   end
 
   it 'searches for documents' do

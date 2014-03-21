@@ -1,4 +1,3 @@
-
 module Elastomer
   class Client
 
@@ -6,7 +5,6 @@ module Elastomer
     def cluster
       @cluster ||= Cluster.new self
     end
-
 
     class Cluster
 
@@ -49,10 +47,11 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response as a Hash
-      def settings( params = {} )
-        response = client.get '/_cluster/settings', params.merge(:action => 'cluster.settings.get')
+      def get_settings( params = {} )
+        response = client.get '/_cluster/settings', params.merge(:action => 'cluster.get_settings')
         response.body
       end
+      alias :settings :get_settings
 
       # Update cluster wide specific settings. Settings updated can either be
       # persistent (applied cross restarts) or transient (will not survive a
@@ -65,7 +64,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
-        response = client.put '/_cluster/settings', params.merge(:body => body, :action => 'cluster.settings.update')
+        response = client.put '/_cluster/settings', params.merge(:body => body, :action => 'cluster.update_settings')
         response.body
       end
 
@@ -104,35 +103,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post '/_shutdown', params.merge(:action => 'shutdown')
-        response.body
-      end
-
-      # Perform an aliases action on the cluster. We are just a teensy bit
-      # clever here in that a single action can be given or an array of
-      # actions. This API method will wrap the request in the appropriate
-      # {:actions => [...]} body construct.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
-      #
-      # actions - An action Hash or an Array of action Hashes
-      # params  - Parameters Hash
-      #
-      # Examples
-      #
-      #   aliases(:add => { :index => 'users-1', :alias => 'users' })
-      #
-      #   aliases([
-      #     { :remove => { :index => 'users-1', :alias => 'users' }},
-      #     { :add    => { :index => 'users-2', :alias => 'users' }}
-      #   ])
-      #
-      # Returns the response body as a Hash
-      def aliases( actions, params = {} )
-        actions = [actions] unless Array === actions
-        body = {:actions => actions}
-
-        response = client.post '/_aliases', params.merge(:body => body, :action => 'aliases.update')
+        response = client.post '/_shutdown', params.merge(:action => 'cluster.shutdown')
         response.body
       end
 
@@ -152,7 +123,36 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get '{/index}/_aliases', params.merge(:action => 'aliases.get')
+        response = client.get '{/index}/_aliases', params.merge(:action => 'cluster.get_aliases')
+        response.body
+      end
+      alias :aliases :get_aliases
+
+      # Perform an aliases action on the cluster. We are just a teensy bit
+      # clever here in that a single action can be given or an array of
+      # actions. This API method will wrap the request in the appropriate
+      # {:actions => [...]} body construct.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
+      #
+      # actions - An action Hash or an Array of action Hashes
+      # params  - Parameters Hash
+      #
+      # Examples
+      #
+      #   update_aliases(:add => { :index => 'users-1', :alias => 'users' })
+      #
+      #   update_aliases([
+      #     { :remove => { :index => 'users-1', :alias => 'users' }},
+      #     { :add    => { :index => 'users-2', :alias => 'users' }}
+      #   ])
+      #
+      # Returns the response body as a Hash
+      def update_aliases( actions, params = {} )
+        actions = [actions] unless Array === actions
+        body = {:actions => actions}
+
+        response = client.post '/_aliases', params.merge(:body => body, :action => 'cluster.update_aliases')
         response.body
       end
 
@@ -196,6 +196,6 @@ module Elastomer
         h['nodes']
       end
 
-    end  # Cluster
-  end  # Client
-end  # Elastomer
+    end
+  end
+end

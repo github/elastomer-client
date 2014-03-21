@@ -39,7 +39,7 @@ module Elastomer
       def index( document, params = {} )
         overrides = from_document(document)
         params = update_params(params, overrides)
-        params[:action] = 'document.index'
+        params[:action] = 'docs.index'
 
         params.delete(:id) if params[:id].nil? || params[:id].to_s =~ /\A\s*\z/
 
@@ -63,7 +63,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete '/{index}/{type}/{id}', update_params(params, :action => 'document.delete')
+        response = client.delete '/{index}/{type}/{id}', update_params(params, :action => 'docs.delete')
         response.body
       end
 
@@ -76,7 +76,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get '/{index}/{type}/{id}', update_params(params, :action => 'document.get')
+        response = client.get '/{index}/{type}/{id}', update_params(params, :action => 'docs.get')
         response.body
       end
 
@@ -89,7 +89,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def source( params = {} )
-        response = client.get '/{index}/{type}/{id}/_source', update_params(params, :action => 'document.source')
+        response = client.get '/{index}/{type}/{id}/_source', update_params(params, :action => 'docs.source')
         response.body
       end
 
@@ -102,7 +102,7 @@ module Elastomer
       # Returns the response body as a Hash
       def multi_get( docs, params = {} )
         overrides = from_document(docs)
-        overrides[:action] = 'mget'
+        overrides[:action] = 'docs.multi_get'
 
         response = client.get '{/index}{/type}{/id}/_mget', update_params(params, overrides)
         response.body
@@ -117,7 +117,7 @@ module Elastomer
       # Returns the response body as a Hash
       def update( script, params = {} )
         overrides = from_document(script)
-        overrides[:action] = 'document.update'
+        overrides[:action] = 'docs.update'
 
         response = client.post '/{index}/{type}/{id}/_update', update_params(params, overrides)
         response.body
@@ -146,7 +146,7 @@ module Elastomer
       def search( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}{/type}/_search', update_params(params, :body => query, :action => 'search')
+        response = client.get '/{index}{/type}/_search', update_params(params, :body => query, :action => 'docs.search')
         response.body
       end
 
@@ -200,7 +200,7 @@ module Elastomer
       def delete_by_query( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.delete '/{index}{/type}/_query', update_params(params, :body => query, :action => 'delete_by_query')
+        response = client.delete '/{index}{/type}/_query', update_params(params, :body => query, :action => 'docs.delete_by_query')
         response.body
       end
 
@@ -230,7 +230,7 @@ Percolate
       def more_like_this(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}/{type}/{id}/_mlt', update_params(params, :body => query)
+        response = client.get '/{index}/{type}/{id}/_mlt', update_params(params, :body => query, :action => 'docs.more_like_this')
         response.body
       end
 
@@ -253,7 +253,7 @@ Percolate
       def explain(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query)
+        response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query, :action => 'docs.explain')
         response.body
       end
 
@@ -277,8 +277,8 @@ Percolate
       # Returns the response body as a hash
       def validate(query, params = nil)
         query, params = extract_params(query) if params.nil?
-        
-        response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query)
+
+        response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query, :action => 'docs.validate')
         response.body
       end
 

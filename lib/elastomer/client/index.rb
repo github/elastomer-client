@@ -90,10 +90,11 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response body as a Hash
-      def settings( params = {} )
-        response = client.get '{/index}/_settings', update_params(params, :action => 'index.settings')
+      def get_settings( params = {} )
+        response = client.get '{/index}/_settings', update_params(params, :action => 'index.get_settings')
         response.body
       end
+      alias :settings :get_settings
 
       # Change specific index level settings in real time.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-update-settings/
@@ -158,6 +159,7 @@ module Elastomer
         response = client.get '/{index}/_aliases', update_params(:action => 'index.get_aliases')
         response.body
       end
+      alias :aliases :get_aliases
 
       # Performs the analysis process on a text and return the tokens breakdown of the text.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze/

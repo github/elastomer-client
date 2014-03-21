@@ -28,11 +28,11 @@ describe Elastomer::Client::Cluster do
   it 'updates the cluster settings' do
     @cluster.update_settings :transient => { 'cluster.blocks.read_only' => true }
     h = @cluster.settings
-    assert_equal({'cluster.blocks.read_only' => 'true'}, h['transient'])
+    assert_equal 'true', h['transient']['cluster.blocks.read_only']
 
     @cluster.update_settings :transient => { 'cluster.blocks.read_only' => false }
     h = @cluster.settings
-    assert_equal({'cluster.blocks.read_only' => 'false'}, h['transient'])
+    assert_equal 'false', h['transient']['cluster.blocks.read_only']
   end
 
   it 'returns the list of nodes in the cluster' do

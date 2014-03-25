@@ -45,7 +45,7 @@ describe Elastomer::Client::Docs do
           :title  => 'the author of logging',
           :author => 'pea53'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
 
     h = @docs.index \
@@ -54,7 +54,7 @@ describe Elastomer::Client::Docs do
           :title  => 'the author of rubber-band',
           :author => 'grantr'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
 
     h = @docs.index \
@@ -63,7 +63,7 @@ describe Elastomer::Client::Docs do
           :title  => 'the author of toml',
           :author => 'mojombo'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
   end
 
@@ -74,7 +74,7 @@ describe Elastomer::Client::Docs do
           :title  => 'the author of logging',
           :author => 'pea53'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_equal '42', h['_id']
   end
 
@@ -84,14 +84,14 @@ describe Elastomer::Client::Docs do
           :id   => '42',
           :type => 'doc2'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_equal '42', h['_id']
 
     h = @docs.index \
           '{"author":"grantr", "title":"the author of rubber-band"}',
           :type => 'doc2'
 
-    assert h['ok'], 'everything is NOT ok'
+    assert_created h
     assert_match %r/^\S{22}$/, h['_id']
   end
 
@@ -133,7 +133,8 @@ describe Elastomer::Client::Docs do
     authors = h['docs'].map { |d| d['_source']['author'] }
     assert_equal %w[pea53 grantr], authors
 
-    @docs.delete :id => 1
+    h = @docs.delete :id => 1
+    assert h['found'], "expected document to be found"
     h = @docs.multi_get :ids => [1, 2]
     exists = h['docs'].map { |d| d['exists'] }
     assert_equal [false, true], exists
@@ -147,8 +148,7 @@ describe Elastomer::Client::Docs do
     @docs = @index.docs('doc2')
     h = @docs.delete :id => 42
 
-    assert true == h['ok'], 'failed to perform delete operation'
-    assert false == h['found'], 'that document was not there'
+    refute h['found'], 'expected document to not be found'
   end
 
   it 'searches for documents' do

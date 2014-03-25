@@ -48,8 +48,8 @@ describe Elastomer::Client::Bulk do
     body = body.join "\n"
     h = $client.bulk body
 
-    ok = h['items'].map {|a| a['index']['ok']}
-    assert_equal [true, true], ok
+    assert_bulk_index(h['items'][0])
+    assert_bulk_index(h['items'][1])
 
     @index.refresh
 
@@ -69,8 +69,8 @@ describe Elastomer::Client::Bulk do
     body = body.join "\n"
     h = $client.bulk body, :index => @name
 
-    assert h['items'].first['index']['ok'], 'we added a new book'
-    assert h['items'].last['delete']['ok'], 'we removed a book'
+    assert_bulk_index h['items'].first, 'expected to index a book'
+    assert_bulk_delete h['items'].last, 'expected to delete a book'
 
     @index.refresh
 
@@ -90,8 +90,8 @@ describe Elastomer::Client::Bulk do
 
     assert_instance_of Fixnum, h['took']
 
-    assert items.first['index']['ok'], 'indexing failed'
-    assert items.last['create']['ok'], 'creation failed'
+    assert_bulk_index h['items'].first
+    assert_bulk_create h['items'].last
 
     book_id = items.last['create']['_id']
     assert_match %r/^\S{22}$/, book_id
@@ -111,8 +111,8 @@ describe Elastomer::Client::Bulk do
     end
     items = h['items']
 
-    assert items.first['create']['ok'], 'we created a new book'
-    assert items.last['delete']['ok'], 'we removed a book'
+    assert_bulk_create h['items'].first, 'expected to create a book'
+    assert_bulk_delete h['items'].last, 'expected to delete a book'
 
     book_id2 = items.first['create']['_id']
     assert_match %r/^\S{22}$/, book_id2
@@ -135,8 +135,8 @@ describe Elastomer::Client::Bulk do
 
     assert_instance_of Fixnum, h['took']
 
-    assert items.first['index']['ok'], 'indexing failed'
-    assert items.last['create']['ok'], 'creation failed'
+    assert_bulk_index h['items'].first
+    assert_bulk_create h['items'].last
 
     @index.refresh
 
@@ -153,8 +153,8 @@ describe Elastomer::Client::Bulk do
     end
     items = h['items']
 
-    assert items.first['index']['ok'], 'we added a new book'
-    assert items.last['delete']['ok'], 'we removed a book'
+    assert_bulk_index h['items'].first, 'expected to index a book'
+    assert_bulk_delete h['items'].last, 'expected to delete a book'
 
     @index.refresh
 
@@ -188,7 +188,7 @@ describe Elastomer::Client::Bulk do
     ary.compact!
 
     assert_equal 4, ary.length
-    assert ary.all? { |a| a['items'].all? { |b| b['index']['ok'] }}, 'all documents were not indexed properly'
+    ary.each { |a| a['items'].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
     h = @index.docs.search :q => '*:*', :search_type => 'count'
@@ -219,7 +219,7 @@ describe Elastomer::Client::Bulk do
     ary.compact!
 
     assert_equal 4, ary.length
-    assert ary.all? { |a| a['items'].all? { |b| b['index']['ok'] }}, 'all documents were not indexed properly'
+    ary.each { |a| a['items'].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
     h = @index.docs.search :q => '*:*', :search_type => 'count'

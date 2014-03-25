@@ -43,6 +43,9 @@ MiniTest::Unit.after_tests do
   end
 end
 
+# add custom assertions
+require File.expand_path('../assertions', __FILE__)
+
 # require 'elastomer/notifications'
 # require 'pp'
 

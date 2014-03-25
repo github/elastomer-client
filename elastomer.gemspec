@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multi_json",  "~> 1.7"
 
   spec.add_development_dependency "bundler", "~> 1.5"
-  spec.add_development_dependency "json",    "~> 1.7" #TODO is this still required? 1.9+ and MultiJson have built in JSON libraries.
   spec.add_development_dependency "minitest","~> 4.7"
   spec.add_development_dependency "rake"
 end

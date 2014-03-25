@@ -5,3 +5,4 @@
 /vendor/cache/*.gem
 /coverage
 Gemfile.lock
+*.gem

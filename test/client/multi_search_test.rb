@@ -46,7 +46,7 @@ describe Elastomer::Client::MultiSearch do
       '{"index" : "elastomer-msearch-test", "search_type" : "count"}',
       '{"query" : {"match_all" : {}}}',
       '{"index" : "elastomer-msearch-test", "type": "doc2"}',
-      '{"query" : {"field": {"author" : "grantr"}}}',
+      '{"query" : {"match": {"author" : "grantr"}}}',
       nil
     ]
     body = body.join "\n"
@@ -58,7 +58,7 @@ describe Elastomer::Client::MultiSearch do
 
     body = [
       '{}',
-      '{"query" : {"field": {"author" : "grantr"}}}',
+      '{"query" : {"match": {"author" : "grantr"}}}',
       nil
     ]
     body = body.join "\n"
@@ -73,7 +73,7 @@ describe Elastomer::Client::MultiSearch do
 
     h = $client.multi_search do |m|
       m.search({:query => { :match_all => {}}}, :index => @name, :search_type => :count)
-      m.search({:query => { :field => { "title" => "author" }}}, :index => @name, :type => 'doc2')
+      m.search({:query => { :match => { "title" => "author" }}}, :index => @name, :type => 'doc2')
     end
 
     response1, response2 = h["responses"]
@@ -83,7 +83,7 @@ describe Elastomer::Client::MultiSearch do
 
     h = @index.multi_search do |m|
       m.search({:query => { :match_all => {}}}, :search_type => :count)
-      m.search({:query => { :field => { "title" => "author" }}}, :type => 'doc2')
+      m.search({:query => { :match => { "title" => "author" }}}, :type => 'doc2')
     end
 
     response1, response2 = h["responses"]
@@ -93,7 +93,7 @@ describe Elastomer::Client::MultiSearch do
 
     h = @index.docs('doc1').multi_search do |m|
       m.search({:query => { :match_all => {}}}, :search_type => :count)
-      m.search({:query => { :field => { "title" => "logging" }}}, :type => 'doc2')
+      m.search({:query => { :match => { "title" => "logging" }}}, :type => 'doc2')
     end
 
     response1, response2 = h["responses"]

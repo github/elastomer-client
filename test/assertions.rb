@@ -8,6 +8,14 @@ module Minitest::Assertions
   end
 
   #COMPATIBILITY
+  # ES 1.0 replaced the 'ok' attribute with an 'acknowledged' attribute
+  # in many responses. Check for either one so we are compatible
+  # with 0.90 and 1.0.
+  def assert_acknowledged(response)
+    assert response['acknowledged'] || response['ok'], 'document was not acknowledged'
+  end
+
+  #COMPATIBILITY
   # ES 1.0 replaced the 'ok' attribute in the bulk response item with a
   # 'status' attribute. Here we check for either one for compatibility
   # with 0.90 and 1.0.

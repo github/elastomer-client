@@ -131,17 +131,17 @@ describe Elastomer::Client::Index do
     #TODO assert this only hits the desired index
     it 'deletes' do
       response = @index.delete
-      assert_equal true, response["acknowledged"]
+      assert_acknowledged response
     end
 
     it 'opens' do
       response = @index.open
-      assert_equal true, response["acknowledged"]
+      assert_acknowledged response
     end
 
     it 'closes' do
       response = @index.close
-      assert_equal true, response["acknowledged"]
+      assert_acknowledged response
     end
 
     it 'refreshes' do

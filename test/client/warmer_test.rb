@@ -32,14 +32,14 @@ describe Elastomer::Client::Warmer do
 
   it 'creates warmers' do
     h = @index.warmer('test1').create(:query => { :match_all => {}})
-    assert_acknowledged response
+    assert_acknowledged h
   end
 
   it 'deletes warmers' do
     @index.warmer('test1').create(:query => { :match_all => {}})
 
     h = @index.warmer('test1').delete
-    assert_acknowledged response
+    assert_acknowledged h
   end
 
   it 'gets warmers' do

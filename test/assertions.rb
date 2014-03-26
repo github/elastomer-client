@@ -36,4 +36,27 @@ module Minitest::Assertions
     status = item['delete']['status']
     assert ok == true || status == 200, message
   end
+
+  #COMPATIBILITY
+  # ES 1.0 nests mappings in a "mappings" element under the index name, e.g.
+  # mapping["test-index"]["mappings"]["doco"]
+  # ES 0.90 doesn't have the "mappings" element:
+  # mapping["test-index"]["doco"]
+  def assert_mapping_exists(response, type, message="mapping expected to exist, but doesn't")
+    mapping = if response.has_key?('mappings')
+      response['mappings'][type]
+    else
+      response[type]
+    end
+    refute_nil mapping, message
+  end
+
+  def assert_property_exists(response, type, property, message="property expected to exist, but doesn't")
+    mapping = if response.has_key?('mappings')
+      response['mappings'][type]
+    else
+      response[type]
+    end
+    assert mapping['properties'].has_key?(property), message
+  end
 end

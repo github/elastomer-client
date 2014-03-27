@@ -238,7 +238,7 @@ describe Elastomer::Client::Docs do
 
     h = @docs.explain({
       :query => {
-        :field => {
+        :match => {
           "author" => "defunkt"
         }
       }

@@ -16,6 +16,18 @@ module Minitest::Assertions
   end
 
   #COMPATIBILITY
+  # ES 1.0 replaced the 'exists' attribute with a 'found' attribute in the
+  # get document response. Check for either one so we are compatible
+  # with 0.90 and 1.0.
+  def assert_found(response)
+    assert response['found'] || response['exists'], 'document was not found'
+  end
+
+  def refute_found(response)
+    refute response['found'] || response['exists'], 'document was unexpectedly found'
+  end
+
+  #COMPATIBILITY
   # ES 1.0 replaced the 'ok' attribute in the bulk response item with a
   # 'status' attribute. Here we check for either one for compatibility
   # with 0.90 and 1.0.

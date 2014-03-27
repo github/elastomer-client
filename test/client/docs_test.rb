@@ -94,12 +94,12 @@ describe Elastomer::Client::Docs do
 
   it 'gets documents from the search index' do
     h = @docs.get :id => '1', :type => 'doc1'
-    assert_equal false, h['exists']
+    refute_found h
 
     populate!
 
     h = @docs.get :id => '1', :type => 'doc1'
-    assert_equal true, h['exists']
+    assert_found h
     assert_equal 'mojombo', h['_source']['author']
   end
 
@@ -118,8 +118,10 @@ describe Elastomer::Client::Docs do
     assert_equal %w[defunkt mojombo], authors
 
     h = @index.docs('doc1').multi_get :ids => [1, 2, 3, 4]
-    exists = h['docs'].map { |d| d['exists'] }
-    assert_equal [true, true, false, false], exists
+    assert_found h['docs'][0]
+    assert_found h['docs'][1]
+    refute_found h['docs'][2]
+    refute_found h['docs'][3]
   end
 
   it 'deletes documents from the search index' do
@@ -133,8 +135,8 @@ describe Elastomer::Client::Docs do
     h = @docs.delete :id => 1
     assert h['found'], "expected document to be found"
     h = @docs.multi_get :ids => [1, 2]
-    exists = h['docs'].map { |d| d['exists'] }
-    assert_equal [false, true], exists
+    refute_found h['docs'][0]
+    assert_found h['docs'][1]
 
     assert_raises(ArgumentError) { @docs.delete :id => nil }
     assert_raises(ArgumentError) { @docs.delete :id => '' }
@@ -268,7 +270,7 @@ describe Elastomer::Client::Docs do
     populate!
 
     h = @docs.get :id => '1', :type => 'doc1'
-    assert_equal true, h['exists']
+    assert_found h
     assert_equal 'mojombo', h['_source']['author']
 
     @docs.update({
@@ -277,7 +279,7 @@ describe Elastomer::Client::Docs do
       :doc   => {:author => 'TwP'}
     })
     h = @docs.get :id => '1', :type => 'doc1'
-    assert_equal true, h['exists']
+    assert_found h
     assert_equal 'TwP', h['_source']['author']
 
     if $client.version >= "0.90"
@@ -292,7 +294,7 @@ describe Elastomer::Client::Docs do
       })
 
       h = @docs.get :id => '42', :type => 'doc1'
-      assert_equal true, h['exists']
+      assert_found h
       assert_equal 'TwP', h['_source']['author']
       assert_equal 'the ineffable beauty of search', h['_source']['title']
     end

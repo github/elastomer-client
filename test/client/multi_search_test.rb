@@ -26,10 +26,7 @@ describe Elastomer::Client::MultiSearch do
           }
         }
 
-      $client.cluster.health \
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
+      wait_for_index(@name)
     end
 
     @docs = @index.docs

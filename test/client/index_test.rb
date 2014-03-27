@@ -132,10 +132,7 @@ describe Elastomer::Client::Index do
   describe "when an index exists" do
     before do
       @index.create(nil)
-      $client.cluster.health \
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
+      wait_for_index(@name)
     end
 
     #TODO assert this only hits the desired index

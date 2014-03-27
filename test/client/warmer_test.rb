@@ -18,11 +18,7 @@ describe Elastomer::Client::Warmer do
           }
         }
       )
-      $client.cluster.health(
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
-      )
+      wait_for_index(@name)
     end
   end
 

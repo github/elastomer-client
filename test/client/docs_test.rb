@@ -150,6 +150,41 @@ describe Elastomer::Client::Docs do
     refute h['found'], 'expected document to not be found'
   end
 
+  it 'deletes documents by query' do
+    populate!
+    @docs = @index.docs('doc2')
+
+    h = @docs.multi_get :ids => [1, 2]
+    authors = h['docs'].map { |d| d['_source']['author'] }
+    assert_equal %w[pea53 grantr], authors
+
+    h = @docs.delete_by_query(:q => "author:grantr")
+    @index.refresh
+    h = @docs.multi_get :ids => [1, 2]
+    assert_found h['docs'][0]
+    refute_found h['docs'][1]
+
+    #COMPATIBILITY
+    # ES 1.0 normalized all search APIs to use a :query top level element.
+    # This broke compatibility with the ES 0.90 delete_by_query api. Since
+    # the query hash version of this api never worked with 0.90 in the first
+    # place, only test it if running 1.0.
+    if es_version_1_x?
+      h = @docs.delete_by_query(
+            :query => {
+              :filtered => {
+                :query => {:match_all => {}},
+                :filter => {:term => {:author => 'pea53'}}
+              }
+            }
+          )
+      @index.refresh
+      h = @docs.multi_get :ids => [1, 2]
+      refute_found h['docs'][0]
+      refute_found h['docs'][1]
+    end
+  end
+
   it 'searches for documents' do
     h = @docs.search :q => '*:*'
     assert_equal 0, h['hits']['total']

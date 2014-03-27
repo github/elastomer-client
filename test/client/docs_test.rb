@@ -222,12 +222,26 @@ describe Elastomer::Client::Docs do
     h = @docs.count :q => '*:*', :type => 'doc1,doc2'
     assert_equal 4, h['count']
 
-    h = @docs.count({
-      :filtered => {
-        :query => {:match_all => {}},
-        :filter => {:term => {:author => 'defunkt'}}
-      }
-    }, :type => %w[doc1 doc2] )
+    #COMPATIBILITY
+    # ES 1.0 normalized all search APIs to use a :query top level element.
+    # This broke compatibility with the ES 0.90 count api.
+    if es_version_1_x?
+      h = @docs.count({
+        :query => {
+          :filtered => {
+            :query => {:match_all => {}},
+            :filter => {:term => {:author => 'defunkt'}}
+          }
+        }
+      }, :type => %w[doc1 doc2] )
+    else
+      h = @docs.count({
+        :filtered => {
+          :query => {:match_all => {}},
+          :filter => {:term => {:author => 'defunkt'}}
+        }
+      }, :type => %w[doc1 doc2] )
+    end
     assert_equal 1, h['count']
   end
 
@@ -292,12 +306,26 @@ describe Elastomer::Client::Docs do
     h = @docs.validate :q => '*:*'
     assert_equal true, h["valid"]
 
-    h = @docs.validate({
-      :filtered => {
-        :query => {:match_all => {}},
-        :filter => {:term => {:author => 'defunkt'}}
-      }
-    }, :type => %w[doc1 doc2] )
+    #COMPATIBILITY
+    # ES 1.0 normalized all search APIs to use a :query top level element.
+    # This broke compatibility with the ES 0.90 validate api.
+    if es_version_1_x?
+      h = @docs.validate({
+        :query => {
+          :filtered => {
+            :query => {:match_all => {}},
+            :filter => {:term => {:author => 'defunkt'}}
+          }
+        }
+      }, :type => %w[doc1 doc2] )
+    else
+      h = @docs.validate({
+        :filtered => {
+          :query => {:match_all => {}},
+          :filter => {:term => {:author => 'defunkt'}}
+        }
+      }, :type => %w[doc1 doc2] )
+    end
     assert_equal true, h["valid"]
   end
 

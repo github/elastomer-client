@@ -26,8 +26,20 @@ describe Elastomer::Client::Index do
       assert @index.exists?, 'the index should now exist'
 
       settings = @index.settings[@name]['settings']
-      assert_equal '3', settings['index.number_of_shards']
-      assert_equal '0', settings['index.number_of_replicas']
+
+      # COMPATIBILITY
+      # ES 1.0 changed the default return format of index settings to always
+      # expand nested properties, e.g.
+      # {"index.number_of_replicas": "1"} changed to
+      # {"index": {"number_of_replicas":"1"}}
+
+      # To support both versions, we check for either return format.
+      value = settings['index.number_of_shards'] ||
+              settings['index']['number_of_shards']
+      assert_equal '3', value
+      value = settings['index.number_of_replicas'] ||
+              settings['index']['number_of_replicas']
+      assert_equal '0', value
     end
 
     it 'adds mappings for document types' do
@@ -56,6 +68,7 @@ describe Elastomer::Client::Index do
     @index.update_settings 'index.number_of_replicas' => 1
     settings = @index.settings[@name]['settings']
 
+    # COMPATIBILITY
     # ES 1.0 changed the default return format of index settings to always
     # expand nested properties, e.g.
     # {"index.number_of_replicas": "1"} changed to

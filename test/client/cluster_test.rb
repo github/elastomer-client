@@ -29,6 +29,7 @@ describe Elastomer::Client::Cluster do
     @cluster.update_settings :transient => { 'indices.ttl.interval' => "30" }
     h = @cluster.settings
 
+    #COMPATIBILITY
     # ES 1.0 changed the default return format of cluster settings to always
     # expand nested properties, e.g.
     # {"indices.ttl.interval": "30"} changed to

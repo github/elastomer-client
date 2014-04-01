@@ -26,11 +26,7 @@ describe Elastomer::Client::Scan do
           }
         }
 
-      $client.cluster.health \
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
-
+      wait_for_index(@name)
       populate!
     end
   end

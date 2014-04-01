@@ -26,8 +26,20 @@ describe Elastomer::Client::Index do
       assert @index.exists?, 'the index should now exist'
 
       settings = @index.settings[@name]['settings']
-      assert_equal '3', settings['index.number_of_shards']
-      assert_equal '0', settings['index.number_of_replicas']
+
+      # COMPATIBILITY
+      # ES 1.0 changed the default return format of index settings to always
+      # expand nested properties, e.g.
+      # {"index.number_of_replicas": "1"} changed to
+      # {"index": {"number_of_replicas":"1"}}
+
+      # To support both versions, we check for either return format.
+      value = settings['index.number_of_shards'] ||
+              settings['index']['number_of_shards']
+      assert_equal '3', value
+      value = settings['index.number_of_replicas'] ||
+              settings['index']['number_of_replicas']
+      assert_equal '0', value
     end
 
     it 'adds mappings for document types' do
@@ -44,10 +56,9 @@ describe Elastomer::Client::Index do
           }
         }
       )
-      assert @index.exists?, 'the index should now exist'
 
-      mapping = @index.mapping[@name]
-      assert mapping.key?('doco'), 'the doco mapping is present'
+      assert @index.exists?, 'the index should now exist'
+      assert_mapping_exists @index.mapping[@name], 'doco'
     end
   end
 
@@ -56,7 +67,17 @@ describe Elastomer::Client::Index do
 
     @index.update_settings 'index.number_of_replicas' => 1
     settings = @index.settings[@name]['settings']
-    assert_equal '1', settings['index.number_of_replicas']
+
+    # COMPATIBILITY
+    # ES 1.0 changed the default return format of index settings to always
+    # expand nested properties, e.g.
+    # {"index.number_of_replicas": "1"} changed to
+    # {"index": {"number_of_replicas":"1"}}
+
+    # To support both versions, we check for either return format.
+    value = settings['index.number_of_replicas'] ||
+            settings['index']['number_of_replicas']
+    assert_equal '1', value
   end
 
   it 'updates document mappings' do
@@ -69,20 +90,21 @@ describe Elastomer::Client::Index do
         }
       }
     )
-    properties = @index.mapping[@name]['doco']['properties']
-    assert_equal %w[title], properties.keys.sort
+
+    assert_property_exists @index.mapping[@name], 'doco', 'title'
 
     @index.update_mapping 'doco', { :doco => { :properties => {
       :author => { :type => 'string', :index => 'not_analyzed' }
     }}}
-    properties = @index.mapping[@name]['doco']['properties']
-    assert_equal %w[author title], properties.keys.sort
+
+    assert_property_exists @index.mapping[@name], 'doco', 'author'
+    assert_property_exists @index.mapping[@name], 'doco', 'title'
 
     @index.update_mapping 'mux_mool', { :mux_mool => { :properties => {
       :song => { :type => 'string', :index => 'not_analyzed' }
     }}}
-    properties = @index.mapping[@name]['mux_mool']['properties']
-    assert_equal %w[song], properties.keys.sort
+
+    assert_property_exists @index.mapping[@name], 'mux_mool', 'song'
   end
 
   it 'deletes document mappings' do
@@ -95,10 +117,11 @@ describe Elastomer::Client::Index do
         }
       }
     )
-    assert @index.mapping[@name].key?('doco'), 'we should have a "doco" mapping'
+    assert_mapping_exists @index.mapping[@name], 'doco'
 
-    @index.delete_mapping 'doco'
-    assert !@index.mapping[@name].key?('doco'), 'we should no longer have a "doco" mapping'
+    response = @index.delete_mapping 'doco'
+    assert_acknowledged response
+    assert @index.mapping == {} || @index.mapping[@name] == {}
   end
 
   it 'lists all aliases to the index' do
@@ -122,26 +145,23 @@ describe Elastomer::Client::Index do
   describe "when an index exists" do
     before do
       @index.create(nil)
-      $client.cluster.health \
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
+      wait_for_index(@name)
     end
 
     #TODO assert this only hits the desired index
     it 'deletes' do
       response = @index.delete
-      assert_equal true, response["acknowledged"]
+      assert_acknowledged response
     end
 
     it 'opens' do
       response = @index.open
-      assert_equal true, response["acknowledged"]
+      assert_acknowledged response
     end
 
     it 'closes' do
       response = @index.close
-      assert_equal true, response["acknowledged"]
+      assert_acknowledged response
     end
 
     it 'refreshes' do

@@ -54,3 +54,34 @@ require File.expand_path('../assertions', __FILE__)
 #   #$stdout.puts "-- #{payload[:action].inspect}"
 #   pp payload #if payload[:action].nil?
 # end
+
+# Wait for an index to be created. Since index creation requests return
+# before the index is actually ready to receive documents, one needs to wait
+# until the cluster status recovers before proceeding.
+#
+#   name   - The index name to wait for
+#   status - The status to wait for. Defaults to yellow. Yellow is the
+#            preferred status for tests, because it waits for at least one
+#            shard to be active, but doesn't wait for all replicas. Single
+#            node clusters will never achieve green status with the default
+#            setting of 1 replica.
+#
+# Returns the cluster health response.
+# Raises Elastomer::Client::TimeoutError if requested status is not achieved
+# within 5 seconds.
+def wait_for_index(name, status='yellow')
+  $client.cluster.health(
+    :index           => name,
+    :wait_for_status => status,
+    :timeout         => '5s'
+  )
+end
+
+# Elasticsearch 1.0 changed some request formats in a non-backward-compatible
+# way. Some tests need to know what version is running to structure requests
+# as expected.
+#
+# Returns true if Elasticsearch version is 1.x.
+def es_version_1_x?
+  $client.version =~ /^1\./
+end

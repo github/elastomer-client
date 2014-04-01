@@ -15,7 +15,7 @@ describe 'stubbed client tests' do
 
       commands = { :move => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }}
       h = @client.cluster.reroute commands, :dry_run => true
-      assert_equal true, h['acknowledged']
+      assert_acknowledged h
     end
 
     it 'performs a shutdown of the cluster' do

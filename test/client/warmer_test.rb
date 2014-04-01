@@ -18,11 +18,7 @@ describe Elastomer::Client::Warmer do
           }
         }
       )
-      $client.cluster.health(
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
-      )
+      wait_for_index(@name)
     end
   end
 
@@ -32,14 +28,14 @@ describe Elastomer::Client::Warmer do
 
   it 'creates warmers' do
     h = @index.warmer('test1').create(:query => { :match_all => {}})
-    assert_equal true, h["acknowledged"]
+    assert_acknowledged h
   end
 
   it 'deletes warmers' do
     @index.warmer('test1').create(:query => { :match_all => {}})
 
     h = @index.warmer('test1').delete
-    assert_equal true, h["acknowledged"]
+    assert_acknowledged h
   end
 
   it 'gets warmers' do

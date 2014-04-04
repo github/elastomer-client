@@ -19,7 +19,8 @@ module Elastomer
     #   :open_timeout - the timeout in seconds when opening an HTTP connection
     #   :adapter      - the Faraday adapter to use (defaults to :excon)
     #   :opaque_id    - set to `true` to use the 'X-Opaque-Id' request header
-    #
+    #   :persistent   - set to `true` to use persistent excon connections
+    #                   Note that the behavior is undefined if your adapter is not :excon
     def initialize( opts = {} )
       host = opts.fetch :host, 'localhost'
       port = opts.fetch :port, 9200
@@ -33,6 +34,7 @@ module Elastomer
       @open_timeout = opts.fetch :open_timeout, 2
       @adapter      = opts.fetch :adapter, Faraday.default_adapter
       @opaque_id    = opts.fetch :opaque_id, false
+      @persistent   = opts.fetch :persistent, false
     end
 
     attr_reader :host, :port, :url
@@ -73,7 +75,16 @@ module Elastomer
 
         conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout
+        conn.options[:persistent] = true if persistent?
       end
+    end
+
+    # Internal: Should we use a persistent HTTP connection?
+    # Only supported by excon https://github.com/geemus/excon
+    #
+    # Returns truthy
+    def persistent?
+      @persistent
     end
 
     # Internal: Sends an HTTP HEAD request to the server.

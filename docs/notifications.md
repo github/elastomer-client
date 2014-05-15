@@ -5,7 +5,7 @@ elastomer events through ActiveSupport::Notifications.
 
 The event namespace is `request.client.elastomer`.
 
-## Sample event
+## Sample event payload
 
 ```
 :index  => "index-test",

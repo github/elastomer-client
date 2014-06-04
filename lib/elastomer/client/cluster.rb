@@ -152,6 +152,8 @@ module Elastomer
         if actions.is_a?(Hash) && actions.key?(:actions)
           body = actions
         elsif actions.is_a?(Hash)
+          # Array() on a Hash does not do what you think it does - that is why
+          # we are explicitly wrapping the Hash via [actions] here.
           body = {:actions => [actions]}
         else
           body = {:actions => Array(actions)}

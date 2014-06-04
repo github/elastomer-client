@@ -48,7 +48,7 @@ module Elastomer
 
     # Returns the version String of the attached ElasticSearch instance.
     def version
-      info['version']['number']
+      @version ||= info['version']['number']
     end
 
     # Returns the information Hash from the attached ElasticSearch instance.

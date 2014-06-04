@@ -3,7 +3,14 @@ require File.expand_path('../../test_helper', __FILE__)
 describe Elastomer::Client::Cluster do
 
   before do
+    @name = 'elastomer-cluster-test'
+    @index = $client.index @name
+    @index.delete if @index.exists?
     @cluster = $client.cluster
+  end
+
+  after do
+    @index.delete if @index.exists?
   end
 
   it 'gets the cluster health' do
@@ -51,6 +58,56 @@ describe Elastomer::Client::Cluster do
   it 'returns the list of nodes in the cluster' do
     nodes = @cluster.nodes
     assert !nodes.empty?, 'we have to have some nodes'
+  end
+
+  describe 'when working with aliases' do
+    before do
+      @name = 'elastomer-cluster-test'
+      @index = $client.index @name
+      @index.create({}) unless @index.exists?
+      wait_for_index(@name)
+    end
+
+    after do
+      @index.delete if @index.exists?
+    end
+
+    it 'adds an alias' do
+      hash = @cluster.get_aliases
+      assert_empty hash[@name]['aliases']
+
+      @cluster.update_aliases \
+        :add => {:index => @name, :alias => 'elastomer-test-unikitty'}
+
+      hash = @cluster.get_aliases
+      assert_equal ['elastomer-test-unikitty'], hash[@name]['aliases'].keys
+    end
+
+    it 'removes an alias' do
+      @cluster.update_aliases \
+        :add => {:index => @name, :alias => 'elastomer-test-unikitty'}
+
+      hash = @cluster.get_aliases
+      assert_equal ['elastomer-test-unikitty'], hash[@name]['aliases'].keys
+
+      @cluster.update_aliases([
+        {:add    => {:index => @name, :alias => 'elastomer-test-SpongeBob-SquarePants'}},
+        {:remove => {:index => @name, :alias => 'elastomer-test-unikitty'}}
+      ])
+
+      hash = @cluster.get_aliases
+      assert_equal ['elastomer-test-SpongeBob-SquarePants'], hash[@name]['aliases'].keys
+    end
+
+    it 'accepts the full aliases actions hash' do
+      @cluster.update_aliases :actions => [
+        {:add => {:index => @name, :alias => 'elastomer-test-He-Man'}},
+        {:add => {:index => @name, :alias => 'elastomer-test-Skeletor'}}
+      ]
+
+      hash = @cluster.get_aliases(:index => @name)
+      assert_equal %w[elastomer-test-He-Man elastomer-test-Skeletor], hash[@name]['aliases'].keys.sort
+    end
   end
 
 end

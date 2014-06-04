@@ -149,8 +149,15 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_aliases( actions, params = {} )
-        actions = [actions] unless Array === actions
-        body = {:actions => actions}
+        if actions.is_a?(Hash) && actions.key?(:actions)
+          body = actions
+        elsif actions.is_a?(Hash)
+          # Array() on a Hash does not do what you think it does - that is why
+          # we are explicitly wrapping the Hash via [actions] here.
+          body = {:actions => [actions]}
+        else
+          body = {:actions => Array(actions)}
+        end
 
         response = client.post '/_aliases', params.merge(:body => body, :action => 'cluster.update_aliases')
         response.body

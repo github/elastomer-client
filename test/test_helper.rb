@@ -1,3 +1,4 @@
+require 'tmpdir'
 require 'rubygems' unless defined? Gem
 require 'bundler'
 Bundler.require(:default, :development)
@@ -84,4 +85,12 @@ end
 # Returns true if Elasticsearch version is 1.x.
 def es_version_1_x?
   $client.version =~ /^1\./
+end
+
+
+def with_tmp_repo(&block)
+  Dir.mktmpdir do |dir|
+    @repo.create({:type => 'fs', :settings => {:location => dir}})
+    yield @repo
+  end
 end

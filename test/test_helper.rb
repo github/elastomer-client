@@ -83,12 +83,12 @@ end
 #
 # Returns true if Elasticsearch version is 1.x.
 def es_version_1_x?
-  $client.semantic_version >= '1.0'
+  $client.semantic_version >= '1.0.0'
 end
 
 # Elasticsearch 1.2 removed support for gateway snapshots.
 #
 # Returns true if Elasticsearch version supports gateway snapshots.
 def es_version_supports_gateway_snapshots?
-  $client.semantic_version <= '1.2'
+  $client.semantic_version <= '1.2.0'
 end

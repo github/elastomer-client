@@ -179,9 +179,11 @@ describe Elastomer::Client::Index do
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    it 'snapshots' do
-      response = @index.snapshot
-      assert_equal 0, response["_shards"]["failed"]
+    if es_version_supports_gateway_snapshots?
+      it 'snapshots' do
+        response = @index.snapshot
+        assert_equal 0, response["_shards"]["failed"]
+      end
     end
 
     it 'clears caches' do

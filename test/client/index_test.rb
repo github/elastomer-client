@@ -132,8 +132,8 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)
   end
 
-  # ES 1.x removed English stopwords from the default analyzers, so create a
-  # custom one with the English stopwords added.
+  # COMPATIBILITY ES 1.x removed English stopwords from the default analyzers,
+  # so create a custom one with the English stopwords added.
   if es_version_1_x?
     it 'analyzes text and returns tokens' do
       tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'standard', :index => nil
@@ -208,6 +208,7 @@ describe Elastomer::Client::Index do
       assert_equal 0, response["_shards"]["failed"]
     end
 
+    # COMPATIBILITY ES 1.2 removed support for the gateway snapshot API.
     if es_version_supports_gateway_snapshots?
       it 'snapshots' do
         response = @index.snapshot

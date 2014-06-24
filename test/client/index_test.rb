@@ -132,14 +132,43 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)
   end
 
-  it 'analyzes text and returns tokens' do
-    tokens = @index.analyze 'Just a few words to analyze.', :index => nil
-    tokens = tokens['tokens'].map { |h| h['token'] }
-    assert_equal %w[just few words analyze], tokens
+  # ES 1.x removed English stopwords from the default analyzers, so create a
+  # custom one with the English stopwords added.
+  if es_version_1_x?
+    it 'analyzes text and returns tokens' do
+      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'standard', :index => nil
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just a few words to analyze], tokens
 
-    tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'simple', :index => nil
-    tokens = tokens['tokens'].map { |h| h['token'] }
-    assert_equal %w[just a few words to analyze], tokens
+      @index.create(
+        :settings => {
+          :number_of_shards => 1,
+          :number_of_replicas => 0,
+          :analysis => {
+            :analyzer => {
+              :english_standard => {
+                :type => :standard,
+                :stopwords => "_english_"
+              }
+            }
+          }
+        }
+      )
+
+      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'english_standard'
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just few words analyze], tokens
+    end
+  else
+    it 'analyzes text and returns tokens' do
+      tokens = @index.analyze 'Just a few words to analyze.', :index => nil
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just few words analyze], tokens
+
+      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'simple', :index => nil
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just a few words to analyze], tokens
+    end
   end
 
   describe "when an index exists" do

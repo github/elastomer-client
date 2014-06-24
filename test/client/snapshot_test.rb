@@ -1,7 +1,7 @@
 
 require File.expand_path('../../test_helper', __FILE__)
 
-describe Elastomer::Client::Repository do
+describe Elastomer::Client::Snapshot do
   if es_version_1_x?
     before do
       @index_name = 'elastomer-snapshot-test-index'

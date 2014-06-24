@@ -352,7 +352,7 @@ module Elastomer
       #
       #   index.multi_search do |m|
       #     m.search({:query => {:match_all => {}}, :search_type => :count)
-      #     m.search({:query => {:field => {"author" => "github"}}}, :type => 'tweet')
+      #     m.search({:query => {:field => {"author" => "grantr"}}}, :type => 'tweet')
       #     ...
       #   end
       #

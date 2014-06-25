@@ -14,5 +14,5 @@ cd "$(dirname "$0")/.."
 if bundle check 1>/dev/null 2>&1; then
     echo "Gem environment up-to-date"
 else
-    exec bundle install --disable-shared-gems --binstubs --path vendor/gems "$@"
+    exec bundle install --binstubs --path vendor/gems "$@"
 fi

@@ -209,10 +209,12 @@ module Elastomer
         response.body
       end
 
-      # Explicitly snapshot (backup) one or more indices to the gateway. By
-      # default this happens periodically (every 1 second) but the period
-      # can be changed or disabled completely.
+      # Deprecated: Explicitly snapshot (backup) one or more indices to the
+      # gateway. By default this happens periodically (every 1 second) but the
+      # period can be changed or disabled completely.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-gateway-snapshot/
+      #
+      # This API was removed in ES 1.2.
       #
       # params - Parameters Hash
       #
@@ -350,7 +352,7 @@ module Elastomer
       #
       #   index.multi_search do |m|
       #     m.search({:query => {:match_all => {}}, :search_type => :count)
-      #     m.search({:query => {:field => {"author" => "github"}}}, :type => 'tweet')
+      #     m.search({:query => {:field => {"author" => "grantr"}}}, :type => 'tweet')
       #     ...
       #   end
       #

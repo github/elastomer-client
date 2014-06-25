@@ -21,7 +21,7 @@ require 'elastomer/client'
 # we are going to use the same client instance everywhere!
 # the client should always be stateless
 $client_params = {
-  :port => ENV['GH_ELASTICSEARCH_PORT'] || 9200,
+  :port => ENV['BOXEN_ELASTICSEARCH_PORT'] || 9200,
   :read_timeout => 2,
   :open_timeout => 1,
   :opaque_id => true
@@ -84,7 +84,14 @@ end
 #
 # Returns true if Elasticsearch version is 1.x.
 def es_version_1_x?
-  $client.version =~ /^1\./
+  $client.semantic_version >= '1.0.0'
+end
+
+# Elasticsearch 1.2 removed support for gateway snapshots.
+#
+# Returns true if Elasticsearch version supports gateway snapshots.
+def es_version_supports_gateway_snapshots?
+  $client.semantic_version <= '1.2.0'
 end
 
 

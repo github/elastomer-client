@@ -1,6 +1,7 @@
 require 'addressable/template'
 require 'faraday'
 require 'multi_json'
+require 'semantic'
 
 require 'elastomer/version'
 
@@ -49,6 +50,12 @@ module Elastomer
     # Returns the version String of the attached ElasticSearch instance.
     def version
       @version ||= info['version']['number']
+    end
+
+    # Returns a Semantic::Version for the attached ElasticSearch instance.
+    # See https://rubygems.org/gems/semantic
+    def semantic_version
+      Semantic::Version.new(version)
     end
 
     # Returns the information Hash from the attached ElasticSearch instance.

@@ -131,7 +131,7 @@ module Elastomer
           overrides = from_document(document)
           params = params.merge overrides
         end
-        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
+        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
 
         add_to_actions({:index => params}, document)
       end
@@ -150,7 +150,7 @@ module Elastomer
           overrides = from_document(document)
           params = params.merge overrides
         end
-        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
+        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
 
         add_to_actions({:create => params}, document)
       end
@@ -168,7 +168,7 @@ module Elastomer
           overrides = from_document(document)
           params = params.merge overrides
         end
-        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
+        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
 
         add_to_actions({:update => params}, document)
       end
@@ -212,7 +212,8 @@ module Elastomer
         opts = {}
 
         %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl _retry_on_conflict].each do |field|
-          key = field.to_sym
+          key = field.sub(/^_/, '').to_sym
+
           opts[key] = document.delete field if document[field]
           opts[key] = document.delete key   if document[key]
         end

@@ -127,10 +127,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def index( document, params = {} )
-        params = convert_special_keys(params)
-        params = params.merge from_document(document)
-        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
-
+        params = prepare_params(document, params)
         add_to_actions({:index => params}, document)
       end
       alias :add :index
@@ -144,10 +141,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def create( document, params )
-        params = convert_special_keys(params)
-        params = params.merge from_document(document)
-        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
-
+        params = prepare_params(document, params)
         add_to_actions({:create => params}, document)
       end
 
@@ -160,10 +154,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def update( document, params )
-        params = convert_special_keys(params)
-        params = params.merge from_document(document)
-        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
-
+        params = prepare_params(document, params)
         add_to_actions({:update => params}, document)
       end
 
@@ -174,8 +165,8 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def delete( params )
-        params = convert_special_keys(params)
-        add_to_actions :delete => params
+        params = prepare_params(nil, params)
+        add_to_actions({:delete => params})
       end
 
       # Immediately execute a bulk API call with the currently accumulated
@@ -203,6 +194,15 @@ module Elastomer
         %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl _retry_on_conflict]
       end
 
+      # Internal: convert special key parameters to their wire representation
+      # and apply any override document parameters.
+      def prepare_params(document, params)
+        params = convert_special_keys(params)
+        params = params.merge from_document(document) unless document === String
+        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
+        params
+      end
+
       # Internal: Extract special keys for bulk indexing from the given
       # `document`. The keys and their values are returned as a Hash from this
       # method. If a value is `nil` then it will be ignored.
@@ -212,7 +212,6 @@ module Elastomer
       # Returns extracted key/value pairs as a Hash.
       def from_document( document )
         opts = {}
-        return opts if String === document
 
         special_keys.each do |field|
           key = field.to_sym

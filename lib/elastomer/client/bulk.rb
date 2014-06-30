@@ -127,11 +127,9 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def index( document, params = {} )
-        unless String === document
-          overrides = from_document(document)
-          params = params.merge overrides
-        end
-        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
+        params = convert_special_keys(params)
+        params = params.merge from_document(document)
+        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
 
         add_to_actions({:index => params}, document)
       end
@@ -146,11 +144,9 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def create( document, params )
-        unless String === document
-          overrides = from_document(document)
-          params = params.merge overrides
-        end
-        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
+        params = convert_special_keys(params)
+        params = params.merge from_document(document)
+        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
 
         add_to_actions({:create => params}, document)
       end
@@ -164,11 +160,9 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def update( document, params )
-        unless String === document
-          overrides = from_document(document)
-          params = params.merge overrides
-        end
-        params.delete(:id) if params[:id].nil? || params[:id].to_s.empty?
+        params = convert_special_keys(params)
+        params = params.merge from_document(document)
+        params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
 
         add_to_actions({:update => params}, document)
       end
@@ -180,6 +174,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def delete( params )
+        params = convert_special_keys(params)
         add_to_actions :delete => params
       end
 
@@ -201,6 +196,13 @@ module Elastomer
         @actions.clear
       end
 
+      # Internal: special keys.
+      #
+      # Returns Array<String>
+      def special_keys
+        %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl _retry_on_conflict]
+      end
+
       # Internal: Extract special keys for bulk indexing from the given
       # `document`. The keys and their values are returned as a Hash from this
       # method. If a value is `nil` then it will be ignored.
@@ -210,15 +212,38 @@ module Elastomer
       # Returns extracted key/value pairs as a Hash.
       def from_document( document )
         opts = {}
+        return opts if String === document
 
-        %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl _retry_on_conflict].each do |field|
-          key = field.sub(/^_/, '').to_sym
-
+        special_keys.each do |field|
+          key = field.to_sym
           opts[key] = document.delete field if document[field]
           opts[key] = document.delete key   if document[key]
         end
 
         opts
+      end
+
+      # Internal: Convert incoming Ruby symbol keys to their special underscore
+      # versions. Maintains API compaibility with the `Docs` API for `index`,
+      # `create`, `update` and `delete`.
+      #
+      # :id -> :_id
+      # 'id' -> '_id'
+      #
+      # params - Hash.
+      #
+      # Returns a new params Hash with the special keys replaced.
+      def convert_special_keys(params)
+        new_params = params.dup
+
+        special_keys.each do |field|
+          key = field.sub(/^_/, '')
+
+          new_params[field] = params.delete key if params.key? key
+          new_params[field.to_sym] = params.delete key.to_sym if params.key? key.to_sym
+        end
+
+        new_params
       end
 
       # Internal: Add the given `action` to the list of actions that will be

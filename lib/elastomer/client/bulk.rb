@@ -188,13 +188,15 @@ module Elastomer
       end
 
       SPECIAL_KEYS = %w[id type index version version_type routing parent percolator timestamp ttl retry_on_conflict]
-      SPECIAL_KEYS_HASH = SPECIAL_KEYS.inject({}) { |k, h| h[k] = "_#{k}"; h }
+      SPECIAL_KEYS_HASH = SPECIAL_KEYS.inject({}) { |h, k| h[k] = "_#{k}"; h }
 
       # Internal: convert special key parameters to their wire representation
       # and apply any override document parameters.
       def prepare_params(document, params)
         params = convert_special_keys(params)
-        params = from_document(document).merge(params) unless document === String
+        unless document.nil? || String === document
+          params = from_document(document).merge(params)
+        end
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
         params
       end
@@ -211,8 +213,8 @@ module Elastomer
 
         SPECIAL_KEYS_HASH.values.each do |field|
           key = field.to_sym
-          opts[key] = document.delete field if document[field]
-          opts[key] = document.delete key   if document[key]
+          opts[key] = document.delete field if document.key? field
+          opts[key] = document.delete key   if document.key? key
         end
 
         opts

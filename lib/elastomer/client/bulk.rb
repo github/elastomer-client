@@ -198,7 +198,7 @@ module Elastomer
       # and apply any override document parameters.
       def prepare_params(document, params)
         params = convert_special_keys(params)
-        params = params.merge from_document(document) unless document === String
+        params = from_document(document).merge(params) unless document === String
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
         params
       end

@@ -223,4 +223,20 @@ describe Elastomer::Client::Bulk do
 
     assert_equal 10, h['hits']['total']
   end
+
+  it 'uses :id from parameters' do
+    response = @index.bulk do |b|
+      document = { :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet' }
+      params = { :id => 'foo' }
+
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    assert_equal 'foo', items[0]['index']['_id']
+  end
 end

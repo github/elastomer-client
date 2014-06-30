@@ -187,12 +187,8 @@ module Elastomer
         @actions.clear
       end
 
-      # Internal: special keys.
-      #
-      # Returns Array<String>
-      def special_keys
-        %w[_id _type _index _version _version_type _routing _parent _percolator _timestamp _ttl _retry_on_conflict]
-      end
+      SPECIAL_KEYS = %w[id type index version version_type routing parent percolator timestamp ttl retry_on_conflict]
+      SPECIAL_KEYS_HASH = SPECIAL_KEYS.inject({}) { |k, h| h[k] = "_#{k}"; h }
 
       # Internal: convert special key parameters to their wire representation
       # and apply any override document parameters.
@@ -213,7 +209,7 @@ module Elastomer
       def from_document( document )
         opts = {}
 
-        special_keys.each do |field|
+        SPECIAL_KEYS_HASH.values.each do |field|
           key = field.to_sym
           opts[key] = document.delete field if document[field]
           opts[key] = document.delete key   if document[key]
@@ -235,11 +231,9 @@ module Elastomer
       def convert_special_keys(params)
         new_params = params.dup
 
-        special_keys.each do |field|
-          key = field.sub(/^_/, '')
-
-          new_params[field] = params.delete key if params.key? key
-          new_params[field.to_sym] = params.delete key.to_sym if params.key? key.to_sym
+        SPECIAL_KEYS_HASH.each do |k1, k2|
+          new_params[k2] = params.delete k1 if params.key? k1
+          new_params[k2.to_sym] = params.delete k1.to_sym if params.key? k1.to_sym
         end
 
         new_params

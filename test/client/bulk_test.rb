@@ -275,4 +275,22 @@ describe Elastomer::Client::Bulk do
     assert !@index.docs('tweet').get(:id => 1)['exists']
     assert_equal 'just a test tweet', @index.docs('tweet').get(:id => 2)['_source']['message']
   end
+
+  it 'doesn\'t upgrade non-prefixed keys to parameters' do
+    document = { :id => 1, :type => 'book', :version => 5, :author => 'pea53', :message => 'just a test tweet' }
+    params = { :id => 2, :type => 'tweet' }
+
+    response = @index.bulk do |b|
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    assert_equal '2', items[0]['index']['_id']
+    assert_equal 'tweet', items[0]['index']['_type']
+    assert_equal 1, items[0]['index']['_version']
+  end
 end

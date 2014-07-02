@@ -258,4 +258,21 @@ describe Elastomer::Client::Bulk do
     assert_equal 'a tweet about foo', @index.docs('tweet').get(:id => 'foo')['_source']['message']
     assert_equal 'a tweet about bar', @index.docs('tweet').get(:id => 'bar')['_source']['message']
   end
+
+  it 'doesn\'t override parameters from the document' do
+    document = { :_id => 1, :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet' }
+    params = { :id => 2 }
+
+    response = @index.bulk do |b|
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    assert !@index.docs('tweet').get(:id => 1)['exists']
+    assert_equal 'just a test tweet', @index.docs('tweet').get(:id => 2)['_source']['message']
+  end
 end

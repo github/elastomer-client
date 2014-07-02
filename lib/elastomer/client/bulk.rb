@@ -234,8 +234,8 @@ module Elastomer
         new_params = params.dup
 
         SPECIAL_KEYS_HASH.each do |k1, k2|
-          new_params[k2] = params.delete k1 if params.key? k1
-          new_params[k2.to_sym] = params.delete k1.to_sym if params.key? k1.to_sym
+          new_params[k2] = new_params.delete k1 if new_params.key? k1
+          new_params[k2.to_sym] = new_params.delete k1.to_sym if new_params.key? k1.to_sym
         end
 
         new_params

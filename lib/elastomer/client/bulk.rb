@@ -118,12 +118,17 @@ module Elastomer
       end
 
       # Add an index action to the list of bulk actions to be performed when
-      # the bulk API call is made. The `_id` of the document cannot be `nil`
-      # or empty. If this is the case then we remove the `_id` and allow
-      # ElasticSearch to generate one.
+      # the bulk API call is made. Parameters can be provided in the
+      # parameters hash (underscore prefix optional) or in the document
+      # hash (underscore prefix required).
       #
       # document - The document to index as a Hash or JSON encoded String
-      # params   - Parameters for the index action (as a Hash)
+      # params   - Parameters for the index action (as a Hash) (optional)
+      #
+      # Examples
+      #   index({"foo" => "bar"}, {:_id => 1, :_type => "foo"}
+      #   index({"foo" => "bar"}, {:id => 1, :type => "foo"}
+      #   index("foo" => "bar", "_id" => 1, "_type" => "foo")
       #
       # Returns the response from the bulk call if one was made or nil.
       def index( document, params = {} )
@@ -133,11 +138,17 @@ module Elastomer
       alias :add :index
 
       # Add a create action to the list of bulk actions to be performed when
-      # the bulk API call is made. The `_id` of the document cannot be `nil`
-      # or empty.
+      # the bulk API call is made. Parameters can be provided in the
+      # parameters hash (underscore prefix optional) or in the document
+      # hash (underscore prefix required).
       #
       # document - The document to create as a Hash or JSON encoded String
-      # params   - Parameters for the create action (as a Hash)
+      # params   - Parameters for the create action (as a Hash) (optional)
+      #
+      # Examples
+      #   create({"foo" => "bar"}, {:_id => 1}
+      #   create({"foo" => "bar"}, {:id => 1}
+      #   create("foo" => "bar", "_id" => 1)
       #
       # Returns the response from the bulk call if one was made or nil.
       def create( document, params )
@@ -147,10 +158,17 @@ module Elastomer
 
       # Add an update action to the list of bulk actions to be performed when
       # the bulk API call is made. The `_id` of the document cannot be `nil`
-      # or empty.
+      # or empty. Parameters can be provided in the parameters hash
+      # (underscore prefix optional) or in the document hash (underscore
+      # prefix required).
       #
       # document - The document to update as a Hash or JSON encoded String
-      # params   - Parameters for the update action (as a Hash)
+      # params   - Parameters for the update action (as a Hash) (optional)
+      #
+      # Examples
+      #   update({"foo" => "bar"}, {:_id => 1}
+      #   update({"foo" => "bar"}, {:id => 1}
+      #   update("foo" => "bar", "_id" => 1)
       #
       # Returns the response from the bulk call if one was made or nil.
       def update( document, params )
@@ -162,6 +180,9 @@ module Elastomer
       # the bulk API call is made.
       #
       # params - Parameters for the delete action (as a Hash)
+      #      
+      # Examples
+      #   delete(:_id => 1, :_type => 'foo')
       #
       # Returns the response from the bulk call if one was made or nil.
       def delete( params )

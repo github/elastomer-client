@@ -272,7 +272,7 @@ describe Elastomer::Client::Bulk do
     items = response['items']
     assert_bulk_index(items[0])
 
-    assert !@index.docs('tweet').get(:id => 1)['exists']
+    refute_found @index.docs('tweet').get(:id => 1)
     assert_equal 'just a test tweet', @index.docs('tweet').get(:id => 2)['_source']['message']
   end
 

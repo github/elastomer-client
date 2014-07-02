@@ -18,12 +18,12 @@ module Elastomer
     #
     # Examples
     #
-    #   bulk( request_body, :index => 'default-index' )
+    #   bulk(request_body, :index => 'default-index')
     #
-    #   bulk( :index => 'default-index' ) do |b|
-    #     b.index( document1 )
-    #     b.index( document2 )
-    #     b.delete( document3 )
+    #   bulk(:index => 'default-index') do |b|
+    #     b.index(document1)
+    #     b.index(document2, :_type => 'default-type')
+    #     b.delete(document3)
     #     ...
     #   end
     #
@@ -157,9 +157,8 @@ module Elastomer
       end
 
       # Add an update action to the list of bulk actions to be performed when
-      # the bulk API call is made. The `_id` of the document cannot be `nil`
-      # or empty. Parameters can be provided in the parameters hash
-      # (underscore prefix optional) or in the document hash (underscore
+      # the bulk API call is made. Parameters can be provided in the parameters 
+      # hash (underscore prefix optional) or in the document hash (underscore
       # prefix required).
       #
       # document - The document to update as a Hash or JSON encoded String

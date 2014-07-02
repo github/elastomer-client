@@ -239,4 +239,23 @@ describe Elastomer::Client::Bulk do
 
     assert_equal 'foo', items[0]['index']['_id']
   end
+
+  it 'supports symbol and string parameters' do
+    response = @index.bulk do |b|
+      doc1 = { :author => 'pea53', :message => 'a tweet about foo' }
+      b.index doc1, { :id => 'foo', :type => 'tweet' }
+
+      doc2 = { :author => 'pea53', :message => 'a tweet about bar' }
+      b.index doc2, { 'id' => 'bar', 'type' => 'tweet' }
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+    assert_bulk_index(items[1])
+
+    assert_equal 'a tweet about foo', @index.docs('tweet').get(:id => 'foo')['_source']['message']
+    assert_equal 'a tweet about bar', @index.docs('tweet').get(:id => 'bar')['_source']['message']
+  end
 end

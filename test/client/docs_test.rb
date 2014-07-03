@@ -363,26 +363,42 @@ describe Elastomer::Client::Docs do
     end
   end
 
-  def populate!
-    @docs.add \
+  it 'supports bulk operations with the same parameters as docs' do
+    response = @docs.bulk do |b|
+      populate!(b)
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    response = @docs.get(:id => 1, :type => 'doc1')
+    assert_found response
+    assert_equal 'mojombo', response['_source']['author']
+  end
+
+  # Create/index multiple documents.
+  #
+  # docs - An instance of Elastomer::Client::Docs or Elastomer::Client::Bulk. If
+  #        nil uses the @docs instance variable.
+  def populate!(docs = @docs)
+    docs.add \
       :_id    => 1,
       :_type  => 'doc1',
       :title  => 'the author of gravatar',
       :author => 'mojombo'
 
-    @docs.add \
+    docs.add \
       :_id    => 2,
       :_type  => 'doc1',
       :title  => 'the author of resque',
       :author => 'defunkt'
 
-    @docs.add \
+    docs.add \
       :_id    => 1,
       :_type  => 'doc2',
       :title  => 'the author of logging',
       :author => 'pea53'
 
-    @docs.add \
+    docs.add \
       :_id    => 2,
       :_type  => 'doc2',
       :title  => 'the author of rubber-band',

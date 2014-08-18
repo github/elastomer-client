@@ -223,4 +223,74 @@ describe Elastomer::Client::Bulk do
 
     assert_equal 10, h['hits']['total']
   end
+
+  it 'uses :id from parameters' do
+    response = @index.bulk do |b|
+      document = { :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet' }
+      params = { :id => 'foo' }
+
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    assert_equal 'foo', items[0]['index']['_id']
+  end
+
+  it 'supports symbol and string parameters' do
+    response = @index.bulk do |b|
+      doc1 = { :author => 'pea53', :message => 'a tweet about foo' }
+      b.index doc1, { :id => 'foo', :type => 'tweet' }
+
+      doc2 = { :author => 'pea53', :message => 'a tweet about bar' }
+      b.index doc2, { 'id' => 'bar', 'type' => 'tweet' }
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+    assert_bulk_index(items[1])
+
+    assert_equal 'a tweet about foo', @index.docs('tweet').get(:id => 'foo')['_source']['message']
+    assert_equal 'a tweet about bar', @index.docs('tweet').get(:id => 'bar')['_source']['message']
+  end
+
+  it 'doesn\'t override parameters from the document' do
+    document = { :_id => 1, :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet' }
+    params = { :id => 2 }
+
+    response = @index.bulk do |b|
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    refute_found @index.docs('tweet').get(:id => 1)
+    assert_equal 'just a test tweet', @index.docs('tweet').get(:id => 2)['_source']['message']
+  end
+
+  it 'doesn\'t upgrade non-prefixed keys to parameters' do
+    document = { :id => 1, :type => 'book', :version => 5, :author => 'pea53', :message => 'just a test tweet' }
+    params = { :id => 2, :type => 'tweet' }
+
+    response = @index.bulk do |b|
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    assert_equal '2', items[0]['index']['_id']
+    assert_equal 'tweet', items[0]['index']['_type']
+    assert_equal 1, items[0]['index']['_version']
+  end
 end

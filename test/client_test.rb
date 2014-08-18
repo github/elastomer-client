@@ -82,5 +82,14 @@ describe Elastomer::Client do
     it 'flattens arrays' do
       assert_equal 'foo,bar,baz,buz', $client.assert_param_presence(["  foo  \t", %w[bar baz buz]])
     end
+
+    it 'allows strings' do
+      assert_equal 'foo', $client.assert_param_presence("foo")
+    end
+
+    it 'converts numbers and symbols to strings' do
+      assert_equal 'foo', $client.assert_param_presence(:foo)
+      assert_equal '9', $client.assert_param_presence(9)
+    end
   end
 end

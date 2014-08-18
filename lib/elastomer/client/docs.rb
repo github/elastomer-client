@@ -267,7 +267,7 @@ Percolate
       # params - Parameters Hash
       #
       # Examples
-      # 
+      #
       #   # request body query
       #   validate(:query_string => {:query => "*:*"})
       #

@@ -265,7 +265,8 @@ module Elastomer
       response
     end
 
-    # Internal: Ensure that the parameter has a valid value. Things like `nil`
+    # Internal: Ensure that the parameter has a valid value. Strings, Symbols,
+    # Numerics, and Arrays of those things are valid. Things like `nil`
     # and empty strings are right out. This method also performs a little
     # formating on the parameter:
     #
@@ -281,7 +282,7 @@ module Elastomer
     # Raises an ArgumentError if the param is not valid.
     def assert_param_presence( param, name = 'input value' )
       case param
-      when String, Numeric
+      when String, Symbol, Numeric
         param = param.to_s.strip
         raise ArgumentError, "#{name} cannot be blank: #{param.inspect}" if param =~ /\A\s*\z/
         param

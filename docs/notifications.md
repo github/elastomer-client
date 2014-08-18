@@ -20,16 +20,16 @@ The event namespace is `request.client.elastomer`.
 
 ## Valid actions
 - bulk
-- cluster.get_settings
-- cluster.health
-- cluster.reroute
-- cluster.state
-- cluster.update_settings
 - cluster.available
 - cluster.get_aliases
+- cluster.get_settings
+- cluster.health
 - cluster.info
+- cluster.reroute
 - cluster.shutdown
+- cluster.state
 - cluster.update_aliases
+- cluster.update_settings
 - docs.delete
 - docs.delete_by_query
 - docs.explain
@@ -65,7 +65,19 @@ The event namespace is `request.client.elastomer`.
 - nodes.info
 - nodes.shutdown
 - nodes.stats
+- repository.create
+- repository.delete
+- repository.exists
+- repository.get
+- repository.status
+- repository.update
 - search.scan
 - search.scroll
+- snapshot.create
+- snapshot.delete
+- snapshot.exists
+- snapshot.get
+- snapshot.restore
+- snapshot.status
 - template.create
 - template.get

@@ -1,3 +1,4 @@
+require 'tmpdir'
 require 'rubygems' unless defined? Gem
 require 'bundler'
 Bundler.require(:default, :development)
@@ -91,4 +92,21 @@ end
 # Returns true if Elasticsearch version supports gateway snapshots.
 def es_version_supports_gateway_snapshots?
   $client.semantic_version <= '1.2.0'
+end
+
+
+def with_tmp_repo(&block)
+  Dir.mktmpdir do |dir|
+    @repo.create({:type => 'fs', :settings => {:location => dir}})
+    yield @repo
+    @repo.delete if @repo.exists?
+  end
+end
+
+def with_tmp_snapshot(&block)
+  with_tmp_repo do
+    @snapshot.create
+    yield @snapshot
+    @snapshot.delete if @snapshot.exists?
+  end
 end

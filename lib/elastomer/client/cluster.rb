@@ -30,7 +30,9 @@ module Elastomer
         response.body
       end
 
-      # Comprehensive state information of the whole cluster.
+      # Comprehensive state information of the whole cluster. For 1.x metric
+      # and index filtering, use the :metrics and :indices parameter keys.
+      #
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-state/
       #
       # params - Parameters Hash

@@ -2,7 +2,7 @@ require File.expand_path('../../test_helper', __FILE__)
 
 describe Elastomer::Client::Nodes do
 
-  it 'gets info for the ndoe(s)' do
+  it 'gets info for the node(s)' do
     h = $client.nodes.info
     assert h.key?('cluster_name'), 'the cluster name is returned'
     assert_instance_of Hash, h['nodes'], 'the node list is returned'
@@ -16,6 +16,15 @@ describe Elastomer::Client::Nodes do
     assert node.key?('indices'), 'indices stats are returned'
   end
 
+  if es_version_1_x?
+    it 'filters node stats' do
+      h = $client.nodes.stats(:stats => 'http')
+      node = h['nodes'].values.first
+      assert node.key?('http'), 'expected http stats to be present'
+      assert !node.key?('indices'), 'expected indices stats to be absent'
+    end
+  end
+
   it 'gets the hot threads for the node(s)' do
     str = $client.nodes.hot_threads :read_timeout => 2
     assert_instance_of String, str
@@ -27,7 +36,7 @@ describe Elastomer::Client::Nodes do
     assert_empty h['nodes']
   end
 
-  it 'can be scoped to a multiple nodes' do
+  it 'can be scoped to multiple nodes' do
     h = $client.nodes(%w[node1 node2 node3]).info
     assert_empty h['nodes']
   end

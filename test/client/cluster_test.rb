@@ -71,6 +71,12 @@ describe Elastomer::Client::Cluster do
     assert_equal "60", value
   end
 
+  it 'returns the list of indices in the cluster' do
+    @index.create({}) unless @index.exists?
+    indices = @cluster.indices
+    assert !indices.empty?, 'expected to see an index'
+  end
+
   it 'returns the list of nodes in the cluster' do
     nodes = @cluster.nodes
     assert !nodes.empty?, 'we have to have some nodes'

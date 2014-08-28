@@ -157,38 +157,40 @@ module Elastomer
 
       path = expand_path path, params
 
-      response = instrument(path, body, params) do
-        case method
-        when :head
-          connection.head(path) { |req| req.options[:timeout] = read_timeout if read_timeout }
+      instrument(path, body, params) do
+        begin
+          response = case method
+          when :head
+            connection.head(path) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-        when :get
-          connection.get(path) { |req|
-            req.body = body if body
-            req.options[:timeout] = read_timeout if read_timeout
-          }
+          when :get
+            connection.get(path) { |req|
+              req.body = body if body
+              req.options[:timeout] = read_timeout if read_timeout
+            }
 
-        when :put
-          connection.put(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+          when :put
+            connection.put(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-        when :post
-          connection.post(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+          when :post
+            connection.post(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-        when :delete
-          connection.delete(path) { |req|
-            req.body = body if body
-            req.options[:timeout] = read_timeout if read_timeout
-          }
+          when :delete
+            connection.delete(path) { |req|
+              req.body = body if body
+              req.options[:timeout] = read_timeout if read_timeout
+            }
 
-        else
-          raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
+          else
+            raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
+          end
+
+          handle_errors response
+
+        rescue Faraday::Error::TimeoutError => boom
+          raise ::Elastomer::Client::TimeoutError.new(boom, path)
         end
       end
-
-      handle_errors response
-
-    rescue Faraday::Error::TimeoutError => boom
-      raise ::Elastomer::Client::TimeoutError.new(boom, path)
 
     # ensure
     #   # FIXME: this is here until we get a real logger in place

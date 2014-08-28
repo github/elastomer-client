@@ -188,6 +188,7 @@ module Elastomer
       handle_errors response
 
     rescue Faraday::Error::TimeoutError => boom
+      instrument(path, body, params, 'timeout.client.elastomer')
       raise ::Elastomer::Client::TimeoutError.new(boom, path)
 
     # ensure
@@ -238,10 +239,11 @@ module Elastomer
     # path   - The full request path as a String
     # body   - The request body as a String or `nil`
     # params - The request params Hash
-    # block  - The block that will be instrumented
+    # name   - The event name to instrument (optional)
+    # block  - The block that will be instrumented (optional)
     #
     # Returns the response from the block
-    def instrument( path, body, params )
+    def instrument( path, body, params, name=nil)
       yield
     end
 

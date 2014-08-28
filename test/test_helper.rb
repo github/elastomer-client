@@ -47,7 +47,7 @@ end
 # add custom assertions
 require File.expand_path('../assertions', __FILE__)
 
-# require 'elastomer/notifications'
+require 'elastomer/notifications'
 # require 'pp'
 
 # ActiveSupport::Notifications.subscribe('request.client.elastomer') do |name, start_time, end_time, transaction_id, payload|

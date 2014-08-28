@@ -22,7 +22,7 @@ describe Elastomer::Notifications do
       assert_raises(Elastomer::Client::TimeoutError) { $client.info }
       event = @events.detect { |e| e.payload[:action] == 'cluster.info' }
       exception = event.payload[:exception]
-      assert_equal 'Elastomer::Error::TimeoutError', exception[0]
+      assert_equal 'Elastomer::Client::TimeoutError', exception[0]
       assert_match 'timeout', exception[1]
     end
   end

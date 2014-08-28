@@ -50,10 +50,11 @@ module Elastomer
     # path   - The full request path as a String
     # body   - The request body as a String or `nil`
     # params - The request params Hash
-    # block  - The block that will be instrumented
+    # name   - The event name to instrument (optional)
+    # block  - The block that will be instrumented (optional)
     #
     # Returns the response from the block
-    def instrument( path, body, params )
+    def instrument(path, body, params, name=NAME)
       payload = {
         :index   => params[:index],
         :type    => params[:type],
@@ -62,17 +63,19 @@ module Elastomer
         :body    => body
       }
 
-      ::Elastomer::Notifications.service.instrument(NAME, payload) do
+      ::Elastomer::Notifications.service.instrument(name, payload) do
         response = yield
-        payload[:url]    = response.env[:url]
-        payload[:method] = response.env[:method]
-        payload[:status] = response.status
+        if response.respond_to?(:env)
+          payload[:url]    = response.env[:url]
+          payload[:method] = response.env[:method]
+        end
+        payload[:status] = response.status if response.respond_to?(:status)
         response
       end
     end
   end
 
-  # use ActiveSupport::Notifications as the default instrumentaiton service
+  # use ActiveSupport::Notifications as the default instrumentation service
   Notifications.service = ActiveSupport::Notifications
 
   # inject our instrument method into the Client class

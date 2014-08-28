@@ -15,6 +15,9 @@ describe Elastomer::Middleware::OpaqueId do
         ]
       }
 
+      stub.get('/') { |env|
+        [ 200, {}, {'version' => {'number' => '1.0.0'}}  ]
+      }
       stub.get('/_cluster/state') { |env|
         [ 200, {'X-Opaque-Id' => "00000000-0000-0000-0000-000000000000"}, %q[{"foo":"bar"}] ]
       }

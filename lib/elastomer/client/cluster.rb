@@ -30,14 +30,16 @@ module Elastomer
         response.body
       end
 
-      # Comprehensive state information of the whole cluster.
+      # Comprehensive state information of the whole cluster. For 1.x metric
+      # and index filtering, use the :metrics and :indices parameter keys.
+      #
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-state/
       #
       # params - Parameters Hash
       #
       # Returns the response as a Hash
       def state( params = {} )
-        response = client.get '/_cluster/state', params.merge(:action => 'cluster.state')
+        response = client.get '/_cluster/state{/metrics}{/indices}', params.merge(:action => 'cluster.state')
         response.body
       end
 
@@ -168,11 +170,17 @@ module Elastomer
       #
       # Returns the template definitions as a Hash
       def templates
-        h = state(
-          :filter_blocks        => true,
-          :filter_nodes         => true,
-          :filter_routing_table => true
-        )
+        # ES 1.x supports state filtering via a path segment called metrics.
+        # ES 0.90 uses query parameters instead.
+        if client.semantic_version >= '1.0.0'
+          h = state(:metrics => 'metadata')
+        else
+          h = state(
+            :filter_blocks        => true,
+            :filter_nodes         => true,
+            :filter_routing_table => true,
+          )
+        end
         h['metadata']['templates']
       end
 
@@ -181,11 +189,17 @@ module Elastomer
       #
       # Returns the indices definitions as a Hash
       def indices
-        h = state(
-          :filter_blocks        => true,
-          :filter_nodes         => true,
-          :filter_routing_table => true
-        )
+        # ES 1.x supports state filtering via a path segment called metrics.
+        # ES 0.90 uses query parameters instead.
+        if client.semantic_version >= '1.0.0'
+          h = state(:metrics => 'metadata')
+        else
+          h = state(
+            :filter_blocks        => true,
+            :filter_nodes         => true,
+            :filter_routing_table => true,
+          )
+        end
         h['metadata']['indices']
       end
 
@@ -195,11 +209,17 @@ module Elastomer
       #
       # Returns the nodes definitions as a Hash
       def nodes
-        h = state(
-          :filter_blocks        => true,
-          :filter_metadata      => true,
-          :filter_routing_table => true
-        )
+        # ES 1.x supports state filtering via a path segment called metrics.
+        # ES 0.90 uses query parameters instead.
+        if client.semantic_version >= '1.0.0'
+          h = state(:metrics => 'nodes')
+        else
+          h = state(
+            :filter_blocks        => true,
+            :filter_metadata      => true,
+            :filter_routing_table => true,
+          )
+        end
         h['nodes']
       end
 

@@ -154,6 +154,7 @@ describe Elastomer::Client::Index do
           }
         }
       )
+      wait_for_index(@name)
 
       tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'english_standard'
       tokens = tokens['tokens'].map { |h| h['token'] }

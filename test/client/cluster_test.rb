@@ -24,6 +24,22 @@ describe Elastomer::Client::Cluster do
     assert h.key?('cluster_name'), 'the cluster name is returned'
     assert h.key?('master_node'), 'the master node is returned'
     assert_instance_of Hash, h['nodes'], 'the node list is returned'
+    assert_instance_of Hash, h['metadata'], 'the metadata are returned'
+  end
+
+  if es_version_1_x?
+    it 'filters cluster state by metrics' do
+      h = @cluster.state(:metrics => 'nodes')
+      refute h.key('metadata'), 'expected only nodes state'
+      h = @cluster.state(:metrics => 'metadata')
+      refute h.key('nodes'), 'expected only metadata state'
+    end
+
+    it 'filters cluster state by indices' do
+      @index.create({}) unless @index.exists?
+      h = @cluster.state(:metrics => 'metadata', :indices => @name)
+      assert [@name], h['metadata']['indices'].keys
+    end
   end
 
   it 'gets the cluster settings' do
@@ -53,6 +69,12 @@ describe Elastomer::Client::Cluster do
     value = h['transient']['indices.ttl.interval'] ||
             h['transient']['indices']['ttl']['interval']
     assert_equal "60", value
+  end
+
+  it 'returns the list of indices in the cluster' do
+    @index.create({}) unless @index.exists?
+    indices = @cluster.indices
+    assert !indices.empty?, 'expected to see an index'
   end
 
   it 'returns the list of nodes in the cluster' do

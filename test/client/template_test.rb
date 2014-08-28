@@ -11,6 +11,12 @@ describe Elastomer::Client::Cluster do
     @template.delete if @template.exists?
   end
 
+  it 'lists templates in the cluster' do
+    @template.create({:template => 'test-elastomer*'})
+    templates = $client.cluster.templates
+    assert !templates.empty?, "expected to see a template"
+  end
+
   it 'creates a template' do
     assert !@template.exists?, 'the template should not exist'
 

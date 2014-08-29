@@ -26,4 +26,44 @@ describe Elastomer::Notifications do
       assert_match 'timeout', exception[1]
     end
   end
+
+  it 'instruments cluster actions' do
+    $client.available?; assert_action_event('cluster.available')
+    $client.info; assert_action_event('cluster.info')
+  end
+
+  it 'instruments node actions' do
+    nodes = $client.nodes
+    nodes.info; assert_action_event('nodes.info')
+    nodes.stats; assert_action_event('nodes.stats')
+    nodes.hot_threads; assert_action_event('nodes.hot_threads')
+  end
+
+  it 'instruments node shutdown' do
+    client = stub_client(:post, '/_cluster/nodes/_all/_shutdown')
+    client.nodes.shutdown; assert_action_event('nodes.shutdown')
+  end
+
+  it 'instruments index actions' do
+    @index.exists?; assert_action_event('index.exists')
+    @index.create('number_of_replicas' => 0)
+    assert_action_event('index.create')
+    @index.get_settings; assert_action_event('index.get_settings')
+    @index.update_settings('number_of_replicas' => 0)
+    assert_action_event('index.get_settings')
+    @index.close; assert_action_event('index.close')
+    @index.open; assert_action_event('index.open')
+    @index.delete; assert_action_event('index.delete')
+  end
+
+  def assert_action_event(action)
+    assert @events.detect { |e| e.payload[:action] == action }, "expected #{action} event"
+  end
+
+  def stub_client(method, url, status=200, body='{"acknowledged":true}')
+    stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+      stub.send(method, url) { |env| [status, {}, body]}
+    end
+    Elastomer::Client.new($client_params.merge(:opaque_id => false, :adapter => [:test, stubs]))
+  end
 end

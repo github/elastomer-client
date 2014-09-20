@@ -22,7 +22,27 @@ describe Elastomer::Client::Error do
     err.set_backtrace %w[one two three four]
 
     err = Elastomer::Client::Error.new(err, "POST", "/index/doc")
-    assert_equal "could not connect to host: POST /index/doc", err.message
+    assert_equal "could not connect to host :: POST /index/doc", err.message
     assert_equal %w[one two three four], err.backtrace
+  end
+
+  it "is fatal by default" do
+    assert Elastomer::Client::Error.fatal?, "client errors are fatal by default"
+
+    error = Elastomer::Client::Error.new "oops!"
+    assert !error.retry?, "client errors are not retryable by default"
+  end
+
+  it "has some fatal subclasses" do
+    assert Elastomer::Client::ResourceNotFound.fatal?, "Resource not found is fatal"
+    assert Elastomer::Client::ParsingError.fatal?, "Parsing error is fatal"
+    assert Elastomer::Client::SSLError.fatal?, "SSL error is fatal"
+    assert Elastomer::Client::RequestError.fatal?, "Request error is fatal"
+  end
+
+  it "has some non-fatal subclasses" do
+    assert !Elastomer::Client::TimeoutError.fatal?, "Timeouts are not fatal"
+    assert !Elastomer::Client::ConnectionFailed.fatal?, "Connection failures are not fatal"
+    assert !Elastomer::Client::ServerError.fatal?, "Server errors are not fatal"
   end
 end

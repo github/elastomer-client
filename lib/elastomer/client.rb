@@ -274,8 +274,8 @@ module Elastomer
     # Raises an Elastomer::Client::Error on 500 responses or responses
     # containing and 'error' field.
     def handle_errors( response )
-      raise Error, response if response.status >= 500
-      raise Error, response if Hash === response.body && response.body['error']
+      raise ServerError, response if response.status >= 500
+      raise RequestError, response if Hash === response.body && response.body['error']
 
       response
     end

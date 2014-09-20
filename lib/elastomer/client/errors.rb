@@ -21,7 +21,7 @@ module Elastomer
         case args.first
         when Exception
           exception = args.shift
-          super("#{exception.message}: #{args.join(' ')}")
+          super("#{exception.message} :: #{args.join(' ')}")
           set_backtrace exception.backtrace
 
         when Faraday::Response
@@ -39,6 +39,29 @@ module Elastomer
       # created with a response.
       attr_reader :status
 
+      # Indicates that the error is fatal. The request should not be tried
+      # again.
+      def fatal?
+        self.class.fatal?
+      end
+
+      # The inverse of the `fatal?` method. A request can be retried if this
+      # method returns `true`.
+      def retry?
+        !fatal?
+      end
+
+      class << self
+        # By default all client errors are fatal and indicate that a request
+        # should not be retried. Only a few errors are retryable.
+        def fatal
+          return @fatal if defined? @fatal
+          @fatal = true
+        end
+        attr_writer :fatal
+        alias :fatal? :fatal
+      end
+
     end  # Error
 
     # Wrapper classes for specific Faraday errors.
@@ -47,6 +70,12 @@ module Elastomer
     ResourceNotFound = Class.new Error
     ParsingError     = Class.new Error
     SSLError         = Class.new Error
+    ServerError      = Class.new Error
+    RequestError     = Class.new Error
+
+    ServerError.fatal      = false
+    TimeoutError.fatal     = false
+    ConnectionFailed.fatal = false
 
   end  # Client
 end  # Elastomer

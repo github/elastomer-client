@@ -250,7 +250,7 @@ describe Elastomer::Client::Docs do
 
     # for some reason, if there's no document indexed here all the mlt
     # queries return zero results
-    @docs.add \
+    @docs.index \
       :_id    => 3,
       :_type  => 'doc1',
       :title  => 'the author of faraday',
@@ -380,25 +380,25 @@ describe Elastomer::Client::Docs do
   # docs - An instance of Elastomer::Client::Docs or Elastomer::Client::Bulk. If
   #        nil uses the @docs instance variable.
   def populate!(docs = @docs)
-    docs.add \
+    docs.index \
       :_id    => 1,
       :_type  => 'doc1',
       :title  => 'the author of gravatar',
       :author => 'mojombo'
 
-    docs.add \
+    docs.index \
       :_id    => 2,
       :_type  => 'doc1',
       :title  => 'the author of resque',
       :author => 'defunkt'
 
-    docs.add \
+    docs.index \
       :_id    => 1,
       :_type  => 'doc2',
       :title  => 'the author of logging',
       :author => 'pea53'
 
-    docs.add \
+    docs.index \
       :_id    => 2,
       :_type  => 'doc2',
       :title  => 'the author of rubber-band',

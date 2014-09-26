@@ -100,25 +100,25 @@ describe Elastomer::Client::MultiSearch do
   end
 
   def populate!
-    @docs.add \
+    @docs.index \
       :_id    => 1,
       :_type  => 'doc1',
       :title  => 'the author of gravatar',
       :author => 'mojombo'
 
-    @docs.add \
+    @docs.index \
       :_id    => 2,
       :_type  => 'doc1',
       :title  => 'the author of resque',
       :author => 'defunkt'
 
-    @docs.add \
+    @docs.index \
       :_id    => 1,
       :_type  => 'doc2',
       :title  => 'the author of logging',
       :author => 'pea53'
 
-    @docs.add \
+    @docs.index \
       :_id    => 2,
       :_type  => 'doc2',
       :title  => 'the author of rubber-band',

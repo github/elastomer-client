@@ -26,10 +26,7 @@ describe Elastomer::Client::Bulk do
           }
         }
 
-      $client.cluster.health \
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
+      wait_for_index(@name)
     end
   end
 
@@ -48,8 +45,8 @@ describe Elastomer::Client::Bulk do
     body = body.join "\n"
     h = $client.bulk body
 
-    ok = h['items'].map {|a| a['index']['ok']}
-    assert_equal [true, true], ok
+    assert_bulk_index(h['items'][0])
+    assert_bulk_index(h['items'][1])
 
     @index.refresh
 
@@ -69,8 +66,8 @@ describe Elastomer::Client::Bulk do
     body = body.join "\n"
     h = $client.bulk body, :index => @name
 
-    assert h['items'].first['index']['ok'], 'we added a new book'
-    assert h['items'].last['delete']['ok'], 'we removed a book'
+    assert_bulk_index h['items'].first, 'expected to index a book'
+    assert_bulk_delete h['items'].last, 'expected to delete a book'
 
     @index.refresh
 
@@ -90,8 +87,8 @@ describe Elastomer::Client::Bulk do
 
     assert_instance_of Fixnum, h['took']
 
-    assert items.first['index']['ok'], 'indexing failed'
-    assert items.last['create']['ok'], 'creation failed'
+    assert_bulk_index h['items'].first
+    assert_bulk_create h['items'].last
 
     book_id = items.last['create']['_id']
     assert_match %r/^\S{22}$/, book_id
@@ -111,8 +108,8 @@ describe Elastomer::Client::Bulk do
     end
     items = h['items']
 
-    assert items.first['create']['ok'], 'we created a new book'
-    assert items.last['delete']['ok'], 'we removed a book'
+    assert_bulk_create h['items'].first, 'expected to create a book'
+    assert_bulk_delete h['items'].last, 'expected to delete a book'
 
     book_id2 = items.first['create']['_id']
     assert_match %r/^\S{22}$/, book_id2
@@ -135,8 +132,8 @@ describe Elastomer::Client::Bulk do
 
     assert_instance_of Fixnum, h['took']
 
-    assert items.first['index']['ok'], 'indexing failed'
-    assert items.last['create']['ok'], 'creation failed'
+    assert_bulk_index h['items'].first
+    assert_bulk_create h['items'].last
 
     @index.refresh
 
@@ -153,8 +150,8 @@ describe Elastomer::Client::Bulk do
     end
     items = h['items']
 
-    assert items.first['index']['ok'], 'we added a new book'
-    assert items.last['delete']['ok'], 'we removed a book'
+    assert_bulk_index h['items'].first, 'expected to index a book'
+    assert_bulk_delete h['items'].last, 'expected to delete a book'
 
     @index.refresh
 
@@ -188,7 +185,7 @@ describe Elastomer::Client::Bulk do
     ary.compact!
 
     assert_equal 4, ary.length
-    assert ary.all? { |a| a['items'].all? { |b| b['index']['ok'] }}, 'all documents were not indexed properly'
+    ary.each { |a| a['items'].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
     h = @index.docs.search :q => '*:*', :search_type => 'count'
@@ -219,11 +216,81 @@ describe Elastomer::Client::Bulk do
     ary.compact!
 
     assert_equal 4, ary.length
-    assert ary.all? { |a| a['items'].all? { |b| b['index']['ok'] }}, 'all documents were not indexed properly'
+    ary.each { |a| a['items'].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
     h = @index.docs.search :q => '*:*', :search_type => 'count'
 
     assert_equal 10, h['hits']['total']
+  end
+
+  it 'uses :id from parameters' do
+    response = @index.bulk do |b|
+      document = { :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet' }
+      params = { :id => 'foo' }
+
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    assert_equal 'foo', items[0]['index']['_id']
+  end
+
+  it 'supports symbol and string parameters' do
+    response = @index.bulk do |b|
+      doc1 = { :author => 'pea53', :message => 'a tweet about foo' }
+      b.index doc1, { :id => 'foo', :type => 'tweet' }
+
+      doc2 = { :author => 'pea53', :message => 'a tweet about bar' }
+      b.index doc2, { 'id' => 'bar', 'type' => 'tweet' }
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+    assert_bulk_index(items[1])
+
+    assert_equal 'a tweet about foo', @index.docs('tweet').get(:id => 'foo')['_source']['message']
+    assert_equal 'a tweet about bar', @index.docs('tweet').get(:id => 'bar')['_source']['message']
+  end
+
+  it 'doesn\'t override parameters from the document' do
+    document = { :_id => 1, :_type => 'tweet', :author => 'pea53', :message => 'just a test tweet' }
+    params = { :id => 2 }
+
+    response = @index.bulk do |b|
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    refute_found @index.docs('tweet').get(:id => 1)
+    assert_equal 'just a test tweet', @index.docs('tweet').get(:id => 2)['_source']['message']
+  end
+
+  it 'doesn\'t upgrade non-prefixed keys to parameters' do
+    document = { :id => 1, :type => 'book', :version => 5, :author => 'pea53', :message => 'just a test tweet' }
+    params = { :id => 2, :type => 'tweet' }
+
+    response = @index.bulk do |b|
+      b.index document, params
+    end
+
+    assert_instance_of Fixnum, response['took']
+
+    items = response['items']
+    assert_bulk_index(items[0])
+
+    assert_equal '2', items[0]['index']['_id']
+    assert_equal 'tweet', items[0]['index']['_type']
+    assert_equal 1, items[0]['index']['_version']
   end
 end

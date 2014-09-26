@@ -37,14 +37,15 @@ module Elastomer
         response.body
       end
 
-      # Retrieve one or more (or all) of the cluster nodes statistics.
+      # Retrieve one or more (or all) of the cluster nodes statistics. For 1.x
+      # stats filtering, use the :stats parameter key.
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-stats/
       #
       # params - Parameters Hash
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get '/_nodes{/node_id}/stats', update_params(params, :action => 'nodes.stats')
+        response = client.get '/_nodes{/node_id}/stats{/stats}', update_params(params, :action => 'nodes.stats')
         response.body
       end
 

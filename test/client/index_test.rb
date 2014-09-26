@@ -26,8 +26,20 @@ describe Elastomer::Client::Index do
       assert @index.exists?, 'the index should now exist'
 
       settings = @index.settings[@name]['settings']
-      assert_equal '3', settings['index.number_of_shards']
-      assert_equal '0', settings['index.number_of_replicas']
+
+      # COMPATIBILITY
+      # ES 1.0 changed the default return format of index settings to always
+      # expand nested properties, e.g.
+      # {"index.number_of_replicas": "1"} changed to
+      # {"index": {"number_of_replicas":"1"}}
+
+      # To support both versions, we check for either return format.
+      value = settings['index.number_of_shards'] ||
+              settings['index']['number_of_shards']
+      assert_equal '3', value
+      value = settings['index.number_of_replicas'] ||
+              settings['index']['number_of_replicas']
+      assert_equal '0', value
     end
 
     it 'adds mappings for document types' do
@@ -44,10 +56,9 @@ describe Elastomer::Client::Index do
           }
         }
       )
-      assert @index.exists?, 'the index should now exist'
 
-      mapping = @index.mapping[@name]
-      assert mapping.key?('doco'), 'the doco mapping is present'
+      assert @index.exists?, 'the index should now exist'
+      assert_mapping_exists @index.mapping[@name], 'doco'
     end
   end
 
@@ -56,7 +67,17 @@ describe Elastomer::Client::Index do
 
     @index.update_settings 'index.number_of_replicas' => 1
     settings = @index.settings[@name]['settings']
-    assert_equal '1', settings['index.number_of_replicas']
+
+    # COMPATIBILITY
+    # ES 1.0 changed the default return format of index settings to always
+    # expand nested properties, e.g.
+    # {"index.number_of_replicas": "1"} changed to
+    # {"index": {"number_of_replicas":"1"}}
+
+    # To support both versions, we check for either return format.
+    value = settings['index.number_of_replicas'] ||
+            settings['index']['number_of_replicas']
+    assert_equal '1', value
   end
 
   it 'updates document mappings' do
@@ -69,20 +90,21 @@ describe Elastomer::Client::Index do
         }
       }
     )
-    properties = @index.mapping[@name]['doco']['properties']
-    assert_equal %w[title], properties.keys.sort
+
+    assert_property_exists @index.mapping[@name], 'doco', 'title'
 
     @index.update_mapping 'doco', { :doco => { :properties => {
       :author => { :type => 'string', :index => 'not_analyzed' }
     }}}
-    properties = @index.mapping[@name]['doco']['properties']
-    assert_equal %w[author title], properties.keys.sort
+
+    assert_property_exists @index.mapping[@name], 'doco', 'author'
+    assert_property_exists @index.mapping[@name], 'doco', 'title'
 
     @index.update_mapping 'mux_mool', { :mux_mool => { :properties => {
       :song => { :type => 'string', :index => 'not_analyzed' }
     }}}
-    properties = @index.mapping[@name]['mux_mool']['properties']
-    assert_equal %w[song], properties.keys.sort
+
+    assert_property_exists @index.mapping[@name], 'mux_mool', 'song'
   end
 
   it 'deletes document mappings' do
@@ -95,78 +117,109 @@ describe Elastomer::Client::Index do
         }
       }
     )
-    assert @index.mapping[@name].key?('doco'), 'we should have a "doco" mapping'
+    assert_mapping_exists @index.mapping[@name], 'doco'
 
-    @index.delete_mapping 'doco'
-    assert !@index.mapping[@name].key?('doco'), 'we should no longer have a "doco" mapping'
+    response = @index.delete_mapping 'doco'
+    assert_acknowledged response
+    assert @index.mapping == {} || @index.mapping[@name] == {}
   end
 
   it 'lists all aliases to the index' do
     @index.create(nil)
     assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
 
-    $client.cluster.aliases :add => {:index => @name, :alias => 'foofaloo'}
+    $client.cluster.update_aliases :add => {:index => @name, :alias => 'foofaloo'}
     assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)
   end
 
-  it 'analyzes text and returns tokens' do
-    tokens = @index.analyze 'Just a few words to analyze.', :index => nil
-    tokens = tokens['tokens'].map { |h| h['token'] }
-    assert_equal %w[just few words analyze], tokens
+  # COMPATIBILITY ES 1.x removed English stopwords from the default analyzers,
+  # so create a custom one with the English stopwords added.
+  if es_version_1_x?
+    it 'analyzes text and returns tokens' do
+      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'standard', :index => nil
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just a few words to analyze], tokens
 
-    tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'simple', :index => nil
-    tokens = tokens['tokens'].map { |h| h['token'] }
-    assert_equal %w[just a few words to analyze], tokens
+      @index.create(
+        :settings => {
+          :number_of_shards => 1,
+          :number_of_replicas => 0,
+          :analysis => {
+            :analyzer => {
+              :english_standard => {
+                :type => :standard,
+                :stopwords => "_english_"
+              }
+            }
+          }
+        }
+      )
+      wait_for_index(@name)
+
+      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'english_standard'
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just few words analyze], tokens
+    end
+  else
+    it 'analyzes text and returns tokens' do
+      tokens = @index.analyze 'Just a few words to analyze.', :index => nil
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just few words analyze], tokens
+
+      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'simple', :index => nil
+      tokens = tokens['tokens'].map { |h| h['token'] }
+      assert_equal %w[just a few words to analyze], tokens
+    end
   end
 
   describe "when an index exists" do
     before do
       @index.create(nil)
-      $client.cluster.health \
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
+      wait_for_index(@name)
     end
 
     #TODO assert this only hits the desired index
     it 'deletes' do
       response = @index.delete
-      assert_equal true, response["ok"]
+      assert_acknowledged response
     end
 
     it 'opens' do
       response = @index.open
-      assert_equal true, response["ok"]
+      assert_acknowledged response
     end
 
     it 'closes' do
       response = @index.close
-      assert_equal true, response["ok"]
+      assert_acknowledged response
     end
 
     it 'refreshes' do
       response = @index.refresh
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'flushes' do
       response = @index.flush
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'optimizes' do
       response = @index.optimize
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
-    it 'snapshots' do
-      response = @index.snapshot
-      assert_equal true, response["ok"]
+    # COMPATIBILITY ES 1.2 removed support for the gateway snapshot API.
+    if es_version_supports_gateway_snapshots?
+      it 'snapshots' do
+        response = @index.snapshot
+        assert_equal 0, response["_shards"]["failed"]
+      end
     end
 
     it 'clears caches' do
       response = @index.clear_cache
-      assert_equal true, response["ok"]
+      assert_equal 0, response["_shards"]["failed"]
     end
 
     it 'gets stats' do

@@ -1,4 +1,3 @@
-
 module Elastomer
   class Client
 
@@ -6,7 +5,6 @@ module Elastomer
     def cluster
       @cluster ||= Cluster.new self
     end
-
 
     class Cluster
 
@@ -32,14 +30,16 @@ module Elastomer
         response.body
       end
 
-      # Comprehensive state information of the whole cluster.
+      # Comprehensive state information of the whole cluster. For 1.x metric
+      # and index filtering, use the :metrics and :indices parameter keys.
+      #
       # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-state/
       #
       # params - Parameters Hash
       #
       # Returns the response as a Hash
       def state( params = {} )
-        response = client.get '/_cluster/state', params.merge(:action => 'cluster.state')
+        response = client.get '/_cluster/state{/metrics}{/indices}', params.merge(:action => 'cluster.state')
         response.body
       end
 
@@ -49,10 +49,11 @@ module Elastomer
       # params - Parameters Hash
       #
       # Returns the response as a Hash
-      def settings( params = {} )
-        response = client.get '/_cluster/settings', params.merge(:action => 'cluster.settings.get')
+      def get_settings( params = {} )
+        response = client.get '/_cluster/settings', params.merge(:action => 'cluster.get_settings')
         response.body
       end
+      alias :settings :get_settings
 
       # Update cluster wide specific settings. Settings updated can either be
       # persistent (applied cross restarts) or transient (will not survive a
@@ -65,7 +66,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
-        response = client.put '/_cluster/settings', params.merge(:body => body, :action => 'cluster.settings.update')
+        response = client.put '/_cluster/settings', params.merge(:body => body, :action => 'cluster.update_settings')
         response.body
       end
 
@@ -104,35 +105,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post '/_shutdown', params.merge(:action => 'shutdown')
-        response.body
-      end
-
-      # Perform an aliases action on the cluster. We are just a teensy bit
-      # clever here in that a single action can be given or an array of
-      # actions. This API method will wrap the request in the appropriate
-      # {:actions => [...]} body construct.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
-      #
-      # actions - An action Hash or an Array of action Hashes
-      # params  - Parameters Hash
-      #
-      # Examples
-      #
-      #   aliases(:add => { :index => 'users-1', :alias => 'users' })
-      #
-      #   aliases([
-      #     { :remove => { :index => 'users-1', :alias => 'users' }},
-      #     { :add    => { :index => 'users-2', :alias => 'users' }}
-      #   ])
-      #
-      # Returns the response body as a Hash
-      def aliases( actions, params = {} )
-        actions = [actions] unless Array === actions
-        body = {:actions => actions}
-
-        response = client.post '/_aliases', params.merge(:body => body, :action => 'aliases.update')
+        response = client.post '/_shutdown', params.merge(:action => 'cluster.shutdown')
         response.body
       end
 
@@ -152,7 +125,43 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get '{/index}/_aliases', params.merge(:action => 'aliases.get')
+        response = client.get '{/index}/_aliases', params.merge(:action => 'cluster.get_aliases')
+        response.body
+      end
+      alias :aliases :get_aliases
+
+      # Perform an aliases action on the cluster. We are just a teensy bit
+      # clever here in that a single action can be given or an array of
+      # actions. This API method will wrap the request in the appropriate
+      # {:actions => [...]} body construct.
+      #
+      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
+      #
+      # actions - An action Hash or an Array of action Hashes
+      # params  - Parameters Hash
+      #
+      # Examples
+      #
+      #   update_aliases(:add => { :index => 'users-1', :alias => 'users' })
+      #
+      #   update_aliases([
+      #     { :remove => { :index => 'users-1', :alias => 'users' }},
+      #     { :add    => { :index => 'users-2', :alias => 'users' }}
+      #   ])
+      #
+      # Returns the response body as a Hash
+      def update_aliases( actions, params = {} )
+        if actions.is_a?(Hash) && actions.key?(:actions)
+          body = actions
+        elsif actions.is_a?(Hash)
+          # Array() on a Hash does not do what you think it does - that is why
+          # we are explicitly wrapping the Hash via [actions] here.
+          body = {:actions => [actions]}
+        else
+          body = {:actions => Array(actions)}
+        end
+
+        response = client.post '/_aliases', params.merge(:body => body, :action => 'cluster.update_aliases')
         response.body
       end
 
@@ -161,11 +170,17 @@ module Elastomer
       #
       # Returns the template definitions as a Hash
       def templates
-        h = state(
-          :filter_blocks        => true,
-          :filter_nodes         => true,
-          :filter_routing_table => true
-        )
+        # ES 1.x supports state filtering via a path segment called metrics.
+        # ES 0.90 uses query parameters instead.
+        if client.semantic_version >= '1.0.0'
+          h = state(:metrics => 'metadata')
+        else
+          h = state(
+            :filter_blocks        => true,
+            :filter_nodes         => true,
+            :filter_routing_table => true,
+          )
+        end
         h['metadata']['templates']
       end
 
@@ -174,11 +189,17 @@ module Elastomer
       #
       # Returns the indices definitions as a Hash
       def indices
-        h = state(
-          :filter_blocks        => true,
-          :filter_nodes         => true,
-          :filter_routing_table => true
-        )
+        # ES 1.x supports state filtering via a path segment called metrics.
+        # ES 0.90 uses query parameters instead.
+        if client.semantic_version >= '1.0.0'
+          h = state(:metrics => 'metadata')
+        else
+          h = state(
+            :filter_blocks        => true,
+            :filter_nodes         => true,
+            :filter_routing_table => true,
+          )
+        end
         h['metadata']['indices']
       end
 
@@ -188,14 +209,20 @@ module Elastomer
       #
       # Returns the nodes definitions as a Hash
       def nodes
-        h = state(
-          :filter_blocks        => true,
-          :filter_metadata      => true,
-          :filter_routing_table => true
-        )
+        # ES 1.x supports state filtering via a path segment called metrics.
+        # ES 0.90 uses query parameters instead.
+        if client.semantic_version >= '1.0.0'
+          h = state(:metrics => 'nodes')
+        else
+          h = state(
+            :filter_blocks        => true,
+            :filter_metadata      => true,
+            :filter_routing_table => true,
+          )
+        end
         h['nodes']
       end
 
-    end  # Cluster
-  end  # Client
-end  # Elastomer
+    end
+  end
+end

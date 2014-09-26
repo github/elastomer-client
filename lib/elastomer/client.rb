@@ -1,6 +1,7 @@
 require 'addressable/template'
 require 'faraday'
 require 'multi_json'
+require 'semantic'
 
 require 'elastomer/version'
 
@@ -48,7 +49,13 @@ module Elastomer
 
     # Returns the version String of the attached ElasticSearch instance.
     def version
-      info['version']['number']
+      @version ||= info['version']['number']
+    end
+
+    # Returns a Semantic::Version for the attached ElasticSearch instance.
+    # See https://rubygems.org/gems/semantic
+    def semantic_version
+      Semantic::Version.new(version)
     end
 
     # Returns the information Hash from the attached ElasticSearch instance.
@@ -181,7 +188,22 @@ module Elastomer
       handle_errors response
 
     rescue Faraday::Error::TimeoutError => boom
-      raise ::Elastomer::Client::TimeoutError.new(boom, path)
+      raise TimeoutError.new(boom, method.upcase, path)
+
+    rescue Faraday::Error::ConnectionFailed => boom
+      raise ConnectionFailed.new(boom, method.upcase, path)
+
+    rescue Faraday::Error::ResourceNotFound => boom
+      raise ResourceNotFound.new(boom, method.upcase, path)
+
+    rescue Faraday::Error::ParsingError => boom
+      raise ParsingError.new(boom, method.upcase, path)
+
+    rescue Faraday::Error::SSLError => boom
+      raise SSLError.new(boom, method.upcase, path)
+
+    rescue Faraday::Error::ClientError => boom
+      raise Error.new(boom, method.upcase, path)
 
     # ensure
     #   # FIXME: this is here until we get a real logger in place
@@ -252,13 +274,14 @@ module Elastomer
     # Raises an Elastomer::Client::Error on 500 responses or responses
     # containing and 'error' field.
     def handle_errors( response )
-      raise Error, response if response.status >= 500
-      raise Error, response if Hash === response.body && response.body['error']
+      raise ServerError, response if response.status >= 500
+      raise RequestError, response if Hash === response.body && response.body['error']
 
       response
     end
 
-    # Internal: Ensure that the parameter has a valid value. Things like `nil`
+    # Internal: Ensure that the parameter has a valid value. Strings, Symbols,
+    # Numerics, and Arrays of those things are valid. Things like `nil`
     # and empty strings are right out. This method also performs a little
     # formating on the parameter:
     #
@@ -274,7 +297,7 @@ module Elastomer
     # Raises an ArgumentError if the param is not valid.
     def assert_param_presence( param, name = 'input value' )
       case param
-      when String, Numeric
+      when String, Symbol, Numeric
         param = param.to_s.strip
         raise ArgumentError, "#{name} cannot be blank: #{param.inspect}" if param =~ /\A\s*\z/
         param

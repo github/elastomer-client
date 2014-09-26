@@ -26,11 +26,7 @@ describe Elastomer::Client::Scan do
           }
         }
 
-      $client.cluster.health \
-        :index           => @name,
-        :wait_for_status => 'green',
-        :timeout         => '5s'
-
+      wait_for_index(@name)
       populate!
     end
   end
@@ -74,14 +70,14 @@ describe Elastomer::Client::Scan do
         b.index %Q({"author":"pea53","message":"this is tweet number #{num}"}), :_id => num, :_type => 'tweet'
       }
     end
-    assert h['items'].all? {|item| item['index']['ok']}
+    h['items'].each {|item| assert_bulk_index(item) }
 
     h = @index.bulk do |b|
       25.times { |num|
         b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}"}), :_id => num, :_type => 'book'
       }
     end
-    assert h['items'].all? {|item| item['index']['ok']}
+    h['items'].each {|item| assert_bulk_index(item) }
 
     @index.refresh
   end

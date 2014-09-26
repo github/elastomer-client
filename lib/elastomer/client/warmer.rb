@@ -71,9 +71,13 @@ module Elastomer
       # a get and watches for an IndexWarmerMissingException error.
       #
       # Returns true if the warmer exists, false if not.
+      #COMPATIBILITY warmer response differs in ES 1.0
+      # ES 1.0: missing warmer returns {} with 200 status
+      # ES 0.90: missing warmer returns IndexWarmerMissingException error
+      # See https://github.com/elasticsearch/elasticsearch/issues/5155
       def exists?
-        get
-        true
+        response = get
+        response != {}
       rescue Elastomer::Client::Error => exception
         if exception.message =~ /IndexWarmerMissingException/
           false

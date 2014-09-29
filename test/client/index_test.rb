@@ -130,6 +130,25 @@ describe Elastomer::Client::Index do
 
     $client.cluster.update_aliases :add => {:index => @name, :alias => 'foofaloo'}
     assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)
+
+    assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_alias("f*"))
+    assert_equal({}, @index.get_alias("r*"))
+  end
+
+  it 'adds and deletes aliases to the index' do
+    @index.create(nil)
+    assert_empty @index.get_alias("*")
+
+    @index.add_alias "gondolin"
+    aliases = @index.get_alias("*")
+    assert_equal %w[gondolin], aliases[@name]["aliases"].keys.sort
+
+    @index.add_alias "gondor"
+    aliases = @index.get_alias("*")
+    assert_equal %w[gondolin gondor], aliases[@name]["aliases"].keys.sort
+
+    @index.delete_alias "gon*"
+    assert_empty @index.get_alias("*")
   end
 
   # COMPATIBILITY ES 1.x removed English stopwords from the default analyzers,

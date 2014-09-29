@@ -71,6 +71,17 @@ describe Elastomer::Client::Cluster do
     assert_equal "60", value
   end
 
+  it 'returns cluster stats' do
+    h = @cluster.stats
+    assert_equal %w[cluster_name indices nodes status timestamp], h.keys.sort
+  end
+
+  it 'returns a list of pending tasks' do
+    h = @cluster.pending_tasks
+    assert_equal %w[tasks], h.keys.sort
+    assert h['tasks'].is_a?(Array), "the tasks lists is always an Array even if empty"
+  end
+
   it 'returns the list of indices in the cluster' do
     @index.create({}) unless @index.exists?
     indices = @cluster.indices

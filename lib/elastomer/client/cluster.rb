@@ -19,10 +19,18 @@ module Elastomer
 
       attr_reader :client
 
-      # Simple status on the health of the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-health/
+      # Simple status on the health of the cluster. The API can also be executed
+      # against one or more indices to get just the specified indices health.
       #
       # params - Parameters Hash
+      #   :index - a single index name or an Array of index names
+      #   :level - one of "cluster", "indices", or "shards"
+      #   :wait_for_status - one of "green", "yellow", or "red"
+      #   :wait_for_relocating_shards - a number controlling to how many relocating shards to wait for
+      #   :wait_for_nodes - the request waits until the specified number N of nodes is available
+      #   :timeout - how long to wait [default is "30s"]
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-health.html
       #
       # Returns the response as a Hash
       def health( params = {} )
@@ -33,9 +41,14 @@ module Elastomer
       # Comprehensive state information of the whole cluster. For 1.x metric
       # and index filtering, use the :metrics and :indices parameter keys.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-state/
+      # The list of available metrics are:
+      #   version, master_node, nodes, routing_table, metadata, blocks
       #
       # params - Parameters Hash
+      #   :metrics - list of metrics to select as an Array
+      #   :indices - a single index name or an Array of index names
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-state.html
       #
       # Returns the response as a Hash
       def state( params = {} )
@@ -43,10 +56,39 @@ module Elastomer
         response.body
       end
 
-      # Cluster wide settings that have been modified via the update API.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-update-settings/
+      # Retrieve statistics from a cluster wide perspective. The API returns
+      # basic index metrics (shard numbers, store size, memory usage) and
+      # information about the current nodes that form the cluster (number,
+      # roles, os, jvm versions, memory usage, cpu and installed plugins).
       #
       # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-stats.html
+      #
+      # Returns the response as a Hash
+      def stats( params = {} )
+        response = client.get '/_cluster/stats', params.merge(:action => 'cluster.stats')
+        response.body
+      end
+
+      # Returns a list of any cluster-level changes (e.g. create index, update
+      # mapping, allocate or fail shard) which have not yet been executed.
+      #
+      # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-pending.html
+      #
+      # Returns the response as a Hash
+      def pending_tasks( params = {} )
+        response = client.get '/_cluster/pending_tasks', params.merge(:action => 'cluster.pending_tasks')
+        response.body
+      end
+
+      # Cluster wide settings that have been modified via the update API.
+      #
+      # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-update-settings.html
       #
       # Returns the response as a Hash
       def get_settings( params = {} )
@@ -59,10 +101,10 @@ module Elastomer
       # persistent (applied cross restarts) or transient (will not survive a
       # full cluster restart).
       #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-update-settings/
-      #
       # body   - The new settings as a Hash or a JSON encoded String
       # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-update-settings.html
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
@@ -74,8 +116,6 @@ module Elastomer
       # a shard can be moved from one node to another explicitly, an
       # allocation can be canceled, or an unassigned shard can be explicitly
       # allocated on a specific node.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-reroute/
       #
       # commands - A command Hash or an Array of command Hashes
       # params   - Parameters Hash
@@ -89,19 +129,22 @@ module Elastomer
       #     { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
       #   ])
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-reroute.html
+      #
       # Returns the response as a Hash
       def reroute( commands, params = {} )
-        commands = [commands] unless Array === commands
-        body = {:commands => commands}
+        body = {:commands => Array(commands)}
 
         response = client.post '/_cluster/reroute', params.merge(:body => body, :action => 'cluster.reroute')
         response.body
       end
 
-      # Shutdown the entire cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-shutdown/
+      # Shutdown the entire cluster. There is also a Nodes#shutdown method for
+      # shutting down individual nodes.
       #
       # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
@@ -114,14 +157,15 @@ module Elastomer
       # can also use the alias name here since it is acting the part of an
       # index.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
-      #
       # params - Parameters Hash
+      #   :index - an index name or Array of index names
       #
       # Examples
       #
       #   get_aliases
       #   get_aliases( :index => 'users' )
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
@@ -135,8 +179,6 @@ module Elastomer
       # actions. This API method will wrap the request in the appropriate
       # {:actions => [...]} body construct.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
-      #
       # actions - An action Hash or an Array of action Hashes
       # params  - Parameters Hash
       #
@@ -148,6 +190,8 @@ module Elastomer
       #     { :remove => { :index => 'users-1', :alias => 'users' }},
       #     { :add    => { :index => 'users-2', :alias => 'users' }}
       #   ])
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def update_aliases( actions, params = {} )

@@ -26,22 +26,43 @@ module Elastomer
 
       attr_reader :client, :node_id
 
-      # Retrieve one or more (or all) of the cluster nodes information.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-info/
+      # Retrieve one or more (or all) of the cluster nodes information. By
+      # default all information is returned from all ndoes. You can select the
+      # information to be returned by passing in the `:info` from the list of
+      # "settings", "os", "process", "jvm", "thread_pool", "network",
+      # "transport", "http" and "plugins".
       #
       # params - Parameters Hash
+      #   :node_id - a single node ID or Array of node IDs
+      #   :info    - a single information attribute or an Array
+      #
+      # Examples
+      #
+      #   info(:info => "_all")
+      #   info(:info => "os")
+      #   info(:info => %w[os jvm process])
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-info.html
       #
       # Returns the response as a Hash
       def info( params = {} )
-        response = client.get '/_nodes{/node_id}', update_params(params, :action => 'nodes.info')
+        response = client.get '/_nodes{/node_id}{/info}', update_params(params, :action => 'nodes.info')
         response.body
       end
 
       # Retrieve one or more (or all) of the cluster nodes statistics. For 1.x
       # stats filtering, use the :stats parameter key.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-stats/
       #
       # params - Parameters Hash
+      #   :node_id - a single node ID or Array of node IDs
+      #   :stats   - a single stats value or an Array of stats values
+      #
+      # Examples
+      #
+      #   stats(:stats => "thread_pool")
+      #   stats(:stats => %w[os process])
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html
       #
       # Returns the response as a Hash
       def stats( params = {} )
@@ -50,9 +71,14 @@ module Elastomer
       end
 
       # Get the current hot threads on each node in the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-hot-threads/
       #
       # params - Parameters Hash
+      #   :node_id  - a single node ID or Array of node IDs
+      #   :threads  - number of hot threads to provide
+      #   :interval - sampling interval [default is 500ms]
+      #   :type     - the type to sample: "cpu", "wait", or "block"
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html
       #
       # Returns the response as a Hash
       def hot_threads( params = {} )
@@ -60,10 +86,13 @@ module Elastomer
         response.body
       end
 
-      # Shutdown one or more nodes in the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-shutdown/
+      # Shutdown one or more nodes in the cluster. There is also a
+      # Cluster#shutdown command for shutting down the entire cluseter.
       #
       # params - Parameters Hash
+      #   :node_id - a single node ID or Array of node IDs
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
@@ -83,6 +112,7 @@ module Elastomer
         h.update overrides unless overrides.nil?
         h
       end
-    end  # Nodes
-  end  # Client
-end  # Elastomer
+
+    end
+  end
+end

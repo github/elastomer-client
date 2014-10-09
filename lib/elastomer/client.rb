@@ -199,8 +199,9 @@ module Elastomer
     rescue Faraday::Error::ParsingError => boom
       raise ParsingError.new(boom, method.upcase, path)
 
-    rescue Faraday::Error::SSLError => boom
-      raise SSLError.new(boom, method.upcase, path)
+    # FIXME - only supported in Faraday 0.9.0 and higher
+    # rescue Faraday::Error::SSLError => boom
+    #   raise SSLError.new(boom, method.upcase, path)
 
     rescue Faraday::Error::ClientError => boom
       raise Error.new(boom, method.upcase, path)

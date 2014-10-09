@@ -187,24 +187,11 @@ module Elastomer
 
       handle_errors response
 
-    rescue Faraday::Error::TimeoutError => boom
-      raise TimeoutError.new(boom, method.upcase, path)
-
-    rescue Faraday::Error::ConnectionFailed => boom
-      raise ConnectionFailed.new(boom, method.upcase, path)
-
-    rescue Faraday::Error::ResourceNotFound => boom
-      raise ResourceNotFound.new(boom, method.upcase, path)
-
-    rescue Faraday::Error::ParsingError => boom
-      raise ParsingError.new(boom, method.upcase, path)
-
-    # FIXME - only supported in Faraday 0.9.0 and higher
-    # rescue Faraday::Error::SSLError => boom
-    #   raise SSLError.new(boom, method.upcase, path)
-
+    # wrap Faraday errors with appropriate Elastomer::Client error classes
     rescue Faraday::Error::ClientError => boom
-      raise Error.new(boom, method.upcase, path)
+      error_name = boom.class.name.split('::').last
+      error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
+      raise error_class.new(boom, method.upcase, path)
 
     # ensure
     #   # FIXME: this is here until we get a real logger in place

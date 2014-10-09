@@ -77,5 +77,16 @@ module Elastomer
     TimeoutError.fatal     = false
     ConnectionFailed.fatal = false
 
+    # Define an Elastomer::Client exception class on the fly for
+    # Faraday exception classes that we don't specifically wrap.
+    Faraday::Error.constants.each do |error_name|
+      next if ::Elastomer::Client.const_get(error_name) rescue nil
+
+      error_class = Faraday::Error.const_get(error_name)
+      next unless error_class < Faraday::Error::ClientError
+
+      ::Elastomer::Client.const_set(error_name, Class.new(Error))
+    end
+
   end  # Client
 end  # Elastomer

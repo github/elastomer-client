@@ -129,12 +129,24 @@ module Elastomer
       #     { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
       #   ])
       #
+      #   reroute(:commands => [
+      #     { :move     => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }},
+      #     { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
+      #   ])
+      #
       # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-reroute.html
       #
       # Returns the response as a Hash
       def reroute( commands, params = {} )
-        commands = [commands] unless commands.instance_of? Array
-        body = {:commands => commands}
+        if commands.is_a?(Hash) && commands.key?(:commands)
+          body = commands
+        elsif commands.is_a?(Hash)
+          # Array() on a Hash does not do what you think it does - that is why
+          # we are explicitly wrapping the Hash via [commands] here.
+          body = {:commands => [commands]}
+        else
+          body = {:commands => Array(commands)}
+        end
 
         response = client.post '/_cluster/reroute', params.merge(:body => body, :action => 'cluster.reroute')
         response.body

@@ -135,7 +135,6 @@ module Elastomer
         params = prepare_params(document, params)
         add_to_actions({:index => params}, document)
       end
-      alias :add :index
 
       # Add a create action to the list of bulk actions to be performed when
       # the bulk API call is made. Parameters can be provided in the

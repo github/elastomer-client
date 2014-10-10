@@ -27,7 +27,7 @@ describe 'stubbed client tests' do
 
   describe Elastomer::Client::Nodes do
     it 'performs a shutdown of the node(s)' do
-      @stubs.post('/_cluster/nodes/_shutdown')       { [200, {'Content-Type' => 'application/json'}, '{"nodes":{"1":{"name":"Node1"}}}'] }
+      @stubs.post('/_cluster/nodes/_all/_shutdown')  { [200, {'Content-Type' => 'application/json'}, '{"nodes":{"1":{"name":"Node1"}}}'] }
       @stubs.post('/_cluster/nodes/node2/_shutdown') { [200, {'Content-Type' => 'application/json'}, '{"nodes":{"2":{"name":"Node2"}}}'] }
 
       h = @client.nodes.shutdown

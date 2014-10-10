@@ -52,7 +52,6 @@ module Elastomer
 
         response.body
       end
-      alias :add :index
 
       # Delete a document from the index based on the document ID. The :id is
       # provided as part of the params hash.

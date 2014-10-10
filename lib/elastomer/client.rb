@@ -187,14 +187,17 @@ module Elastomer
 
           handle_errors response
 
-        rescue Faraday::Error::TimeoutError => boom
-          raise ::Elastomer::Client::TimeoutError.new(boom, path)
+        # wrap Faraday errors with appropriate Elastomer::Client error classes
+        rescue Faraday::Error::ClientError => boom
+          error_name = boom.class.name.split('::').last
+          error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
+          raise error_class.new(boom, method.upcase, path)
+
+        # ensure
+        #   # FIXME: this is here until we get a real logger in place
+        #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
         end
       end
-
-    # ensure
-    #   # FIXME: this is here until we get a real logger in place
-    #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
     end
 
     # Internal: Apply path expansions to the `path` and append query
@@ -261,8 +264,8 @@ module Elastomer
     # Raises an Elastomer::Client::Error on 500 responses or responses
     # containing and 'error' field.
     def handle_errors( response )
-      raise Error, response if response.status >= 500
-      raise Error, response if Hash === response.body && response.body['error']
+      raise ServerError, response if response.status >= 500
+      raise RequestError, response if Hash === response.body && response.body['error']
 
       response
     end

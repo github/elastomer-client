@@ -17,6 +17,19 @@ describe Elastomer::Client::Nodes do
   end
 
   if es_version_1_x?
+    it 'fitlers node info' do
+      h = $client.nodes.info(:info => 'os')
+      node = h['nodes'].values.first
+      assert node.key?('os'), 'expected os info to be present'
+      assert !node.key?('jvm'), 'expected jvm info to be absent'
+
+      h = $client.nodes.info(:info => %w[jvm process])
+      node = h['nodes'].values.first
+      assert node.key?('jvm'), 'expected jvm info to be present'
+      assert node.key?('process'), 'expected process info to be present'
+      assert !node.key?('network'), 'expected network info to be absent'
+    end
+
     it 'filters node stats' do
       h = $client.nodes.stats(:stats => 'http')
       node = h['nodes'].values.first

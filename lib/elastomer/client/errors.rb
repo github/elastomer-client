@@ -14,38 +14,79 @@ module Elastomer
       # extracted from the response body.
       #
       # response - Faraday::Response object or a simple error message String
-      def initialize( response )
-        if response.respond_to? :body
+      #
+      def initialize( *args )
+        @status = nil
+
+        case args.first
+        when Exception
+          exception = args.shift
+          super("#{exception.message} :: #{args.join(' ')}")
+          set_backtrace exception.backtrace
+
+        when Faraday::Response
+          response = args.shift
           message = Hash === response.body && response.body['error'] || response.body.to_s
+          @status = response.status
+          super message
+
         else
-          message, response = response.to_s, nil
+          super args.join(' ')
         end
-
-        @status = response.nil? ? nil : response.status
-
-        super message
       end
 
       # Returns the status code from the `response` or nil if the Error was not
       # created with a response.
       attr_reader :status
 
+      # Indicates that the error is fatal. The request should not be tried
+      # again.
+      def fatal?
+        self.class.fatal?
+      end
+
+      # The inverse of the `fatal?` method. A request can be retried if this
+      # method returns `true`.
+      def retry?
+        !fatal?
+      end
+
+      class << self
+        # By default all client errors are fatal and indicate that a request
+        # should not be retried. Only a few errors are retryable.
+        def fatal
+          return @fatal if defined? @fatal
+          @fatal = true
+        end
+        attr_writer :fatal
+        alias :fatal? :fatal
+      end
+
     end  # Error
 
-    # Timeout specific error class.
-    class TimeoutError < ::Elastomer::Error
+    # Wrapper classes for specific Faraday errors.
+    TimeoutError     = Class.new Error
+    ConnectionFailed = Class.new Error
+    ResourceNotFound = Class.new Error
+    ParsingError     = Class.new Error
+    SSLError         = Class.new Error
+    ServerError      = Class.new Error
+    RequestError     = Class.new Error
 
-      # Wrap a Farday TimeoutError with our own class and include the HTTP
-      # path where the error originated.
-      #
-      # exception - The originating Faraday::Error::TimeoutError
-      # path      - The path portion of the HTTP request
-      #
-      def initialize( exception, path )
-        super "#{exception.message}: #{path}"
-        set_backtrace exception.backtrace
-      end
-    end  # TimeoutError
+    ServerError.fatal      = false
+    TimeoutError.fatal     = false
+    ConnectionFailed.fatal = false
+
+    # Define an Elastomer::Client exception class on the fly for
+    # Faraday exception classes that we don't specifically wrap.
+    Faraday::Error.constants.each do |error_name|
+      next if ::Elastomer::Client.const_get(error_name) rescue nil
+
+      error_class = Faraday::Error.const_get(error_name)
+      next unless error_class < Faraday::Error::ClientError
+
+      ::Elastomer::Client.const_set(error_name, Class.new(Error))
+    end
 
   end  # Client
 end  # Elastomer

@@ -150,9 +150,10 @@ module Elastomer
       end
 
       # Return the aliases associated with this index.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-aliases/
       #
       # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
@@ -160,6 +161,63 @@ module Elastomer
         response.body
       end
       alias :aliases :get_aliases
+
+      # Return the named aliases associated with this index.
+      #
+      # name   - Name of the alias to look up
+      # params - Parameters Hash
+      #   :ignore_unavailable - What to do is an specified index name doesn’t
+      #                         exist. If set to `true` then those indices are ignored.
+      #
+      # Examples
+      #
+      #   index.get_alias("*")       # returns all aliases for the current index
+      #   index.get_alias("issue*")  # returns all aliases starting with "issue"
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      #
+      # Returns the response body as a Hash
+      def get_alias( name, params = {} )
+        response = client.get '/{index}/_alias/{name}', update_params(params, :name => name, :action => 'index.get_alias')
+        response.body
+      end
+
+      # Add a single alias to this index.
+      #
+      # name   - Name of the alias to add to the index
+      # params - Parameters Hash
+      #   :routing - optional routing that can be associated with an alias
+      #   :filter  - optional filter that can be associated with an alias
+      #
+      # Examples
+      #
+      #   index.add_alias("foo", :routing => "foo")
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      #
+      # Returns the response body as a Hash
+      def add_alias( name, params = {} )
+        response = client.put '/{index}/_alias/{name}', update_params(params, :name => name, :action => 'index.add_alias')
+        response.body
+      end
+
+      # Delete an alias from this index.
+      #
+      # name   - Name of the alias to delete from the index
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   index.delete_alias("foo")
+      #   index.delete_alias(["foo", "bar"])
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      #
+      # Returns the response body as a Hash
+      def delete_alias( name, params = {} )
+        response = client.delete '/{index}/_alias/{name}', update_params(params, :name => name, :action => 'index.delete_alias')
+        response.body
+      end
 
       # Performs the analysis process on a text and return the tokens breakdown of the text.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-analyze/

@@ -25,9 +25,11 @@ The event namespace is `request.client.elastomer`.
 - cluster.get_settings
 - cluster.health
 - cluster.info
+- cluster.pending_tasks
 - cluster.reroute
 - cluster.shutdown
 - cluster.state
+- cluster.stats
 - cluster.update_aliases
 - cluster.update_settings
 - docs.delete
@@ -41,14 +43,17 @@ The event namespace is `request.client.elastomer`.
 - docs.source
 - docs.update
 - docs.validate
+- index.add_alias
 - index.analyze
 - index.clear_cache
 - index.close
 - index.create
 - index.delete
+- index.delete_alias
 - index.delete_mapping
 - index.exists
 - index.flush
+- index.get_alias
 - index.get_aliases
 - index.get_settings
 - index.mapping
@@ -80,4 +85,5 @@ The event namespace is `request.client.elastomer`.
 - snapshot.restore
 - snapshot.status
 - template.create
+- template.delete
 - template.get

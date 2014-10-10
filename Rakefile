@@ -7,3 +7,18 @@ Rake::TestTask.new do |t|
 end
 
 task :default => :test
+
+namespace :actions do
+  desc "list valid actions"
+  task :list do
+    list = %x(grep ':action =>' `find lib -name '*.rb'`).split("\n")
+    list.map! do |line|
+      m = /\A.*?:action => '(.*?)'.*\Z/.match line
+      m.nil? ? nil : m[1]
+    end
+
+    list.compact.sort.uniq.each do |action|
+      STDOUT.puts "- #{action}"
+    end
+  end
+end

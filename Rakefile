@@ -11,21 +11,13 @@ task :default => :test
 namespace :actions do
   desc "list valid actions"
   task :list do
-    list = %x(grep ':action\\s\\+=>' `find lib -name '*.rb'`).split("\n")
+    list = %x(grep '\\[\\?:action\\]\\?\\s\\+=' `find lib -name '*.rb'`).split("\n")
     list.map! do |line|
-      m = /\A.*?:action\s+=>\s+'(.*?)'.*\Z/.match line
+      m = /\A.*?\[?:action\]?\s+=>?\s+'(.*?)'.*\Z/.match line
       m.nil? ? nil : m[1]
     end
-    ary = list
 
-    list = %x(grep '\\[:action\\]\\s\\+=' `find lib -name '*.rb'`).split("\n")
-    list.map! do |line|
-      m = /\A.*?\[:action\]\s+=\s+'(.*?)'.*\Z/.match line
-      m.nil? ? nil : m[1]
-    end
-    ary.concat list
-
-    ary.compact.sort.uniq.each do |action|
+    list.compact.sort.uniq.each do |action|
       STDOUT.puts "- #{action}"
     end
   end

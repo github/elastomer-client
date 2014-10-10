@@ -133,7 +133,8 @@ module Elastomer
       #
       # Returns the response as a Hash
       def reroute( commands, params = {} )
-        body = {:commands => Array(commands)}
+        commands = [commands] unless commands.instance_of? Array
+        body = {:commands => commands}
 
         response = client.post '/_cluster/reroute', params.merge(:body => body, :action => 'cluster.reroute')
         response.body

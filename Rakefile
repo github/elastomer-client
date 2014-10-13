@@ -11,6 +11,12 @@ task :default => :test
 namespace :actions do
   desc "list valid actions"
   task :list do
+    # there are two distinct :action declarations we need to find
+    # the regular expressions below capture both
+    #
+    #   [:action] = 'some.value'
+    #   :action => 'some.value'
+    #
     list = %x(grep '\\[\\?:action\\]\\?\\s\\+=' `find lib -name '*.rb'`).split("\n")
     list.map! do |line|
       m = /\A.*?\[?:action\]?\s+=>?\s+'(.*?)'.*\Z/.match line

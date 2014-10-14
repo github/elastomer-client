@@ -1,3 +1,6 @@
+## 0.4.1 (2014-10-14)
+- Support for index `_recovery` endpoint
+
 ## 0.4.0 (2014-10-08)
 - BREAKING: docs.add alias for docs.index removed
 - BREAKING: Faraday exceptions are now raised as Elastomer exceptions

@@ -25,7 +25,6 @@ The event namespace is `request.client.elastomer`.
 - cluster.get_settings
 - cluster.health
 - cluster.info
-- cluster.recovery
 - cluster.reroute
 - cluster.shutdown
 - cluster.state

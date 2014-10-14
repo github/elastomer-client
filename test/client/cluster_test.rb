@@ -76,14 +76,6 @@ describe Elastomer::Client::Cluster do
     assert_equal %w[cluster_name indices nodes status timestamp], h.keys.sort
   end
 
-  if es_version_1_x?
-    it 'returns cluster recovery' do
-      indices = @cluster.indices.keys.sort
-      h = @cluster.recovery
-      assert_equal indices, h.keys.sort
-    end
-  end
-
   it 'returns a list of pending tasks' do
     h = @cluster.pending_tasks
     assert_equal %w[tasks], h.keys.sort

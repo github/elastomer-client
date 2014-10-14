@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Elastomer::VERSION
   spec.authors       = ["Tim Pease", "Grant Rodgers"]
   spec.email         = ["tim.pease@github.com", "grant.rodgers@github.com"]
-  spec.summary       = %q{A library for interacting with the GitHub Search infrastructure}
+  spec.summary       = %q{A library for interacting with Elasticsearch}
   spec.description   = %q{Elastomer is a low level API client for the
                           Elasticsearch HTTP interface.}
   spec.homepage      = "https://github.com/github/elastomer-client"

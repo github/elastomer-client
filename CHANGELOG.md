@@ -1,3 +1,9 @@
+## 0.4.1 (2014-10-14)
+- Support for index `_recovery` endpoint
+- Fix Faraday 0.8 support
+- Wrap all Faraday exceptions
+- Correctly wrap single-command reroute with a command array
+
 ## 0.4.0 (2014-10-08)
 - BREAKING: docs.add alias for docs.index removed
 - BREAKING: Faraday exceptions are now raised as Elastomer exceptions

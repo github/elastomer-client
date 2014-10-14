@@ -282,6 +282,19 @@ module Elastomer
         response.body
       end
 
+      # Provides insight into on-going index shard recoveries. Recovery status
+      # may be reported for specific indices, or cluster-wide.
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-recovery.html
+      #
+      # params - Parameters Hash
+      #
+      # Returns the response body as a Hash
+      def recovery( params = {} )
+        response = client.get '{/index}/_recovery', update_params(params, :action => 'index.recovery')
+        response.body
+      end
+
       # Clear caches for one or more indices. Individual caches can be
       # specified with parameters.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-clearcache/

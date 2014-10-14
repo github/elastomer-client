@@ -54,6 +54,7 @@ The event namespace is `request.client.elastomer`.
 - index.mapping
 - index.open
 - index.optimize
+- index.recovery
 - index.refresh
 - index.segments
 - index.snapshot

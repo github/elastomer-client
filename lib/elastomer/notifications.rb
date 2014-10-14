@@ -72,7 +72,7 @@ module Elastomer
     end
   end
 
-  # use ActiveSupport::Notifications as the default instrumentaiton service
+  # use ActiveSupport::Notifications as the default instrumentation service
   Notifications.service = ActiveSupport::Notifications
 
   # inject our instrument method into the Client class

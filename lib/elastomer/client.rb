@@ -157,45 +157,47 @@ module Elastomer
 
       path = expand_path path, params
 
-      response = instrument(path, body, params) do
-        case method
-        when :head
-          connection.head(path) { |req| req.options[:timeout] = read_timeout if read_timeout }
+      instrument(path, body, params) do
+        begin
+          response = case method
+          when :head
+            connection.head(path) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-        when :get
-          connection.get(path) { |req|
-            req.body = body if body
-            req.options[:timeout] = read_timeout if read_timeout
-          }
+          when :get
+            connection.get(path) { |req|
+              req.body = body if body
+              req.options[:timeout] = read_timeout if read_timeout
+            }
 
-        when :put
-          connection.put(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+          when :put
+            connection.put(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-        when :post
-          connection.post(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+          when :post
+            connection.post(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-        when :delete
-          connection.delete(path) { |req|
-            req.body = body if body
-            req.options[:timeout] = read_timeout if read_timeout
-          }
+          when :delete
+            connection.delete(path) { |req|
+              req.body = body if body
+              req.options[:timeout] = read_timeout if read_timeout
+            }
 
-        else
-          raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
+          else
+            raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
+          end
+
+          handle_errors response
+
+        # wrap Faraday errors with appropriate Elastomer::Client error classes
+        rescue Faraday::Error::ClientError => boom
+          error_name = boom.class.name.split('::').last
+          error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
+          raise error_class.new(boom, method.upcase, path)
+
+        # ensure
+        #   # FIXME: this is here until we get a real logger in place
+        #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
         end
       end
-
-      handle_errors response
-
-    # wrap Faraday errors with appropriate Elastomer::Client error classes
-    rescue Faraday::Error::ClientError => boom
-      error_name = boom.class.name.split('::').last
-      error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
-      raise error_class.new(boom, method.upcase, path)
-
-    # ensure
-    #   # FIXME: this is here until we get a real logger in place
-    #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
     end
 
     # Internal: Apply path expansions to the `path` and append query

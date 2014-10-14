@@ -240,9 +240,11 @@ describe Elastomer::Client::Index do
       end
     end
 
-    it 'recovery' do
-      response = @index.recovery
-      assert_includes response, "elastomer-index-test"
+    if es_version_1_x?
+      it 'recovery' do
+        response = @index.recovery
+        assert_includes response, "elastomer-index-test"
+      end
     end
 
     it 'clears caches' do

@@ -10,7 +10,7 @@ Use [Boxen](https://setup.githubapp.com) to get your machine set up. Then:
 $ git clone https://github.com/github/elastomer-client.git
 $ cd elastomer-client
 $ script/bootstrap
-$ script/testsuite
+$ script/test
 ```
 
 ## Client

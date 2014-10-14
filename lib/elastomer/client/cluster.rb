@@ -165,6 +165,18 @@ module Elastomer
         response.body
       end
 
+      # Provides insight into on-going index shard recoveries cluster-wide.
+      #
+      # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-recovery.html
+      #
+      # Returns the response as a Hash
+      def recovery( params = {} )
+        response = client.get '/_recovery', params.merge(:action => 'cluster.recovery')
+        response.body
+      end
+
       # Retrieve the current aliases. An :index name can be given (or an
       # array of index names) to get just the aliases for those indexes. You
       # can also use the alias name here since it is acting the part of an

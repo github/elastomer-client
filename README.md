@@ -75,10 +75,9 @@ index.delete
 
 #### Docs
 
-This decomposition is the most questionable, but it's a starting point. The
-[Docs](lib/elastomer/client/docs.rb) class handles the indexing and searching
-of documents. Each instance is scoped to an index and optionally a document
-type.
+The [Docs](lib/elastomer/client/docs.rb) class handles the indexing and
+searching of documents. Each instance is scoped to an index and optionally a
+document type.
 
 ```ruby
 require 'elastomer/client'

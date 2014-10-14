@@ -8,14 +8,16 @@ The event namespace is `request.client.elastomer`.
 ## Sample event payload
 
 ```
-:index  => "index-test",
-:type   => nil,
-:action => "docs.search",
-:context=> nil,
-:body   => "{\"query\":{\"match_all\":{}}}",
-:url    => #<URI::HTTP:0x007fb6f3e98b60 URL:http://localhost:19200/index-test/_search?search_type=count>,
-:method => :get,
-:status => 200}
+{
+  :index   => "index-test",
+  :type    => nil,
+  :action  => "docs.search",
+  :context => nil,
+  :body    => "{\"query\":{\"match_all\":{}}}",
+  :url     => #<URI::HTTP:0x007fb6f3e98b60 URL:http://localhost:19200/index-test/_search?search_type = count>,
+  :method  => :get,
+  :status  => 200
+}
 ```
 
 ## Valid actions

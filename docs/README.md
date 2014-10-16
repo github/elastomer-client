@@ -5,8 +5,8 @@ We first started building the Elastomer Client gem when an
 was not yet available from ElasticSearch. We were looking for a client that
 provided a one-to-one mapping of the ElasticSearch APIs and avoided higher level
 complexity such as connection pooling, round-robin connections, thrift support,
-and the like. All these things are bettered handled at different layers and by
-other software libraries.
+and the like. We think these things these things are bettered handled at
+different layers and by other software libraries.
 
 Our goal is to keep our ElasticSearch client simple and then compose
 higher level functionality from smaller components. This is the UNIX philosophy

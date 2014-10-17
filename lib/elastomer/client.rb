@@ -192,10 +192,6 @@ module Elastomer
           error_name = boom.class.name.split('::').last
           error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
           raise error_class.new(boom, method.upcase, path)
-
-        # ensure
-        #   # FIXME: this is here until we get a real logger in place
-        #   STDERR.puts "[#{response.status.inspect}] curl -X#{method.to_s.upcase} '#{url}#{path}'" unless response.nil?
         end
       end
     end

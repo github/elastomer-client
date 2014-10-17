@@ -150,11 +150,8 @@ module Elastomer
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     def request( method, path, params )
-      body = params.delete :body
-      body = MultiJson.dump body if Hash === body
-
       read_timeout = params.delete :read_timeout
-
+      body = extract_body params
       path = expand_path path, params
 
       instrument(path, body, params) do
@@ -193,6 +190,37 @@ module Elastomer
           error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
           raise error_class.new(boom, method.upcase, path)
         end
+      end
+    end
+
+    # Internal: Extract the :body from the params Hash and convert it to a
+    # JSON String format. If the params Hash does not contain a :body then no
+    # action is taken and `nil` is returned.
+    #
+    # If a :body is present and is a String then it is assumed to a JSON String
+    # and returned "as is".
+    #
+    # If a :body is present and is an Array then we join the values together
+    # with newlines and append a trailing newline. This is a special case for
+    # dealing with ES `bulk` imports and `multi_search` methods.
+    #
+    # Otherwise we convert the :body to a JSON string and return.
+    #
+    # params - Parameters Hash
+    #
+    # Returns the request body as a String or `nil` if no :body is present
+    def extract_body( params )
+      body = params.delete :body
+      return if body.nil?
+
+      case body
+      when String
+        body
+      when Array
+        body << nil unless body.last.nil?
+        body.join "\n"
+      else
+        MultiJson.dump body
       end
     end
 

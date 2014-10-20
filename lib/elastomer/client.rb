@@ -74,7 +74,7 @@ module Elastomer
         conn.response :parse_json
         conn.request  :opaque_id if @opaque_id
 
-        Array === @adapter ?
+        @adapter.is_a?(Array) ?
           conn.adapter(*@adapter) :
           conn.adapter(@adapter)
 
@@ -289,7 +289,7 @@ module Elastomer
     # containing and 'error' field.
     def handle_errors( response )
       raise ServerError, response if response.status >= 500
-      raise RequestError, response if Hash === response.body && response.body['error']
+      raise RequestError, response if response.body.is_a?(Hash) && response.body['error']
 
       response
     end

@@ -26,8 +26,10 @@ module Elastomer
 
         when Faraday::Response
           response = args.shift
-          message = Hash === response.body && response.body['error'] || response.body.to_s
           @status = response.status
+          body = response.body
+
+          message = body.is_a?(Hash) && body['error'] || body.to_s
           super message
 
         else

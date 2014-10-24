@@ -26,9 +26,9 @@ document. All the other components are build atop the client.
 **Core Components**
 
 * [Client](client.md)
-* [Cluster](cluster.md)
 * [Index](index.md)
-* [Documents](documents.md)
+* [Documents](docs.md)
+* [Cluster](cluster.md)
 * [Templates](templates.md)
 * [Warmers](warmers.md)
 

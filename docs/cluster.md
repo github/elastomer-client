@@ -109,14 +109,40 @@ client.cluster.nodes
 ```
 
 Using these methods we can quickly get the names of all the indices in the
-cluster. The `indices` method above returns a hash of the index settings keyed
-by the index name.
+cluster. The `indices` method returns a hash of the index settings keyed by the
+index name.
 
 ```ruby
 client.cluster.indices.keys
 ```
 
-The same method can be used for getting all the template names, too.
+The same method can be used for getting all the template names, as well.
 
 ## Nodes
 
+There are also node level API methods that provide stats and information for
+individual (or multiple) nodes in the cluster. We expose these via the `nodes`
+module in elastomer-client.
+
+```ruby
+require 'elastomer/client'
+client = Elastomer::Client.new :port => 19200
+
+# gather OS, JVM, and process information from the local node
+client.nodes("_local").info(:info => %w[os jvm process])
+```
+
+More than one node can be queried at the same time.
+
+```ruby
+client.nodes(%w[node-1.local node-2.local]).stats(:stats => %w[os process])
+```
+
+Or you can query all nodes.
+
+```ruby
+client.nodes("_all").stats(:stats => "fs")
+```
+
+Take a look at the source code documentation for all the API calls provided by
+elastomer-client.

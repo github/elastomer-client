@@ -2,13 +2,13 @@
 module Elastomer
   class Client
 
-    # Provides access to node-level API commands. The default node is "_local",
-    # but it can be set to one or more nodes in the cluster include "_all".
+    # Provides access to node-level API commands. The default node is set to
+    # "_all". You can specify an individual node or multiple nodes.
     #
     # node_id - The node ID as a String or an Array of node IDs
     #
     # Returns a Nodes instance.
-    def nodes( node_id = "_local" )
+    def nodes( node_id = "_all" )
       Nodes.new self, node_id
     end
 

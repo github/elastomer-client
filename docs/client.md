@@ -190,6 +190,27 @@ client.expand_path("{/index}{/type}/_search", {
 #=> "/twitter/tweet,user/_search?q=*:*&search_type=count"
 ```
 
+In the examples above the path elements are optional. We can force them to be
+required and non-empty using a slightly different template syntax. In the
+example below we are requiring the `:index` and `:type` parameters to be
+provided. If either of them are missing (or nil or an empty string) then an
+`ArgumentError` is raised.
+
+```ruby
+client.expand_path("/{index}/{type}/_search", {
+  :index => "twitter",
+  :q     => "*:*"
+})
+#=> raises an ArgumentError - :type is missing
+
+client.expand_path("/{index}/{type}/_search", {
+  :index => "twitter",
+  :type  => " ",
+  :q     => "*:*"
+})
+#=> raises an ArgumentError - :type is an empty string
+```
+
 And that is the basic concept of the `expand_path` method. The URL template
 pattern is used extensively in the Elastomer client code, so it is definitely
 worth knowing about.

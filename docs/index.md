@@ -158,6 +158,5 @@ be written to. Some time in the future we can delete this index (but we should
 take a [snapshot](snapshots.md) first).
 
 ```ruby
-index = client.index "event-log-2014-09"
-index.delete
+client.index("event-log-2014-09").delete
 ```

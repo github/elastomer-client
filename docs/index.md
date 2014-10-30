@@ -9,13 +9,23 @@ documents are found in the [documents](documents.md) component. The index
 component deals solely with management of the indices themselves.
 
 Access to the index component is provided via the `index` method on the client.
-An index name is required. All operations will be on the named index.
+If you provide an index name then it will be used for all the API calls.
+However, you can omit the index name and pass it along with each API method
+called.
 
 ```ruby
 require 'elastomer/client'
 client = Elastomer::Client.new :port => 19200
 
+# you can provide an index name
 index = client.index "blog"
+index.status
+
+# or you can omit the index name and provide it with each API method call
+index = client.index
+index.status :index => "blog"
+index.status :index => "users"
+
 ```
 
 You can operate on more than one index, too, by providing a list of index names.
@@ -23,6 +33,7 @@ This is useful for maintenance operations on more than one index.
 
 ```ruby
 client.index(%w[blog users]).status
+client.index.status :index => %w[blog users]
 ```
 
 Some operations do not make sense against multiple indices - index existence is a
@@ -110,21 +121,13 @@ index.analyze "The Role of Morphology in Phoneme Prediction",
 And we can explore the standard analyzers provided by ElasticSearch.
 
 ```ruby
-index = client.index "blog"
-index.analyze "The Role of Morphology in Phoneme Prediction",
-  :index => nil,
+client.index.analyze "The Role of Morphology in Phoneme Prediction",
   :analyzer => "snowball"
 ```
 
 The `analyze` API only provides access to the analyzers defined on the current
-index. We work around this by setting the index to `nil` for this request. In
-fact, this index override trick can be used on any of the API methods.
-
-```ruby
-index = client.index "blog"
-index.status                    #=> status of the "blog" index
-index(:index => "user").status  #=> status of the "user" index
-```
+index. We omit the index name when we want to use the standard analyzers
+provided by ElasticSearch.
 
 #### Index Maintenance
 

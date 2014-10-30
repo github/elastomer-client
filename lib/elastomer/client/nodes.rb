@@ -3,12 +3,14 @@ module Elastomer
   class Client
 
     # Provides access to node-level API commands. The default node is set to
-    # "_all". You can specify an individual node or multiple nodes.
+    # nil which target all nodes. You can pass in "_all" (to get the
+    # same effect) or "_local" to target only the current node the client is
+    # connected to. And you can specify an individual node or multiple nodes.
     #
     # node_id - The node ID as a String or an Array of node IDs
     #
     # Returns a Nodes instance.
-    def nodes( node_id = "_all" )
+    def nodes( node_id = nil )
       Nodes.new self, node_id
     end
 

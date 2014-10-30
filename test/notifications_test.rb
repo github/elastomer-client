@@ -40,7 +40,7 @@ describe Elastomer::Notifications do
   end
 
   it 'instruments node shutdown' do
-    client = stub_client(:post, '/_cluster/nodes/_all/_shutdown')
+    client = stub_client(:post, '/_cluster/nodes/_shutdown')
     client.nodes.shutdown; assert_action_event('nodes.shutdown')
   end
 

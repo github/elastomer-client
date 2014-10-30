@@ -238,7 +238,6 @@ module Elastomer
       #
       # text   - The text to analyze as a String
       # params - Parameters Hash
-      #   :index - set to `nil` to access standard analyzers
       #
       # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-analyze.html
       #

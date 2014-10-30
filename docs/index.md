@@ -118,16 +118,12 @@ index.analyze "The Role of Morphology in Phoneme Prediction",
   :field => "post.title"
 ```
 
-And we can explore the standard analyzers provided by ElasticSearch.
+And we can explore the default analyzers provided by ElasticSearch.
 
 ```ruby
 client.index.analyze "The Role of Morphology in Phoneme Prediction",
   :analyzer => "snowball"
 ```
-
-The `analyze` API only provides access to the analyzers defined on the current
-index. We omit the index name when we want to use the standard analyzers
-provided by ElasticSearch.
 
 #### Index Maintenance
 

@@ -116,7 +116,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_settings( body, params = {} )
-        response = client.put '/{index}/_settings', update_params(params, :body => body, :action => 'index.update_settings')
+        response = client.put '{/index}/_settings', update_params(params, :body => body, :action => 'index.update_settings')
         response.body
       end
 

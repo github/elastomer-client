@@ -513,45 +513,6 @@ module Elastomer
         { :index => name }
       end
 
-      def each_segment( &block )
-        segments["indices"][name]["shards"].each do |shard_num, shards|
-          shards.each do |shard|
-            shard["segments"].each(&block)
-          end
-        end
-        self
-      end
-
-      def each_primary_segment( &block )
-        segments["indices"][name]["shards"].each do |shard_num, shards|
-          shards.each do |shard|
-            next unless shard["routing"]["primary"]
-            shard["segments"].each(&block)
-          end
-        end
-        self
-      end
-
-      def deleted_fracion
-        num_docs = 0
-        deleted_docs = 0
-
-        each_primary_segment do |name, segment|
-          num_docs += (segment["num_docs"] || 0)
-          deleted_docs += (segment["deleted_docs"] || 0)
-        end
-
-        deleted_docs.to_f / num_docs.to_f
-      end
-
-      def memory_in_bytes
-        memory = 0
-        each_primary_segment { |name, segment|
-          memory += (segment["memory_in_bytes"] || 0)
-        }
-        memory
-      end
-
     end
   end
 end

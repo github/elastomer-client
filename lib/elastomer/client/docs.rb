@@ -271,6 +271,40 @@ module Elastomer
         response.body
       end
 
+      # Returns information and statistics on terms in the fields of a
+      # particular document as stored in the index. The :id is provided as part
+      # of the params hash.
+      #
+      # params - Parameters Hash
+      #   :id - the ID of the document to get
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-termvectors.html
+      #
+      # Returns the response body as a hash
+      def termvector( params = {} )
+        response = client.get '/{index}/{type}/{id}/_termvector', update_params(params, :action => 'docs.termvector')
+        response.body
+      end
+      alias :termvectors :termvector
+      alias :term_vector :termvector
+      alias :term_vectors :termvector
+
+      # Multi termvectors API allows  you to get multiple termvectors based on
+      # an index, type and id. The response includes a docs array with all the
+      # fetched termvectors, each element having the structure provided by the
+      # `termvector` API.
+      #
+      # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-multi-termvectors.html
+      #
+      # Returns the response body as a hash
+      def multi_termvectors( body, params = {} )
+        response = client.get '{/index}{/type}/_mtermvectors', update_params(params, :body => body, :action => 'docs.multi_termvectors')
+        response.body
+      end
+      alias :multi_term_vectors :multi_termvectors
+
 =begin
 Percolate
 =end
@@ -486,7 +520,7 @@ Percolate
       # params - params hash OR nil if no query
       #
       # Returns an array of the query (possibly nil) and params Hash.
-      def extract_params(query, params=nil)
+      def extract_params( query, params = nil )
         if params.nil?
           if query.key? :query
             params = {}
@@ -497,6 +531,6 @@ Percolate
         [query, params]
       end
 
-    end  # Docs
-  end  # Client
-end  # Elastomer
+    end
+  end
+end

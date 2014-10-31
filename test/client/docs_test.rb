@@ -20,7 +20,7 @@ describe Elastomer::Client::Docs do
           :doc2 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => 'string', :analyzer => 'standard' },
+              :title  => { :type => 'string', :analyzer => 'standard', :term_vector => 'with_positions_offsets' },
               :author => { :type => 'string', :index => 'not_analyzed' }
             }
           }
@@ -401,6 +401,23 @@ describe Elastomer::Client::Docs do
     response = @docs.get(:id => 1, :type => 'doc1')
     assert_found response
     assert_equal 'mojombo', response['_source']['author']
+  end
+
+  it 'provides access to term vector statistics' do
+    populate!
+
+    response = @docs.term_vector :type => 'doc2', :id => 1, :fields => 'title'
+
+    assert response['term_vectors']['title']
+    assert response['term_vectors']['title']['field_statistics']
+    assert response['term_vectors']['title']['terms']
+    assert_equal %w[author logging of the], response['term_vectors']['title']['terms'].keys
+
+    response = @docs.multi_term_vectors({:ids => [1, 2]}, :type => 'doc2', :fields => 'title', :term_statistics => true)
+    docs = response['docs']
+
+    assert docs
+    assert_equal(%w[1 2], docs.map { |h| h['_id'] }.sort)
   end
 
   # Create/index multiple documents.

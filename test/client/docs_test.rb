@@ -92,6 +92,28 @@ describe Elastomer::Client::Docs do
     assert_match %r/^\S{22}$/, h['_id']
   end
 
+  it 'extracts underscore attributes from the document' do
+    doc = {
+      :_id => '12',
+      :_type => 'doc2',
+      :_routing => 'author',
+      '_consistency' => 'all',
+      :title => "The Adventures of Huckleberry Finn",
+      :author => "Mark Twain",
+      :_unknown => "unknown attribute"
+    }
+
+    h = @docs.index doc
+    assert_created h
+    assert_equal '12', h['_id']
+
+    assert !doc.key?(:_id)
+    assert !doc.key?(:_type)
+    assert !doc.key?(:_routing)
+    assert !doc.key?('_consistency')
+    assert  doc.key?(:_unknown)
+  end
+
   it 'gets documents from the search index' do
     h = @docs.get :id => '1', :type => 'doc1'
     refute_found h

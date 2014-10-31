@@ -4,8 +4,10 @@ module Elastomer
 
     # Provides access to document-level API commands.
     #
-    # name - The name of the index as a String
-    # type - The document type as a String
+    # name - The name of the index as a String (required)
+    # type - The document type as a String (optional)
+    #
+    # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs.html
     #
     # Returns a Docs instance.
     def docs( name, type = nil )
@@ -29,15 +31,41 @@ module Elastomer
 
       attr_reader :client, :name, :type
 
-      # Adds or updates a document in the index, making it searchable.
-      # See http://www.elasticsearch.org/guide/reference/api/index_/
+      # Adds or updates a document in the index, making it searchable. If the
+      # document contains an `:_id` attribute then PUT semantics will be used to
+      # create (or update) a document with that ID. If no ID is provided then a
+      # new document will be created using POST semantics.
+      #
+      # There are several other document attributes that control how
+      # ElasticSearch will index the document. They are listed below. Please
+      # refer to the ElasticSearch documentation for a full explanation of each
+      # and how it affects the indexing process.
+      #
+      #   :_id
+      #   :_type
+      #   :_version
+      #   :_version_type
+      #   :_op_type
+      #   :_routing
+      #   :_parent
+      #   :_timestamp
+      #   :_ttl
+      #   :_consistency
+      #   :_replication
+      #   :_refresh
+      #
+      # If any of these attributes are present in the document they will be
+      # removed from the document before it is indexed. This means that the
+      # document will be modified by this method.
       #
       # document - The document (as a Hash or JSON encoded String) to add to the index
       # params   - Parameters Hash
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-index_.html
+      #
       # Returns the response body as a Hash
       def index( document, params = {} )
-        overrides = from_document(document)
+        overrides = from_document document
         params = update_params(params, overrides)
         params[:action] = 'docs.index'
 
@@ -115,7 +143,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update( script, params = {} )
-        overrides = from_document(script)
+        overrides = from_document script
         overrides[:action] = 'docs.update'
 
         response = client.post '/{index}/{type}/{id}/_update', update_params(params, overrides)
@@ -364,6 +392,9 @@ Percolate
         client.multi_search params, &block
       end
 
+      SPECIAL_KEYS = %w[index type id version version_type op_type routing parent timestamp ttl consistency replication refresh].freeze
+      SPECIAL_KEYS_HASH = SPECIAL_KEYS.inject({}) { |h, k| h[k.to_sym] = "_#{k}"; h }.freeze
+
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document
       # will be returned as the value of the :body key.
@@ -377,10 +408,8 @@ Percolate
       def from_document( document )
         opts = {:body => document}
 
-        unless String === document
-          %w[_id _type _routing _parent _ttl _timestamp _retry_on_conflict].each do |field|
-            key = field.sub(/^_/, '').to_sym
-
+        if document.is_a? Hash
+          SPECIAL_KEYS_HASH.each do |key, field|
             opts[key] = document.delete field if document.key? field
             opts[key] = document.delete field.to_sym if document.key? field.to_sym
           end

@@ -8,14 +8,16 @@ The event namespace is `request.client.elastomer`.
 ## Sample event payload
 
 ```
-:index  => "index-test",
-:type   => nil,
-:action => "docs.search",
-:context=> nil,
-:body   => "{\"query\":{\"match_all\":{}}}",
-:url    => #<URI::HTTP:0x007fb6f3e98b60 URL:http://localhost:19200/index-test/_search?search_type=count>,
-:method => :get,
-:status => 200}
+{
+  :index   => "index-test",
+  :type    => nil,
+  :action  => "docs.search",
+  :context => nil,
+  :body    => "{\"query\":{\"match_all\":{}}}",
+  :url     => #<URI::HTTP:0x007fb6f3e98b60 URL:http://localhost:19200/index-test/_search?search_type = count>,
+  :method  => :get,
+  :status  => 200
+}
 ```
 
 ## Valid actions
@@ -25,9 +27,11 @@ The event namespace is `request.client.elastomer`.
 - cluster.get_settings
 - cluster.health
 - cluster.info
+- cluster.pending_tasks
 - cluster.reroute
 - cluster.shutdown
 - cluster.state
+- cluster.stats
 - cluster.update_aliases
 - cluster.update_settings
 - docs.delete
@@ -41,14 +45,17 @@ The event namespace is `request.client.elastomer`.
 - docs.source
 - docs.update
 - docs.validate
+- index.add_alias
 - index.analyze
 - index.clear_cache
 - index.close
 - index.create
 - index.delete
+- index.delete_alias
 - index.delete_mapping
 - index.exists
 - index.flush
+- index.get_alias
 - index.get_aliases
 - index.get_settings
 - index.mapping
@@ -81,4 +88,5 @@ The event namespace is `request.client.elastomer`.
 - snapshot.restore
 - snapshot.status
 - template.create
+- template.delete
 - template.get

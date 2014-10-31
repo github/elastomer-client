@@ -55,6 +55,44 @@ describe Elastomer::Client do
     }
   end
 
+  describe 'when extracting and converting :body params' do
+    it 'deletes the :body from the params (or it gets the hose)' do
+      params = { :body => nil, :q => "what what?" }
+      body = $client.extract_body params
+
+      assert_nil body
+      assert_equal({:q => "what what?"}, params)
+    end
+
+    it 'leaves String values unchanged' do
+      body = $client.extract_body :body => '{"query":{"match_all":{}}}'
+      assert_equal '{"query":{"match_all":{}}}', body
+
+      body = $client.extract_body :body => 'not a JSON string, but who cares!'
+      assert_equal 'not a JSON string, but who cares!', body
+    end
+
+    it 'joins Array values' do
+      body = $client.extract_body :body => %w[foo bar baz]
+      assert_equal "foo\nbar\nbaz\n", body
+
+      body = $client.extract_body :body => [
+        'the first entry',
+        'the second entry',
+        nil
+      ]
+      assert_equal "the first entry\nthe second entry\n", body
+    end
+
+    it 'converts values to JSON' do
+      body = $client.extract_body :body => true
+      assert_equal "true", body
+
+      body = $client.extract_body :body => {:query => {:match_all => {}}}
+      assert_equal '{"query":{"match_all":{}}}', body
+    end
+  end
+
   describe 'when validating parameters' do
     it 'rejects nil values' do
       assert_raises(ArgumentError) { $client.assert_param_presence nil }

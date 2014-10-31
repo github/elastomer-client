@@ -17,7 +17,7 @@ result=0
 export RBENV_VERSION="$(cat .ruby-version)"
 echo "Building under $RBENV_VERSION"
 script/bootstrap
-script/testsuite || result=$?
+script/test || result=$?
 
 if [ $result -ne 0 ]; then
     exit $result

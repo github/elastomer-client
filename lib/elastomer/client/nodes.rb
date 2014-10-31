@@ -2,12 +2,13 @@
 module Elastomer
   class Client
 
-    # Provides access to node-level API commands.
+    # Provides access to node-level API commands. The default node is "_local",
+    # but it can be set to one or more nodes in the cluster include "_all".
     #
     # node_id - The node ID as a String or an Array of node IDs
     #
     # Returns a Nodes instance.
-    def nodes( node_id = '_all' )
+    def nodes( node_id = "_local" )
       Nodes.new self, node_id
     end
 
@@ -70,7 +71,9 @@ module Elastomer
         response.body
       end
 
-      # Get the current hot threads on each node in the cluster.
+      # Get the current hot threads on each node in the cluster. The return
+      # value is a human formatted String - i.e. a String with newlines and
+      # other formatting characters suitable for display in a terminal window.
       #
       # params - Parameters Hash
       #   :node_id  - a single node ID or Array of node IDs
@@ -80,7 +83,7 @@ module Elastomer
       #
       # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html
       #
-      # Returns the response as a Hash
+      # Returns the response as a String
       def hot_threads( params = {} )
         response = client.get '/_nodes{/node_id}/hot_threads', update_params(params, :action => 'nodes.hot_threads')
         response.body

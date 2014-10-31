@@ -1,4 +1,4 @@
-# Elastomer
+# Elastomer Client
 
 Making a stupid simple ElasticSearch client so your project can be smarter!
 
@@ -10,7 +10,7 @@ Use [Boxen](https://setup.githubapp.com) to get your machine set up. Then:
 $ git clone https://github.com/github/elastomer-client.git
 $ cd elastomer-client
 $ script/bootstrap
-$ script/testsuite
+$ script/test
 ```
 
 ## Client

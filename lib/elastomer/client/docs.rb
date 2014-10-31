@@ -84,9 +84,10 @@ module Elastomer
       # Delete a document from the index based on the document ID. The :id is
       # provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/delete/
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document to delete
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete.html
       #
       # Returns the response body as a Hash
       def delete( params = {} )
@@ -97,15 +98,31 @@ module Elastomer
       # Retrieve a document from the index based on its ID. The :id is
       # provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/get/
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document to get
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
       #
       # Returns the response body as a Hash
       def get( params = {} )
         response = client.get '/{index}/{type}/{id}', update_params(params, :action => 'docs.get')
         response.body
       end
+
+      # Check to see if a document exists. The :id is provided as part of the
+      # params hash.
+      #
+      # params - Parameters Hash
+      #   :id - the ID of the document to check
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
+      #
+      # Returns true if the document exists
+      def exists?( params = {} )
+        response = client.head '/{index}/{type}/{id}', update_params(params, :action => 'docs.exists')
+        response.success?
+      end
+      alias :exist? :exists?
 
       # Retrieve the document source from the index based on the ID and type.
       # The :id is provided as part of the params hash.

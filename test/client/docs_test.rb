@@ -107,11 +107,11 @@ describe Elastomer::Client::Docs do
     assert_created h
     assert_equal '12', h['_id']
 
-    assert !doc.key?(:_id)
-    assert !doc.key?(:_type)
-    assert !doc.key?(:_routing)
-    assert !doc.key?('_consistency')
-    assert  doc.key?(:_unknown)
+    refute doc.key?(:_id)
+    refute doc.key?(:_type)
+    refute doc.key?(:_routing)
+    refute doc.key?('_consistency')
+    assert doc.key?(:_unknown)
   end
 
   it 'gets documents from the search index' do
@@ -123,6 +123,12 @@ describe Elastomer::Client::Docs do
     h = @docs.get :id => '1', :type => 'doc1'
     assert_found h
     assert_equal 'mojombo', h['_source']['author']
+  end
+
+  it 'checks if documents exist in the search index' do
+    refute @docs.exists?(:id => '1', :type => 'doc1')
+    populate!
+    assert @docs.exists?(:id => '1', :type => 'doc1')
   end
 
   it 'gets multiple documents from the search index' do

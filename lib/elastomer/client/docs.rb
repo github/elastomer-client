@@ -147,15 +147,19 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def multi_get( body, params = {} )
-        response = client.get '{/index}{/type}/_mget', update_params(params, :body => body, :action => 'docs.multi_get')
+        overrides = from_document body
+        overrides[:action] = 'docs.multi_get'
+
+        response = client.get '{/index}{/type}/_mget', update_params(params, overrides)
         response.body
       end
 
       # Update a document based on a script provided.
-      # See http://www.elasticsearch.org/guide/reference/api/update/
       #
       # script - The script (as a Hash) used to update the document in place
       # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-update.html
       #
       # Returns the response body as a Hash
       def update( script, params = {} )
@@ -172,8 +176,6 @@ module Elastomer
       # the query hash must contain the :query key. Otherwise we assume a URI
       # request is being made.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/search/
-      #
       # query  - The query body as a Hash
       # params - Parameters Hash
       #
@@ -185,6 +187,10 @@ module Elastomer
       #   # same thing but using the URI request method
       #   search(:q => '*:*', :type => 'tweet')
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-search.html
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-uri-request.html
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-body.html
+      #
       # Returns the response body as a hash
       def search( query, params = nil )
         query, params = extract_params(query) if params.nil?
@@ -193,13 +199,29 @@ module Elastomer
         response.body
       end
 
+      # The search shards API returns the indices and shards that a search
+      # request would be executed against. This can give useful feedback for
+      # working out issues or planning optimizations with routing and shard
+      # preferences.
+      #
+      # params - Parameters Hash
+      #   :routing    - routing values
+      #   :preference - which shard replicas to execute the search request on
+      #   :local      - boolean value to use local cluster state
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-shards.html
+      #
+      # Returns the response body as a hash
+      def search_shards( params = {} )
+        response = client.get '/{index}{/type}/_search_shards', update_params(params, :action => 'docs.search_shards')
+        response.body
+      end
+
       # Executes a search query, but instead of returning results, returns
       # the number of documents matched. This method supports both the
       # "request body" query and the "URI request" query. When using the
       # request body semantics, the query hash must contain the :query key.
       # Otherwise we assume a URI request is being made.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/count/
       #
       # query  - The query body as a Hash
       # params - Parameters Hash
@@ -212,11 +234,13 @@ module Elastomer
       #   # same thing but using the URI request method
       #   count(:q => '*:*', :type => 'tweet')
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-count.html
+      #
       # Returns the response body as a Hash
-      def count(query, params = nil)
+      def count( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}{/type}/_count', update_params(params, :body => query)
+        response = client.get '/{index}{/type}/_count', update_params(params, :body => query, :action => 'docs.count')
         response.body
       end
 
@@ -225,8 +249,6 @@ module Elastomer
       # "URI request" query. When using the request body semantics, the query
       # hash must contain the :query key. Otherwise we assume a URI request is
       # being made.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/delete-by-query/
       #
       # query  - The query body as a Hash
       # params - Parameters Hash
@@ -238,6 +260,8 @@ module Elastomer
       #
       #   # same thing but using the URI request method
       #   delete_by_query(:q => '*:*', :type => 'tweet')
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
       #
       # Returns the response body as a hash
       def delete_by_query( query, params = nil )
@@ -257,9 +281,8 @@ Percolate
       # in the query body, but other fields like :size and :facets are
       # allowed.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/more-like-this/
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document
       #
       # Examples
       #
@@ -269,8 +292,10 @@ Percolate
       #   more_like_this({:from => 5, :size => 10}, :mlt_fields => "title",
       #                   :min_term_freq => 1, :type => "doc1", :id => 1)
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-more-like-this.html
+      #
       # Returns the response body as a hash
-      def more_like_this(query, params = nil)
+      def more_like_this( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}/{type}/{id}/_mlt', update_params(params, :body => query, :action => 'docs.more_like_this')
@@ -281,10 +306,9 @@ Percolate
       # can give useful feedback about why a document matched or didn't match
       # a query. The document :id is provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/explain/
-      #
       # query  - The query body as a Hash
       # params - Parameters Hash
+      #   :id - the ID of the document
       #
       # Examples
       #
@@ -292,8 +316,10 @@ Percolate
       #
       #   explain(:q => "message:search", :id => 1)
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-explain.html
+      #
       # Returns the response body as a hash
-      def explain(query, params = nil)
+      def explain( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query, :action => 'docs.explain')
@@ -304,21 +330,21 @@ Percolate
       # :explain parameter can be used to get detailed information about
       # why a query failed.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/validate/
-      #
       # query  - The query body as a Hash
       # params - Parameters Hash
       #
       # Examples
       #
       #   # request body query
-      #   validate(:query_string => {:query => "*:*"})
+      #   validate({:query => {:query_string => {:query => "*:*"}}}, :explain => true)
       #
       #   # same thing but using the URI query parameter
-      #   validate({:q => "post_date:foo"}, :explain => true)
+      #   validate(:q => "post_date:foo", :explain => true)
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-validate.html
       #
       # Returns the response body as a hash
-      def validate(query, params = nil)
+      def validate( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query, :action => 'docs.validate')
@@ -382,8 +408,6 @@ Percolate
       # and document type will be passed to the multi_search API call as
       # part of the request parameters.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/multi-search/
-      #
       # params - Parameters Hash that will be passed to the API call.
       # block  - Required block that is used to accumulate searches.
       #          All the operations will be passed to the search cluster
@@ -400,8 +424,10 @@ Percolate
       #     ...
       #   end
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-multi-search.html
+      #
       # Returns the response body as a Hash
-      def multi_search(params = {}, &block)
+      def multi_search( params = {}, &block )
         raise 'a block is required' if block.nil?
 
         params = {:index => self.name, :type => self.type}.merge params

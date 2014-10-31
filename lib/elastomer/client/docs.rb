@@ -4,13 +4,13 @@ module Elastomer
 
     # Provides access to document-level API commands.
     #
-    # name - The name of the index as a String (required)
+    # name - The name of the index as a String (optional)
     # type - The document type as a String (optional)
     #
     # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs.html
     #
     # Returns a Docs instance.
-    def docs( name, type = nil )
+    def docs( name = nil, type = nil )
       Docs.new self, name, type
     end
 
@@ -25,7 +25,7 @@ module Elastomer
       #
       def initialize( client, name, type = nil )
         @client = client
-        @name   = @client.assert_param_presence(name, 'index name')
+        @name   = @client.assert_param_presence(name, 'index name') unless name.nil?
         @type   = @client.assert_param_presence(type, 'document type') unless type.nil?
       end
 
@@ -127,9 +127,10 @@ module Elastomer
       # Retrieve the document source from the index based on the ID and type.
       # The :id is provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#_source
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#_source
       #
       # Returns the response body as a Hash
       def source( params = {} )
@@ -138,17 +139,15 @@ module Elastomer
       end
 
       # Allows to get multiple documents based on an index, type, and id (and possibly routing).
-      # See http://www.elasticsearch.org/guide/reference/api/multi-get/
       #
-      # docs   - The Hash describing the documents to get
+      # body   - The request body as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-multi-get.html
+      #
       # Returns the response body as a Hash
-      def multi_get( docs, params = {} )
-        overrides = from_document(docs)
-        overrides[:action] = 'docs.multi_get'
-
-        response = client.get '{/index}{/type}{/id}/_mget', update_params(params, overrides)
+      def multi_get( body, params = {} )
+        response = client.get '{/index}{/type}/_mget', update_params(params, :body => body, :action => 'docs.multi_get')
         response.body
       end
 

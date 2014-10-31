@@ -141,7 +141,7 @@ describe Elastomer::Client::Docs do
     authors = h['docs'].map { |d| d['_source']['author'] }
     assert_equal %w[mojombo pea53], authors
 
-    h = @docs.multi_get :ids => [2, 1], :_type => 'doc1'
+    h = @docs.multi_get({:ids => [2, 1]}, :type => 'doc1')
     authors = h['docs'].map { |d| d['_source']['author'] }
     assert_equal %w[defunkt mojombo], authors
 

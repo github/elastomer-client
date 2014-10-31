@@ -104,11 +104,7 @@ def with_tmp_repo(&block)
     yield @repo
   ensure
     @repo.delete if @repo.exists?
-    begin
-      FileUtils.remove_entry(path)
-    rescue => e
-      # Oh well, couldn't delete it
-    end
+    FileUtils.remove_entry(path)
   end
 end
 

@@ -1,5 +1,4 @@
 require 'tmpdir'
-require 'securerandom'
 require 'rubygems' unless defined? Gem
 require 'bundler'
 Bundler.require(:default, :development)
@@ -97,24 +96,17 @@ end
 
 
 def with_tmp_repo(&block)
-  path = File.join(Dir.tmpdir, "elastomer-client", SecureRandom.uuid)
-  FileUtils.mkdir_p(path, :mode => 0777)
-  begin
-    @repo.create({:type => 'fs', :settings => {:location => path}})
+  Dir.mktmpdir do |dir|
+    @repo.create({:type => 'fs', :settings => {:location => dir}})
     yield @repo
-  ensure
     @repo.delete if @repo.exists?
-    FileUtils.remove_entry(path)
   end
 end
 
 def with_tmp_snapshot(&block)
   with_tmp_repo do
-    begin
-      @snapshot.create
-      yield @snapshot
-    ensure
-      @snapshot.delete if @snapshot.exists?
-    end
+    @snapshot.create
+    yield @snapshot
+    @snapshot.delete if @snapshot.exists?
   end
 end

@@ -1,3 +1,6 @@
+## 0.5.0 (2014-10-31)
+- client.index no longer requires a name
+
 ## 0.4.1 (2014-10-14)
 - Support for index `_recovery` endpoint
 - Fix Faraday 0.8 support

@@ -14,7 +14,7 @@ echo
 
 result=0
 
-echo "Building under $RBENV_VERSION"
+ruby -v
 script/bootstrap
 script/test || result=$?
 

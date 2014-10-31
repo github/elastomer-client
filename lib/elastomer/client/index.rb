@@ -24,7 +24,7 @@ module Elastomer
       #
       def initialize( client, name )
         @client = client
-        @name   = name
+        @name   = @client.assert_param_presence(name, 'index name') unless name.nil?
       end
 
       attr_reader :client, :name

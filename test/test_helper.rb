@@ -97,16 +97,22 @@ end
 
 def with_tmp_repo(&block)
   Dir.mktmpdir do |dir|
-    @repo.create({:type => 'fs', :settings => {:location => dir}})
-    yield @repo
-    @repo.delete if @repo.exists?
+    begin
+      @repo.create({:type => 'fs', :settings => {:location => dir}})
+      yield @repo
+    ensure
+      @repo.delete if @repo.exists?
+    end
   end
 end
 
 def with_tmp_snapshot(&block)
   with_tmp_repo do
-    @snapshot.create
-    yield @snapshot
-    @snapshot.delete if @snapshot.exists?
+    begin
+      @snapshot.create
+      yield @snapshot
+    ensure
+      @snapshot.delete if @snapshot.exists?
+    end
   end
 end

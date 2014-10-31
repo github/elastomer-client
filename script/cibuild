@@ -14,7 +14,6 @@ echo
 
 result=0
 
-export RBENV_VERSION="$(cat .ruby-version)"
 echo "Building under $RBENV_VERSION"
 script/bootstrap
 script/test || result=$?

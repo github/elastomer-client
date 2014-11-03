@@ -14,6 +14,7 @@ end
 require 'minitest/spec'
 require 'minitest/autorun'
 
+require 'webmock'
 require 'vcr'
 
 # push the lib folder onto the load path
@@ -98,7 +99,7 @@ end
 
 VCR.configure do |c|
   c.cassette_library_dir = File.expand_path('../fixtures/vcr_cassettes', __FILE__)
-  c.hook_into :faraday
+  c.hook_into :webmock
   c.default_cassette_options = {:match_requests_on => [:method, :path]}
 end
 

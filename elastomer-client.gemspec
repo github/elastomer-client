@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "debugger", "~> 1.6.8"
   spec.add_development_dependency "vcr"
+  spec.add_development_dependency "webmock"
 end

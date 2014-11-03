@@ -12,10 +12,10 @@ PATH="$(pwd)/bin:$(pwd)/script:/usr/share/rbenv/shims:$PATH"
 git log -n 1 || true
 echo
 
-# Create a snapshot dir and delete everything in it
+# Create a snapshot dir and chown it to the es user
 export SNAPSHOT_DIR=/tmp/elastomer-client-snapshot-test
 mkdir -p $SNAPSHOT_DIR
-rm -rf $SNAPSHOT_DIR/*
+chown -R elasticsearch $SNAPSHOT_DIR
 
 result=0
 

@@ -1,4 +1,4 @@
-require 'tmpdir'
+require 'securerandom'
 require 'rubygems' unless defined? Gem
 require 'bundler'
 Bundler.require(:default, :development)
@@ -10,6 +10,8 @@ if ENV['COVERAGE'] == 'true'
     add_filter "/vendor/"
   end
 end
+
+ENV['SNAPSHOT_DIR'] ||= '/tmp/elastomer-client-snapshot-test'
 
 require 'minitest/spec'
 require 'minitest/autorun'
@@ -94,25 +96,43 @@ def es_version_supports_gateway_snapshots?
   $client.semantic_version <= '1.2.0'
 end
 
+def create_repo(name, settings = {})
+  default_settings = {:type => 'fs', :settings => {:location => ENV['SNAPSHOT_DIR']}}
+  $client.repository(name).create(default_settings.merge(settings))
+end
 
-def with_tmp_repo(&block)
-  Dir.mktmpdir do |dir|
-    begin
-      @repo.create({:type => 'fs', :settings => {:location => dir}})
-      yield @repo
-    ensure
-      @repo.delete if @repo.exists?
+def delete_repo(name)
+  repo = $client.repository(name)
+  repo.delete if repo.exists?
+end
+
+def delete_repo_snapshots(name)
+  repo = $client.repository(name)
+  if repo.exists?
+    response = repo.snapshots.get
+    response["snapshots"].each do |snapshot_info|
+      repo.snapshot(snapshot_info["snapshot"]).delete
     end
   end
 end
 
-def with_tmp_snapshot(&block)
-  with_tmp_repo do
-    begin
-      @snapshot.create
-      yield @snapshot
-    ensure
-      @snapshot.delete if @snapshot.exists?
-    end
+def with_tmp_repo(name = SecureRandom.uuid, &block)
+  begin
+    create_repo(name)
+    yield $client.repository(name)
+  ensure
+    delete_repo_snapshots(name)
+    delete_repo(name)
+  end
+end
+
+def create_snapshot(repo, name = SecureRandom.uuid)
+  repo.snapshot(name).create({}, :wait_for_completion => true)
+end
+
+def with_tmp_snapshot(name = SecureRandom.uuid, &block)
+  with_tmp_repo do |repo|
+    create_snapshot(repo, name)
+    yield repo.snapshot(name), repo
   end
 end

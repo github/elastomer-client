@@ -14,9 +14,6 @@ end
 require 'minitest/spec'
 require 'minitest/autorun'
 
-require 'webmock'
-require 'vcr'
-
 # push the lib folder onto the load path
 $LOAD_PATH.unshift 'lib'
 require 'elastomer/client'
@@ -97,13 +94,7 @@ def es_version_supports_gateway_snapshots?
   $client.semantic_version <= '1.2.0'
 end
 
-VCR.configure do |c|
-  c.cassette_library_dir = File.expand_path('../fixtures/vcr_cassettes', __FILE__)
-  c.hook_into :webmock
-  c.default_cassette_options = {:match_requests_on => [:method, :path]}
-end
 
-# This will only work if ES is running as the same user as the tests
 def with_tmp_repo(&block)
   Dir.mktmpdir do |dir|
     begin

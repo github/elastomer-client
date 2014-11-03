@@ -12,6 +12,11 @@ PATH="$(pwd)/bin:$(pwd)/script:/usr/share/rbenv/shims:$PATH"
 git log -n 1 || true
 echo
 
+# Create a snapshot dir and make it world writable
+export SNAPSHOT_DIR=/tmp/elastomer-client-snapshot-test
+mkdir -p $SNAPSHOT_DIR
+chmod a+rw $SNAPSHOT_DIR
+
 result=0
 
 export RBENV_VERSION="$(cat .ruby-version)"

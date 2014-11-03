@@ -2,9 +2,5 @@
 set -e
 cd "$(dirname "$0")/.."
 
-# run entire test suite
-ruby --version 1>&2
-exec ruby -I. -rubygems \
-    -r "$(pwd)/test/test_helper" \
-    -e "ARGV.each { |f| require(f) }" \
-    -- $(find test -name '*_test.rb')
+fn=${1:-"test/**/*_test.rb"}
+bundle exec testrb -Itest $fn $@

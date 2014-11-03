@@ -3,5 +3,4 @@ set -e
 cd "$(dirname "$0")/.."
 
 fn=${1:-"test/**/*_test.rb"}
-#shift
 bundle exec testrb -Itest $fn $@

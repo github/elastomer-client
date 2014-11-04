@@ -14,7 +14,7 @@ echo
 
 result=0
 
-echo "RBENV_VERSION is $RBENV_VERSION"
+RBENV_VERSION="2.1.1-github"
 ruby -v
 script/bootstrap
 script/test || result=$?

@@ -19,8 +19,8 @@ chmod a+rw $SNAPSHOT_DIR
 
 result=0
 
-export RBENV_VERSION="$(cat .ruby-version)"
-echo "Building under $RBENV_VERSION"
+export RBENV_VERSION="2.1.1-github"
+ruby -v
 script/bootstrap
 script/test || result=$?
 

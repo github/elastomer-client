@@ -7,53 +7,45 @@ describe Elastomer::Client::Repository do
     before do
       @name = 'elastomer-repository-test'
       @repo = $client.repository(@name)
-      @repo.delete if @repo.exists?
-    end
-
-    after do
-      @repo.delete if @repo.exists?
     end
 
     it 'determines if a repo exists' do
       assert_equal false, @repo.exists?
       assert_equal false, @repo.exist?
-      with_tmp_repo do
+      with_tmp_repo(@name) do
         assert_equal true, @repo.exists?
       end
     end
 
     it 'creates repos' do
-      Dir.mktmpdir do |dir|
-        response = @repo.create({:type => 'fs', :settings => {:location => dir}})
-        assert_equal true, response["acknowledged"]
-      end
+      response = create_repo(@name)
+      assert_equal true, response["acknowledged"]
+      delete_repo(@name)
     end
 
     it 'cannot create a repo without a name' do
-      Dir.mktmpdir do |dir|
-        lambda {
-          $client.repository.create({:type => 'fs', :settings => {:location => dir}})
-        }.must_raise ArgumentError
-      end
+      lambda {
+        create_repo(nil)
+      }.must_raise ArgumentError
     end
 
     it 'gets repos' do
-      with_tmp_repo do
-        response = @repo.get
-        refute_nil response[@name]
+      with_tmp_repo do |repo|
+        response = repo.get
+        refute_nil response[repo.name]
       end
     end
 
     it 'gets all repos' do
-      with_tmp_repo do
+      with_tmp_repo do |repo|
         response = $client.repository.get
-        refute_nil response[@name]
+        refute_nil response[repo.name]
       end
     end
 
     it 'gets repo status' do
-      with_tmp_repo do
-        response = @repo.status
+      with_tmp_repo do |repo|
+        response = repo.status
         assert_equal [], response["snapshots"]
       end
     end
@@ -64,28 +56,28 @@ describe Elastomer::Client::Repository do
     end
 
     it 'updates repos' do
-      Dir.mktmpdir do |dir|
-        @repo.create({:type => 'fs', :settings => {:location => dir}})
-        response = @repo.update(:type => 'fs', :settings => {:compress => true, :location => dir})
+      with_tmp_repo do |repo|
+        settings = repo.get[repo.name]['settings']
+        response = repo.update(:type => 'fs', :settings => settings.merge('compress' => true))
         assert_equal true, response["acknowledged"]
-        response = @repo.get
-        assert_equal "true", response[@name]["settings"]["compress"]
+        assert_equal "true", repo.get[repo.name]["settings"]["compress"]
       end
     end
 
     it 'cannot update a repo without a name' do
-      Dir.mktmpdir do |dir|
+      with_tmp_repo do |repo|
         lambda {
-          $client.repository.update({:type => 'fs', :settings => {:location => dir}})
+          settings = repo.get[repo.name]['settings']
+          $client.repository.update(:type => 'fs', :settings => settings.merge('compress' => true))
         }.must_raise ArgumentError
       end
     end
 
     it 'deletes repos' do
-      with_tmp_repo do
-        response = @repo.delete
+      with_tmp_repo do |repo|
+        response = repo.delete
         assert_equal true, response["acknowledged"]
-        assert_equal false, @repo.exists?
+        assert_equal false, repo.exists?
       end
     end
 
@@ -96,12 +88,19 @@ describe Elastomer::Client::Repository do
     end
 
     it 'gets snapshots' do
-      with_tmp_repo do
-        response = @repo.snapshots.get
+      with_tmp_repo do |repo|
+        response = repo.snapshots.get
         assert_equal [], response["snapshots"]
-        response = @repo.snapshot.get
-        assert_equal [], response["snapshots"]
-        assert_equal false, @repo.snapshot('elastomer-test').exists?
+
+        create_snapshot(repo, 'test-snapshot')
+        response = repo.snapshot.get
+        assert_equal ['test-snapshot'], response["snapshots"].collect { |info| info["snapshot"] }
+
+        snapshot2 = create_snapshot(repo, 'test-snapshot2')
+        response  = repo.snapshots.get
+        snapshot_names = response["snapshots"].collect { |info| info["snapshot"] }
+        assert_includes snapshot_names, 'test-snapshot'
+        assert_includes snapshot_names, 'test-snapshot2'
       end
     end
   end

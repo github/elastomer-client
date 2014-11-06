@@ -2,7 +2,8 @@
 module Elastomer
   class Client
 
-    # Provides access to document-level API commands.
+    # Provides access to document-level API commands. Indexing documents and
+    # searching documents are both handled by this module.
     #
     # name - The name of the index as a String (optional)
     # type - The document type as a String (optional)

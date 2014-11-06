@@ -1,5 +1,12 @@
-## 0.5.0 (2014-10-31)
-- client.index no longer requires a name
+## 0.5.0 (2014-11-07)
+- Index Component
+  - client.index no longer requires a name
+- Documents Component
+  - client.docs no longer requires an index name
+  - added an `exists?` method
+  - added `termvector` and `multi_termvectors` methods
+  - added a `search_shards` method
+- Adding more documentation
 
 ## 0.4.1 (2014-10-14)
 - Support for index `_recovery` endpoint

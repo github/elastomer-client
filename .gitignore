@@ -2,6 +2,7 @@
 /vendor/gems
 /.bundle
 /.rbenv-version
+/.ruby-version
 /vendor/cache/*.gem
 /coverage
 Gemfile.lock

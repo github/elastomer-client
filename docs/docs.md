@@ -128,12 +128,127 @@ client.docs.delete \
 client.docs("blog", "post").delete :id => 127
 ```
 
-Since we are not providing an actual document to this method, the underscore
-fields are not used. These are just parameters being passed to an HTTP DELETE
-call.
+Since we are not providing an actual document to the `delete` method, the underscore
+fields are not used. The `delete` method only understands parameters that become
+part of a URL passed to an HTTP DELETE call.
 
 #### Searching
 
+Putting documents into an index is only half the story. The other half is
+searching for documents (and somewhere in there is GI Joe and red and blue
+lasers). The `search` method accepts a query Hash and a set of parameters that
+control the search processing (such as routing, search type, timeouts, etc).
 
+```ruby
+client.docs("blog", "post").search \
+  :query => {:match_all => {}}
 
+client.docs.search(
+  {:query => {:match_all => {}}},
+  :index => "blog",
+  :type  => "post"
+)
+```
 
+You can also pass the query via the `:q` parameter. The query will be sent as
+part of the URL. The examples above send the query as the request body.
+
+```ruby
+client.docs.search \
+  :q     => "*:*",
+  :index => "blog",
+  :type  => "post"
+```
+
+The `search` method returns the query response from ElasticSearch as a ruby
+Hash. All the keys are represented as Strings. The [hashie](https://github.com/intridea/hashie)
+project has some useful transforms and wrappers for working with these result
+sets, but that is left to the user to implement if they so desire. Elastomer
+client returns only ruby Hashes.
+
+Searches can be executed against multiple indices and multiple types. Again,
+just pass in an Array of index names and an Array document types.
+
+```ruby
+client.docs.search(
+  {:query => {:match => {:title => "nerd"}}},
+  :index   => %w[blog user],
+  :type    => %w[post info]
+  :timeout => "500"    # 500ms timeout
+)
+```
+
+The above search assumes that all the documents have a *title* field that is
+analyzed and searchable.
+
+#### Counting
+
+There are times when we want to know how many documents match a search but are
+not necessarily interested in returning those documents. A quick and easy to get
+the number of documents is to set the `:size` of the result set to zero.
+
+```ruby
+results = client.docs("blog", "post").search \
+  :q    => "title:nerd",
+  :size => 0
+
+results["hits"]["total"]  #=> 1
+```
+
+The search results always contain the total number of matched documents; even if
+the `:size` is set to zero or some other number. However this is very inefficient.
+
+ElasticSearch provides specific methods for obtaining the number of documents
+that match a search. Instead we can specify a `:search_type` tailored for
+counting.
+
+```ruby
+results = client.docs("blog", "post").search \
+  :q => "title:nerd",
+  :search_type => "count"
+
+results["hits"]["total"]  #=> 1
+```
+
+The `"count"` search type is much more efficient then setting the size to zero.
+These count queries will return more quickly and consume less memory inside
+ElasticSearch.
+
+There is also a `count` API method, but the `:serach_type` approach is even more
+efficient than the count API.
+
+#### Deleting
+
+Documents can be deleted directly given their document ID.
+
+```ruby
+client.docs("blog", "post").delete :id => 127
+```
+
+But we can also delete all documents that match a given query. For example, we
+can delete all documents that have "nerd" in their title.
+
+```ruby
+client.docs.delete_by_query \
+  :q => "title:nerd",
+  :index => "blog",
+  :type => "post"
+```
+
+The `:type` can be omitted in order to delete any kind of document in the blog
+index. Or you can specify more than one type (and more than one index) by
+passing in an Array of values.
+
+Just as with the `search` methods, the query can be passed as a parameter or as
+the request body.
+
+```ruby
+client.docs.delete_by_query(
+  {:query => {:match => {:title => "nerd"}}},
+  :index => "blog",
+  :type => "post"
+)
+```
+
+Take a look through the documents component for information on all the other
+supported API methods.

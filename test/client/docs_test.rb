@@ -404,6 +404,8 @@ describe Elastomer::Client::Docs do
   end
 
   it 'provides access to term vector statistics' do
+    next unless es_version_1_x?
+
     populate!
 
     response = @docs.term_vector :type => 'doc2', :id => 1, :fields => 'title'

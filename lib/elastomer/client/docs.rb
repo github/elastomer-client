@@ -2,13 +2,16 @@
 module Elastomer
   class Client
 
-    # Provides access to document-level API commands.
+    # Provides access to document-level API commands. Indexing documents and
+    # searching documents are both handled by this module.
     #
-    # name - The name of the index as a String
-    # type - The document type as a String
+    # name - The name of the index as a String (optional)
+    # type - The document type as a String (optional)
+    #
+    # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs.html
     #
     # Returns a Docs instance.
-    def docs( name, type = nil )
+    def docs( name = nil, type = nil )
       Docs.new self, name, type
     end
 
@@ -23,21 +26,47 @@ module Elastomer
       #
       def initialize( client, name, type = nil )
         @client = client
-        @name   = @client.assert_param_presence(name, 'index name')
+        @name   = @client.assert_param_presence(name, 'index name') unless name.nil?
         @type   = @client.assert_param_presence(type, 'document type') unless type.nil?
       end
 
       attr_reader :client, :name, :type
 
-      # Adds or updates a document in the index, making it searchable.
-      # See http://www.elasticsearch.org/guide/reference/api/index_/
+      # Adds or updates a document in the index, making it searchable. If the
+      # document contains an `:_id` attribute then PUT semantics will be used to
+      # create (or update) a document with that ID. If no ID is provided then a
+      # new document will be created using POST semantics.
+      #
+      # There are several other document attributes that control how
+      # ElasticSearch will index the document. They are listed below. Please
+      # refer to the ElasticSearch documentation for a full explanation of each
+      # and how it affects the indexing process.
+      #
+      #   :_id
+      #   :_type
+      #   :_version
+      #   :_version_type
+      #   :_op_type
+      #   :_routing
+      #   :_parent
+      #   :_timestamp
+      #   :_ttl
+      #   :_consistency
+      #   :_replication
+      #   :_refresh
+      #
+      # If any of these attributes are present in the document they will be
+      # removed from the document before it is indexed. This means that the
+      # document will be modified by this method.
       #
       # document - The document (as a Hash or JSON encoded String) to add to the index
       # params   - Parameters Hash
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-index_.html
+      #
       # Returns the response body as a Hash
       def index( document, params = {} )
-        overrides = from_document(document)
+        overrides = from_document document
         params = update_params(params, overrides)
         params[:action] = 'docs.index'
 
@@ -56,9 +85,10 @@ module Elastomer
       # Delete a document from the index based on the document ID. The :id is
       # provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/delete/
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document to delete
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete.html
       #
       # Returns the response body as a Hash
       def delete( params = {} )
@@ -69,9 +99,10 @@ module Elastomer
       # Retrieve a document from the index based on its ID. The :id is
       # provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/get/
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document to get
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
       #
       # Returns the response body as a Hash
       def get( params = {} )
@@ -79,12 +110,28 @@ module Elastomer
         response.body
       end
 
+      # Check to see if a document exists. The :id is provided as part of the
+      # params hash.
+      #
+      # params - Parameters Hash
+      #   :id - the ID of the document to check
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
+      #
+      # Returns true if the document exists
+      def exists?( params = {} )
+        response = client.head '/{index}/{type}/{id}', update_params(params, :action => 'docs.exists')
+        response.success?
+      end
+      alias :exist? :exists?
+
       # Retrieve the document source from the index based on the ID and type.
       # The :id is provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#_source
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#_source
       #
       # Returns the response body as a Hash
       def source( params = {} )
@@ -93,29 +140,31 @@ module Elastomer
       end
 
       # Allows to get multiple documents based on an index, type, and id (and possibly routing).
-      # See http://www.elasticsearch.org/guide/reference/api/multi-get/
       #
-      # docs   - The Hash describing the documents to get
+      # body   - The request body as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-multi-get.html
+      #
       # Returns the response body as a Hash
-      def multi_get( docs, params = {} )
-        overrides = from_document(docs)
+      def multi_get( body, params = {} )
+        overrides = from_document body
         overrides[:action] = 'docs.multi_get'
 
-        response = client.get '{/index}{/type}{/id}/_mget', update_params(params, overrides)
+        response = client.get '{/index}{/type}/_mget', update_params(params, overrides)
         response.body
       end
 
       # Update a document based on a script provided.
-      # See http://www.elasticsearch.org/guide/reference/api/update/
       #
       # script - The script (as a Hash) used to update the document in place
       # params - Parameters Hash
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-update.html
+      #
       # Returns the response body as a Hash
       def update( script, params = {} )
-        overrides = from_document(script)
+        overrides = from_document script
         overrides[:action] = 'docs.update'
 
         response = client.post '/{index}/{type}/{id}/_update', update_params(params, overrides)
@@ -128,8 +177,6 @@ module Elastomer
       # the query hash must contain the :query key. Otherwise we assume a URI
       # request is being made.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/search/
-      #
       # query  - The query body as a Hash
       # params - Parameters Hash
       #
@@ -141,6 +188,10 @@ module Elastomer
       #   # same thing but using the URI request method
       #   search(:q => '*:*', :type => 'tweet')
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-search.html
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-uri-request.html
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-body.html
+      #
       # Returns the response body as a hash
       def search( query, params = nil )
         query, params = extract_params(query) if params.nil?
@@ -149,13 +200,29 @@ module Elastomer
         response.body
       end
 
+      # The search shards API returns the indices and shards that a search
+      # request would be executed against. This can give useful feedback for
+      # working out issues or planning optimizations with routing and shard
+      # preferences.
+      #
+      # params - Parameters Hash
+      #   :routing    - routing values
+      #   :preference - which shard replicas to execute the search request on
+      #   :local      - boolean value to use local cluster state
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-shards.html
+      #
+      # Returns the response body as a hash
+      def search_shards( params = {} )
+        response = client.get '/{index}{/type}/_search_shards', update_params(params, :action => 'docs.search_shards')
+        response.body
+      end
+
       # Executes a search query, but instead of returning results, returns
       # the number of documents matched. This method supports both the
       # "request body" query and the "URI request" query. When using the
       # request body semantics, the query hash must contain the :query key.
       # Otherwise we assume a URI request is being made.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/count/
       #
       # query  - The query body as a Hash
       # params - Parameters Hash
@@ -168,11 +235,13 @@ module Elastomer
       #   # same thing but using the URI request method
       #   count(:q => '*:*', :type => 'tweet')
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-count.html
+      #
       # Returns the response body as a Hash
-      def count(query, params = nil)
+      def count( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}{/type}/_count', update_params(params, :body => query)
+        response = client.get '/{index}{/type}/_count', update_params(params, :body => query, :action => 'docs.count')
         response.body
       end
 
@@ -181,8 +250,6 @@ module Elastomer
       # "URI request" query. When using the request body semantics, the query
       # hash must contain the :query key. Otherwise we assume a URI request is
       # being made.
-      #
-      # See http://www.elasticsearch.org/guide/reference/api/delete-by-query/
       #
       # query  - The query body as a Hash
       # params - Parameters Hash
@@ -195,6 +262,8 @@ module Elastomer
       #   # same thing but using the URI request method
       #   delete_by_query(:q => '*:*', :type => 'tweet')
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
+      #
       # Returns the response body as a hash
       def delete_by_query( query, params = nil )
         query, params = extract_params(query) if params.nil?
@@ -202,6 +271,40 @@ module Elastomer
         response = client.delete '/{index}{/type}/_query', update_params(params, :body => query, :action => 'docs.delete_by_query')
         response.body
       end
+
+      # Returns information and statistics on terms in the fields of a
+      # particular document as stored in the index. The :id is provided as part
+      # of the params hash.
+      #
+      # params - Parameters Hash
+      #   :id - the ID of the document to get
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-termvectors.html
+      #
+      # Returns the response body as a hash
+      def termvector( params = {} )
+        response = client.get '/{index}/{type}/{id}/_termvector', update_params(params, :action => 'docs.termvector')
+        response.body
+      end
+      alias :termvectors :termvector
+      alias :term_vector :termvector
+      alias :term_vectors :termvector
+
+      # Multi termvectors API allows  you to get multiple termvectors based on
+      # an index, type and id. The response includes a docs array with all the
+      # fetched termvectors, each element having the structure provided by the
+      # `termvector` API.
+      #
+      # params - Parameters Hash
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-multi-termvectors.html
+      #
+      # Returns the response body as a hash
+      def multi_termvectors( body, params = {} )
+        response = client.get '{/index}{/type}/_mtermvectors', update_params(params, :body => body, :action => 'docs.multi_termvectors')
+        response.body
+      end
+      alias :multi_term_vectors :multi_termvectors
 
 =begin
 Percolate
@@ -213,9 +316,8 @@ Percolate
       # in the query body, but other fields like :size and :facets are
       # allowed.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/more-like-this/
-      #
       # params - Parameters Hash
+      #   :id - the ID of the document
       #
       # Examples
       #
@@ -225,8 +327,10 @@ Percolate
       #   more_like_this({:from => 5, :size => 10}, :mlt_fields => "title",
       #                   :min_term_freq => 1, :type => "doc1", :id => 1)
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-more-like-this.html
+      #
       # Returns the response body as a hash
-      def more_like_this(query, params = nil)
+      def more_like_this( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}/{type}/{id}/_mlt', update_params(params, :body => query, :action => 'docs.more_like_this')
@@ -237,10 +341,9 @@ Percolate
       # can give useful feedback about why a document matched or didn't match
       # a query. The document :id is provided as part of the params hash.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/explain/
-      #
       # query  - The query body as a Hash
       # params - Parameters Hash
+      #   :id - the ID of the document
       #
       # Examples
       #
@@ -248,8 +351,10 @@ Percolate
       #
       #   explain(:q => "message:search", :id => 1)
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-explain.html
+      #
       # Returns the response body as a hash
-      def explain(query, params = nil)
+      def explain( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query, :action => 'docs.explain')
@@ -260,21 +365,21 @@ Percolate
       # :explain parameter can be used to get detailed information about
       # why a query failed.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/validate/
-      #
       # query  - The query body as a Hash
       # params - Parameters Hash
       #
       # Examples
       #
       #   # request body query
-      #   validate(:query_string => {:query => "*:*"})
+      #   validate({:query => {:query_string => {:query => "*:*"}}}, :explain => true)
       #
       #   # same thing but using the URI query parameter
-      #   validate({:q => "post_date:foo"}, :explain => true)
+      #   validate(:q => "post_date:foo", :explain => true)
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-validate.html
       #
       # Returns the response body as a hash
-      def validate(query, params = nil)
+      def validate( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
         response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query, :action => 'docs.validate')
@@ -338,8 +443,6 @@ Percolate
       # and document type will be passed to the multi_search API call as
       # part of the request parameters.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/multi-search/
-      #
       # params - Parameters Hash that will be passed to the API call.
       # block  - Required block that is used to accumulate searches.
       #          All the operations will be passed to the search cluster
@@ -356,13 +459,18 @@ Percolate
       #     ...
       #   end
       #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-multi-search.html
+      #
       # Returns the response body as a Hash
-      def multi_search(params = {}, &block)
+      def multi_search( params = {}, &block )
         raise 'a block is required' if block.nil?
 
         params = {:index => self.name, :type => self.type}.merge params
         client.multi_search params, &block
       end
+
+      SPECIAL_KEYS = %w[index type id version version_type op_type routing parent timestamp ttl consistency replication refresh].freeze
+      SPECIAL_KEYS_HASH = SPECIAL_KEYS.inject({}) { |h, k| h[k.to_sym] = "_#{k}"; h }.freeze
 
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document
@@ -377,10 +485,8 @@ Percolate
       def from_document( document )
         opts = {:body => document}
 
-        unless String === document
-          %w[_id _type _routing _parent _ttl _timestamp _retry_on_conflict].each do |field|
-            key = field.sub(/^_/, '').to_sym
-
+        if document.is_a? Hash
+          SPECIAL_KEYS_HASH.each do |key, field|
             opts[key] = document.delete field if document.key? field
             opts[key] = document.delete field.to_sym if document.key? field.to_sym
           end
@@ -415,7 +521,7 @@ Percolate
       # params - params hash OR nil if no query
       #
       # Returns an array of the query (possibly nil) and params Hash.
-      def extract_params(query, params=nil)
+      def extract_params( query, params = nil )
         if params.nil?
           if query.key? :query
             params = {}
@@ -426,6 +532,6 @@ Percolate
         [query, params]
       end
 
-    end  # Docs
-  end  # Client
-end  # Elastomer
+    end
+  end
+end

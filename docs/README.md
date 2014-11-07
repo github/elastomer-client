@@ -21,7 +21,7 @@ types of queries.
 
 Below are links to documents describing the various components of the Elastomer
 Client library. Start with the core components - specifically the **Client**
-document. All the other components are build atop the client.
+document. All the other components are built atop the client.
 
 **Core Components**
 

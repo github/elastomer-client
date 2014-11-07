@@ -20,7 +20,7 @@ describe Elastomer::Client::Docs do
           :doc2 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => 'string', :analyzer => 'standard' },
+              :title  => { :type => 'string', :analyzer => 'standard', :term_vector => 'with_positions_offsets' },
               :author => { :type => 'string', :index => 'not_analyzed' }
             }
           }
@@ -92,6 +92,28 @@ describe Elastomer::Client::Docs do
     assert_match %r/^\S{22}$/, h['_id']
   end
 
+  it 'extracts underscore attributes from the document' do
+    doc = {
+      :_id => '12',
+      :_type => 'doc2',
+      :_routing => 'author',
+      '_consistency' => 'all',
+      :title => "The Adventures of Huckleberry Finn",
+      :author => "Mark Twain",
+      :_unknown => "unknown attribute"
+    }
+
+    h = @docs.index doc
+    assert_created h
+    assert_equal '12', h['_id']
+
+    refute doc.key?(:_id)
+    refute doc.key?(:_type)
+    refute doc.key?(:_routing)
+    refute doc.key?('_consistency')
+    assert doc.key?(:_unknown)
+  end
+
   it 'gets documents from the search index' do
     h = @docs.get :id => '1', :type => 'doc1'
     refute_found h
@@ -101,6 +123,12 @@ describe Elastomer::Client::Docs do
     h = @docs.get :id => '1', :type => 'doc1'
     assert_found h
     assert_equal 'mojombo', h['_source']['author']
+  end
+
+  it 'checks if documents exist in the search index' do
+    refute @docs.exists?(:id => '1', :type => 'doc1')
+    populate!
+    assert @docs.exists?(:id => '1', :type => 'doc1')
   end
 
   it 'gets multiple documents from the search index' do
@@ -113,7 +141,7 @@ describe Elastomer::Client::Docs do
     authors = h['docs'].map { |d| d['_source']['author'] }
     assert_equal %w[mojombo pea53], authors
 
-    h = @docs.multi_get :ids => [2, 1], :_type => 'doc1'
+    h = @docs.multi_get({:ids => [2, 1]}, :type => 'doc1')
     authors = h['docs'].map { |d| d['_source']['author'] }
     assert_equal %w[defunkt mojombo], authors
 
@@ -373,6 +401,25 @@ describe Elastomer::Client::Docs do
     response = @docs.get(:id => 1, :type => 'doc1')
     assert_found response
     assert_equal 'mojombo', response['_source']['author']
+  end
+
+  it 'provides access to term vector statistics' do
+    next unless es_version_1_x?
+
+    populate!
+
+    response = @docs.term_vector :type => 'doc2', :id => 1, :fields => 'title'
+
+    assert response['term_vectors']['title']
+    assert response['term_vectors']['title']['field_statistics']
+    assert response['term_vectors']['title']['terms']
+    assert_equal %w[author logging of the], response['term_vectors']['title']['terms'].keys
+
+    response = @docs.multi_term_vectors({:ids => [1, 2]}, :type => 'doc2', :fields => 'title', :term_statistics => true)
+    docs = response['docs']
+
+    assert docs
+    assert_equal(%w[1 2], docs.map { |h| h['_id'] }.sort)
   end
 
   # Create/index multiple documents.

@@ -5,3 +5,6 @@ rvm:
 
 services:
   - elasticsearch
+
+notifications:
+  email: false

@@ -1,9 +1,7 @@
-# Elastomer Client
+# Elastomer Client [![Build
+Status](https://travis-ci.org/github/elastomer-client.svg)](https://travis-ci.org/github/elastomer-client)
 
 Making a stupid simple ElasticSearch client so your project can be smarter!
-
-[![Build
-Status](https://travis-ci.org/github/elastomer-client.svg)](https://travis-ci.org/github/elastomer-client)
 
 ## Getting Started
 

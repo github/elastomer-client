@@ -12,8 +12,9 @@ describe Elastomer::Client::Index do
     @index.delete if @index.exists?
   end
 
-  it 'requires an index name' do
-    assert_raises(ArgumentError) { $client.index }
+  it 'does not require an index name' do
+    index = $client.index
+    assert_nil index.name
   end
 
   it 'determines if an index exists' do

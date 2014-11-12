@@ -4,7 +4,7 @@ Making a stupid simple ElasticSearch client so your project can be smarter!
 
 ## Getting Started
 
-Use [Boxen](https://setup.githubapp.com) to get your machine set up. Then:
+Get started by cloning and running a few scripts:
 
 ```
 $ git clone https://github.com/github/elastomer-client.git

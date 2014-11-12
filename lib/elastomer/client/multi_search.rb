@@ -44,7 +44,7 @@ module Elastomer
         response.body
       end
     end
-    alias :msearch :multi_search
+    alias_method :msearch, :multi_search
 
     # The MultiSearch class is a helper for accumulating and submitting
     # multi_search API requests. Instances of the MultiSearch class

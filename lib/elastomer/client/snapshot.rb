@@ -44,7 +44,7 @@ module Elastomer
           raise exception
         end
       end
-      alias :exist? :exists?
+      alias_method :exist?, :exists?
 
       # Create the snapshot.
       # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot

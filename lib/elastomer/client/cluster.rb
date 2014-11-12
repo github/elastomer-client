@@ -95,7 +95,7 @@ module Elastomer
         response = client.get '/_cluster/settings', params.merge(:action => 'cluster.get_settings')
         response.body
       end
-      alias :settings :get_settings
+      alias_method :settings, :get_settings
 
       # Update cluster wide specific settings. Settings updated can either be
       # persistent (applied cross restarts) or transient (will not survive a
@@ -185,7 +185,7 @@ module Elastomer
         response = client.get '{/index}/_aliases', params.merge(:action => 'cluster.get_aliases')
         response.body
       end
-      alias :aliases :get_aliases
+      alias_method :aliases, :get_aliases
 
       # Perform an aliases action on the cluster. We are just a teensy bit
       # clever here in that a single action can be given or an array of

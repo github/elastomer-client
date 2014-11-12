@@ -130,4 +130,26 @@ describe Elastomer::Client do
       assert_equal '9', $client.assert_param_presence(9)
     end
   end
+
+  describe 'top level actions' do
+    it 'pings the cluster' do
+      assert_equal true, $client.ping
+      assert_equal true, $client.available?
+    end
+
+    it 'gets cluster info' do
+      h = $client.info
+      assert h.key?('name'), 'expected cluster name to be returned'
+      assert h.key?('status'), 'expected cluster info status to be returned'
+    end
+
+    it 'gets cluster version' do
+      assert_match /[\d\.]+/, $client.version
+    end
+
+    it 'gets semantic version' do
+      version_string = $client.version
+      assert_equal Semantic::Version.new(version_string), $client.semantic_version
+    end
+  end
 end

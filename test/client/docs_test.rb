@@ -131,6 +131,12 @@ describe Elastomer::Client::Docs do
     assert @docs.exists?(:id => '1', :type => 'doc1')
   end
 
+  it 'checks if documents exist in the search index with .exist?' do
+    refute @docs.exist?(:id => '1', :type => 'doc1')
+    populate!
+    assert @docs.exist?(:id => '1', :type => 'doc1')
+  end
+
   it 'gets multiple documents from the search index' do
     populate!
 
@@ -407,12 +413,59 @@ describe Elastomer::Client::Docs do
     it 'provides access to term vector statistics' do
       populate!
 
+      response = @docs.termvector :type => 'doc2', :id => 1, :fields => 'title'
+
+      assert response['term_vectors']['title']
+      assert response['term_vectors']['title']['field_statistics']
+      assert response['term_vectors']['title']['terms']
+      assert_equal %w[author logging of the], response['term_vectors']['title']['terms'].keys
+    end
+
+    it 'provides access to term vector statistics with .termvectors' do
+      populate!
+
+      response = @docs.termvectors :type => 'doc2', :id => 1, :fields => 'title'
+
+      assert response['term_vectors']['title']
+      assert response['term_vectors']['title']['field_statistics']
+      assert response['term_vectors']['title']['terms']
+      assert_equal %w[author logging of the], response['term_vectors']['title']['terms'].keys
+    end
+
+    it 'provides access to term vector statistics with .term_vector' do
+      populate!
+
       response = @docs.term_vector :type => 'doc2', :id => 1, :fields => 'title'
 
       assert response['term_vectors']['title']
       assert response['term_vectors']['title']['field_statistics']
       assert response['term_vectors']['title']['terms']
       assert_equal %w[author logging of the], response['term_vectors']['title']['terms'].keys
+    end
+
+    it 'provides access to term vector statistics with .term_vectors' do
+      populate!
+
+      response = @docs.term_vectors :type => 'doc2', :id => 1, :fields => 'title'
+
+      assert response['term_vectors']['title']
+      assert response['term_vectors']['title']['field_statistics']
+      assert response['term_vectors']['title']['terms']
+      assert_equal %w[author logging of the], response['term_vectors']['title']['terms'].keys
+    end
+
+    it 'provides access to multi term vector statistics' do
+      populate!
+
+      response = @docs.multi_termvectors({:ids => [1, 2]}, :type => 'doc2', :fields => 'title', :term_statistics => true)
+      docs = response['docs']
+
+      assert docs
+      assert_equal(%w[1 2], docs.map { |h| h['_id'] }.sort)
+    end
+
+    it 'provides access to multi term vector statistics with .multi_term_vectors' do
+      populate!
 
       response = @docs.multi_term_vectors({:ids => [1, 2]}, :type => 'doc2', :fields => 'title', :term_statistics => true)
       docs = response['docs']

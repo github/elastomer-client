@@ -43,6 +43,12 @@ describe Elastomer::Client::Cluster do
   end
 
   it 'gets the cluster settings' do
+    h = @cluster.get_settings
+    assert_instance_of Hash, h['persistent'], 'the persistent settings are returned'
+    assert_instance_of Hash, h['transient'], 'the transient settings are returned'
+  end
+
+  it 'gets the cluster settings with .settings' do
     h = @cluster.settings
     assert_instance_of Hash, h['persistent'], 'the persistent settings are returned'
     assert_instance_of Hash, h['transient'], 'the transient settings are returned'
@@ -105,7 +111,7 @@ describe Elastomer::Client::Cluster do
       @index.delete if @index.exists?
     end
 
-    it 'adds an alias' do
+    it 'adds and gets an alias' do
       hash = @cluster.get_aliases
       assert_empty hash[@name]['aliases']
 
@@ -113,6 +119,17 @@ describe Elastomer::Client::Cluster do
         :add => {:index => @name, :alias => 'elastomer-test-unikitty'}
 
       hash = @cluster.get_aliases
+      assert_equal ['elastomer-test-unikitty'], hash[@name]['aliases'].keys
+    end
+
+    it 'adds and gets an alias with .aliases' do
+      hash = @cluster.aliases
+      assert_empty hash[@name]['aliases']
+
+      @cluster.update_aliases \
+        :add => {:index => @name, :alias => 'elastomer-test-unikitty'}
+
+      hash = @cluster.aliases
       assert_equal ['elastomer-test-unikitty'], hash[@name]['aliases'].keys
     end
 

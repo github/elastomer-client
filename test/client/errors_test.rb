@@ -27,22 +27,26 @@ describe Elastomer::Client::Error do
   end
 
   it "is fatal by default" do
-    assert Elastomer::Client::Error.fatal?, "client errors are fatal by default"
+    assert Elastomer::Client::Error.fatal, "client errors are fatal by default"
 
     error = Elastomer::Client::Error.new "oops!"
     assert !error.retry?, "client errors are not retryable by default"
   end
 
+  it "supports .fatal? alias" do
+    assert Elastomer::Client::Error.fatal?, "client errors support .fatal?"
+  end
+
   it "has some fatal subclasses" do
-    assert Elastomer::Client::ResourceNotFound.fatal?, "Resource not found is fatal"
-    assert Elastomer::Client::ParsingError.fatal?, "Parsing error is fatal"
-    assert Elastomer::Client::SSLError.fatal?, "SSL error is fatal"
-    assert Elastomer::Client::RequestError.fatal?, "Request error is fatal"
+    assert Elastomer::Client::ResourceNotFound.fatal, "Resource not found is fatal"
+    assert Elastomer::Client::ParsingError.fatal, "Parsing error is fatal"
+    assert Elastomer::Client::SSLError.fatal, "SSL error is fatal"
+    assert Elastomer::Client::RequestError.fatal, "Request error is fatal"
   end
 
   it "has some non-fatal subclasses" do
-    assert !Elastomer::Client::TimeoutError.fatal?, "Timeouts are not fatal"
-    assert !Elastomer::Client::ConnectionFailed.fatal?, "Connection failures are not fatal"
-    assert !Elastomer::Client::ServerError.fatal?, "Server errors are not fatal"
+    assert !Elastomer::Client::TimeoutError.fatal, "Timeouts are not fatal"
+    assert !Elastomer::Client::ConnectionFailed.fatal, "Connection failures are not fatal"
+    assert !Elastomer::Client::ServerError.fatal, "Server errors are not fatal"
   end
 end

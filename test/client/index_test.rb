@@ -21,11 +21,37 @@ describe Elastomer::Client::Index do
     assert !@index.exists?, 'the index should not yet exist'
   end
 
+  it 'determines if an index exists with .exist?' do
+    assert !@index.exist?, 'the index should not yet exist'
+  end
+
   describe 'when creating an index' do
     it 'creates an index' do
-      @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
+      @index.create({})
       assert @index.exists?, 'the index should now exist'
+    end
 
+    it 'creates an index with settings' do
+      @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
+      settings = @index.get_settings[@name]['settings']
+
+      # COMPATIBILITY
+      # ES 1.0 changed the default return format of index settings to always
+      # expand nested properties, e.g.
+      # {"index.number_of_replicas": "1"} changed to
+      # {"index": {"number_of_replicas":"1"}}
+
+      # To support both versions, we check for either return format.
+      value = settings['index.number_of_shards'] ||
+              settings['index']['number_of_shards']
+      assert_equal '3', value
+      value = settings['index.number_of_replicas'] ||
+              settings['index']['number_of_replicas']
+      assert_equal '0', value
+    end
+
+    it 'creates an index with settings with .settings' do
+      @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
       settings = @index.settings[@name]['settings']
 
       # COMPATIBILITY
@@ -44,6 +70,25 @@ describe Elastomer::Client::Index do
     end
 
     it 'adds mappings for document types' do
+      @index.create(
+        :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
+        :mappings => {
+          :doco => {
+            :_source => { :enabled => false },
+            :_all    => { :enabled => false },
+            :properties => {
+              :title  => { :type => 'string', :analyzer => 'standard' },
+              :author => { :type => 'string', :index => 'not_analyzed' }
+            }
+          }
+        }
+      )
+
+      assert @index.exists?, 'the index should now exist'
+      assert_mapping_exists @index.get_mapping[@name], 'doco'
+    end
+
+    it 'adds mappings for document types with .mapping' do
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
         :mappings => {
@@ -102,6 +147,33 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], 'doco', 'title'
 
     @index.update_mapping 'mux_mool', { :mux_mool => { :properties => {
+      :song => { :type => 'string', :index => 'not_analyzed' }
+    }}}
+
+    assert_property_exists @index.mapping[@name], 'mux_mool', 'song'
+  end
+
+  it 'updates document mappings with .put_mapping' do
+    @index.create(
+      :mappings => {
+        :doco => {
+          :_source => { :enabled => false },
+          :_all    => { :enabled => false },
+          :properties => {:title  => { :type => 'string', :analyzer => 'standard' }}
+        }
+      }
+    )
+
+    assert_property_exists @index.mapping[@name], 'doco', 'title'
+
+    @index.put_mapping 'doco', { :doco => { :properties => {
+      :author => { :type => 'string', :index => 'not_analyzed' }
+    }}}
+
+    assert_property_exists @index.mapping[@name], 'doco', 'author'
+    assert_property_exists @index.mapping[@name], 'doco', 'title'
+
+    @index.put_mapping 'mux_mool', { :mux_mool => { :properties => {
       :song => { :type => 'string', :index => 'not_analyzed' }
     }}}
 

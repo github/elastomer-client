@@ -35,7 +35,7 @@ module Elastomer
           raise exception
         end
       end
-      alias :exist? :exists?
+      alias_method :exist?, :exists?
 
       # Create the repository.
       # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
@@ -103,7 +103,7 @@ module Elastomer
       def snapshot(snapshot = nil)
         client.snapshot(name, snapshot)
       end
-      alias :snapshots :snapshot
+      alias_method :snapshots, :snapshot
 
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.

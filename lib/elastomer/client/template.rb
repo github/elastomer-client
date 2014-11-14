@@ -27,7 +27,7 @@ module Elastomer
       def exists?
         client.cluster.templates.key? name
       end
-      alias :exist? :exists?
+      alias_method :exist?, :exists?
 
       # Get the template from the cluster.
       # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/

@@ -61,7 +61,7 @@ module Elastomer
           @fatal = true
         end
         attr_writer :fatal
-        alias :fatal? :fatal
+        alias_method :fatal?, :fatal
       end
 
     end  # Error

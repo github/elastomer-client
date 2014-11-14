@@ -85,7 +85,7 @@ module Elastomer
           raise exception
         end
       end
-      alias :exist? :exists?
+      alias_method :exist?, :exists?
 
       # Internal: Returns a Hash containing default parameters.
       def defaults

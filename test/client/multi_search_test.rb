@@ -65,6 +65,35 @@ describe Elastomer::Client::MultiSearch do
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
   end
 
+  it 'performs multisearches with .msearch' do
+    populate!
+
+    body = [
+      '{"index" : "elastomer-msearch-test", "search_type" : "count"}',
+      '{"query" : {"match_all" : {}}}',
+      '{"index" : "elastomer-msearch-test", "type": "doc2"}',
+      '{"query" : {"match": {"author" : "grantr"}}}',
+      nil
+    ]
+    body = body.join "\n"
+    h = $client.msearch body
+    response1, response2 = h["responses"]
+    assert_equal 4, response1["hits"]["total"]
+    assert_equal 1, response2["hits"]["total"]
+    assert_equal "2", response2["hits"]["hits"][0]["_id"]
+
+    body = [
+      '{}',
+      '{"query" : {"match": {"author" : "grantr"}}}',
+      nil
+    ]
+    body = body.join "\n"
+    h = $client.msearch body, :index => @name
+    response1 = h["responses"].first
+    assert_equal 1, response1["hits"]["total"]
+    assert_equal "2", response1["hits"]["hits"][0]["_id"]
+  end
+
   it 'supports a nice block syntax' do
     populate!
 

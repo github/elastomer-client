@@ -43,7 +43,7 @@ module Elastomer
         response = client.head '/{index}{/type}', update_params(params, :action => 'index.exists')
         response.success?
       end
-      alias :exist? :exists?
+      alias_method :exist?, :exists?
 
       # Create the index.
       #
@@ -105,7 +105,7 @@ module Elastomer
         response = client.get '{/index}/_settings', update_params(params, :action => 'index.get_settings')
         response.body
       end
-      alias :settings :get_settings
+      alias_method :settings, :get_settings
 
       # Change specific index level settings in real time.
       #
@@ -133,7 +133,7 @@ module Elastomer
         response = client.get '/{index}{/type}/_mapping', update_params(params, :action => 'index.get_mapping')
         response.body
       end
-      alias :mapping :get_mapping
+      alias_method :mapping, :get_mapping
 
       # Register specific mapping definition for a specific type.
       #
@@ -148,7 +148,7 @@ module Elastomer
         response = client.put '/{index}/{type}/_mapping', update_params(params, :body => body, :type => type, :action => 'index.update_mapping')
         response.body
       end
-      alias :put_mapping :update_mapping
+      alias_method :put_mapping, :update_mapping
 
       # Delete the mapping identified by `type`. This deletes all documents of
       # that type from the index.
@@ -175,7 +175,7 @@ module Elastomer
         response = client.get '/{index}/_aliases', update_params(:action => 'index.get_aliases')
         response.body
       end
-      alias :aliases :get_aliases
+      alias_method :aliases, :get_aliases
 
       # Return the named aliases associated with this index.
       #

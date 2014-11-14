@@ -7,6 +7,7 @@
   - added an `exists?` method
   - added `termvector` and `multi_termvectors` methods
   - added a `search_shards` method
+  - added an `mget` alias for `multi_get`
 - Adding more documentation
 - Rename client.available? to client.ping (aliased as available?)
 

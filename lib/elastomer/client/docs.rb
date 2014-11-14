@@ -123,7 +123,7 @@ module Elastomer
         response = client.head '/{index}/{type}/{id}', update_params(params, :action => 'docs.exists')
         response.success?
       end
-      alias :exist? :exists?
+      alias_method :exist?, :exists?
 
       # Retrieve the document source from the index based on the ID and type.
       # The :id is provided as part of the params hash.
@@ -154,6 +154,7 @@ module Elastomer
         response = client.get '{/index}{/type}/_mget', update_params(params, overrides)
         response.body
       end
+      alias_method :mget, :multi_get
 
       # Update a document based on a script provided.
       #
@@ -286,9 +287,9 @@ module Elastomer
         response = client.get '/{index}/{type}/{id}/_termvector', update_params(params, :action => 'docs.termvector')
         response.body
       end
-      alias :termvectors :termvector
-      alias :term_vector :termvector
-      alias :term_vectors :termvector
+      alias_method :termvectors, :termvector
+      alias_method :term_vector, :termvector
+      alias_method :term_vectors, :termvector
 
       # Multi termvectors API allows  you to get multiple termvectors based on
       # an index, type and id. The response includes a docs array with all the
@@ -304,7 +305,7 @@ module Elastomer
         response = client.get '{/index}{/type}/_mtermvectors', update_params(params, :body => body, :action => 'docs.multi_termvectors')
         response.body
       end
-      alias :multi_term_vectors :multi_termvectors
+      alias_method :multi_term_vectors, :multi_termvectors
 
 =begin
 Percolate

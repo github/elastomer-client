@@ -28,7 +28,7 @@ describe Elastomer::Notifications do
   end
 
   it 'instruments cluster actions' do
-    $client.available?; assert_action_event('cluster.available')
+    $client.ping; assert_action_event('cluster.ping')
     $client.info; assert_action_event('cluster.info')
   end
 

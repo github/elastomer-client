@@ -40,12 +40,13 @@ module Elastomer
     attr_reader :read_timeout, :open_timeout
 
     # Returns true if the server is available; returns false otherwise.
-    def available?
-      response = head '/', :action => 'cluster.available'
+    def ping
+      response = head '/', :action => 'cluster.ping'
       response.success?
     rescue StandardError
       false
     end
+    alias_method :available?, :ping
 
     # Returns the version String of the attached ElasticSearch instance.
     def version

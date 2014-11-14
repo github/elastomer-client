@@ -1,4 +1,5 @@
 ## 0.5.0 (2014-11-07)
+- BREAKING: rename action.available notification to action.ping
 - Index Component
   - client.index no longer requires a name
 - Documents Component
@@ -7,6 +8,7 @@
   - added `termvector` and `multi_termvectors` methods
   - added a `search_shards` method
 - Adding more documentation
+- Rename client.available? to client.ping (aliased as available?)
 
 ## 0.4.1 (2014-10-14)
 - Support for index `_recovery` endpoint

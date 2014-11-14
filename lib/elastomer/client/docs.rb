@@ -154,6 +154,7 @@ module Elastomer
         response = client.get '{/index}{/type}/_mget', update_params(params, overrides)
         response.body
       end
+      alias_method :mget, :multi_get
 
       # Update a document based on a script provided.
       #

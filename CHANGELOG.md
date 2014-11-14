@@ -6,6 +6,7 @@
   - added an `exists?` method
   - added `termvector` and `multi_termvectors` methods
   - added a `search_shards` method
+  - added an `mget` alias for `multi_get`
 - Adding more documentation
 
 ## 0.4.1 (2014-10-14)

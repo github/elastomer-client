@@ -158,6 +158,27 @@ describe Elastomer::Client::Docs do
     refute_found h['docs'][3]
   end
 
+  it 'gets multiple documents from the search index with .mget' do
+    populate!
+
+    h = @docs.mget :docs => [
+      { :_id => 1, :_type => 'doc1' },
+      { :_id => 1, :_type => 'doc2' }
+    ]
+    authors = h['docs'].map { |d| d['_source']['author'] }
+    assert_equal %w[mojombo pea53], authors
+
+    h = @docs.mget({:ids => [2, 1]}, :type => 'doc1')
+    authors = h['docs'].map { |d| d['_source']['author'] }
+    assert_equal %w[defunkt mojombo], authors
+
+    h = @index.docs('doc1').mget :ids => [1, 2, 3, 4]
+    assert_found h['docs'][0]
+    assert_found h['docs'][1]
+    refute_found h['docs'][2]
+    refute_found h['docs'][3]
+  end
+
   it 'deletes documents from the search index' do
     populate!
     @docs = @index.docs('doc2')

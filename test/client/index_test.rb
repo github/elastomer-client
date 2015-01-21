@@ -199,7 +199,13 @@ describe Elastomer::Client::Index do
 
   it 'lists all aliases to the index' do
     @index.create(nil)
-    assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
+    response = @index.get_aliases
+
+    if es_version_always_returns_aliases?
+      assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
+    else
+      assert_equal({@name => {}}, @index.get_aliases)
+    end
 
     $client.cluster.update_aliases :add => {:index => @name, :alias => 'foofaloo'}
     assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)

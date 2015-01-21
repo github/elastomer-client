@@ -89,6 +89,15 @@ def es_version_1_x?
   $client.semantic_version >= '1.0.0'
 end
 
+# Elasticsearch 1.4 changed the response body for interacting with index
+# alaises. If an index does not contain any aliases, then an "alises" key is no
+# longer returned in the resopsne.
+#
+# Reeturns `true` if the response contains an "alises" key.
+def es_version_always_returns_aliases?
+  $client.semantic_version <= '1.4.0'
+end
+
 # Elasticsearch 1.2 removed support for gateway snapshots.
 #
 # Returns true if Elasticsearch version supports gateway snapshots.

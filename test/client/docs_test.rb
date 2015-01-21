@@ -43,7 +43,7 @@ describe Elastomer::Client::Docs do
           :author => 'pea53'
 
     assert_created h
-    assert_match %r/^\S{22}$/, h['_id']
+    assert_match %r/^\S{20,22}$/, h['_id']
 
     h = @docs.index \
           :_id    => nil,
@@ -52,7 +52,7 @@ describe Elastomer::Client::Docs do
           :author => 'grantr'
 
     assert_created h
-    assert_match %r/^\S{22}$/, h['_id']
+    assert_match %r/^\S{20,22}$/, h['_id']
 
     h = @docs.index \
           :_id    => '',
@@ -61,7 +61,7 @@ describe Elastomer::Client::Docs do
           :author => 'mojombo'
 
     assert_created h
-    assert_match %r/^\S{22}$/, h['_id']
+    assert_match %r/^\S{20,22}$/, h['_id']
   end
 
   it 'uses the provided document ID' do
@@ -89,7 +89,7 @@ describe Elastomer::Client::Docs do
           :type => 'doc2'
 
     assert_created h
-    assert_match %r/^\S{22}$/, h['_id']
+    assert_match %r/^\S{20,22}$/, h['_id']
   end
 
   it 'extracts underscore attributes from the document' do

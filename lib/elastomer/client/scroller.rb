@@ -196,7 +196,11 @@ module Elastomer
         each { |hits| hits['hits'].each(&block) }
       end
 
-      # Internal:
+      # Internal: Perform the actual scroll requests. This method wil call out
+      # to the `Client#start_scroll` and `Client#continue_scroll` methods while
+      # keeping track of the `scroll_id` internally.
+      #
+      # Returns the response body as a Hash.
       def do_scroll
         if scroll_id.nil?
           body = client.start_scroll(scroll_opts)
@@ -212,7 +216,8 @@ module Elastomer
         body
       end
 
-      # Internal:
+      # Internal: Returns the options Hash that should be passed to the initial
+      # `Client#start_scroll` method call.
       def scroll_opts
         hash = {
           :scroll => scroll,

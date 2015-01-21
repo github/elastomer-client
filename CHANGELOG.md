@@ -11,6 +11,7 @@
 - Adding more documentation
 - Rename client.available? to client.ping (aliased as available?)
 - Updating tests to pass with ES 1.4.X
+- Enabling regular scroll queries vi `Client#scroll`
 
 ## 0.4.1 (2014-10-14)
 - Support for index `_recovery` endpoint

@@ -199,7 +199,6 @@ describe Elastomer::Client::Index do
 
   it 'lists all aliases to the index' do
     @index.create(nil)
-    response = @index.get_aliases
 
     if es_version_always_returns_aliases?
       assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)

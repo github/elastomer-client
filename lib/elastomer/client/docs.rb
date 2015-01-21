@@ -415,8 +415,37 @@ Percolate
         client.bulk params, &block
       end
 
-      # Create a new Scan instance for scrolling all results from a `query`.
-      # The Scan will be scoped to the current index and document type.
+      # Create a new Scroller instance for scrolling all results from a `query`.
+      # The Scroller will be scoped to the current index and document type.
+      #
+      # query  - The query to scroll as a Hash or a JSON encoded String
+      # opts   - Options Hash
+      #   :index  - the name of the index to search
+      #   :type   - the document type to search
+      #   :scroll - the keep alive time of the scrolling request (5 minutes by default)
+      #   :size   - the number of documents per shard to fetch per scroll
+      #
+      # Examples
+      #
+      #   scroll = index.scroll('{"query":{"match_all":{}},"sort":{"date":"desc"}}')
+      #   scroll.each_document do |document|
+      #     document['_id']
+      #     document['_source']
+      #   end
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/scan-scroll.html
+      #
+      # Returns a new Scroller instance
+      def scroll( query, opts = {} )
+        opts = {:index => name, :type => type}.merge opts
+        client.scroll query, opts
+      end
+
+      # Create a new Scroller instance for scanning all results from a `query`.
+      # The Scroller will be scoped to the current index and document type. The
+      # Scroller is configured to use `scan` semantics which are more efficient
+      # than a standard scroll query; the caveat is that the returned documents
+      # cannot be sorted.
       #
       # query  - The query to scan as a Hash or a JSON encoded String
       # opts   - Options Hash
@@ -433,7 +462,7 @@ Percolate
       #     document['_source']
       #   end
       #
-      # Returns a new Scan instance
+      # Returns a new Scroller instance
       def scan( query, opts = {} )
         opts = {:index => name, :type => type}.merge opts
         client.scan query, opts

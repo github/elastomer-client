@@ -22,12 +22,12 @@ The event namespace is `request.client.elastomer`.
 
 ## Valid actions
 - bulk
-- cluster.available
 - cluster.get_aliases
 - cluster.get_settings
 - cluster.health
 - cluster.info
 - cluster.pending_tasks
+- cluster.ping
 - cluster.reroute
 - cluster.shutdown
 - cluster.state

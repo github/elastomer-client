@@ -1,6 +1,28 @@
 module Elastomer
   class Client
 
+    # Create a new Scroller instance for scrolling all results from a `query`.
+    #
+    # query  - The query to scroll as a Hash or a JSON encoded String
+    # opts   - Options Hash
+    #   :index  - the name of the index to search
+    #   :type   - the document type to search
+    #   :scroll - the keep alive time of the scrolling request (5 minutes by default)
+    #   :size   - the number of documents per shard to fetch per scroll
+    #
+    # Examples
+    #
+    #   scroll = client.scroll('{"query":{"match_all":{}}}', :index => 'test')
+    #   scroll.each_document do |document|
+    #     document['_id']
+    #     document['_source']
+    #   end
+    #
+    # Returns a new Scroller instance
+    def scroll( query, opts = {} )
+      Scroller.new(self, query, opts)
+    end
+
     # Create a new Scroller instance for scrolling all results from a `query`
     # via "scan" semantics.
     #
@@ -25,14 +47,30 @@ module Elastomer
       Scroller.new(self, query, opts)
     end
 
+    # Begin scrolling a query.
+    # See http://www.elasticsearch.org/guide/reference/api/search/scroll/
     #
+    # opts   - Options Hash
+    #   :query       - the query to scroll as a Hash or JSON encoded String
+    #   :index       - the name of the index to search
+    #   :type        - the document type to search
+    #   :scroll      - the keep alive time of the scrolling request (5 minutes by default)
+    #   :size        - the number of documents per shard to fetch per scroll
+    #   :search_type - set to 'scan' for scan semantics
     #
-    def scroll( query, opts = {} )
-      Scroller.new(self, query, opts)
-    end
-
+    # Examples
     #
+    #   h = client.start_scroll('{"query":{"match_all":{}},"sort":{"created":"desc"}}', :index => 'test')
+    #   scroll_id = h['_scroll_id']
+    #   h['hits']['hits'].each { |doc| ... }
     #
+    #   h = client.continue_scroll(scroll_id)
+    #   scroll_id = h['_scroll_id']
+    #   h['hits']['hits'].each { |doc| ... }
+    #
+    #   # repeat until there are no more hits
+    #
+    # Returns the response body as a Hash.
     def start_scroll( opts = {} )
       opts = opts.merge :action => 'search.start_scroll'
       response = get '{/index}{/type}/_search', opts
@@ -47,7 +85,7 @@ module Elastomer
     #
     # Examples
     #
-    #   scroll_id = client.start_scroll('{"query":{"match_all":{}}}', :index => 'test')['_scroll_id']
+    #   scroll_id = client.start_scroll('{"query":{"match_all":{}}}', :index => 'test', :search_type => 'scan')['_scroll_id']
     #
     #   h = client.continue_scroll scroll_id   # scroll to get the next set of results
     #   scroll_id = h['_scroll_id']            # and store the scroll_id to use later
@@ -62,7 +100,6 @@ module Elastomer
       response = get '/_search/scroll', :body => scroll_id, :scroll => scroll, :action => 'search.scroll'
       response.body
     end
-
 
     class Scroller
       # Create a new scroller that can be used to iterate over all the documents

@@ -427,8 +427,8 @@ Percolate
       #
       # Examples
       #
-      #   scan = index.scan('{"query":{"match_all":{}},"sort":{"date":"desc"}}')
-      #   scan.each_document do |document|
+      #   scroll = index.scroll('{"query":{"match_all":{}},"sort":{"date":"desc"}}')
+      #   scroll.each_document do |document|
       #     document['_id']
       #     document['_source']
       #   end

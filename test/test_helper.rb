@@ -99,6 +99,11 @@ def es_version_always_returns_aliases?
   $client.semantic_version >= '1.4.3'
 end
 
+# ElasticSearch 1.3 added the `search_shards` API endpoint.
+def es_version_supports_search_shards?
+  $client.semantic_version >= '1.3.0'
+end
+
 # Elasticsearch 1.2 removed support for gateway snapshots.
 #
 # Returns true if Elasticsearch version supports gateway snapshots.

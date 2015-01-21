@@ -33,6 +33,8 @@ $client = Elastomer::Client.new $client_params
 # ensure we have an ElasticSearch server to test with
 raise "No server available at #{$client.url}" unless $client.available?
 
+puts "Elasticsearch version is #{$client.version}"
+
 # remove any lingering test indices from the cluster
 MiniTest::Unit.after_tests do
   $client.cluster.indices.keys.each do |name|

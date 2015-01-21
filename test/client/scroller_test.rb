@@ -1,9 +1,9 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-describe Elastomer::Client::Scan do
+describe Elastomer::Client::Scroller do
 
   before do
-    @name  = 'elastomer-scan-test'
+    @name  = 'elastomer-scroller-test'
     @index = $client.index(@name)
 
     unless @index.exists?
@@ -14,14 +14,16 @@ describe Elastomer::Client::Scan do
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
               :message => { :type => 'string', :analyzer => 'standard' },
-              :author  => { :type => 'string', :index => 'not_analyzed' }
+              :author  => { :type => 'string', :index => 'not_analyzed' },
+              :sorter  => { :type => 'integer' }
             }
           },
           :book => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
               :title  => { :type => 'string', :analyzer => 'standard' },
-              :author => { :type => 'string', :index => 'not_analyzed' }
+              :author => { :type => 'string', :index => 'not_analyzed' },
+              :sorter  => { :type => 'integer' }
             }
           }
         }
@@ -29,6 +31,10 @@ describe Elastomer::Client::Scan do
       wait_for_index(@name)
       populate!
     end
+  end
+
+  after do
+    @index.delete if @index.exists?
   end
 
   it 'scans over all documents in an index' do
@@ -64,17 +70,30 @@ describe Elastomer::Client::Scan do
     assert_equal 1, counts['book']
   end
 
+  it 'scrolls and sorts over all documents' do
+    scroll = @index.scroll({
+      :query => {:match_all => {}},
+      :sort => {:sorter => {:order => :asc}}
+    }, :type => 'tweet')
+
+    tweets = []
+    scroll.each_document { |h| tweets << h['_id'].to_i }
+
+    expected = (0...50).to_a.reverse
+    assert_equal expected, tweets
+  end
+
   def populate!
     h = @index.bulk do |b|
       50.times { |num|
-        b.index %Q({"author":"pea53","message":"this is tweet number #{num}"}), :_id => num, :_type => 'tweet'
+        b.index %Q({"author":"pea53","message":"this is tweet number #{num}","sorter":#{50-num}}), :_id => num, :_type => 'tweet'
       }
     end
     h['items'].each {|item| assert_bulk_index(item) }
 
     h = @index.bulk do |b|
       25.times { |num|
-        b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}"}), :_id => num, :_type => 'book'
+        b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), :_id => num, :_type => 'book'
       }
     end
     h['items'].each {|item| assert_bulk_index(item) }

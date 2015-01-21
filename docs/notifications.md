@@ -84,8 +84,8 @@ The event namespace is `request.client.elastomer`.
 - repository.get
 - repository.status
 - repository.update
-- search.scan
 - search.scroll
+- search.start_scroll
 - snapshot.create
 - snapshot.delete
 - snapshot.exists

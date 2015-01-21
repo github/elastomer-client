@@ -194,7 +194,12 @@ describe Elastomer::Client::Index do
 
     response = @index.delete_mapping 'doco'
     assert_acknowledged response
-    assert @index.mapping == {} || @index.mapping[@name] == {}
+
+    mapping = @index.get_mapping
+    mapping = mapping[@name] if mapping.key? @name
+    mapping = mapping["mappings"] if mapping.key? "mappings"
+
+    assert_empty mapping, "no mappings are present"
   end
 
   it 'lists all aliases to the index' do

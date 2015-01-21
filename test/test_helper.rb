@@ -95,7 +95,7 @@ end
 #
 # Reeturns `true` if the response contains an "alises" key.
 def es_version_always_returns_aliases?
-  $client.semantic_version <= '1.4.0' &&
+  $client.semantic_version <= '1.4.0' ||
   $client.semantic_version >= '1.4.3'
 end
 

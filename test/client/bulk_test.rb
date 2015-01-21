@@ -91,7 +91,7 @@ describe Elastomer::Client::Bulk do
     assert_bulk_create h['items'].last
 
     book_id = items.last['create']['_id']
-    assert_match %r/^\S{22}$/, book_id
+    assert_match %r/^\S{20,22}$/, book_id
 
     @index.refresh
 
@@ -112,7 +112,7 @@ describe Elastomer::Client::Bulk do
     assert_bulk_delete h['items'].last, 'expected to delete a book'
 
     book_id2 = items.first['create']['_id']
-    assert_match %r/^\S{22}$/, book_id2
+    assert_match %r/^\S{20,22}$/, book_id2
 
     @index.refresh
 

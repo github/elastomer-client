@@ -194,12 +194,22 @@ describe Elastomer::Client::Index do
 
     response = @index.delete_mapping 'doco'
     assert_acknowledged response
-    assert @index.mapping == {} || @index.mapping[@name] == {}
+
+    mapping = @index.get_mapping
+    mapping = mapping[@name] if mapping.key? @name
+    mapping = mapping["mappings"] if mapping.key? "mappings"
+
+    assert_empty mapping, "no mappings are present"
   end
 
   it 'lists all aliases to the index' do
     @index.create(nil)
-    assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
+
+    if es_version_always_returns_aliases?
+      assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
+    else
+      assert_equal({@name => {}}, @index.get_aliases)
+    end
 
     $client.cluster.update_aliases :add => {:index => @name, :alias => 'foofaloo'}
     assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)

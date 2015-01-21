@@ -1,4 +1,4 @@
-## 0.5.0 (2014-11-07)
+## 0.5.0 (2015-01-21)
 - BREAKING: rename action.available notification to action.ping
 - Index Component
   - client.index no longer requires a name
@@ -10,6 +10,7 @@
   - added an `mget` alias for `multi_get`
 - Adding more documentation
 - Rename client.available? to client.ping (aliased as available?)
+- Updating tests to pass with ES 1.4.X
 
 ## 0.4.1 (2014-10-14)
 - Support for index `_recovery` endpoint

@@ -20,7 +20,7 @@ module Elastomer
   # The payload contains the following bits of information:
   #
   # * :index  - index name (if any)
-  # * :type   - documeht type (if any)
+  # * :type   - document type (if any)
   # * :action - the action being performed
   # * :url    - request URL
   # * :method - request method (:head, :get, :put, :post, :delete)
@@ -42,7 +42,7 @@ module Elastomer
     # The name to subscribe to for notifications
     NAME = 'request.client.elastomer'.freeze
 
-    # Internal: Execute the given block and provide instrumentaiton info to
+    # Internal: Execute the given block and provide instrumentation info to
     # subscribers. The name we use for subscriptions is
     # `request.client.elastomer` and a supplemental payload is provided with
     # more information about the specific ElasticSearch request.
@@ -55,18 +55,20 @@ module Elastomer
     # Returns the response from the block
     def instrument( path, body, params )
       payload = {
-        :index   => params[:index],
-        :type    => params[:type],
-        :action  => params[:action],
-        :context => params[:context],
-        :body    => body
+        :index        => params[:index],
+        :type         => params[:type],
+        :action       => params[:action],
+        :context      => params[:context],
+        :request_body => body,
+        :body         => body   # for backwards compatibility
       }
 
       ::Elastomer::Notifications.service.instrument(NAME, payload) do
         response = yield
-        payload[:url]    = response.env[:url]
-        payload[:method] = response.env[:method]
-        payload[:status] = response.status
+        payload[:url]           = response.env[:url]
+        payload[:method]        = response.env[:method]
+        payload[:status]        = response.status
+        payload[:response_body] = response.body
         response
       end
     end

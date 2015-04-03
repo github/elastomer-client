@@ -56,6 +56,22 @@ describe Elastomer::Notifications do
     @index.delete; assert_action_event('index.delete')
   end
 
+  it 'includes the response body in the payload' do
+    @index.create('number_of_replicas' => 0)
+    event = @events.detect { |e| e.payload[:action] == 'index.create' }
+    assert event.payload[:response_body]
+  end
+
+  it 'includes the request body in the payload' do
+    @index.create('number_of_replicas' => 0)
+    event = @events.detect { |e| e.payload[:action] == 'index.create' }
+
+    payload = event.payload
+    assert payload[:response_body]
+    assert payload[:request_body]
+    assert_same payload[:body], payload[:request_body]
+  end
+
   def assert_action_event(action)
     assert @events.detect { |e| e.payload[:action] == action }, "expected #{action} event"
   end

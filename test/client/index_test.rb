@@ -127,6 +127,10 @@ describe Elastomer::Client::Index do
   end
 
   it 'updates document mappings' do
+    if $client.semantic_version == '1.4.0'
+      skip "Update Mapping API is broken in ES 1.4.0: https://github.com/elastic/elasticsearch/pull/8426"
+    end
+
     @index.create(
       :mappings => {
         :doco => {
@@ -154,6 +158,10 @@ describe Elastomer::Client::Index do
   end
 
   it 'updates document mappings with .put_mapping' do
+    if $client.semantic_version == '1.4.0'
+      skip "Update Mapping API is broken in ES 1.4.0: https://github.com/elastic/elasticsearch/pull/8426"
+    end
+
     @index.create(
       :mappings => {
         :doco => {

@@ -113,6 +113,15 @@ def es_version_supports_gateway_snapshots?
   $client.semantic_version <= '1.2.0'
 end
 
+# Elasticsearch 1.4.0 had a bug in its handling of the Mapping API where it
+# would not accept an Update request if the index had been created with the
+# _all field set to disabled. This bug was fixed in 1.4.1.
+#
+# See: https://github.com/elastic/elasticsearch/pull/8426
+def es_version_supports_update_mapping_with__all_disabled?
+  $client.semantic_version != '1.4.0'
+end
+
 def create_repo(name, settings = {})
   default_settings = {:type => 'fs', :settings => {:location => ENV['SNAPSHOT_DIR']}}
   $client.repository(name).create(default_settings.merge(settings))

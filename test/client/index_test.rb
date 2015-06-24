@@ -127,6 +127,10 @@ describe Elastomer::Client::Index do
   end
 
   it 'updates document mappings' do
+    unless es_version_supports_update_mapping_with__all_disabled?
+      skip "Mapping Update API is broken in this ES version."
+    end
+
     @index.create(
       :mappings => {
         :doco => {
@@ -154,6 +158,10 @@ describe Elastomer::Client::Index do
   end
 
   it 'updates document mappings with .put_mapping' do
+    unless es_version_supports_update_mapping_with__all_disabled?
+      skip "Mapping Update API is broken in this ES version."
+    end
+
     @index.create(
       :mappings => {
         :doco => {

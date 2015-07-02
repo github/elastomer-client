@@ -187,6 +187,11 @@ module Elastomer
 
         # wrap Faraday errors with appropriate Elastomer::Client error classes
         rescue Faraday::Error::ClientError => boom
+          # reset connection on timeouts to avoid reading incorrect response on next request
+          if Faraday::Error::TimeoutError === boom
+            @connection = nil
+          end
+
           error_name = boom.class.name.split('::').last
           error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
           raise error_class.new(boom, method.upcase, path)

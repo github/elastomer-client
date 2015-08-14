@@ -84,6 +84,15 @@ module Elastomer
         response.body
       end
 
+      # Returns `true` if there items in the pending task list. Returns `false`
+      # if the pending task list is empty. Returns `nil` if the response body
+      # does not contain the "tasks" field.
+      def pending_tasks?
+        hash = pending_tasks
+        return nil unless hash.key? "tasks"
+        hash["tasks"].length > 0
+      end
+
       # Cluster wide settings that have been modified via the update API.
       #
       # params - Parameters Hash

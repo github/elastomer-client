@@ -1,3 +1,6 @@
+## 0.5.1 (2015-04-03)
+- Add response body to notification payload
+
 ## 0.5.0 (2015-01-21)
 - BREAKING: rename action.available notification to action.ping
 - Index Component

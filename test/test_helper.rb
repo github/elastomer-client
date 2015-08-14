@@ -90,12 +90,12 @@ def es_version_1_x?
 end
 
 # Elasticsearch 1.4 changed the response body for interacting with index
-# alaises. If an index does not contain any aliases, then an "alises" key is no
-# longer returned in the resopsne.
+# aliases. If an index does not contain any aliases, then an "aliases" key is no
+# longer returned in the response.
 #
-# Reeturns `true` if the response contains an "alises" key.
+# Returns `true` if the response contains an "aliases" key.
 def es_version_always_returns_aliases?
-  $client.semantic_version <= '1.4.0' ||
+  $client.semantic_version <  '1.4.0' ||
   $client.semantic_version >= '1.4.3'
 end
 
@@ -109,6 +109,15 @@ end
 # Returns true if Elasticsearch version supports gateway snapshots.
 def es_version_supports_gateway_snapshots?
   $client.semantic_version <= '1.2.0'
+end
+
+# Elasticsearch 1.4.0 had a bug in its handling of the Mapping API where it
+# would not accept an Update request if the index had been created with the
+# _all field set to disabled. This bug was fixed in 1.4.1.
+#
+# See: https://github.com/elastic/elasticsearch/pull/8426
+def es_version_supports_update_mapping_with__all_disabled?
+  $client.semantic_version != '1.4.0'
 end
 
 # Elasticsearch 1.6 requires the repo.path setting when creating

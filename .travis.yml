@@ -9,4 +9,7 @@ services:
 notifications:
   email: false
 
-sudo: false
+sudo: true
+
+before_install:
+    - curl -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.1.deb && sudo dpkg -i --force-confnew elasticsearch-1.7.1.deb

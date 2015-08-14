@@ -2,7 +2,7 @@ require File.expand_path('../../test_helper', __FILE__)
 
 describe Elastomer::Client::Repository do
 
-  if es_version_1_x?
+  if es_version_1_x? && run_snapshot_tests?
 
     before do
       @name = 'elastomer-repository-test'

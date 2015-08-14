@@ -2,7 +2,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 describe Elastomer::Client::Snapshot do
-  if es_version_1_x?
+  if es_version_1_x? && run_snapshot_tests?
     before do
       @index_name = 'elastomer-snapshot-test-index'
       @index = $client.index(@index_name)

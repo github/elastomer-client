@@ -11,8 +11,6 @@ if ENV['COVERAGE'] == 'true'
   end
 end
 
-ENV['SNAPSHOT_DIR'] ||= '/tmp/elastomer-client-snapshot-test'
-
 require 'minitest/spec'
 require 'minitest/autorun'
 
@@ -113,8 +111,31 @@ def es_version_supports_gateway_snapshots?
   $client.semantic_version <= '1.2.0'
 end
 
+# Elasticsearch 1.6 requires the repo.path setting when creating
+# FS repositories.
+def es_version_requires_repo_path?
+  $client.semantic_version >= '1.6.0'
+end
+
+def run_snapshot_tests?
+  unless defined? $run_snapshot_tests
+    begin
+      create_repo("elastomer-client-snapshot-test")
+      $run_snapshot_tests = true
+    rescue Elastomer::Client::Error => e
+      puts "Could not create a snapshot repo. Snapshot tests will be disabled."
+      puts "To enable snapshot tests, add a path.repo setting to your elasticsearch.yml file."
+      $run_snapshot_tests = false
+    ensure
+      delete_repo("elastomer-client-snapshot-test")
+    end
+  end
+  $run_snapshot_tests
+end
+
 def create_repo(name, settings = {})
-  default_settings = {:type => 'fs', :settings => {:location => ENV['SNAPSHOT_DIR']}}
+  location = File.join(*[ENV['SNAPSHOT_DIR'], name].compact)
+  default_settings = {:type => 'fs', :settings => {:location => location}}
   $client.repository(name).create(default_settings.merge(settings))
 end
 

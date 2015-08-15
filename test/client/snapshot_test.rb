@@ -2,15 +2,19 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 describe Elastomer::Client::Snapshot do
-  if es_version_1_x? && run_snapshot_tests?
+  if es_version_1_x?
     before do
+      if !run_snapshot_tests?
+        skip "To enable snapshot tests, add a path.repo setting to your elasticsearch.yml file."
+      end
+
       @index_name = 'elastomer-snapshot-test-index'
       @index = $client.index(@index_name)
       @name = 'elastomer-test'
     end
 
     after do
-      @index.delete if @index.exists?
+      @index.delete if @index && @index.exists?
     end
 
     it 'determines if a snapshot exists' do
@@ -99,7 +103,7 @@ describe Elastomer::Client::Snapshot do
       end
 
       after do
-        @restored_index.delete if @restored_index.exists?
+        @restored_index.delete if @restored_index && @restored_index.exists?
       end
 
       it 'restores snapshots with options' do

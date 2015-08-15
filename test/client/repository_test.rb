@@ -2,9 +2,13 @@ require File.expand_path('../../test_helper', __FILE__)
 
 describe Elastomer::Client::Repository do
 
-  if es_version_1_x? && run_snapshot_tests?
+  if es_version_1_x?
 
     before do
+      if !run_snapshot_tests?
+        skip "To enable snapshot tests, add a path.repo setting to your elasticsearch.yml file."
+      end
+
       @name = 'elastomer-repository-test'
       @repo = $client.repository(@name)
     end

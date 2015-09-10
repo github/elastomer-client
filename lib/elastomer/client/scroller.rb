@@ -101,6 +101,13 @@ module Elastomer
       response.body
     end
 
+    DEFAULT_OPTS = {
+      :index => nil,
+      :type => nil,
+      :scroll => '5m',
+      :size => 50,
+    }.freeze
+
     class Scroller
       # Create a new scroller that can be used to iterate over all the documents
       # returned by the `query`. The Scroller supports both the 'scan' and the
@@ -129,15 +136,7 @@ module Elastomer
       def initialize( client, query, opts = {} )
         @client = client
 
-        default_opts = {
-          :index => nil,
-          :type => nil,
-          :scroll => '5m',
-          :size => 50,
-          :body => query,
-        }
-
-        @opts = default_opts.merge opts
+        @opts = DEFAULT_OPTS.merge({ :body => query }).merge(opts)
 
         @scroll_id = nil
         @offset = 0

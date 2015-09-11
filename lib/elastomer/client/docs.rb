@@ -281,7 +281,7 @@ module Elastomer
 
         accumulate.call(bulk do |b|
           scan(query, params).each_document do |hit|
-            accumulate.call(b.delete(_id: hit["_id"]))
+            accumulate.call(b.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
           end
         end)
 

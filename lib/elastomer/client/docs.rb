@@ -269,8 +269,40 @@ module Elastomer
       def delete_by_query( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.delete '/{index}{/type}/_query', update_params(params, :body => query, :action => 'docs.delete_by_query')
-        response.body
+        responses = []
+        accumulate = lambda { |response| responses << response unless response == nil }
+
+        accumulate.call(bulk do |b|
+          scan(query, params).each_document do |hit|
+            accumulate.call(b.delete(_id: hit["_id"]))
+          end
+        end)
+
+        response_items = responses.flat_map { |r| r["items"].map { |i| i["delete"] } }
+
+        is_ok = lambda { |status| status.between?(200, 299) }
+
+        categorize = lambda do |items|
+          {
+            "found" => items.count { |i| i["found"] },
+            "deleted" => items.count { |i| is_ok.call(i["status"]) },
+            "missing" => items.count { |i| !i["found"] },
+            "failed" => items.count { |i| i["found"] && !is_ok.call(i["status"]) },
+          }
+        end
+
+        indices = response_items
+          .map { |i| { i["_index"] => [i.tap { |ip| ip.delete("_index") }] } }
+          .reduce({}) { |acc, i| acc.merge(i) { |_, old, new| old + new } }
+          .map { |index, items| [index, categorize.call(items)] }.to_h
+
+        indices_with_all = indices.merge({ "_all" => indices.values.reduce({}) { |acc, i| acc.merge(i) { |_, n, m| n + m } } })
+
+        {
+          "took" => responses.map { |r| r["took"] }.reduce(:+),
+          "_indices" => indices_with_all,
+          "failures" => response_items.select { |i| !is_ok.call(i["status"]) },
+        }
       end
 
       # Returns information and statistics on terms in the fields of a

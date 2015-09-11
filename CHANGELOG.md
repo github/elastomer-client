@@ -1,3 +1,7 @@
+## 0.6.0 (2015-09-11)
+- Support all URL parameters when using `Client.#scroll`
+- BREAKING: Moved some `Scroller` reader methods into `Scroller.opts`
+
 ## 0.5.1 (2015-04-03)
 - Add response body to notification payload
 

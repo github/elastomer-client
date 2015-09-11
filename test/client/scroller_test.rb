@@ -83,6 +83,16 @@ describe Elastomer::Client::Scroller do
     assert_equal expected, tweets
   end
 
+  it 'propagates URL query strings' do
+    scan = @index.scan(nil, { :q => 'author:pea53 || title:17' })
+
+    counts = {'tweet' => 0, 'book' => 0}
+    scan.each_document { |h| counts[h['_type']] += 1 }
+
+    assert_equal 50, counts['tweet']
+    assert_equal 1, counts['book']
+  end
+
   def populate!
     h = @index.bulk do |b|
       50.times { |num|

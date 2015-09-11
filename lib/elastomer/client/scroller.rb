@@ -101,6 +101,13 @@ module Elastomer
       response.body
     end
 
+    DEFAULT_OPTS = {
+      :index => nil,
+      :type => nil,
+      :scroll => '5m',
+      :size => 50,
+    }.freeze
+
     class Scroller
       # Create a new scroller that can be used to iterate over all the documents
       # returned by the `query`. The Scroller supports both the 'scan' and the
@@ -128,19 +135,14 @@ module Elastomer
       #
       def initialize( client, query, opts = {} )
         @client = client
-        @query  = query
 
-        @index       = opts.fetch(:index, nil)
-        @type        = opts.fetch(:type, nil)
-        @scroll      = opts.fetch(:scroll, '5m')
-        @size        = opts.fetch(:size, 50)
-        @search_type = opts.fetch(:search_type, nil)
+        @opts = DEFAULT_OPTS.merge({ :body => query }).merge(opts)
 
         @scroll_id = nil
         @offset = 0
       end
 
-      attr_reader :client, :query, :index, :type, :scroll, :size, :search_type, :scroll_id
+      attr_reader :client, :query, :scroll_id
 
       # Iterate over all the search results from the scan query.
       #
@@ -203,31 +205,17 @@ module Elastomer
       # Returns the response body as a Hash.
       def do_scroll
         if scroll_id.nil?
-          body = client.start_scroll(scroll_opts)
+          body = client.start_scroll(@opts)
           if body['hits']['hits'].empty?
             @scroll_id = body['_scroll_id']
             return do_scroll
           end
         else
-          body = client.continue_scroll(scroll_id, scroll)
+          body = client.continue_scroll(scroll_id, @opts[:scroll])
         end
 
         @scroll_id = body['_scroll_id']
         body
-      end
-
-      # Internal: Returns the options Hash that should be passed to the initial
-      # `Client#start_scroll` method call.
-      def scroll_opts
-        hash = {
-          :scroll => scroll,
-          :size   => size,
-          :index  => index,
-          :type   => type,
-          :body   => query
-        }
-        hash[:search_type] = search_type unless search_type.nil?
-        hash
       end
 
     end  # Scroller

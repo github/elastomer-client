@@ -279,7 +279,7 @@ module Elastomer
         responses = []
         accumulate = lambda { |response| responses << response unless response == nil }
 
-        accumulate.call(bulk do |b|
+        accumulate.call(bulk(params) do |b|
           scan(query, params).each_document do |hit|
             accumulate.call(b.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
           end

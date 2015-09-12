@@ -1,3 +1,6 @@
+require 'webmock'
+WebMock.allow_net_connect!
+
 require 'securerandom'
 require 'rubygems' unless defined? Gem
 require 'bundler'

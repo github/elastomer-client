@@ -279,12 +279,17 @@ module Elastomer
         responses = []
         accumulate = lambda { |response| responses << response unless response == nil }
 
+        # accumulate is called both inside and outside the bulk block in order
+        # to capture bulk responses returned from calls to `delete` and the call
+        # to `bulk`
         accumulate.call(bulk(params) do |b|
           scan(query, params).each_document do |hit|
             accumulate.call(b.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
           end
         end)
 
+        # collects the array of responses containing arrays of delete action
+        # hashes into an array
         response_items = responses.flat_map { |r| r["items"].map { |i| i["delete"] } }
 
         is_ok = lambda { |status| status.between?(200, 299) }
@@ -299,7 +304,7 @@ module Elastomer
         end
 
         indices = Hash[response_items
-          .group_by { |i| i["_index"] }
+          .group_by { |i| i["_index"] } # indexes the delete hashes by index name
           .map { |index, items| [index, categorize.call(items)] }]
 
         indices_with_all = indices.merge({ "_all" => indices.values.reduce({}) { |acc, i| acc.merge(i) { |_, n, m| n + m } } })

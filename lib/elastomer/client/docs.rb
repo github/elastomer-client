@@ -299,8 +299,7 @@ module Elastomer
         end
 
         indices = Hash[response_items
-          .map { |i| { i["_index"] => [i.tap { |ip| ip.delete("_index") }] } }
-          .reduce({}) { |acc, i| acc.merge(i) { |_, old, new| old + new } }
+          .group_by { |i| i["_index"] }
           .map { |index, items| [index, categorize.call(items)] }]
 
         indices_with_all = indices.merge({ "_all" => indices.values.reduce({}) { |acc, i| acc.merge(i) { |_, n, m| n + m } } })

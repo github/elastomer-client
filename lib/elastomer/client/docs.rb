@@ -276,44 +276,7 @@ module Elastomer
       def delete_by_query( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        responses = []
-        accumulate = lambda { |response| responses << response unless response == nil }
-
-        # accumulate is called both inside and outside the bulk block in order
-        # to capture bulk responses returned from calls to `delete` and the call
-        # to `bulk`
-        accumulate.call(bulk(params) do |b|
-          scan(query, params).each_document do |hit|
-            accumulate.call(b.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
-          end
-        end)
-
-        # collects the array of responses containing arrays of delete action
-        # hashes into an array
-        response_items = responses.flat_map { |r| r["items"].map { |i| i["delete"] } }
-
-        is_ok = lambda { |status| status.between?(200, 299) }
-
-        categorize = lambda do |items|
-          {
-            "found" => items.count { |i| i["found"] },
-            "deleted" => items.count { |i| is_ok.call(i["status"]) },
-            "missing" => items.count { |i| !i["found"] },
-            "failed" => items.count { |i| i["found"] && !is_ok.call(i["status"]) },
-          }
-        end
-
-        indices = Hash[response_items
-          .group_by { |i| i["_index"] } # indexes the delete hashes by index name
-          .map { |index, items| [index, categorize.call(items)] }]
-
-        indices_with_all = indices.merge({ "_all" => indices.values.reduce({}) { |acc, i| acc.merge(i) { |_, n, m| n + m } } })
-
-        {
-          "took" => responses.map { |r| r["took"] }.reduce(:+),
-          "_indices" => indices_with_all,
-          "failures" => response_items.select { |i| !is_ok.call(i["status"]) },
-        }
+        DeleteByQuery.new(self, query, params).execute()
       end
 
       # Returns information and statistics on terms in the fields of a

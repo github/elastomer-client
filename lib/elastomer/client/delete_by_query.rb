@@ -29,6 +29,27 @@ module Elastomer
         @responses << response unless response == nil
       end
 
+      # Perform bulk indexing and/or delete operations. The current index name
+      # and document type will be passed to the bulk API call as part of the
+      # request parameters.
+      #
+      # params - Parameters Hash that will be passed to the bulk API call.
+      # block  - Required block that is used to accumulate bulk API operations.
+      #          All the operations will be passed to the search cluster via a
+      #          single API request.
+      #
+      # Yields a Bulk instance for building bulk API call bodies.
+      #
+      # Examples
+      #
+      #   docs.bulk do |b|
+      #     b.index( document1 )
+      #     b.index( document2 )
+      #     b.delete( document3 )
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
       def execute()
         # accumulate is called both inside and outside the bulk block in order
         # to capture bulk responses returned from calls to `delete` and the call

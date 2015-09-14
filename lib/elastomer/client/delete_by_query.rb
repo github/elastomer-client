@@ -57,11 +57,11 @@ module Elastomer
         unless response.nil?
           @response_stats['took'] += response['took']
 
-          response['items'].each do |i|
-            i = i['delete']
-            (@response_stats['_indices'][i['_index']] ||= {}).merge!(categorize(i)) { |_, n, m| n + m }
-            @response_stats['_indices']['_all'].merge!(categorize(i)) { |_, n, m| n + m }
-            @response_stats['failures'] << i unless is_ok? i['status']
+          response['items'].each do |item|
+            item = item['delete']
+            (@response_stats['_indices'][item['_index']] ||= {}).merge!(categorize(item)) { |_, n, m| n + m }
+            @response_stats['_indices']['_all'].merge!(categorize(item)) { |_, n, m| n + m }
+            @response_stats['failures'] << item unless is_ok? item['status']
           end
         end
       end
@@ -70,9 +70,9 @@ module Elastomer
         # accumulate is called both inside and outside the bulk block in order
         # to capture bulk responses returned from calls to `delete` and the call
         # to `bulk`
-        accumulate(@client.bulk(@params) do |b|
+        accumulate(@client.bulk(@params) do |bulk|
           @client.scan(@query, @params).each_document do |hit|
-            accumulate(b.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
+            accumulate(bulk.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
           end
         end)
 

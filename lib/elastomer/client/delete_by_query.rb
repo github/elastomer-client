@@ -54,7 +54,7 @@ module Elastomer
       end
 
       def accumulate(response)
-        unless response == nil
+        unless response.nil?
           @response_stats['took'] += response['took']
 
           response['items'].map { |i| i['delete'] }.each do |i|

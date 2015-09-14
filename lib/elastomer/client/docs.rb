@@ -275,8 +275,9 @@ module Elastomer
       # Returns a Hash of statistics about the delete operations
       def delete_by_query( query, params = nil )
         query, params = extract_params(query) if params.nil?
+        params = { :index => @name, :type => @type }.merge params
 
-        DeleteByQuery.new(self, query, params).execute()
+        DeleteByQuery.new(@client, query, params).execute()
       end
 
       # Returns information and statistics on terms in the fields of a

@@ -3,14 +3,14 @@ module Elastomer
 
     class DeleteByQuery
 
-      def initialize( docs, query, params = nil )
-        @docs      = docs
+      def initialize( client, query, params = nil )
+        @client    = client
         @query     = query
         @params    = params
         @responses = []
       end
 
-      attr_reader :docs, :query, :params, :responses
+      attr_reader :client, :query, :params, :responses
 
       def is_ok( status )
         status.between?(200, 299)
@@ -33,8 +33,8 @@ module Elastomer
         # accumulate is called both inside and outside the bulk block in order
         # to capture bulk responses returned from calls to `delete` and the call
         # to `bulk`
-        accumulate(@docs.bulk(@params) do |b|
-          @docs.scan(@query, @params).each_document do |hit|
+        accumulate(@client.bulk(@params) do |b|
+          @client.scan(@query, @params).each_document do |hit|
             accumulate(b.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
           end
         end)

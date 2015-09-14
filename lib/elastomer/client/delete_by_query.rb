@@ -4,29 +4,37 @@ module Elastomer
     class DeleteByQuery
 
       def initialize( client, query, params = nil )
-        @client    = client
-        @query     = query
-        @params    = params
-        @responses = []
+        @client = client
+        @query = query
+        @params = params
+        @response_stats = { 'took' => 0, '_indices' => { '_all' => {} }, 'failures' => [] }
       end
 
-      attr_reader :client, :query, :params, :responses
+      attr_reader :client, :query, :params, :response_stats
 
       def is_ok( status )
         status.between?(200, 299)
       end
 
-      def categorize( items )
+      def categorize( item )
         {
-          "found" => items.count { |i| i["found"] },
-          "deleted" => items.count { |i| is_ok(i["status"]) },
-          "missing" => items.count { |i| !i["found"] },
-          "failed" => items.count { |i| i["found"] && !is_ok(i["status"]) },
+          "found" => item["found"] ? 1 : 0,
+          "deleted" => is_ok(item["status"]) ? 1 : 0,
+          "missing" => !item["found"] ? 1 : 0,
+          "failed" => item["found"] && !is_ok(item["status"]) ? 1 : 0,
         }
       end
 
       def accumulate( response )
-        @responses << response unless response == nil
+        unless response == nil
+          @response_stats['took'] += response['took']
+
+          response['items'].map { |i| i['delete'] }.each do |i|
+            (@response_stats['_indices'][i['_index']] ||= {}).merge!(categorize(i)) { |_, n, m| n + m }
+            @response_stats['_indices']['_all'].merge!(categorize(i)) { |_, n, m| n + m }
+            @response_stats['failures'] << i unless is_ok i['status']
+          end
+        end
       end
 
       # Delete documents from one or more indices and one or more types based
@@ -66,21 +74,7 @@ module Elastomer
           end
         end)
 
-        # collects the array of responses containing arrays of delete action
-        # hashes into an array
-        response_items = @responses.flat_map { |r| r["items"].map { |i| i["delete"] } }
-
-        indices = Hash[response_items
-          .group_by { |i| i["_index"] } # indexes the delete hashes by index name
-          .map { |index, items| [index, categorize(items)] }]
-
-        indices_with_all = indices.merge({ "_all" => indices.values.reduce({}) { |acc, i| acc.merge(i) { |_, n, m| n + m } } })
-
-        {
-          "took" => @responses.map { |r| r["took"] }.reduce(:+),
-          "_indices" => indices_with_all,
-          "failures" => response_items.select { |i| !is_ok(i["status"]) },
-        }
+        @response_stats
       end
 
     end  # DeleteByQuery

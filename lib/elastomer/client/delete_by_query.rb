@@ -24,7 +24,26 @@ module Elastomer
     #
     # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
     #
-    # Returns a Hash of statistics about the delete operations
+    # Returns a Hash of statistics about the delete operations, for example:
+    #
+    #   {
+    #     "took" : 639,
+    #     "_indices" : {
+    #       "_all" : {
+    #         "found" : 5901,
+    #         "deleted" : 5901,
+    #         "missing" : 0,
+    #         "failed" : 0
+    #       },
+    #       "twitter" : {
+    #         "found" : 5901,
+    #         "deleted" : 5901,
+    #         "missing" : 0,
+    #         "failed" : 0
+    #       }
+    #     },
+    #     "failures" : [ ]
+    #   }
     def delete_by_query(query, params = {})
       DeleteByQuery.new(self, query, params).execute
     end

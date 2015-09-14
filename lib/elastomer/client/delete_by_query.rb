@@ -4,7 +4,7 @@ module Elastomer
     class DeleteByQuery
 
       def initialize( docs, query, params = nil )
-        @docs    = docs
+        @docs      = docs
         @query     = query
         @params    = params
         @responses = []
@@ -16,7 +16,7 @@ module Elastomer
         status.between?(200, 299)
       end
 
-      def categorize ( items )
+      def categorize( items )
         {
           "found" => items.count { |i| i["found"] },
           "deleted" => items.count { |i| is_ok(i["status"]) },

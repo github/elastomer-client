@@ -12,16 +12,16 @@ module Elastomer
 
       attr_reader :client, :query, :params, :response_stats
 
-      def is_ok( status )
+      def is_ok?( status )
         status.between?(200, 299)
       end
 
       def categorize( item )
         {
           "found" => item["found"] ? 1 : 0,
-          "deleted" => is_ok(item["status"]) ? 1 : 0,
+          "deleted" => is_ok?(item["status"]) ? 1 : 0,
           "missing" => !item["found"] ? 1 : 0,
-          "failed" => item["found"] && !is_ok(item["status"]) ? 1 : 0,
+          "failed" => item["found"] && !is_ok?(item["status"]) ? 1 : 0,
         }
       end
 
@@ -32,7 +32,7 @@ module Elastomer
           response['items'].map { |i| i['delete'] }.each do |i|
             (@response_stats['_indices'][i['_index']] ||= {}).merge!(categorize(i)) { |_, n, m| n + m }
             @response_stats['_indices']['_all'].merge!(categorize(i)) { |_, n, m| n + m }
-            @response_stats['failures'] << i unless is_ok i['status']
+            @response_stats['failures'] << i unless is_ok? i['status']
           end
         end
       end

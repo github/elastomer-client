@@ -29,27 +29,33 @@ module Elastomer
         @responses << response unless response == nil
       end
 
-      # Perform bulk indexing and/or delete operations. The current index name
-      # and document type will be passed to the bulk API call as part of the
-      # request parameters.
+      # Delete documents from one or more indices and one or more types based
+      # on a query. This method supports both the "request body" query and the
+      # "URI request" query. When using the request body semantics, the query
+      # hash must contain the :query key. Otherwise we assume a URI request is
+      # being made.
       #
-      # params - Parameters Hash that will be passed to the bulk API call.
-      # block  - Required block that is used to accumulate bulk API operations.
-      #          All the operations will be passed to the search cluster via a
-      #          single API request.
+      # The return value follows the format returned by the Elasticsearch Delete
+      # by Query plugin: https://github.com/elastic/elasticsearch/blob/master/docs/plugins/delete-by-query.asciidoc#response-body
       #
-      # Yields a Bulk instance for building bulk API call bodies.
+      # Internally, this method uses a combination of scroll and bulk delete
+      # instead of the Delete by Query API, which was removed in Elasticsearch
+      # 2.0.
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
       #
       # Examples
       #
-      #   docs.bulk do |b|
-      #     b.index( document1 )
-      #     b.index( document2 )
-      #     b.delete( document3 )
-      #     ...
-      #   end
+      #   # request body query
+      #   delete_by_query({:query => {:match_all => {}}}, :type => 'tweet')
       #
-      # Returns the response body as a Hash
+      #   # same thing but using the URI request method
+      #   delete_by_query(:q => '*:*', :type => 'tweet')
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
+      #
+      # Returns a Hash of statistics about the delete operations
       def execute()
         # accumulate is called both inside and outside the bulk block in order
         # to capture bulk responses returned from calls to `delete` and the call

@@ -57,7 +57,8 @@ module Elastomer
         unless response.nil?
           @response_stats['took'] += response['took']
 
-          response['items'].map { |i| i['delete'] }.each do |i|
+          response['items'].each do |i|
+            i = i['delete']
             (@response_stats['_indices'][i['_index']] ||= {}).merge!(categorize(i)) { |_, n, m| n + m }
             @response_stats['_indices']['_all'].merge!(categorize(i)) { |_, n, m| n + m }
             @response_stats['failures'] << i unless is_ok? i['status']

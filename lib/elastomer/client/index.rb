@@ -523,6 +523,34 @@ module Elastomer
         client.warmer(name, warmer_name)
       end
 
+      # Delete documents from one or more indices and one or more types based
+      # on a query.
+      #
+      # The return value follows the format returned by the Elasticsearch Delete
+      # by Query plugin: https://github.com/elastic/elasticsearch/blob/master/docs/plugins/delete-by-query.asciidoc#response-body
+      #
+      # Internally, this method uses a combination of scroll and bulk delete
+      # instead of the Delete by Query API, which was removed in Elasticsearch
+      # 2.0.
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # Examples
+      #
+      #   # request body query
+      #   delete_by_query({:query => {:match_all => {}}}, :type => 'tweet')
+      #
+      #   # same thing but using the URI request method
+      #   delete_by_query(:q => '*:*', :type => 'tweet')
+      #
+      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
+      #
+      # Returns a Hash of statistics about the delete operations
+      def delete_by_query(query, params = nil)
+        docs.delete_by_query(query, params)
+      end
+
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.
       #

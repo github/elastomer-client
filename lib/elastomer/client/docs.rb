@@ -273,7 +273,7 @@ module Elastomer
       # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
       #
       # Returns a Hash of statistics about the delete operations
-      def delete_by_query( query, params = nil )
+      def delete_by_query(query, params = nil)
         query, params = extract_params(query) if params.nil?
         params = { :index => @name, :type => @type }.merge params
 

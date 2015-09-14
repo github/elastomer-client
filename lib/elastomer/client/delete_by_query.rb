@@ -3,7 +3,7 @@ module Elastomer
 
     class DeleteByQuery
 
-      def initialize( client, query, params = nil )
+      def initialize(client, query, params = nil)
         @client = client
         @query = query
         @params = params
@@ -12,11 +12,11 @@ module Elastomer
 
       attr_reader :client, :query, :params, :response_stats
 
-      def is_ok?( status )
+      def is_ok?(status)
         status.between?(200, 299)
       end
 
-      def categorize( item )
+      def categorize(item)
         {
           "found" => item["found"] ? 1 : 0,
           "deleted" => is_ok?(item["status"]) ? 1 : 0,
@@ -25,7 +25,7 @@ module Elastomer
         }
       end
 
-      def accumulate( response )
+      def accumulate(response)
         unless response == nil
           @response_stats['took'] += response['took']
 

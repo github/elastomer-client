@@ -276,7 +276,7 @@ module Elastomer
       def delete_by_query(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        @client.delete_by_query(query, update_params(params, { :index => @name, :type => @type }))
+        @client.delete_by_query(query, update_params(params))
       end
 
       # Returns information and statistics on terms in the fields of a

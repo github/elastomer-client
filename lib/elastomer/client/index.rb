@@ -523,6 +523,16 @@ module Elastomer
         client.warmer(name, warmer_name)
       end
 
+      # Delete documents from one or more indices and one or more types based
+      # on a query.
+      #
+      # See Client#delete_by_query for more information.
+      #
+      # Returns a Hash of statistics about the delete operations
+      def delete_by_query(query, params = nil)
+        docs.delete_by_query(query, params)
+      end
+
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.
       #

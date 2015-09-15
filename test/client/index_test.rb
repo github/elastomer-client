@@ -362,5 +362,25 @@ describe Elastomer::Client::Index do
       response = @index.segments
       assert_includes response["indices"], "elastomer-index-test"
     end
+
+    it 'deletes by query' do
+      @index.docs('foo').index("foo" => "bar")
+      @index.refresh
+      r = @index.delete_by_query(:q => '*')
+      assert_equal({
+        '_all' => {
+          'found' => 1,
+          'deleted' => 1,
+          'missing' => 0,
+          'failed' => 0,
+        },
+        @name => {
+          'found' => 1,
+          'deleted' => 1,
+          'missing' => 0,
+          'failed' => 0,
+        }
+      }, r['_indices'])
+    end
   end
 end

@@ -109,7 +109,7 @@ module Elastomer
       # Perform the Delete by Query action
       #
       # Returns a Hash of statistics about the bulk operation
-      def execute()
+      def execute
         # accumulate is called both inside and outside the bulk block in order
         # to capture bulk responses returned from calls to `delete` and the call
         # to `bulk`

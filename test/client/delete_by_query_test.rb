@@ -58,6 +58,25 @@ describe Elastomer::Client::DeleteByQuery do
       response = $client.delete_by_query(nil, :action_count => 1)
 
       assert_equal(2, count)
+      assert_equal({
+        '_all' => {
+          'found' => 2,
+          'deleted' => 2,
+          'missing' => 0,
+          'failed' => 0,
+        },
+        @index.name => {
+          'found' => 2,
+          'deleted' => 2,
+          'missing' => 0,
+          'failed' => 0,
+        },
+      }, response['_indices'])
+
+      @index.refresh
+      response = @docs.multi_get :ids => [0, 1]
+      refute_found response['docs'][0]
+      refute_found response['docs'][1]
     end
 
     it 'counts missing documents' do

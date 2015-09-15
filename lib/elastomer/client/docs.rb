@@ -252,25 +252,7 @@ module Elastomer
       # hash must contain the :query key. Otherwise we assume a URI request is
       # being made.
       #
-      # The return value follows the format returned by the Elasticsearch Delete
-      # by Query plugin: https://github.com/elastic/elasticsearch/blob/master/docs/plugins/delete-by-query.asciidoc#response-body
-      #
-      # Internally, this method uses a combination of scroll and bulk delete
-      # instead of the Delete by Query API, which was removed in Elasticsearch
-      # 2.0.
-      #
-      # query  - The query body as a Hash
-      # params - Parameters Hash
-      #
-      # Examples
-      #
-      #   # request body query
-      #   delete_by_query({:query => {:match_all => {}}}, :type => 'tweet')
-      #
-      #   # same thing but using the URI request method
-      #   delete_by_query(:q => '*:*', :type => 'tweet')
-      #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
+      # See Client#delete_by_query for more information.
       #
       # Returns a Hash of statistics about the delete operations
       def delete_by_query(query, params = nil)

@@ -83,10 +83,10 @@ module Elastomer
       # Returns a Hash of counts for each category
       def categorize(item)
         {
-          "found" => item["found"] ? 1 : 0,
+          "found" => item["found"] || item["status"] == 409 ? 1 : 0,
           "deleted" => is_ok?(item["status"]) ? 1 : 0,
-          "missing" => !item["found"] ? 1 : 0,
-          "failed" => item["found"] && !is_ok?(item["status"]) ? 1 : 0,
+          "missing" => !item["found"]  && !item.key?("error") ? 1 : 0,
+          "failed" => item.key?("error") ? 1 : 0,
         }
       end
 

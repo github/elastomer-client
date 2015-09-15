@@ -1,4 +1,4 @@
-require 'webmock'
+require 'webmock/minitest'
 WebMock.allow_net_connect!
 
 require 'securerandom'

@@ -16,14 +16,13 @@ describe Elastomer::Client::DeleteByQuery do
     before do
       @index.create(nil)
       wait_for_index(@index_name)
-
-      @docs.index({ :_id => 0, :name => "mittens" })
-      @docs.index({ :_id => 1, :name => "luna" })
-
-      @index.refresh
     end
 
     it 'deletes by query' do
+      @docs.index({ :_id => 0, :name => "mittens" })
+      @docs.index({ :_id => 1, :name => "luna" })
+      @index.refresh
+
       response = $client.delete_by_query(nil, :q => "name:mittens")
       assert_equal({
         '_all' => {
@@ -47,6 +46,10 @@ describe Elastomer::Client::DeleteByQuery do
     end
 
     it 'respects action_count' do
+      @docs.index({ :_id => 0, :name => "mittens" })
+      @docs.index({ :_id => 1, :name => "luna" })
+      @index.refresh
+
       count = 0
       WebMock.after_request do |request, _|
         count += 1 if request.uri.path =~ /_bulk$/
@@ -55,6 +58,81 @@ describe Elastomer::Client::DeleteByQuery do
       response = $client.delete_by_query(nil, :action_count => 1)
 
       assert_equal(2, count)
+    end
+
+    it 'counts missing documents' do
+      @docs.index({ :_id => 0 })
+      @index.refresh
+
+      stub_request(:post, /_bulk/).
+        to_return(lambda do |request|
+          {
+            :body => MultiJson.dump({
+              "took" => 0,
+              "errors" => false,
+              "items" => [{
+                "delete" => {
+                  "_index" => @index.name,
+                  "_type" => @docs.name,
+                  "_id" => 0,
+                  "_version" => 1,
+                  "status" => 404,
+                  "found" => false } }] }) }
+        end)
+
+      @index.refresh
+      response = $client.delete_by_query(nil, :action_count => 1)
+      assert_equal({
+        '_all' => {
+          'found' => 0,
+          'deleted' => 0,
+          'missing' => 1,
+          'failed' => 0,
+        },
+        @index.name => {
+          'found' => 0,
+          'deleted' => 0,
+          'missing' => 1,
+          'failed' => 0,
+        },
+      }, response['_indices'])
+    end
+
+    it 'counts failed operations' do
+      @docs.index({ :_id => 0 })
+      @index.refresh
+
+      stub_request(:post, /_bulk/).
+        to_return(lambda do |request|
+          {
+            :body => MultiJson.dump({
+              "took" => 0,
+              "errors" => false,
+              "items" => [{
+                "delete" => {
+                  "_index" => @index.name,
+                  "_type" => @docs.name,
+                  "_id" => 0,
+                  "status" => 409,
+                  "error" => "VersionConflictEngineException" } }] }) }
+        end)
+
+      @index.refresh
+      response = $client.delete_by_query(nil, :action_count => 1)
+      assert_equal({
+        '_all' => {
+          'found' => 1,
+          'deleted' => 0,
+          'missing' => 0,
+          'failed' => 1,
+        },
+        @index.name => {
+          'found' => 1,
+          'deleted' => 0,
+          'missing' => 0,
+          'failed' => 1,
+        },
+      }, response['_indices'])
     end
   end
 end

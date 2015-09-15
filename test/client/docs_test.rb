@@ -254,19 +254,6 @@ describe Elastomer::Client::Docs do
     end
   end
 
-  it 'deletes documents by query and respects action_count' do
-    count = 0
-    WebMock.after_request do |request, _|
-      count += 1 if request.uri.path =~ /_bulk$/
-    end
-
-    populate!
-
-    response = @index.docs('doc2').delete_by_query(:action_count => 1)
-
-    assert_equal(2, count)
-  end
-
   it 'searches for documents' do
     h = @docs.search :q => '*:*'
     assert_equal 0, h['hits']['total']

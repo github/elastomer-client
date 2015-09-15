@@ -50,14 +50,10 @@ describe Elastomer::Client::DeleteByQuery do
       @docs.index({ :_id => 1, :name => "luna" })
       @index.refresh
 
-      count = 0
-      WebMock.after_request do |request, _|
-        count += 1 if request.uri.path =~ /_bulk$/
-      end
-
       response = $client.delete_by_query(nil, :action_count => 1)
 
-      assert_equal(2, count)
+      assert_requested(:post, /_bulk/, :times => 2)
+
       assert_equal({
         '_all' => {
           'found' => 2,

@@ -21,8 +21,8 @@ describe Elastomer::Client::DeleteByQuery do
     it 'deletes by query' do
       @docs.index({ :_id => 0, :name => "mittens" })
       @docs.index({ :_id => 1, :name => "luna" })
-      @index.refresh
 
+      @index.refresh
       response = $client.delete_by_query(nil, :q => "name:mittens")
       assert_equal({
         '_all' => {
@@ -62,7 +62,6 @@ describe Elastomer::Client::DeleteByQuery do
 
     it 'counts missing documents' do
       @docs.index({ :_id => 0 })
-      @index.refresh
 
       stub_request(:post, /_bulk/).
         to_return(lambda do |request|
@@ -100,7 +99,6 @@ describe Elastomer::Client::DeleteByQuery do
 
     it 'counts failed operations' do
       @docs.index({ :_id => 0 })
-      @index.refresh
 
       stub_request(:post, /_bulk/).
         to_return(lambda do |request|

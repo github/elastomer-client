@@ -156,7 +156,7 @@ module Elastomer
       end
 
       # Add an update action to the list of bulk actions to be performed when
-      # the bulk API call is made. Parameters can be provided in the parameters 
+      # the bulk API call is made. Parameters can be provided in the parameters
       # hash (underscore prefix optional) or in the document hash (underscore
       # prefix required).
       #
@@ -178,7 +178,7 @@ module Elastomer
       # the bulk API call is made.
       #
       # params - Parameters for the delete action (as a Hash)
-      #      
+      #
       # Examples
       #   delete(:_id => 1, :_type => 'foo')
       #

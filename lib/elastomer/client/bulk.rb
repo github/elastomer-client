@@ -43,6 +43,48 @@ module Elastomer
       end
     end
 
+    # Stream bulk actions from an Enumerator.
+    #
+    # Examples
+    #
+    #   ops = [
+    #     Bulk::index(document1, :_type => 'default-type', :_id => 1),
+    #     Bulk::index(document2, params2),
+    #     Bulk::delete(params3),
+    #   ]
+    #   bulk(ops, :index => 'default-index').each do |response|
+    #     puts response
+    #   end
+    #
+    # Returns an Enumerator of responses.
+    def bulk_stream_responses(ops, params = {})
+      bulk_obj = Bulk.new(self, params)
+
+      Enumerator.new do |yielder|
+        ops.each do |op|
+          response = bulk_obj.add_to_actions *op
+          yielder.yield response unless response.nil?
+        end
+
+        response = bulk_obj.call
+        yielder.yield response unless response.nil?
+      end
+    end
+
+    # Stream bulk actions from an Enumerator.
+    #
+    # See Client#bulk_stream_responses for more information.
+    #
+    # Returns an Enumerator of items from the responses.
+    def bulk_stream_items(ops, params = {})
+      Enumerator.new do |yielder|
+        bulk_stream_responses(ops, params).each do |response|
+          response["items"].each do |item|
+            yielder.yield item
+          end
+        end
+      end
+    end
 
     # The Bulk class provides some abstractions and helper methods for working
     # with the ElasticSearch bulk API command. Instances of the Bulk class
@@ -132,7 +174,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def index( document, params = {} )
-        params = prepare_params(document, params)
+        params = Bulk::prepare_params(document, params)
         add_to_actions({:index => params}, document)
       end
 
@@ -151,7 +193,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def create( document, params )
-        params = prepare_params(document, params)
+        params = Bulk::prepare_params(document, params)
         add_to_actions({:create => params}, document)
       end
 
@@ -170,7 +212,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def update( document, params )
-        params = prepare_params(document, params)
+        params = Bulk::prepare_params(document, params)
         add_to_actions({:update => params}, document)
       end
 
@@ -184,8 +226,79 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def delete( params )
-        params = prepare_params(nil, params)
+        params = Bulk::prepare_params(nil, params)
         add_to_actions({:delete => params})
+      end
+
+      # Construct a bulk action which indexes a document. Parameters can be
+      # provided in the parameters hash (underscore prefix optional) or in the
+      # document hash (underscore prefix required).
+      #
+      # document - The document to index as a Hash or JSON encoded String
+      # params   - Parameters for the index action (as a Hash) (optional)
+      #
+      # Examples
+      #   index({"foo" => "bar"}, {:_id => 1, :_type => "foo", :_index => "foo"})
+      #   index({"foo" => "bar"}, {:id => 1, :type => "foo", :_index => "foo"})
+      #   index("foo" => "bar", "_id" => 1, "_type" => "foo", "_index" => "foo")
+      #   # => [{:index => {"_id" => 1, "_type" => "foo", "_index" => "foo"}}, {"foo" => "bar"}]
+      #
+      # Returns an Array representing the rows of the action in a bulk call
+      def self.op_index( document, params = {} )
+        [{:index => prepare_params(document, params)}, document]
+      end
+
+      # Construct a bulk action which creates a document. Parameters can be
+      # provided in the parameters hash (underscore prefix optional) or in the
+      # document hash (underscore prefix required).
+      #
+      # document - The document to create as a Hash or JSON encoded String
+      # params   - Parameters for the create action (as a Hash) (optional)
+      #
+      # Examples
+      #   create({"foo" => "bar"}, {:_id => 1, :_type => "foo", :_index => "foo"})
+      #   create({"foo" => "bar"}, {:id => 1, :type => "foo", :_index => "foo"})
+      #   create("foo" => "bar", "_id" => 1, "_type" => "foo", "_index" => "foo")
+      #   # => [{:create => {"_id" => 1, "_type" => "foo", "_index" => "foo"}}, {"foo" => "bar"}]
+      #
+      # Returns an Array representing the rows of the action in a bulk call
+      def self.op_create( document, params )
+        [{:create => prepare_params(document, params)}, document]
+      end
+
+      # Construct a bulk action which updates a document. Parameters can be
+      # provided in the parameters hash (underscore prefix optional) or in the
+      # document hash (underscore prefix required).
+      #
+      # document - The document to update as a Hash or JSON encoded String
+      # params   - Parameters for the update action (as a Hash) (optional)
+      #
+      # Examples
+      #   update({"foo" => "bar"}, {:_id => 1, :_type => "foo", :_index => "foo"})
+      #   update({"foo" => "bar"}, {:id => 1, :type => "foo", :_index => "foo"})
+      #   update("foo" => "bar", "_id" => 1, "_type" => "foo", "_index" => "foo")
+      #   # => [{:update => {"_id" => 1, "_type" => "foo", "_index" => "foo"}}, {"foo" => "bar"}]
+      #
+      # Returns an Array representing the rows of the action in a bulk call
+      def self.op_update( document, params )
+        [{:update => prepare_params(document, params)}, document]
+      end
+
+      # Construct a bulk action which deletes a document. Parameters can be
+      # provided in the parameters hash (underscore prefix optional) or in the
+      # document hash (underscore prefix required).
+      #
+      # params - Parameters for the delete action (as a Hash)
+      #
+      # Examples
+      #   delete({"foo" => "bar"}, {:_id => 1, :_type => "foo", :_index => "foo"})
+      #   delete({"foo" => "bar"}, {:id => 1, :type => "foo", :_index => "foo"})
+      #   delete("foo" => "bar", "_id" => 1, "_type" => "foo", "_index" => "foo")
+      #   # => [{:delete => {"_id" => 1, "_type" => "foo", "_index" => "foo"}}, {"foo" => "bar"}]
+      #
+      # Returns an Array representing the rows of the action in a bulk call
+      def self.op_delete( params )
+        [{:delete => prepare_params(nil, params)}]
       end
 
       # Immediately execute a bulk API call with the currently accumulated
@@ -211,7 +324,7 @@ module Elastomer
 
       # Internal: convert special key parameters to their wire representation
       # and apply any override document parameters.
-      def prepare_params(document, params)
+      def self.prepare_params(document, params)
         params = convert_special_keys(params)
         if document.is_a? Hash
           params = from_document(document).merge(params)
@@ -227,7 +340,7 @@ module Elastomer
       # document - The document Hash
       #
       # Returns extracted key/value pairs as a Hash.
-      def from_document( document )
+      def self.from_document( document )
         opts = {}
 
         SPECIAL_KEYS_HASH.values.each do |field|
@@ -249,7 +362,7 @@ module Elastomer
       # params - Hash.
       #
       # Returns a new params Hash with the special keys replaced.
-      def convert_special_keys(params)
+      def self.convert_special_keys(params)
         new_params = params.dup
 
         SPECIAL_KEYS_HASH.each do |k1, k2|
@@ -268,8 +381,8 @@ module Elastomer
       # size, then a bulk API call will be performed. After the call the
       # actions list is cleared and we'll start accumulating actions again.
       #
-      # action   - The bulk action (as a Hash) to perform
-      # document - Optional document for the action as a Hash or JSON encoded String
+      # action - The bulk action (as a Hash) to perform
+      # document  - Optional document for the action as a Hash or JSON encoded String
       #
       # Returns the response from the bulk call if one was made or nil.
       def add_to_actions( action, document = nil )

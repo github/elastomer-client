@@ -1,3 +1,6 @@
+require 'webmock/minitest'
+WebMock.allow_net_connect!
+
 require 'securerandom'
 require 'rubygems' unless defined? Gem
 require 'bundler'
@@ -24,7 +27,7 @@ $client_params = {
   :port => ENV['BOXEN_ELASTICSEARCH_PORT'] || 9200,
   :read_timeout => 2,
   :open_timeout => 1,
-  :opaque_id => true
+  :opaque_id => false
 }
 $client = Elastomer::Client.new $client_params
 

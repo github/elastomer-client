@@ -252,25 +252,13 @@ module Elastomer
       # hash must contain the :query key. Otherwise we assume a URI request is
       # being made.
       #
-      # query  - The query body as a Hash
-      # params - Parameters Hash
+      # See Client#delete_by_query for more information.
       #
-      # Examples
-      #
-      #   # request body query
-      #   delete_by_query({:query => {:match_all => {}}}, :type => 'tweet')
-      #
-      #   # same thing but using the URI request method
-      #   delete_by_query(:q => '*:*', :type => 'tweet')
-      #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
-      #
-      # Returns the response body as a hash
-      def delete_by_query( query, params = nil )
+      # Returns a Hash of statistics about the delete operations
+      def delete_by_query(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.delete '/{index}{/type}/_query', update_params(params, :body => query, :action => 'docs.delete_by_query')
-        response.body
+        @client.delete_by_query(query, update_params(params))
       end
 
       # Returns information and statistics on terms in the fields of a

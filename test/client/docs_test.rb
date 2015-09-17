@@ -598,6 +598,7 @@ describe Elastomer::Client::Docs do
   #
   # docs - An instance of Elastomer::Client::Docs or Elastomer::Client::Bulk. If
   #        nil uses the @docs instance variable.
+  # rubocop:disable Metrics/MethodLength
   def populate!(docs = @docs)
     docs.index \
       :_id    => 1,
@@ -625,5 +626,6 @@ describe Elastomer::Client::Docs do
 
     @index.refresh
   end
+  # rubocop:enable Metrics/MethodLength
 
 end

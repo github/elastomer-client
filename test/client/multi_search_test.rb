@@ -128,6 +128,7 @@ describe Elastomer::Client::MultiSearch do
     assert_equal 1, response2["hits"]["total"]
   end
 
+  # rubocop:disable Metrics/MethodLength
   def populate!
     @docs.index \
       :_id    => 1,
@@ -155,4 +156,5 @@ describe Elastomer::Client::MultiSearch do
 
     @index.refresh
   end
+  # rubocop:enable Metrics/MethodLength
 end

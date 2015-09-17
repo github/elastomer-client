@@ -150,6 +150,7 @@ module Elastomer
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
+    # rubocop:disable Metrics/MethodLength
     def request( method, path, params )
       read_timeout = params.delete :read_timeout
       body = extract_body params
@@ -193,6 +194,7 @@ module Elastomer
         end
       end
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Internal: Extract the :body from the params Hash and convert it to a
     # JSON String format. If the params Hash does not contain a :body then no

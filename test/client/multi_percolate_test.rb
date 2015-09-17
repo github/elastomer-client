@@ -91,6 +91,7 @@ describe Elastomer::Client::MultiPercolate do
     assert_equal 2, response3["total"]
   end
 
+  # rubocop:disable Metrics/MethodLength
   def populate!
     @docs.index \
       :_id    => 1,
@@ -125,4 +126,5 @@ describe Elastomer::Client::MultiPercolate do
 
     @index.refresh
   end
+  # rubocop:enable Metrics/MethodLength
 end

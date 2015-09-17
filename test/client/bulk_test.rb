@@ -296,9 +296,9 @@ describe Elastomer::Client::Bulk do
 
   it 'streams bulk responses' do
     ops = [
-      Elastomer::Client::Bulk::op_index({ :message => 'tweet 1' }, { :_id => 1, :_type => 'book', :_index => @index.name }),
-      Elastomer::Client::Bulk::op_index({ :message => 'tweet 2' }, { :_id => 2, :_type => 'book', :_index => @index.name }),
-      Elastomer::Client::Bulk::op_index({ :message => 'tweet 3' }, { :_id => 3, :_type => 'book', :_index => @index.name })
+      [:index, { :message => 'tweet 1' }, { :_id => 1, :_type => 'book', :_index => @index.name }],
+      [:index, { :message => 'tweet 2' }, { :_id => 2, :_type => 'book', :_index => @index.name }],
+      [:index, { :message => 'tweet 3' }, { :_id => 3, :_type => 'book', :_index => @index.name }]
     ]
     responses = $client.bulk_stream_responses(ops, { :action_count => 2 }).to_a
     assert_equal(2, responses.length)
@@ -309,9 +309,9 @@ describe Elastomer::Client::Bulk do
 
   it 'streams bulk items' do
     ops = [
-      Elastomer::Client::Bulk::op_index({ :message => 'tweet 1' }, { :_id => 1, :_type => 'book', :_index => @index.name }),
-      Elastomer::Client::Bulk::op_index({ :message => 'tweet 2' }, { :_id => 2, :_type => 'book', :_index => @index.name }),
-      Elastomer::Client::Bulk::op_index({ :message => 'tweet 3' }, { :_id => 3, :_type => 'book', :_index => @index.name })
+      [:index, { :message => 'tweet 1' }, { :_id => 1, :_type => 'book', :_index => @index.name }],
+      [:index, { :message => 'tweet 2' }, { :_id => 2, :_type => 'book', :_index => @index.name }],
+      [:index, { :message => 'tweet 3' }, { :_id => 3, :_type => 'book', :_index => @index.name }]
     ]
     items = []
     stats = $client.bulk_stream_items(ops, { :action_count => 2 }) { |item| items << item }

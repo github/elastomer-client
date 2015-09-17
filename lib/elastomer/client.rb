@@ -160,31 +160,32 @@ module Elastomer
 
       instrument(path, body, params) do
         begin
-          response = case method
-          when :head
-            connection.head(path) { |req| req.options[:timeout] = read_timeout if read_timeout }
+          response =
+            case method
+            when :head
+              connection.head(path) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-          when :get
-            connection.get(path) { |req|
-              req.body = body if body
-              req.options[:timeout] = read_timeout if read_timeout
-            }
+            when :get
+              connection.get(path) { |req|
+                req.body = body if body
+                req.options[:timeout] = read_timeout if read_timeout
+              }
 
-          when :put
-            connection.put(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+            when :put
+              connection.put(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-          when :post
-            connection.post(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
+            when :post
+              connection.post(path, body) { |req| req.options[:timeout] = read_timeout if read_timeout }
 
-          when :delete
-            connection.delete(path) { |req|
-              req.body = body if body
-              req.options[:timeout] = read_timeout if read_timeout
-            }
+            when :delete
+              connection.delete(path) { |req|
+                req.body = body if body
+                req.options[:timeout] = read_timeout if read_timeout
+              }
 
-          else
-            raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
-          end
+            else
+              raise ArgumentError, "unknown HTTP request method: #{method.inspect}"
+            end
 
           handle_errors response
 

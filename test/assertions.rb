@@ -55,20 +55,22 @@ module Minitest::Assertions
   # ES 0.90 doesn't have the "mappings" element:
   # mapping["test-index"]["doco"]
   def assert_mapping_exists(response, type, message="mapping expected to exist, but doesn't")
-    mapping = if response.has_key?('mappings')
-      response['mappings'][type]
-    else
-      response[type]
-    end
+    mapping =
+      if response.has_key?('mappings')
+        response['mappings'][type]
+      else
+        response[type]
+      end
     refute_nil mapping, message
   end
 
   def assert_property_exists(response, type, property, message="property expected to exist, but doesn't")
-    mapping = if response.has_key?('mappings')
-      response['mappings'][type]
-    else
-      response[type]
-    end
+    mapping =
+      if response.has_key?('mappings')
+        response['mappings'][type]
+      else
+        response[type]
+      end
     assert mapping['properties'].has_key?(property), message
   end
 end

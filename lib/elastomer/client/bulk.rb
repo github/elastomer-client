@@ -381,8 +381,8 @@ module Elastomer
       # size, then a bulk API call will be performed. After the call the
       # actions list is cleared and we'll start accumulating actions again.
       #
-      # action - The bulk action (as a Hash) to perform
-      # document  - Optional document for the action as a Hash or JSON encoded String
+      # action   - The bulk action (as a Hash) to perform
+      # document - Optional document for the action as a Hash or JSON encoded String
       #
       # Returns the response from the bulk call if one was made or nil.
       def add_to_actions( action, document = nil )

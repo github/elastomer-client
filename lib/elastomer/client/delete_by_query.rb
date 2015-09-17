@@ -94,15 +94,13 @@ module Elastomer
       #
       # response - A bulk response
       def accumulate(response)
-        unless response.nil?
-          @response_stats['took'] += response['took']
+        @response_stats['took'] += response['took']
 
-          response['items'].each do |item|
-            item = item['delete']
-            (@response_stats['_indices'][item['_index']] ||= {}).merge!(categorize(item)) { |_, n, m| n + m }
-            @response_stats['_indices']['_all'].merge!(categorize(item)) { |_, n, m| n + m }
-            @response_stats['failures'] << item unless is_ok? item['status']
-          end
+        response['items'].each do |item|
+          item = item['delete']
+          (@response_stats['_indices'][item['_index']] ||= {}).merge!(categorize(item)) { |_, n, m| n + m }
+          @response_stats['_indices']['_all'].merge!(categorize(item)) { |_, n, m| n + m }
+          @response_stats['failures'] << item unless is_ok? item['status']
         end
       end
 
@@ -110,14 +108,13 @@ module Elastomer
       #
       # Returns a Hash of statistics about the bulk operation
       def execute
-        # accumulate is called both inside and outside the bulk block in order
-        # to capture bulk responses returned from calls to `delete` and the call
-        # to `bulk`
-        accumulate(@client.bulk(@params) do |bulk|
+        ops = Enumerator.new do |yielder|
           @client.scan(@query, @params).each_document do |hit|
-            accumulate(bulk.delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
+            yielder.yield(Elastomer::Client::Bulk::op_delete(_id: hit["_id"], _type: hit["_type"], _index: hit["_index"]))
           end
-        end)
+        end
+
+        @client.bulk_stream_responses(ops, @params).each { |response| accumulate(response) }
 
         @response_stats
       end

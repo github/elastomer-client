@@ -52,7 +52,7 @@ module Elastomer
     #     Bulk::index(document2, params2),
     #     Bulk::delete(params3),
     #   ]
-    #   bulk(ops, :index => 'default-index').each do |response|
+    #   bulk_stream_responses(ops, :index => 'default-index').each do |response|
     #     puts response
     #   end
     #

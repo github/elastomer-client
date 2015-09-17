@@ -75,9 +75,11 @@ module Elastomer
         conn.response :parse_json
         conn.request  :opaque_id if @opaque_id
 
-        @adapter.is_a?(Array) ?
-          conn.adapter(*@adapter) :
+        if @adapter.is_a?(Array)
+          conn.adapter(*@adapter)
+        else
           conn.adapter(@adapter)
+        end
 
         conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout

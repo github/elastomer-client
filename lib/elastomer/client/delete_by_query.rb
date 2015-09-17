@@ -90,18 +90,14 @@ module Elastomer
         }
       end
 
-      # Internal: Combine the items in a response with the existing statistics
+      # Internal: Combine a response item with the existing statistics
       #
-      # response - A bulk response
-      def accumulate(response)
-        @response_stats['took'] += response['took']
-
-        response['items'].each do |item|
-          item = item['delete']
-          (@response_stats['_indices'][item['_index']] ||= {}).merge!(categorize(item)) { |_, n, m| n + m }
-          @response_stats['_indices']['_all'].merge!(categorize(item)) { |_, n, m| n + m }
-          @response_stats['failures'] << item unless is_ok? item['status']
-        end
+      # item - A bulk response item
+      def accumulate(item)
+        item = item["delete"]
+        (@response_stats['_indices'][item['_index']] ||= {}).merge!(categorize(item)) { |_, n, m| n + m }
+        @response_stats['_indices']['_all'].merge!(categorize(item)) { |_, n, m| n + m }
+        @response_stats['failures'] << item unless is_ok? item['status']
       end
 
       # Perform the Delete by Query action
@@ -114,8 +110,8 @@ module Elastomer
           end
         end
 
-        @client.bulk_stream_responses(ops, @params).each { |response| accumulate(response) }
-
+        stats = @client.bulk_stream_items(ops, @params) { |item| accumulate(item) }
+        @response_stats['took'] = stats['took']
         @response_stats
       end
 

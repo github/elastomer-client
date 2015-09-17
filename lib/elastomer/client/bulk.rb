@@ -71,19 +71,61 @@ module Elastomer
       end
     end
 
-    # Stream bulk actions from an Enumerator.
+    # Internal: Determine whether or not a response item has an HTTP status code
+    # in the range 200 to 299.
     #
-    # See Client#bulk_stream_responses for more information.
+    # item - The bulk response item
     #
-    # Returns an Enumerator of items from the responses.
+    # Returns a boolean
+    def is_ok?(item)
+      item.values.first["status"].between?(200, 299)
+    end
+
+    # Stream bulk actions from an Enumerator and passes them to the given block.
+    #
+    # Examples
+    #
+    #   ops = [
+    #     Bulk::index(document1, :_type => 'default-type', :_id => 1),
+    #     Bulk::index(document2, params2),
+    #     Bulk::delete(params3),
+    #   ]
+    #   bulk_stream_items(ops, :index => 'default-index') do |item|
+    #     puts item
+    #   end
+    #
+    #   # return value:
+    #   # {
+    #   #   "took" => 256,
+    #   #   "errors" => false,
+    #   #   "success" => 3,
+    #   #   "failure" => 0
+    #   # }
+    #
+    # Returns a Hash of stats about items from the responses.
     def bulk_stream_items(ops, params = {})
-      Enumerator.new do |yielder|
-        bulk_stream_responses(ops, params).each do |response|
-          response["items"].each do |item|
-            yielder.yield item
+      stats = {
+        "took" => 0,
+        "errors" => false,
+        "success" => 0,
+        "failure" => 0
+      }
+
+      bulk_stream_responses(ops, params).each do |response|
+        stats["took"] += response["took"]
+        stats["errors"] |= response["errors"]
+
+        response["items"].each do |item|
+          if is_ok?(item)
+            stats["success"] += 1
+          else
+            stats["failure"] += 1
           end
+          yield item
         end
       end
+
+      stats
     end
 
     # The Bulk class provides some abstractions and helper methods for working

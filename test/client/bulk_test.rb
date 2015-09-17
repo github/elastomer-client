@@ -313,7 +313,8 @@ describe Elastomer::Client::Bulk do
       Elastomer::Client::Bulk::op_index({ :message => 'tweet 2' }, { :_id => 2, :_type => 'book', :_index => @index.name }),
       Elastomer::Client::Bulk::op_index({ :message => 'tweet 3' }, { :_id => 3, :_type => 'book', :_index => @index.name })
     ]
-    items = $client.bulk_stream_items(ops, { :action_count => 2 }).to_a
+    items = []
+    stats = $client.bulk_stream_items(ops, { :action_count => 2 }) { |item| items << item }
     assert_equal(3, items.length)
     assert_bulk_index(items[0])
     assert_bulk_index(items[1])

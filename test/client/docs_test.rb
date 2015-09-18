@@ -548,6 +548,34 @@ describe Elastomer::Client::Docs do
       assert_equal 1, response["matches"].length
       assert_equal "1", response["matches"][0]["_id"]
     end
+
+    it 'counts the matches for percolating a given document' do
+      populate!
+
+      percolator1 = @index.percolator "1"
+      response = percolator1.create :query => { :match => { :author => "pea53" } }
+      assert response["created"], "Couldn't create the percolator query"
+      percolator2 = @index.percolator "2"
+      response = percolator2.create :query => { :match => { :author => "defunkt" } }
+      assert response["created"], "Couldn't create the percolator query"
+
+      count = @index.docs("doc1").percolate_count :doc => { :author => "pea53" }
+      assert_equal 1, count
+    end
+
+    it 'counts the matches for percolating an existing document' do
+      populate!
+
+      percolator1 = @index.percolator "1"
+      response = percolator1.create :query => { :match => { :author => "pea53" } }
+      assert response["created"], "Couldn't create the percolator query"
+      percolator2 = @index.percolator "2"
+      response = percolator2.create :query => { :match => { :author => "defunkt" } }
+      assert response["created"], "Couldn't create the percolator query"
+
+      count = @index.docs("doc2").percolate_count(nil, :id => "1")
+      assert_equal 1, count
+    end
   end
 
   # Create/index multiple documents.

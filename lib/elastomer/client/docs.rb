@@ -277,6 +277,22 @@ module Elastomer
         response.body
       end
 
+      # Counts the queries that match a provided or existing document. To count
+      # matches for an existing document, pass `nil` as the body and include
+      # `:id` in the params.
+      #
+      # Examples
+      #
+      #   index.register_percolator_query 1, :query => { :match => { :author => "pea53" } }
+      #   docs.percolate_count :doc => { :author => "pea53" }
+      #   docs.percolate_count nil, :id => 3
+      #
+      # Returns the count
+      def percolate_count(body = nil, params = {})
+        response = client.get '/{index}/{type}{/id}/_percolate/count', update_params(params, :body => body, :action => 'percolator.percolate_count')
+        response.body["total"]
+      end
+
       # Returns information and statistics on terms in the fields of a
       # particular document as stored in the index. The :id is provided as part
       # of the params hash.

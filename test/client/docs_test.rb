@@ -519,7 +519,7 @@ describe Elastomer::Client::Docs do
       assert_equal(%w[1 2], docs.map { |h| h['_id'] }.sort)
     end
 
-    it 'percolates' do
+    it 'percolates a given document' do
       populate!
 
       percolator1 = @index.percolator "1"
@@ -529,7 +529,22 @@ describe Elastomer::Client::Docs do
       response = percolator2.create :query => { :match => { :author => "defunkt" } }
       assert response["created"], "Couldn't create the percolator query"
 
-      response = @index.docs("docs1").percolate(:doc => { :author => "pea53" })
+      response = @index.docs("doc1").percolate(:doc => { :author => "pea53" })
+      assert_equal 1, response["matches"].length
+      assert_equal "1", response["matches"][0]["_id"]
+    end
+
+    it 'percolates an existing document' do
+      populate!
+
+      percolator1 = @index.percolator "1"
+      response = percolator1.create :query => { :match => { :author => "pea53" } }
+      assert response["created"], "Couldn't create the percolator query"
+      percolator2 = @index.percolator "2"
+      response = percolator2.create :query => { :match => { :author => "defunkt" } }
+      assert response["created"], "Couldn't create the percolator query"
+
+      response = @index.docs("doc2").percolate(nil, :id => "1")
       assert_equal 1, response["matches"].length
       assert_equal "1", response["matches"][0]["_id"]
     end

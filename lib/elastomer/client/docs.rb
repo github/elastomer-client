@@ -261,17 +261,19 @@ module Elastomer
         @client.delete_by_query(query, update_params(params))
       end
 
-      # Matches a document to the queries stored in the percolator for the given
-      # index.
+      # Matches a provided or existing document to the stored percolator
+      # queries. To match an existing document, pass `nil` as the body and
+      # include `:id` in the params.
       #
       # Examples
       #
       #   index.register_percolator_query 1, :query => { :match => { :author => "pea53" } }
       #   docs.percolate :doc => { :author => "pea53" }
+      #   docs.percolate nil, :id => 3
       #
       # Returns the response body as a Hash
-      def percolate(body, params = {})
-        response = client.get '/{index}/{type}/_percolate', update_params(params, :body => body, :action => 'percolator.percolate')
+      def percolate(body = nil, params = {})
+        response = client.get '/{index}/{type}{/id}/_percolate', update_params(params, :body => body, :action => 'percolator.percolate')
         response.body
       end
 

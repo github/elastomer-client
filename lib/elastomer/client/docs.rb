@@ -271,7 +271,6 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def percolate(body, params = {})
-        raise 'percolate requires document type' if type.nil?
         response = client.get '/{index}/{type}/_percolate', update_params(params, :body => body, :action => 'percolator.percolate')
         response.body
       end

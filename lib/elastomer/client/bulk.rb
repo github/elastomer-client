@@ -81,7 +81,8 @@ module Elastomer
       item.values.first["status"].between?(200, 299)
     end
 
-    # Stream bulk actions from an Enumerator and passes them to the given block.
+    # Stream bulk actions from an Enumerator and passes the response items to
+    # the given block.
     #
     # Examples
     #
@@ -100,6 +101,18 @@ module Elastomer
     #   #   "errors" => false,
     #   #   "success" => 3,
     #   #   "failure" => 0
+    #   # }
+    #
+    #   # sample response item:
+    #   # {
+    #   #   "delete": {
+    #   #     "_index": "foo",
+    #   #     "_type": "bar",
+    #   #     "_id": "42",
+    #   #     "_version": 3,
+    #   #     "status": 200,
+    #   #     "found": true
+    #   #   }
     #   # }
     #
     # Returns a Hash of stats about items from the responses.

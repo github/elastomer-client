@@ -1,3 +1,7 @@
+## 0.7.0 (2015-09-18)
+- Add streaming bulk functionality via `bulk_stream_items`
+- Make Delete by Query compatible with Elasticsearch 2.0
+
 ## 0.6.0 (2015-09-11)
 - Support all URL parameters when using `Client.#scroll`
 - BREAKING: Moved some `Scroller` reader methods into `Scroller.opts`

@@ -43,6 +43,103 @@ module Elastomer
       end
     end
 
+    # Stream bulk actions from an Enumerator.
+    #
+    # Examples
+    #
+    #   ops = [
+    #     [:index, document1, {:_type => "foo", :_id => 1}],
+    #     [:create, document2],
+    #     [:delete, {:_type => "bar", :_id => 42}]
+    #   ]
+    #   bulk_stream_responses(ops, :index => 'default-index').each do |response|
+    #     puts response
+    #   end
+    #
+    # Returns an Enumerator of responses.
+    def bulk_stream_responses(ops, params = {})
+      bulk_obj = Bulk.new(self, params)
+
+      Enumerator.new do |yielder|
+        ops.each do |action, *args|
+          response = bulk_obj.send(action, *args)
+          yielder.yield response unless response.nil?
+        end
+
+        response = bulk_obj.call
+        yielder.yield response unless response.nil?
+      end
+    end
+
+    # Internal: Determine whether or not a response item has an HTTP status code
+    # in the range 200 to 299.
+    #
+    # item - The bulk response item
+    #
+    # Returns a boolean
+    def is_ok?(item)
+      item.values.first["status"].between?(200, 299)
+    end
+
+    # Stream bulk actions from an Enumerator and passes the response items to
+    # the given block.
+    #
+    # Examples
+    #
+    #   ops = [
+    #     [:index, document1, {:_type => "foo", :_id => 1}],
+    #     [:create, document2],
+    #     [:delete, {:_type => "bar", :_id => 42}]
+    #   ]
+    #   bulk_stream_items(ops, :index => 'default-index') do |item|
+    #     puts item
+    #   end
+    #
+    #   # return value:
+    #   # {
+    #   #   "took" => 256,
+    #   #   "errors" => false,
+    #   #   "success" => 3,
+    #   #   "failure" => 0
+    #   # }
+    #
+    #   # sample response item:
+    #   # {
+    #   #   "delete": {
+    #   #     "_index": "foo",
+    #   #     "_type": "bar",
+    #   #     "_id": "42",
+    #   #     "_version": 3,
+    #   #     "status": 200,
+    #   #     "found": true
+    #   #   }
+    #   # }
+    #
+    # Returns a Hash of stats about items from the responses.
+    def bulk_stream_items(ops, params = {})
+      stats = {
+        "took" => 0,
+        "errors" => false,
+        "success" => 0,
+        "failure" => 0
+      }
+
+      bulk_stream_responses(ops, params).each do |response|
+        stats["took"] += response["took"]
+        stats["errors"] |= response["errors"]
+
+        response["items"].each do |item|
+          if is_ok?(item)
+            stats["success"] += 1
+          else
+            stats["failure"] += 1
+          end
+          yield item
+        end
+      end
+
+      stats
+    end
 
     # The Bulk class provides some abstractions and helper methods for working
     # with the ElasticSearch bulk API command. Instances of the Bulk class
@@ -156,7 +253,7 @@ module Elastomer
       end
 
       # Add an update action to the list of bulk actions to be performed when
-      # the bulk API call is made. Parameters can be provided in the parameters 
+      # the bulk API call is made. Parameters can be provided in the parameters
       # hash (underscore prefix optional) or in the document hash (underscore
       # prefix required).
       #
@@ -178,7 +275,7 @@ module Elastomer
       # the bulk API call is made.
       #
       # params - Parameters for the delete action (as a Hash)
-      #      
+      #
       # Examples
       #   delete(:_id => 1, :_type => 'foo')
       #

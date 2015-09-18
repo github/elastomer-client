@@ -522,12 +522,14 @@ describe Elastomer::Client::Docs do
     it 'percolates' do
       populate!
 
-      response = @index.register_percolator_query "1", { :query => { :match => { :author => "pea53" } } }
-      assert response["created"], "Couldn't register the percolator query"
-      response = @index.register_percolator_query "2", { :query => { :match => { :author => "defunkt" } } }
-      assert response["created"], "Couldn't register the percolator query"
+      percolator1 = @index.percolator "1"
+      response = percolator1.create :query => { :match => { :author => "pea53" } }
+      assert response["created"], "Couldn't create the percolator query"
+      percolator2 = @index.percolator "2"
+      response = percolator2.create :query => { :match => { :author => "defunkt" } }
+      assert response["created"], "Couldn't create the percolator query"
 
-      response = @index.docs("docs1").percolate({ :doc => { :author => "pea53" } })
+      response = @index.docs("docs1").percolate(:doc => { :author => "pea53" })
       assert_equal 1, response["matches"].length
       assert_equal "1", response["matches"][0]["_id"]
     end

@@ -262,12 +262,12 @@ module Elastomer
       end
 
       # Matches a document to the queries stored in the percolator for the given
-      # index. Type is required.
+      # index.
       #
       # Examples
       #
-      #   index.register_percolator_query 1, { :query => { :match => { :author => "pea53" } } }
-      #   index.docs(type).percolate({ :doc => { :author => "pea53" } })
+      #   index.register_percolator_query 1, :query => { :match => { :author => "pea53" } }
+      #   docs.percolate :doc => { :author => "pea53" }
       #
       # Returns the response body as a Hash
       def percolate(body, params = {})

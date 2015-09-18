@@ -216,7 +216,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def index( document, params = {} )
-        params = Bulk::prepare_params(document, params)
+        params = prepare_params(document, params)
         add_to_actions({:index => params}, document)
       end
 
@@ -235,7 +235,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def create( document, params )
-        params = Bulk::prepare_params(document, params)
+        params = prepare_params(document, params)
         add_to_actions({:create => params}, document)
       end
 
@@ -254,7 +254,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def update( document, params )
-        params = Bulk::prepare_params(document, params)
+        params = prepare_params(document, params)
         add_to_actions({:update => params}, document)
       end
 
@@ -268,7 +268,7 @@ module Elastomer
       #
       # Returns the response from the bulk call if one was made or nil.
       def delete( params )
-        params = Bulk::prepare_params(nil, params)
+        params = prepare_params(nil, params)
         add_to_actions({:delete => params})
       end
 
@@ -295,7 +295,7 @@ module Elastomer
 
       # Internal: convert special key parameters to their wire representation
       # and apply any override document parameters.
-      def self.prepare_params(document, params)
+      def prepare_params(document, params)
         params = convert_special_keys(params)
         if document.is_a? Hash
           params = from_document(document).merge(params)
@@ -311,7 +311,7 @@ module Elastomer
       # document - The document Hash
       #
       # Returns extracted key/value pairs as a Hash.
-      def self.from_document( document )
+      def from_document( document )
         opts = {}
 
         SPECIAL_KEYS_HASH.values.each do |field|
@@ -333,7 +333,7 @@ module Elastomer
       # params - Hash.
       #
       # Returns a new params Hash with the special keys replaced.
-      def self.convert_special_keys(params)
+      def convert_special_keys(params)
         new_params = params.dup
 
         SPECIAL_KEYS_HASH.each do |k1, k2|

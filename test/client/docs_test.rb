@@ -518,6 +518,19 @@ describe Elastomer::Client::Docs do
       assert docs
       assert_equal(%w[1 2], docs.map { |h| h['_id'] }.sort)
     end
+
+    it 'percolates' do
+      populate!
+
+      response = @index.register_percolator_query "1", { :query => { :match => { :author => "pea53" } } }
+      assert response["created"]
+      response = @index.register_percolator_query "2", { :query => { :match => { :author => "defunkt" } } }
+      assert response["created"]
+
+      response = @index.docs("docs1").percolate({ :doc => { :author => "pea53" } })
+      assert_equal 1, response["matches"].length
+      assert_equal "1", response["matches"][0]["_id"]
+    end
   end
 
   # Create/index multiple documents.

@@ -533,6 +533,18 @@ module Elastomer
         docs.delete_by_query(query, params)
       end
 
+      # Registers a query in the percolator for this index.
+      #
+      # Examples
+      #
+      #   index.register_percolator_query 1, { :query => { :match => { :author => "pea53" } } }
+      #
+      # Returns the response body as a Hash
+      def register_percolator_query(id, body, params = {})
+        response = client.put "/{index}/.percolator/#{id}", update_params(params, :body => body, :action => 'percolator.register')
+        response.body
+      end
+
       # Internal: Add default parameters to the `params` Hash and then apply
       # `overrides` to the params if any are given.
       #

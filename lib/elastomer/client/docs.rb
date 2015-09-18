@@ -261,6 +261,21 @@ module Elastomer
         @client.delete_by_query(query, update_params(params))
       end
 
+      # Matches a document to the queries stored in the percolator for the given
+      # index. Type is required.
+      #
+      # Examples
+      #
+      #   index.register_percolator_query 1, { :query => { :match => { :author => "pea53" } } }
+      #   index.docs(type).percolate({ :doc => { :author => "pea53" } })
+      #
+      # Returns the response body as a Hash
+      def percolate(body, params = {})
+        raise 'percolate requires document type' if type.nil?
+        response = client.get '/{index}/{type}/_percolate', update_params(params, :body => body, :action => 'percolator.percolate')
+        response.body
+      end
+
       # Returns information and statistics on terms in the fields of a
       # particular document as stored in the index. The :id is provided as part
       # of the params hash.

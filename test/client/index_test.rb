@@ -382,5 +382,10 @@ describe Elastomer::Client::Index do
         }
       }, r['_indices'])
     end
+
+    it 'registers percolator queries' do
+      response = @index.register_percolator_query "1", { :query => { :match_all => {} } }
+      assert response["created"]
+    end
   end
 end

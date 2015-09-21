@@ -55,7 +55,7 @@ describe Elastomer::Client::MultiPercolate do
     assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
   end
 
-  it 'performs multipercolatees with .mpercolate' do
+  it 'performs multipercolates with .mpercolate' do
     populate!
 
     body = [

@@ -51,8 +51,8 @@ describe Elastomer::Client::MultiPercolate do
     body = body.join "\n"
     h = $client.multi_percolate body
     response1, response2, response3 = h["responses"]
-    assert ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-    assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
   end
 
   it 'performs multipercolates with .mpercolate' do
@@ -70,8 +70,8 @@ describe Elastomer::Client::MultiPercolate do
     body = body.join "\n"
     h = $client.mpercolate body
     response1, response2, response3 = h["responses"]
-    assert ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-    assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
   end
 
   it 'supports a nice block syntax' do
@@ -84,8 +84,8 @@ describe Elastomer::Client::MultiPercolate do
     end
 
     response1, response2, response3 = h["responses"]
-    assert ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-    assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
   end
 
   def populate!

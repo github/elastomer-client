@@ -402,6 +402,9 @@ describe Elastomer::Client::Index do
         :title  => 'the author of rubber-band',
         :author => 'grantr'
 
+      @index.percolator("1").create :query => { :match_all => { } }
+      @index.percolator("2").create :query => { :match => { :author => "pea53" } }
+
       h = @index.multi_percolate(:type => 'doc2') do |m|
         m.percolate({}, { :author => "pea53" })
         m.percolate({}, { :author => "grantr" })
@@ -409,8 +412,8 @@ describe Elastomer::Client::Index do
       end
 
       response1, response2, response3 = h["responses"]
-      assert ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-      assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
+      assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+      assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
     end
   end
 end

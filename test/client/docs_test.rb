@@ -578,6 +578,9 @@ describe Elastomer::Client::Docs do
     end
 
     it 'runs multi percolate queries' do
+      @index.percolator("1").create :query => { :match_all => { } }
+      @index.percolator("2").create :query => { :match => { :author => "pea53" } }
+
       h = @index.docs("doc2").multi_percolate() do |m|
         m.percolate({}, { :author => "pea53" })
         m.percolate({}, { :author => "grantr" })
@@ -585,8 +588,8 @@ describe Elastomer::Client::Docs do
       end
 
       response1, response2, response3 = h["responses"]
-      assert ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-      assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
+      assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+      assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
     end
   end
 

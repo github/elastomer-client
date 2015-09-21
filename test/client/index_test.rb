@@ -383,7 +383,7 @@ describe Elastomer::Client::Index do
       }, r['_indices'])
     end
 
-    it 'can create a Percolator' do
+    it 'creates a Percolator' do
       id = "1"
       percolator = @index.percolator id
       assert_equal id, percolator.id

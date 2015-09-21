@@ -388,5 +388,29 @@ describe Elastomer::Client::Index do
       percolator = @index.percolator id
       assert_equal id, percolator.id
     end
+
+    it 'runs multi percolate queries' do
+      @index.docs.index \
+        :_id    => 1,
+        :_type  => 'doc2',
+        :title  => 'the author of logging',
+        :author => 'pea53'
+
+      @index.docs.index \
+        :_id    => 2,
+        :_type  => 'doc2',
+        :title  => 'the author of rubber-band',
+        :author => 'grantr'
+
+      h = @index.multi_percolate(:type => 'doc2') do |m|
+        m.percolate({}, { :author => "pea53" })
+        m.percolate({}, { :author => "grantr" })
+        m.count({}, { :author => "grantr" })
+      end
+
+      response1, response2, response3 = h["responses"]
+      assert ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+      assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    end
   end
 end

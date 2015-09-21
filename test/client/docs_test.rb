@@ -576,6 +576,18 @@ describe Elastomer::Client::Docs do
       count = @index.docs("doc2").percolate_count(nil, :id => "1")
       assert_equal 1, count
     end
+
+    it 'runs multi percolate queries' do
+      h = @index.docs("doc2").multi_percolate() do |m|
+        m.percolate({}, { :author => "pea53" })
+        m.percolate({}, { :author => "grantr" })
+        m.count({}, { :author => "grantr" })
+      end
+
+      response1, response2, response3 = h["responses"]
+      assert ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+      assert ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    end
   end
 
   # Create/index multiple documents.

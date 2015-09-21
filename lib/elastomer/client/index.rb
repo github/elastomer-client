@@ -501,6 +501,31 @@ module Elastomer
         client.multi_search params, &block
       end
 
+      # Execute an array of percolate actions in bulk. Results are returned in
+      # an array in the order the actions were sent. The current index name will
+      # be passed to the API call as part of the request parameters.
+      #
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-percolate.html#_multi_percolate_api
+      #
+      # params - Optional request parameters as a Hash
+      # block  - Passed to a MultiPercolate instance which assembles the
+      #          percolate actions into a single request.
+      #
+      # Examples
+      #
+      #   # block form
+      #   multi_percolate() do |m|
+      #     m.percolate({ :type => 'default-type' }, { :author => "pea53" })
+      #     m.count({ :type => 'type2' }, { :author => "pea53" })
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def multi_percolate(params = {}, &block)
+        params = { :index => self.name }.merge params
+        client.multi_percolate(params, &block)
+      end
+
       # Provides access to warmer API commands. Index warmers run search
       # requests to warm up the index before it is available for
       # searching. Warmers are useful for searches that require heavy

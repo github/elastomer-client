@@ -25,7 +25,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create(body, params = {})
-        response = client.put("/#{@index}/.percolator/#{@id}", params.merge(:body => body, :action => 'percolator.create'))
+        response = client.put("/{index}/.percolator/{id}", defaults.merge(params.merge(:body => body, :action => 'percolator.create')))
         response.body
       end
 
@@ -38,7 +38,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get(params = {})
-        response = client.get("/#{@index}/.percolator/#{@id}", params.merge(:action => 'percolator.get'))
+        response = client.get("/{index}/.percolator/{id}", defaults.merge(params.merge(:action => 'percolator.get')))
         response.body
       end
 
@@ -51,7 +51,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete("/#{@index}/.percolator/#{@id}", params.merge(:action => 'percolator.delete'))
+        response = client.delete("/{index}/.percolator/{id}", defaults.merge(params.merge(:action => 'percolator.delete')))
         response.body
       end
 
@@ -65,6 +65,11 @@ module Elastomer
       # Returns a boolean
       def exists?(params = {})
         get(params)["found"]
+      end
+
+      # Internal: Returns a Hash containing default parameters.
+      def defaults
+        {:index => index_name, :id => id}
       end
 
     end  # Percolator

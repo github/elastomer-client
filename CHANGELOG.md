@@ -1,4 +1,5 @@
 ## 0.7.0 (2015-09-18)
+- BREAKING: Remove `Client#warmer` method
 - Add streaming bulk functionality via `bulk_stream_items`
 - Make Delete by Query compatible with Elasticsearch 2.0
 

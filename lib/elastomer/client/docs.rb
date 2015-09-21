@@ -272,7 +272,7 @@ module Elastomer
       #   docs.percolate nil, :id => 3
       #
       # Returns the response body as a Hash
-      def percolate(body = nil, params = {})
+      def percolate(body, params = {})
         response = client.get '/{index}/{type}{/id}/_percolate', update_params(params, :body => body, :action => 'percolator.percolate')
         response.body
       end
@@ -288,7 +288,7 @@ module Elastomer
       #   docs.percolate_count nil, :id => 3
       #
       # Returns the count
-      def percolate_count(body = nil, params = {})
+      def percolate_count(body, params = {})
         response = client.get '/{index}/{type}{/id}/_percolate/count', update_params(params, :body => body, :action => 'percolator.percolate_count')
         response.body["total"]
       end

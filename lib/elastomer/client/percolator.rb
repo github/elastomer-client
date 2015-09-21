@@ -10,7 +10,7 @@ module Elastomer
       # id         - The _id for the query
       def initialize(client, index_name, id)
         @client = client
-        @index_name = index_name
+        @index_name = client.assert_param_presence(index_name, 'index name')
         @id = id
       end
 

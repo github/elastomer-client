@@ -80,8 +80,8 @@ describe Elastomer::Client::MultiPercolate do
     populate!
 
     h = $client.multi_percolate(:index => @name, :type => 'doc2') do |m|
-      m.percolate({}, { :author => "pea53" })
-      m.percolate({}, { :author => "grantr" })
+      m.percolate :author => "pea53"
+      m.percolate :author => "grantr"
       m.count({}, { :author => "grantr" })
     end
 

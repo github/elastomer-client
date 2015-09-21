@@ -406,8 +406,8 @@ describe Elastomer::Client::Index do
       @index.percolator("2").create :query => { :match => { :author => "pea53" } }
 
       h = @index.multi_percolate(:type => 'doc2') do |m|
-        m.percolate({}, { :author => "pea53" })
-        m.percolate({}, { :author => "grantr" })
+        m.percolate :author => "pea53"
+        m.percolate :author => "grantr"
         m.count({}, { :author => "grantr" })
       end
 

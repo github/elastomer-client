@@ -533,8 +533,8 @@ Percolate
       #
       #   # block form
       #   multi_percolate() do |m|
-      #     m.percolate({}, { :author => "pea53" })
-      #     m.count({}, { :author => "grantr" })
+      #     m.percolate(:author => "pea53")
+      #     m.count(:author => "grantr")
       #     ...
       #   end
       #

@@ -25,8 +25,8 @@ module Elastomer
     #
     #   # block form
     #   multi_percolate(:index => 'default-index') do |m|
-    #     m.percolate({ :type => 'default-type' }, { :author => "pea53" })
-    #     m.count({ :type => 'type2' }, { :author => "pea53" })
+    #     m.percolate({ :author => "pea53" }, { :type => 'default-type' })
+    #     m.count({ :author => "pea53" }, { :type => 'type2' })
     #     ...
     #   end
     #
@@ -79,7 +79,7 @@ module Elastomer
       # doc    - A Hash of the document
       #
       # Returns this MultiPercolate instance.
-      def percolate(header, doc)
+      def percolate(doc, header = {})
         add_to_actions(:percolate => header)
         add_to_actions(:doc => doc)
       end

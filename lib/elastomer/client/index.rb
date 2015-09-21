@@ -519,8 +519,8 @@ module Elastomer
       # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-warmers.html
       #
       # Returns a new Warmer instance
-      def warmer( warmer_name )
-        client.warmer(name, warmer_name)
+      def warmer(warmer_name)
+        Warmer.new(client, name, warmer_name)
       end
 
       # Delete documents from one or more indices and one or more types based

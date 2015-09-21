@@ -5,16 +5,16 @@ module Elastomer
 
       # Create a new Percolator for managing a query.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
-      # index  - The index name
-      # id     - The _id for the query
-      def initialize(client, index, id)
+      # client     - Elastomer::Client used for HTTP requests to the server
+      # index_name - The index name
+      # id         - The _id for the query
+      def initialize(client, index_name, id)
         @client = client
-        @index = index
+        @index_name = index_name
         @id = id
       end
 
-      attr_reader :client, :index, :id
+      attr_reader :client, :index_name, :id
 
       # Create a percolator query.
       #

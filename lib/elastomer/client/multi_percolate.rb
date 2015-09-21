@@ -40,7 +40,7 @@ module Elastomer
         raise 'multi_percolate request body cannot be nil' if body.nil?
         params ||= {}
 
-        response = self.post '/_mpercolate', params.merge(:body => body)
+        response = self.post '{/index}{/type}/_mpercolate', params.merge(:body => body)
         response.body
       end
     end

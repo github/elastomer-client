@@ -541,7 +541,7 @@ module Elastomer
       #
       # Returns a Percolator
       def percolator(id)
-        Percolator.new(@client, @name, id)
+        Percolator.new(client, name, id)
       end
 
       # Internal: Add default parameters to the `params` Hash and then apply

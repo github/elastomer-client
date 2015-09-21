@@ -213,7 +213,7 @@ describe Elastomer::Client::Docs do
     authors = h['docs'].map { |d| d['_source']['author'] }
     assert_equal %w[pea53 grantr], authors
 
-    h = @docs.delete_by_query(:q => "author:grantr")
+    h = @docs.delete_by_query(:q => "author:grantr", :index => @index.name)
     assert_equal(h['_indices'], {
       '_all' => {
         'found' => 1,
@@ -239,14 +239,12 @@ describe Elastomer::Client::Docs do
     # the query hash version of this api never worked with 0.90 in the first
     # place, only test it if running 1.0.
     if es_version_1_x?
-      h = @docs.delete_by_query(
+      h = @docs.delete_by_query({
             :query => {
               :filtered => {
                 :query => {:match_all => {}},
-                :filter => {:term => {:author => 'pea53'}}
-              }
-            }
-          )
+                :filter => {:term => {:author => 'pea53'} } } } },
+            :index => @index.name)
       @index.refresh
       h = @docs.multi_get :ids => [1, 2]
       refute_found h['docs'][0]

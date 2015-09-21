@@ -366,7 +366,7 @@ describe Elastomer::Client::Index do
     it 'deletes by query' do
       @index.docs('foo').index("foo" => "bar")
       @index.refresh
-      r = @index.delete_by_query(:q => '*')
+      r = @index.delete_by_query(:q => '*', :index => @index.name)
       assert_equal({
         '_all' => {
           'found' => 1,

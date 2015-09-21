@@ -414,6 +414,7 @@ describe Elastomer::Client::Index do
       response1, response2, response3 = h["responses"]
       assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
       assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
+      assert_equal 1, response3["total"]
     end
   end
 end

@@ -53,6 +53,7 @@ describe Elastomer::Client::MultiPercolate do
     response1, response2, response3 = h["responses"]
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
     assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 1, response3["total"]
   end
 
   it 'performs multi percolate queries with .mpercolate' do
@@ -72,6 +73,7 @@ describe Elastomer::Client::MultiPercolate do
     response1, response2, response3 = h["responses"]
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
     assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 1, response3["total"]
   end
 
   it 'supports a nice block syntax' do
@@ -86,6 +88,7 @@ describe Elastomer::Client::MultiPercolate do
     response1, response2, response3 = h["responses"]
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
     assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 1, response3["total"]
   end
 
   def populate!

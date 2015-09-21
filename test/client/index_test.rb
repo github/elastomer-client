@@ -389,7 +389,7 @@ describe Elastomer::Client::Index do
       assert_equal id, percolator.id
     end
 
-    it 'runs multi percolate queries' do
+    it 'performs multi percolate queries' do
       @index.docs.index \
         :_id    => 1,
         :_type  => 'doc2',

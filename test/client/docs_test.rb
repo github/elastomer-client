@@ -577,7 +577,7 @@ describe Elastomer::Client::Docs do
       assert_equal 1, count
     end
 
-    it 'runs multi percolate queries' do
+    it 'performs multi percolate queries' do
       @index.percolator("1").create :query => { :match_all => { } }
       @index.percolator("2").create :query => { :match => { :author => "pea53" } }
 

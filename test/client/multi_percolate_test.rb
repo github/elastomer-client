@@ -36,7 +36,7 @@ describe Elastomer::Client::MultiPercolate do
     @index.delete if @index.exists?
   end
 
-  it 'performs multipercolates' do
+  it 'performs multi percolate queries' do
     populate!
 
     body = [
@@ -55,7 +55,7 @@ describe Elastomer::Client::MultiPercolate do
     assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
   end
 
-  it 'performs multipercolates with .mpercolate' do
+  it 'performs multi percolate queries with .mpercolate' do
     populate!
 
     body = [

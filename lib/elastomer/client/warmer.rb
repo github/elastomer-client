@@ -1,17 +1,6 @@
 module Elastomer
   class Client
 
-    # Provides access to warmer API commands.
-    # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
-    #
-    # index_name  - The name of the index as a String
-    # warmer_name - The name of the warmer as a String
-    #
-    # Returns a Warmer instance.
-    def warmer(index_name, warmer_name)
-      Warmer.new(self, index_name, warmer_name)
-    end
-
     class Warmer
 
       # Create a new Warmer helper for making warmer API requests.

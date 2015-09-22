@@ -23,7 +23,7 @@ describe Elastomer::Client::DeleteByQuery do
       @docs.index({ :_id => 1, :name => "luna" })
 
       @index.refresh
-      response = $client.delete_by_query(nil, :q => "name:mittens")
+      response = @index.delete_by_query(nil, :q => "name:mittens")
       assert_equal({
         '_all' => {
           'found' => 1,
@@ -50,7 +50,7 @@ describe Elastomer::Client::DeleteByQuery do
       @docs.index({ :_id => 1, :name => "luna" })
       @index.refresh
 
-      response = $client.delete_by_query(nil, :action_count => 1)
+      response = @index.delete_by_query(nil, :action_count => 1)
 
       assert_requested(:post, /_bulk/, :times => 2)
 
@@ -95,7 +95,7 @@ describe Elastomer::Client::DeleteByQuery do
         end)
 
       @index.refresh
-      response = $client.delete_by_query(nil, :action_count => 1)
+      response = @index.delete_by_query(nil, :action_count => 1)
       assert_equal({
         '_all' => {
           'found' => 0,
@@ -131,7 +131,7 @@ describe Elastomer::Client::DeleteByQuery do
         end)
 
       @index.refresh
-      response = $client.delete_by_query(nil, :action_count => 1)
+      response = @index.delete_by_query(nil, :action_count => 1)
       assert_equal({
         '_all' => {
           'found' => 1,

@@ -105,7 +105,7 @@ module Elastomer
       # Returns a Hash of statistics about the bulk operation
       def execute
         ops = Enumerator.new do |yielder|
-          @client.scan(@query, @params).each_document do |hit|
+          @client.scan(@query, @params.merge(:_source => false)).each_document do |hit|
             yielder.yield([:delete, { _id: hit["_id"], _type: hit["_type"], _index: hit["_index"] }])
           end
         end

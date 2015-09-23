@@ -102,6 +102,6 @@ ElasticSearch. You may find that Excon performs better for your use. To enable
 Excon, add it to your bundle and then change your Elastomer initialization
 thusly:
 
-```
+```ruby
 Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
 ```

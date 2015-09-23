@@ -1,4 +1,4 @@
-require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Client::DeleteByQuery do
 
@@ -18,34 +18,34 @@ describe Elastomer::Client::DeleteByQuery do
       wait_for_index(@index_name)
     end
 
-    it 'deletes by query' do
+    it "deletes by query" do
       @docs.index({ :_id => 0, :name => "mittens" })
       @docs.index({ :_id => 1, :name => "luna" })
 
       @index.refresh
       response = @index.delete_by_query(nil, :q => "name:mittens")
       assert_equal({
-        '_all' => {
-          'found' => 1,
-          'deleted' => 1,
-          'missing' => 0,
-          'failed' => 0,
+        "_all" => {
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
         },
         @index.name => {
-          'found' => 1,
-          'deleted' => 1,
-          'missing' => 0,
-          'failed' => 0,
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
         },
-      }, response['_indices'])
+      }, response["_indices"])
 
       @index.refresh
       response = @docs.multi_get :ids => [0, 1]
-      refute_found response['docs'][0]
-      assert_found response['docs'][1]
+      refute_found response["docs"][0]
+      assert_found response["docs"][1]
     end
 
-    it 'respects action_count' do
+    it "respects action_count" do
       @docs.index({ :_id => 0, :name => "mittens" })
       @docs.index({ :_id => 1, :name => "luna" })
       @index.refresh
@@ -55,27 +55,27 @@ describe Elastomer::Client::DeleteByQuery do
       assert_requested(:post, /_bulk/, :times => 2)
 
       assert_equal({
-        '_all' => {
-          'found' => 2,
-          'deleted' => 2,
-          'missing' => 0,
-          'failed' => 0,
+        "_all" => {
+          "found" => 2,
+          "deleted" => 2,
+          "missing" => 0,
+          "failed" => 0,
         },
         @index.name => {
-          'found' => 2,
-          'deleted' => 2,
-          'missing' => 0,
-          'failed' => 0,
+          "found" => 2,
+          "deleted" => 2,
+          "missing" => 0,
+          "failed" => 0,
         },
-      }, response['_indices'])
+      }, response["_indices"])
 
       @index.refresh
       response = @docs.multi_get :ids => [0, 1]
-      refute_found response['docs'][0]
-      refute_found response['docs'][1]
+      refute_found response["docs"][0]
+      refute_found response["docs"][1]
     end
 
-    it 'counts missing documents' do
+    it "counts missing documents" do
       @docs.index({ :_id => 0 })
 
       stub_request(:post, /_bulk/).
@@ -97,22 +97,22 @@ describe Elastomer::Client::DeleteByQuery do
       @index.refresh
       response = @index.delete_by_query(nil, :action_count => 1)
       assert_equal({
-        '_all' => {
-          'found' => 0,
-          'deleted' => 0,
-          'missing' => 1,
-          'failed' => 0,
+        "_all" => {
+          "found" => 0,
+          "deleted" => 0,
+          "missing" => 1,
+          "failed" => 0,
         },
         @index.name => {
-          'found' => 0,
-          'deleted' => 0,
-          'missing' => 1,
-          'failed' => 0,
+          "found" => 0,
+          "deleted" => 0,
+          "missing" => 1,
+          "failed" => 0,
         },
-      }, response['_indices'])
+      }, response["_indices"])
     end
 
-    it 'counts failed operations' do
+    it "counts failed operations" do
       @docs.index({ :_id => 0 })
 
       stub_request(:post, /_bulk/).
@@ -133,19 +133,19 @@ describe Elastomer::Client::DeleteByQuery do
       @index.refresh
       response = @index.delete_by_query(nil, :action_count => 1)
       assert_equal({
-        '_all' => {
-          'found' => 1,
-          'deleted' => 0,
-          'missing' => 0,
-          'failed' => 1,
+        "_all" => {
+          "found" => 1,
+          "deleted" => 0,
+          "missing" => 0,
+          "failed" => 1,
         },
         @index.name => {
-          'found' => 1,
-          'deleted' => 0,
-          'missing' => 0,
-          'failed' => 1,
+          "found" => 1,
+          "deleted" => 0,
+          "missing" => 0,
+          "failed" => 1,
         },
-      }, response['_indices'])
+      }, response["_indices"])
     end
   end
 end

@@ -1,9 +1,9 @@
-require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Client::Index do
 
   before do
-    @name  = 'elastomer-index-test'
+    @name  = "elastomer-index-test"
     @index = $client.index @name
     @index.delete if @index.exists?
   end
@@ -12,28 +12,28 @@ describe Elastomer::Client::Index do
     @index.delete if @index.exists?
   end
 
-  it 'does not require an index name' do
+  it "does not require an index name" do
     index = $client.index
     assert_nil index.name
   end
 
-  it 'determines if an index exists' do
-    assert !@index.exists?, 'the index should not yet exist'
+  it "determines if an index exists" do
+    assert !@index.exists?, "the index should not yet exist"
   end
 
-  it 'determines if an index exists with .exist?' do
-    assert !@index.exist?, 'the index should not yet exist'
+  it "determines if an index exists with .exist?" do
+    assert !@index.exist?, "the index should not yet exist"
   end
 
-  describe 'when creating an index' do
-    it 'creates an index' do
+  describe "when creating an index" do
+    it "creates an index" do
       @index.create({})
-      assert @index.exists?, 'the index should now exist'
+      assert @index.exists?, "the index should now exist"
     end
 
-    it 'creates an index with settings' do
+    it "creates an index with settings" do
       @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
-      settings = @index.get_settings[@name]['settings']
+      settings = @index.get_settings[@name]["settings"]
 
       # COMPATIBILITY
       # ES 1.0 changed the default return format of index settings to always
@@ -42,17 +42,17 @@ describe Elastomer::Client::Index do
       # {"index": {"number_of_replicas":"1"}}
 
       # To support both versions, we check for either return format.
-      value = settings['index.number_of_shards'] ||
-              settings['index']['number_of_shards']
-      assert_equal '3', value
-      value = settings['index.number_of_replicas'] ||
-              settings['index']['number_of_replicas']
-      assert_equal '0', value
+      value = settings["index.number_of_shards"] ||
+              settings["index"]["number_of_shards"]
+      assert_equal "3", value
+      value = settings["index.number_of_replicas"] ||
+              settings["index"]["number_of_replicas"]
+      assert_equal "0", value
     end
 
-    it 'creates an index with settings with .settings' do
+    it "creates an index with settings with .settings" do
       @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
-      settings = @index.settings[@name]['settings']
+      settings = @index.settings[@name]["settings"]
 
       # COMPATIBILITY
       # ES 1.0 changed the default return format of index settings to always
@@ -61,15 +61,15 @@ describe Elastomer::Client::Index do
       # {"index": {"number_of_replicas":"1"}}
 
       # To support both versions, we check for either return format.
-      value = settings['index.number_of_shards'] ||
-              settings['index']['number_of_shards']
-      assert_equal '3', value
-      value = settings['index.number_of_replicas'] ||
-              settings['index']['number_of_replicas']
-      assert_equal '0', value
+      value = settings["index.number_of_shards"] ||
+              settings["index"]["number_of_shards"]
+      assert_equal "3", value
+      value = settings["index.number_of_replicas"] ||
+              settings["index"]["number_of_replicas"]
+      assert_equal "0", value
     end
 
-    it 'adds mappings for document types' do
+    it "adds mappings for document types" do
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
         :mappings => {
@@ -77,18 +77,18 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => 'string', :analyzer => 'standard' },
-              :author => { :type => 'string', :index => 'not_analyzed' }
+              :title  => { :type => "string", :analyzer => "standard" },
+              :author => { :type => "string", :index => "not_analyzed" }
             }
           }
         }
       )
 
-      assert @index.exists?, 'the index should now exist'
-      assert_mapping_exists @index.get_mapping[@name], 'doco'
+      assert @index.exists?, "the index should now exist"
+      assert_mapping_exists @index.get_mapping[@name], "doco"
     end
 
-    it 'adds mappings for document types with .mapping' do
+    it "adds mappings for document types with .mapping" do
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
         :mappings => {
@@ -96,23 +96,23 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => 'string', :analyzer => 'standard' },
-              :author => { :type => 'string', :index => 'not_analyzed' }
+              :title  => { :type => "string", :analyzer => "standard" },
+              :author => { :type => "string", :index => "not_analyzed" }
             }
           }
         }
       )
 
-      assert @index.exists?, 'the index should now exist'
-      assert_mapping_exists @index.mapping[@name], 'doco'
+      assert @index.exists?, "the index should now exist"
+      assert_mapping_exists @index.mapping[@name], "doco"
     end
   end
 
-  it 'updates index settings' do
+  it "updates index settings" do
     @index.create :settings => { :number_of_shards => 1, :number_of_replicas => 0 }
 
-    @index.update_settings 'index.number_of_replicas' => 1
-    settings = @index.settings[@name]['settings']
+    @index.update_settings "index.number_of_replicas" => 1
+    settings = @index.settings[@name]["settings"]
 
     # COMPATIBILITY
     # ES 1.0 changed the default return format of index settings to always
@@ -121,12 +121,12 @@ describe Elastomer::Client::Index do
     # {"index": {"number_of_replicas":"1"}}
 
     # To support both versions, we check for either return format.
-    value = settings['index.number_of_replicas'] ||
-            settings['index']['number_of_replicas']
-    assert_equal '1', value
+    value = settings["index.number_of_replicas"] ||
+            settings["index"]["number_of_replicas"]
+    assert_equal "1", value
   end
 
-  it 'updates document mappings' do
+  it "updates document mappings" do
     unless es_version_supports_update_mapping_with__all_disabled?
       skip "Mapping Update API is broken in this ES version."
     end
@@ -136,28 +136,28 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => 'string', :analyzer => 'standard' }}
+          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
         }
       }
     )
 
-    assert_property_exists @index.mapping[@name], 'doco', 'title'
+    assert_property_exists @index.mapping[@name], "doco", "title"
 
-    @index.update_mapping 'doco', { :doco => { :properties => {
-      :author => { :type => 'string', :index => 'not_analyzed' }
+    @index.update_mapping "doco", { :doco => { :properties => {
+      :author => { :type => "string", :index => "not_analyzed" }
     }}}
 
-    assert_property_exists @index.mapping[@name], 'doco', 'author'
-    assert_property_exists @index.mapping[@name], 'doco', 'title'
+    assert_property_exists @index.mapping[@name], "doco", "author"
+    assert_property_exists @index.mapping[@name], "doco", "title"
 
-    @index.update_mapping 'mux_mool', { :mux_mool => { :properties => {
-      :song => { :type => 'string', :index => 'not_analyzed' }
+    @index.update_mapping "mux_mool", { :mux_mool => { :properties => {
+      :song => { :type => "string", :index => "not_analyzed" }
     }}}
 
-    assert_property_exists @index.mapping[@name], 'mux_mool', 'song'
+    assert_property_exists @index.mapping[@name], "mux_mool", "song"
   end
 
-  it 'updates document mappings with .put_mapping' do
+  it "updates document mappings with .put_mapping" do
     unless es_version_supports_update_mapping_with__all_disabled?
       skip "Mapping Update API is broken in this ES version."
     end
@@ -167,40 +167,40 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => 'string', :analyzer => 'standard' }}
+          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
         }
       }
     )
 
-    assert_property_exists @index.mapping[@name], 'doco', 'title'
+    assert_property_exists @index.mapping[@name], "doco", "title"
 
-    @index.put_mapping 'doco', { :doco => { :properties => {
-      :author => { :type => 'string', :index => 'not_analyzed' }
+    @index.put_mapping "doco", { :doco => { :properties => {
+      :author => { :type => "string", :index => "not_analyzed" }
     }}}
 
-    assert_property_exists @index.mapping[@name], 'doco', 'author'
-    assert_property_exists @index.mapping[@name], 'doco', 'title'
+    assert_property_exists @index.mapping[@name], "doco", "author"
+    assert_property_exists @index.mapping[@name], "doco", "title"
 
-    @index.put_mapping 'mux_mool', { :mux_mool => { :properties => {
-      :song => { :type => 'string', :index => 'not_analyzed' }
+    @index.put_mapping "mux_mool", { :mux_mool => { :properties => {
+      :song => { :type => "string", :index => "not_analyzed" }
     }}}
 
-    assert_property_exists @index.mapping[@name], 'mux_mool', 'song'
+    assert_property_exists @index.mapping[@name], "mux_mool", "song"
   end
 
-  it 'deletes document mappings' do
+  it "deletes document mappings" do
     @index.create(
       :mappings => {
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => 'string', :analyzer => 'standard' }}
+          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
         }
       }
     )
-    assert_mapping_exists @index.mapping[@name], 'doco'
+    assert_mapping_exists @index.mapping[@name], "doco"
 
-    response = @index.delete_mapping 'doco'
+    response = @index.delete_mapping "doco"
     assert_acknowledged response
 
     mapping = @index.get_mapping
@@ -210,26 +210,26 @@ describe Elastomer::Client::Index do
     assert_empty mapping, "no mappings are present"
   end
 
-  it 'lists all aliases to the index' do
+  it "lists all aliases to the index" do
     @index.create(nil)
 
     if es_version_always_returns_aliases?
-      assert_equal({@name => {'aliases' => {}}}, @index.get_aliases)
+      assert_equal({@name => {"aliases" => {}}}, @index.get_aliases)
     else
       assert_equal({@name => {}}, @index.get_aliases)
     end
 
-    $client.cluster.update_aliases :add => {:index => @name, :alias => 'foofaloo'}
-    assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_aliases)
+    $client.cluster.update_aliases :add => {:index => @name, :alias => "foofaloo"}
+    assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_aliases)
 
     if es_version_1_x?
-      assert_equal({@name => {'aliases' => {'foofaloo' => {}}}}, @index.get_alias("f*"))
+      assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
       assert_equal({}, @index.get_alias("r*"))
     end
   end
 
   if es_version_1_x?
-    it 'adds and deletes aliases to the index' do
+    it "adds and deletes aliases to the index" do
       @index.create(nil)
       assert_empty @index.get_alias("*")
 
@@ -249,9 +249,9 @@ describe Elastomer::Client::Index do
   # COMPATIBILITY ES 1.x removed English stopwords from the default analyzers,
   # so create a custom one with the English stopwords added.
   if es_version_1_x?
-    it 'analyzes text and returns tokens' do
-      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'standard', :index => nil
-      tokens = tokens['tokens'].map { |h| h['token'] }
+    it "analyzes text and returns tokens" do
+      tokens = @index.analyze "Just a few words to analyze.", :analyzer => "standard", :index => nil
+      tokens = tokens["tokens"].map { |h| h["token"] }
       assert_equal %w[just a few words to analyze], tokens
 
       @index.create(
@@ -270,18 +270,18 @@ describe Elastomer::Client::Index do
       )
       wait_for_index(@name)
 
-      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'english_standard'
-      tokens = tokens['tokens'].map { |h| h['token'] }
+      tokens = @index.analyze "Just a few words to analyze.", :analyzer => "english_standard"
+      tokens = tokens["tokens"].map { |h| h["token"] }
       assert_equal %w[just few words analyze], tokens
     end
   else
-    it 'analyzes text and returns tokens' do
-      tokens = @index.analyze 'Just a few words to analyze.', :index => nil
-      tokens = tokens['tokens'].map { |h| h['token'] }
+    it "analyzes text and returns tokens" do
+      tokens = @index.analyze "Just a few words to analyze.", :index => nil
+      tokens = tokens["tokens"].map { |h| h["token"] }
       assert_equal %w[just few words analyze], tokens
 
-      tokens = @index.analyze 'Just a few words to analyze.', :analyzer => 'simple', :index => nil
-      tokens = tokens['tokens'].map { |h| h['token'] }
+      tokens = @index.analyze "Just a few words to analyze.", :analyzer => "simple", :index => nil
+      tokens = tokens["tokens"].map { |h| h["token"] }
       assert_equal %w[just a few words to analyze], tokens
     end
   end
@@ -293,119 +293,119 @@ describe Elastomer::Client::Index do
     end
 
     #TODO assert this only hits the desired index
-    it 'deletes' do
+    it "deletes" do
       response = @index.delete
       assert_acknowledged response
     end
 
-    it 'opens' do
+    it "opens" do
       response = @index.open
       assert_acknowledged response
     end
 
-    it 'closes' do
+    it "closes" do
       response = @index.close
       assert_acknowledged response
     end
 
-    it 'refreshes' do
+    it "refreshes" do
       response = @index.refresh
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    it 'flushes' do
+    it "flushes" do
       response = @index.flush
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    it 'optimizes' do
+    it "optimizes" do
       response = @index.optimize
       assert_equal 0, response["_shards"]["failed"]
     end
 
     # COMPATIBILITY ES 1.2 removed support for the gateway snapshot API.
     if es_version_supports_gateway_snapshots?
-      it 'snapshots' do
+      it "snapshots" do
         response = @index.snapshot
         assert_equal 0, response["_shards"]["failed"]
       end
     end
 
     if es_version_1_x?
-      it 'recovery' do
+      it "recovery" do
         response = @index.recovery
         assert_includes response, "elastomer-index-test"
       end
     end
 
-    it 'clears caches' do
+    it "clears caches" do
       response = @index.clear_cache
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    it 'gets stats' do
+    it "gets stats" do
       response = @index.stats
-      if response.key? 'indices'
+      if response.key? "indices"
         assert_includes response["indices"], "elastomer-index-test"
       else
         assert_includes response["_all"]["indices"], "elastomer-index-test"
       end
     end
 
-    it 'gets status' do
+    it "gets status" do
       response = @index.status
       assert_includes response["indices"], "elastomer-index-test"
     end
 
-    it 'gets segments' do
-      @index.docs('foo').index("foo" => "bar")
+    it "gets segments" do
+      @index.docs("foo").index("foo" => "bar")
       response = @index.segments
       assert_includes response["indices"], "elastomer-index-test"
     end
 
-    it 'deletes by query' do
-      @index.docs('foo').index("foo" => "bar")
+    it "deletes by query" do
+      @index.docs("foo").index("foo" => "bar")
       @index.refresh
-      r = @index.delete_by_query(:q => '*')
+      r = @index.delete_by_query(:q => "*")
       assert_equal({
-        '_all' => {
-          'found' => 1,
-          'deleted' => 1,
-          'missing' => 0,
-          'failed' => 0,
+        "_all" => {
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
         },
         @name => {
-          'found' => 1,
-          'deleted' => 1,
-          'missing' => 0,
-          'failed' => 0,
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
         }
-      }, r['_indices'])
+      }, r["_indices"])
     end
 
-    it 'creates a Percolator' do
+    it "creates a Percolator" do
       id = "1"
       percolator = @index.percolator id
       assert_equal id, percolator.id
     end
 
-    it 'performs multi percolate queries' do
+    it "performs multi percolate queries" do
       @index.docs.index \
         :_id    => 1,
-        :_type  => 'doc2',
-        :title  => 'the author of logging',
-        :author => 'pea53'
+        :_type  => "doc2",
+        :title  => "the author of logging",
+        :author => "pea53"
 
       @index.docs.index \
         :_id    => 2,
-        :_type  => 'doc2',
-        :title  => 'the author of rubber-band',
-        :author => 'grantr'
+        :_type  => "doc2",
+        :title  => "the author of rubber-band",
+        :author => "grantr"
 
       @index.percolator("1").create :query => { :match_all => { } }
       @index.percolator("2").create :query => { :match => { :author => "pea53" } }
 
-      h = @index.multi_percolate(:type => 'doc2') do |m|
+      h = @index.multi_percolate(:type => "doc2") do |m|
         m.percolate :author => "pea53"
         m.percolate :author => "grantr"
         m.count({}, { :author => "grantr" })

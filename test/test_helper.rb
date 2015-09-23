@@ -1,30 +1,30 @@
-require 'webmock/minitest'
+require "webmock/minitest"
 WebMock.allow_net_connect!
 
-require 'securerandom'
-require 'rubygems' unless defined? Gem
-require 'bundler'
+require "securerandom"
+require "rubygems" unless defined? Gem
+require "bundler"
 Bundler.require(:default, :development)
 
-if ENV['COVERAGE'] == 'true'
-  require 'simplecov'
+if ENV["COVERAGE"] == "true"
+  require "simplecov"
   SimpleCov.start do
     add_filter "/test/"
     add_filter "/vendor/"
   end
 end
 
-require 'minitest/spec'
-require 'minitest/autorun'
+require "minitest/spec"
+require "minitest/autorun"
 
 # push the lib folder onto the load path
-$LOAD_PATH.unshift 'lib'
-require 'elastomer/client'
+$LOAD_PATH.unshift "lib"
+require "elastomer/client"
 
 # we are going to use the same client instance everywhere!
 # the client should always be stateless
 $client_params = {
-  :port => ENV['BOXEN_ELASTICSEARCH_PORT'] || 9200,
+  :port => ENV["BOXEN_ELASTICSEARCH_PORT"] || 9200,
   :read_timeout => 2,
   :open_timeout => 1,
   :opaque_id => false
@@ -50,7 +50,7 @@ MiniTest::Unit.after_tests do
 end
 
 # add custom assertions
-require File.expand_path('../assertions', __FILE__)
+require File.expand_path("../assertions", __FILE__)
 
 # require 'elastomer/notifications'
 # require 'pp'
@@ -75,11 +75,11 @@ require File.expand_path('../assertions', __FILE__)
 # Returns the cluster health response.
 # Raises Elastomer::Client::TimeoutError if requested status is not achieved
 # within 5 seconds.
-def wait_for_index(name, status='yellow')
+def wait_for_index(name, status="yellow")
   $client.cluster.health(
     :index           => name,
     :wait_for_status => status,
-    :timeout         => '5s'
+    :timeout         => "5s"
   )
 end
 
@@ -89,7 +89,7 @@ end
 #
 # Returns true if Elasticsearch version is 1.x.
 def es_version_1_x?
-  $client.semantic_version >= '1.0.0'
+  $client.semantic_version >= "1.0.0"
 end
 
 # Elasticsearch 1.4 changed the response body for interacting with index
@@ -98,20 +98,20 @@ end
 #
 # Returns `true` if the response contains an "aliases" key.
 def es_version_always_returns_aliases?
-  $client.semantic_version <  '1.4.0' ||
-  $client.semantic_version >= '1.4.3'
+  $client.semantic_version <  "1.4.0" ||
+  $client.semantic_version >= "1.4.3"
 end
 
 # ElasticSearch 1.3 added the `search_shards` API endpoint.
 def es_version_supports_search_shards?
-  $client.semantic_version >= '1.3.0'
+  $client.semantic_version >= "1.3.0"
 end
 
 # Elasticsearch 1.2 removed support for gateway snapshots.
 #
 # Returns true if Elasticsearch version supports gateway snapshots.
 def es_version_supports_gateway_snapshots?
-  $client.semantic_version <= '1.2.0'
+  $client.semantic_version <= "1.2.0"
 end
 
 # Elasticsearch 1.4.0 had a bug in its handling of the Mapping API where it
@@ -120,13 +120,13 @@ end
 #
 # See: https://github.com/elastic/elasticsearch/pull/8426
 def es_version_supports_update_mapping_with__all_disabled?
-  $client.semantic_version != '1.4.0'
+  $client.semantic_version != "1.4.0"
 end
 
 # Elasticsearch 1.6 requires the repo.path setting when creating
 # FS repositories.
 def es_version_requires_repo_path?
-  $client.semantic_version >= '1.6.0'
+  $client.semantic_version >= "1.6.0"
 end
 
 def run_snapshot_tests?
@@ -146,8 +146,8 @@ def run_snapshot_tests?
 end
 
 def create_repo(name, settings = {})
-  location = File.join(*[ENV['SNAPSHOT_DIR'], name].compact)
-  default_settings = {:type => 'fs', :settings => {:location => location}}
+  location = File.join(*[ENV["SNAPSHOT_DIR"], name].compact)
+  default_settings = {:type => "fs", :settings => {:location => location}}
   $client.repository(name).create(default_settings.merge(settings))
 end
 

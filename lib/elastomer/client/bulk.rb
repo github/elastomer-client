@@ -35,10 +35,10 @@ module Elastomer
         bulk_obj.call
 
       else
-        raise 'bulk request body cannot be nil' if body.nil?
+        raise "bulk request body cannot be nil" if body.nil?
         params ||= {}
 
-        response = self.post '{/index}{/type}/_bulk', params.merge(:body => body, :action => 'bulk')
+        response = self.post "{/index}{/type}/_bulk", params.merge(:body => body, :action => "bulk")
         response.body
       end
     end

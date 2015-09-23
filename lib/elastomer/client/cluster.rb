@@ -34,7 +34,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def health( params = {} )
-        response = client.get '/_cluster/health{/index}', params.merge(:action => 'cluster.health')
+        response = client.get "/_cluster/health{/index}", params.merge(:action => "cluster.health")
         response.body
       end
 
@@ -52,7 +52,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def state( params = {} )
-        response = client.get '/_cluster/state{/metrics}{/indices}', params.merge(:action => 'cluster.state')
+        response = client.get "/_cluster/state{/metrics}{/indices}", params.merge(:action => "cluster.state")
         response.body
       end
 
@@ -67,7 +67,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get '/_cluster/stats', params.merge(:action => 'cluster.stats')
+        response = client.get "/_cluster/stats", params.merge(:action => "cluster.stats")
         response.body
       end
 
@@ -80,7 +80,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def pending_tasks( params = {} )
-        response = client.get '/_cluster/pending_tasks', params.merge(:action => 'cluster.pending_tasks')
+        response = client.get "/_cluster/pending_tasks", params.merge(:action => "cluster.pending_tasks")
         response.body
       end
 
@@ -101,7 +101,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def get_settings( params = {} )
-        response = client.get '/_cluster/settings', params.merge(:action => 'cluster.get_settings')
+        response = client.get "/_cluster/settings", params.merge(:action => "cluster.get_settings")
         response.body
       end
       alias_method :settings, :get_settings
@@ -117,7 +117,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
-        response = client.put '/_cluster/settings', params.merge(:body => body, :action => 'cluster.update_settings')
+        response = client.put "/_cluster/settings", params.merge(:body => body, :action => "cluster.update_settings")
         response.body
       end
 
@@ -157,7 +157,7 @@ module Elastomer
           body = {:commands => Array(commands)}
         end
 
-        response = client.post '/_cluster/reroute', params.merge(:body => body, :action => 'cluster.reroute')
+        response = client.post "/_cluster/reroute", params.merge(:body => body, :action => "cluster.reroute")
         response.body
       end
 
@@ -170,7 +170,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post '/_shutdown', params.merge(:action => 'cluster.shutdown')
+        response = client.post "/_shutdown", params.merge(:action => "cluster.shutdown")
         response.body
       end
 
@@ -191,7 +191,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get '{/index}/_aliases', params.merge(:action => 'cluster.get_aliases')
+        response = client.get "{/index}/_aliases", params.merge(:action => "cluster.get_aliases")
         response.body
       end
       alias_method :aliases, :get_aliases
@@ -227,7 +227,7 @@ module Elastomer
           body = {:actions => Array(actions)}
         end
 
-        response = client.post '/_aliases', params.merge(:body => body, :action => 'cluster.update_aliases')
+        response = client.post "/_aliases", params.merge(:body => body, :action => "cluster.update_aliases")
         response.body
       end
 
@@ -238,8 +238,8 @@ module Elastomer
       def templates
         # ES 1.x supports state filtering via a path segment called metrics.
         # ES 0.90 uses query parameters instead.
-        if client.semantic_version >= '1.0.0'
-          h = state(:metrics => 'metadata')
+        if client.semantic_version >= "1.0.0"
+          h = state(:metrics => "metadata")
         else
           h = state(
             :filter_blocks        => true,
@@ -247,7 +247,7 @@ module Elastomer
             :filter_routing_table => true,
           )
         end
-        h['metadata']['templates']
+        h["metadata"]["templates"]
       end
 
       # List all indices currently defined. This is just a convenience method
@@ -257,8 +257,8 @@ module Elastomer
       def indices
         # ES 1.x supports state filtering via a path segment called metrics.
         # ES 0.90 uses query parameters instead.
-        if client.semantic_version >= '1.0.0'
-          h = state(:metrics => 'metadata')
+        if client.semantic_version >= "1.0.0"
+          h = state(:metrics => "metadata")
         else
           h = state(
             :filter_blocks        => true,
@@ -266,7 +266,7 @@ module Elastomer
             :filter_routing_table => true,
           )
         end
-        h['metadata']['indices']
+        h["metadata"]["indices"]
       end
 
       # List all nodes currently part of the cluster. This is just a convenience
@@ -277,8 +277,8 @@ module Elastomer
       def nodes
         # ES 1.x supports state filtering via a path segment called metrics.
         # ES 0.90 uses query parameters instead.
-        if client.semantic_version >= '1.0.0'
-          h = state(:metrics => 'nodes')
+        if client.semantic_version >= "1.0.0"
+          h = state(:metrics => "nodes")
         else
           h = state(
             :filter_blocks        => true,
@@ -286,7 +286,7 @@ module Elastomer
             :filter_routing_table => true,
           )
         end
-        h['nodes']
+        h["nodes"]
       end
 
     end

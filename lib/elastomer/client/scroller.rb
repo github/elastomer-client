@@ -43,7 +43,7 @@ module Elastomer
     #
     # Returns a new Scroller instance
     def scan( query, opts = {} )
-      opts = opts.merge(:search_type => 'scan')
+      opts = opts.merge(:search_type => "scan")
       Scroller.new(self, query, opts)
     end
 
@@ -72,8 +72,8 @@ module Elastomer
     #
     # Returns the response body as a Hash.
     def start_scroll( opts = {} )
-      opts = opts.merge :action => 'search.start_scroll'
-      response = get '{/index}{/type}/_search', opts
+      opts = opts.merge :action => "search.start_scroll"
+      response = get "{/index}{/type}/_search", opts
       response.body
     end
 
@@ -96,15 +96,15 @@ module Elastomer
     #   # repeat until the results are empty
     #
     # Returns the response body as a Hash.
-    def continue_scroll( scroll_id, scroll = '5m' )
-      response = get '/_search/scroll', :body => scroll_id, :scroll => scroll, :action => 'search.scroll'
+    def continue_scroll( scroll_id, scroll = "5m" )
+      response = get "/_search/scroll", :body => scroll_id, :scroll => scroll, :action => "search.scroll"
       response.body
     end
 
     DEFAULT_OPTS = {
       :index => nil,
       :type => nil,
-      :scroll => '5m',
+      :scroll => "5m",
       :size => 50,
     }.freeze
 
@@ -165,11 +165,11 @@ module Elastomer
         loop do
           body = do_scroll
 
-          hits = body['hits']
-          break if hits['hits'].empty?
+          hits = body["hits"]
+          break if hits["hits"].empty?
 
-          hits['offset'] = @offset
-          @offset += hits['hits'].length
+          hits["offset"] = @offset
+          @offset += hits["hits"].length
 
           yield hits
         end
@@ -195,7 +195,7 @@ module Elastomer
       #
       # Returns this Scan instance.
       def each_document( &block )
-        each { |hits| hits['hits'].each(&block) }
+        each { |hits| hits["hits"].each(&block) }
       end
 
       # Internal: Perform the actual scroll requests. This method wil call out
@@ -206,15 +206,15 @@ module Elastomer
       def do_scroll
         if scroll_id.nil?
           body = client.start_scroll(@opts)
-          if body['hits']['hits'].empty?
-            @scroll_id = body['_scroll_id']
+          if body["hits"]["hits"].empty?
+            @scroll_id = body["_scroll_id"]
             return do_scroll
           end
         else
           body = client.continue_scroll(scroll_id, @opts[:scroll])
         end
 
-        @scroll_id = body['_scroll_id']
+        @scroll_id = body["_scroll_id"]
         body
       end
 

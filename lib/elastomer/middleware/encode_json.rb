@@ -8,8 +8,8 @@ module Elastomer
     #
     # Doesn't try to encode bodies that already are in string form.
     class EncodeJson < Faraday::Middleware
-      CONTENT_TYPE = 'Content-Type'.freeze
-      MIME_TYPE    = 'application/json'.freeze
+      CONTENT_TYPE = "Content-Type".freeze
+      MIME_TYPE    = "application/json".freeze
 
       def call(env)
         match_content_type(env) do |data|
@@ -31,16 +31,16 @@ module Elastomer
 
       def process_request?(env)
         type = request_type(env)
-        has_body?(env) and (type.empty? or type == MIME_TYPE)
+        has_body?(env) && (type.empty? || type == MIME_TYPE)
       end
 
       def has_body?(env)
-        body = env[:body] and !(body.respond_to?(:to_str) and body.empty?)
+        (body = env[:body]) && !(body.respond_to?(:to_str) && body.empty?)
       end
 
       def request_type(env)
         type = env[:request_headers][CONTENT_TYPE].to_s
-        type = type.split(';', 2).first if type.index(';')
+        type = type.split(";", 2).first if type.index(";")
         type
       end
     end

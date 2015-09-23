@@ -1,7 +1,7 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'elastomer/version'
+require "elastomer/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "elastomer-client"
@@ -29,4 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest","~> 4.7"
   spec.add_development_dependency "webmock","~> 1.21"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "overcommit"
+  spec.add_development_dependency "rubocop"
 end

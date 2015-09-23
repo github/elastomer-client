@@ -1,53 +1,53 @@
-require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Middleware::EncodeJson do
   let(:middleware) { Elastomer::Middleware::EncodeJson.new(lambda {|env| env})}
 
   def process(body, content_type = nil)
     env = { :body => body, :request_headers => Faraday::Utils::Headers.new }
-    env[:request_headers]['content-type'] = content_type if content_type
+    env[:request_headers]["content-type"] = content_type if content_type
     middleware.call(env)
   end
 
-  it 'handles no body' do
+  it "handles no body" do
     result = process(nil)
     assert_nil result[:body]
-    assert_nil result[:request_headers]['content-type']
+    assert_nil result[:request_headers]["content-type"]
   end
 
-  it 'handles empty body' do
-    result = process('')
+  it "handles empty body" do
+    result = process("")
     assert_empty result[:body]
-    assert_nil result[:request_headers]['content-type']
+    assert_nil result[:request_headers]["content-type"]
   end
 
-  it 'handles string body' do
+  it "handles string body" do
     result = process('{"a":1}')
     assert_equal '{"a":1}', result[:body]
-    assert_equal 'application/json', result[:request_headers]['content-type']
+    assert_equal "application/json", result[:request_headers]["content-type"]
   end
 
-  it 'handles object body' do
+  it "handles object body" do
     result = process({:a => 1})
     assert_equal '{"a":1}', result[:body]
-    assert_equal 'application/json', result[:request_headers]['content-type']
+    assert_equal "application/json", result[:request_headers]["content-type"]
   end
 
-  it 'handles empty object body' do
+  it "handles empty object body" do
     result = process({})
-    assert_equal '{}', result[:body]
-    assert_equal 'application/json', result[:request_headers]['content-type']
+    assert_equal "{}", result[:body]
+    assert_equal "application/json", result[:request_headers]["content-type"]
   end
 
-  it 'handles object body with json type' do
-    result = process({:a => 1}, 'application/json; charset=utf-8')
+  it "handles object body with json type" do
+    result = process({:a => 1}, "application/json; charset=utf-8")
     assert_equal '{"a":1}', result[:body]
-    assert_equal 'application/json; charset=utf-8', result[:request_headers]['content-type']
+    assert_equal "application/json; charset=utf-8", result[:request_headers]["content-type"]
   end
 
-  it 'handles object body with incompatible type' do
-    result = process({:a => 1}, 'application/xml; charset=utf-8')
+  it "handles object body with incompatible type" do
+    result = process({:a => 1}, "application/xml; charset=utf-8")
     assert_equal({:a => 1}, result[:body])
-    assert_equal 'application/xml; charset=utf-8', result[:request_headers]['content-type']
+    assert_equal "application/xml; charset=utf-8", result[:request_headers]["content-type"]
   end
 end

@@ -24,7 +24,7 @@ module Elastomer
       #
       def initialize( client, name )
         @client = client
-        @name   = @client.assert_param_presence(name, 'index name') unless name.nil?
+        @name   = @client.assert_param_presence(name, "index name") unless name.nil?
       end
 
       attr_reader :client, :name
@@ -40,7 +40,7 @@ module Elastomer
       #
       # Returns true if the index (or type) exists
       def exists?( params = {} )
-        response = client.head '/{index}{/type}', update_params(params, :action => 'index.exists')
+        response = client.head "/{index}{/type}", update_params(params, :action => "index.exists")
         response.success?
       end
       alias_method :exist?, :exists?
@@ -54,7 +54,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create( body, params = {} )
-        response = client.post '/{index}', update_params(params, :body => body, :action => 'index.create')
+        response = client.post "/{index}", update_params(params, :body => body, :action => "index.create")
         response.body
       end
 
@@ -66,7 +66,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete '/{index}', update_params(params, :action => 'index.delete')
+        response = client.delete "/{index}", update_params(params, :action => "index.delete")
         response.body
       end
 
@@ -78,7 +78,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def open( params = {} )
-        response = client.post '/{index}/_open', update_params(params, :action => 'index.open')
+        response = client.post "/{index}/_open", update_params(params, :action => "index.open")
         response.body
       end
 
@@ -90,7 +90,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def close( params = {} )
-        response = client.post '/{index}/_close', update_params(params, :action => 'index.close')
+        response = client.post "/{index}/_close", update_params(params, :action => "index.close")
         response.body
       end
 
@@ -102,7 +102,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_settings( params = {} )
-        response = client.get '{/index}/_settings', update_params(params, :action => 'index.get_settings')
+        response = client.get "{/index}/_settings", update_params(params, :action => "index.get_settings")
         response.body
       end
       alias_method :settings, :get_settings
@@ -116,7 +116,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_settings( body, params = {} )
-        response = client.put '{/index}/_settings', update_params(params, :body => body, :action => 'index.update_settings')
+        response = client.put "{/index}/_settings", update_params(params, :body => body, :action => "index.update_settings")
         response.body
       end
 
@@ -130,7 +130,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_mapping( params = {} )
-        response = client.get '/{index}{/type}/_mapping', update_params(params, :action => 'index.get_mapping')
+        response = client.get "/{index}{/type}/_mapping", update_params(params, :action => "index.get_mapping")
         response.body
       end
       alias_method :mapping, :get_mapping
@@ -145,7 +145,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_mapping( type, body, params = {} )
-        response = client.put '/{index}/{type}/_mapping', update_params(params, :body => body, :type => type, :action => 'index.update_mapping')
+        response = client.put "/{index}/{type}/_mapping", update_params(params, :body => body, :type => type, :action => "index.update_mapping")
         response.body
       end
       alias_method :put_mapping, :update_mapping
@@ -160,7 +160,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete_mapping( type, params = {} )
-        response = client.delete '/{index}/{type}', update_params(params, :type => type, :action => 'index.delete_mapping')
+        response = client.delete "/{index}/{type}", update_params(params, :type => type, :action => "index.delete_mapping")
         response.body
       end
 
@@ -172,7 +172,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get '/{index}/_aliases', update_params(:action => 'index.get_aliases')
+        response = client.get "/{index}/_aliases", update_params(:action => "index.get_aliases")
         response.body
       end
       alias_method :aliases, :get_aliases
@@ -193,7 +193,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_alias( name, params = {} )
-        response = client.get '/{index}/_alias/{name}', update_params(params, :name => name, :action => 'index.get_alias')
+        response = client.get "/{index}/_alias/{name}", update_params(params, :name => name, :action => "index.get_alias")
         response.body
       end
 
@@ -212,7 +212,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def add_alias( name, params = {} )
-        response = client.put '/{index}/_alias/{name}', update_params(params, :name => name, :action => 'index.add_alias')
+        response = client.put "/{index}/_alias/{name}", update_params(params, :name => name, :action => "index.add_alias")
         response.body
       end
 
@@ -230,7 +230,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete_alias( name, params = {} )
-        response = client.delete '/{index}/_alias/{name}', update_params(params, :name => name, :action => 'index.delete_alias')
+        response = client.delete "/{index}/_alias/{name}", update_params(params, :name => name, :action => "index.delete_alias")
         response.body
       end
 
@@ -243,7 +243,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def analyze( text, params = {} )
-        response = client.get '{/index}/_analyze', update_params(params, :body => text.to_s, :action => 'index.analyze')
+        response = client.get "{/index}/_analyze", update_params(params, :body => text.to_s, :action => "index.analyze")
         response.body
       end
 
@@ -257,7 +257,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def refresh( params = {} )
-        response = client.post '{/index}/_refresh', update_params(params, :action => 'index.refresh')
+        response = client.post "{/index}/_refresh", update_params(params, :action => "index.refresh")
         response.body
       end
 
@@ -270,7 +270,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def flush( params = {} )
-        response = client.post '{/index}/_flush', update_params(params, :action => 'index.flush')
+        response = client.post "{/index}/_flush", update_params(params, :action => "index.flush")
         response.body
       end
 
@@ -284,7 +284,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def optimize( params = {} )
-        response = client.post '{/index}/_optimize', update_params(params, :action => 'index.optimize')
+        response = client.post "{/index}/_optimize", update_params(params, :action => "index.optimize")
         response.body
       end
 
@@ -300,7 +300,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def snapshot( params = {} )
-        response = client.post '{/index}/_gateway/snapshot', update_params(params, :action => 'index.snapshot')
+        response = client.post "{/index}/_gateway/snapshot", update_params(params, :action => "index.snapshot")
         response.body
       end
 
@@ -313,7 +313,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def recovery( params = {} )
-        response = client.get '{/index}/_recovery', update_params(params, :action => 'index.recovery')
+        response = client.get "{/index}/_recovery", update_params(params, :action => "index.recovery")
         response.body
       end
 
@@ -327,7 +327,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def clear_cache( params = {} )
-        response = client.post '{/index}/_cache/clear', update_params(params, :action => 'index.clear_cache')
+        response = client.post "{/index}/_cache/clear", update_params(params, :action => "index.clear_cache")
         response.body
       end
 
@@ -340,7 +340,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def stats( params = {} )
-        response = client.get '{/index}/_stats', update_params(params, :action => 'index.stats')
+        response = client.get "{/index}/_stats", update_params(params, :action => "index.stats")
         response.body
       end
 
@@ -355,7 +355,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def status( params = {} )
-        response = client.get '{/index}/_status', update_params(params, :action => 'index.status')
+        response = client.get "{/index}/_status", update_params(params, :action => "index.status")
         response.body
       end
 
@@ -368,7 +368,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def segments( params = {} )
-        response = client.get '{/index}/_segments', update_params(params, :action => 'index.segments')
+        response = client.get "{/index}/_segments", update_params(params, :action => "index.segments")
         response.body
       end
 
@@ -407,7 +407,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def bulk( params = {}, &block )
-        raise 'a block is required' if block.nil?
+        raise "a block is required" if block.nil?
 
         params = {:index => self.name}.merge params
         client.bulk params, &block
@@ -495,7 +495,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def multi_search( params = {}, &block )
-        raise 'a block is required' if block.nil?
+        raise "a block is required" if block.nil?
 
         params = {:index => self.name}.merge params
         client.multi_search params, &block

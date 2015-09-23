@@ -29,11 +29,11 @@ module Elastomer
           @status = response.status
           body = response.body
 
-          message = body.is_a?(Hash) && body['error'] || body.to_s
+          message = body.is_a?(Hash) && body["error"] || body.to_s
           super message
 
         else
-          super args.join(' ')
+          super args.join(" ")
         end
       end
 

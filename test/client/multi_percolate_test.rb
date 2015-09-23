@@ -1,27 +1,27 @@
-require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Client::MultiPercolate do
 
   before do
-    @name  = 'elastomer-mpercolate-test'
+    @name  = "elastomer-mpercolate-test"
     @index = $client.index(@name)
 
     unless @index.exists?
       @index.create \
-        :settings => { 'index.number_of_shards' => 1, 'index.number_of_replicas' => 0 },
+        :settings => { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
         :mappings => {
           :doc1 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => 'string', :analyzer => 'standard' },
-              :author => { :type => 'string', :index => 'not_analyzed' }
+              :title  => { :type => "string", :analyzer => "standard" },
+              :author => { :type => "string", :index => "not_analyzed" }
             }
           },
           :doc2 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => 'string', :analyzer => 'standard' },
-              :author => { :type => 'string', :index => 'not_analyzed' }
+              :title  => { :type => "string", :analyzer => "standard" },
+              :author => { :type => "string", :index => "not_analyzed" }
             }
           }
         }
@@ -36,7 +36,7 @@ describe Elastomer::Client::MultiPercolate do
     @index.delete if @index.exists?
   end
 
-  it 'performs multi percolate queries' do
+  it "performs multi percolate queries" do
     populate!
 
     body = [
@@ -56,7 +56,7 @@ describe Elastomer::Client::MultiPercolate do
     assert_equal 2, response3["total"]
   end
 
-  it 'performs multi percolate queries with .mpercolate' do
+  it "performs multi percolate queries with .mpercolate" do
     populate!
 
     body = [
@@ -76,10 +76,10 @@ describe Elastomer::Client::MultiPercolate do
     assert_equal 2, response3["total"]
   end
 
-  it 'supports a nice block syntax' do
+  it "supports a nice block syntax" do
     populate!
 
-    h = $client.multi_percolate(:index => @name, :type => 'doc2') do |m|
+    h = $client.multi_percolate(:index => @name, :type => "doc2") do |m|
       m.percolate :author => "pea53"
       m.percolate :author => "grantr"
       m.count({ :author => "grantr" })
@@ -91,30 +91,31 @@ describe Elastomer::Client::MultiPercolate do
     assert_equal 2, response3["total"]
   end
 
+  # rubocop:disable Metrics/MethodLength
   def populate!
     @docs.index \
       :_id    => 1,
-      :_type  => 'doc1',
-      :title  => 'the author of gravatar',
-      :author => 'mojombo'
+      :_type  => "doc1",
+      :title  => "the author of gravatar",
+      :author => "mojombo"
 
     @docs.index \
       :_id    => 2,
-      :_type  => 'doc1',
-      :title  => 'the author of resque',
-      :author => 'defunkt'
+      :_type  => "doc1",
+      :title  => "the author of resque",
+      :author => "defunkt"
 
     @docs.index \
       :_id    => 1,
-      :_type  => 'doc2',
-      :title  => 'the author of logging',
-      :author => 'pea53'
+      :_type  => "doc2",
+      :title  => "the author of logging",
+      :author => "pea53"
 
     @docs.index \
       :_id    => 2,
-      :_type  => 'doc2',
-      :title  => 'the author of rubber-band',
-      :author => 'grantr'
+      :_type  => "doc2",
+      :title  => "the author of rubber-band",
+      :author => "grantr"
 
     percolator1 = @index.percolator "1"
     percolator1.create :query => { :match_all => { } }
@@ -125,4 +126,5 @@ describe Elastomer::Client::MultiPercolate do
 
     @index.refresh
   end
+  # rubocop:enable Metrics/MethodLength
 end

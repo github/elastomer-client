@@ -1,25 +1,25 @@
-require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Middleware::OpaqueId do
 
   before do
     stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-      stub.get('/_cluster/health') { |env|
+      stub.get("/_cluster/health") { |env|
         [ 200,
 
-          { 'X-Opaque-Id'    => env[:request_headers]['X-Opaque-Id'],
-            'Content-Type'   => 'application/json; charset=UTF-8',
-            'Content-Length' => '49' },
+          { "X-Opaque-Id"    => env[:request_headers]["X-Opaque-Id"],
+            "Content-Type"   => "application/json; charset=UTF-8",
+            "Content-Length" => "49" },
 
           %q[{"cluster_name":"elasticsearch","status":"green"}]
         ]
       }
 
-      stub.get('/') { |env|
-        [ 200, {}, {'version' => {'number' => '1.0.0'}}  ]
+      stub.get("/") { |env|
+        [ 200, {}, {"version" => {"number" => "1.0.0"}}  ]
       }
-      stub.get('/_cluster/state') { |env|
-        [ 200, {'X-Opaque-Id' => "00000000-0000-0000-0000-000000000000"}, %q[{"foo":"bar"}] ]
+      stub.get("/_cluster/state") { |env|
+        [ 200, {"X-Opaque-Id" => "00000000-0000-0000-0000-000000000000"}, %q[{"foo":"bar"}] ]
       }
     end
 
@@ -35,7 +35,7 @@ describe Elastomer::Middleware::OpaqueId do
     assert_equal({"cluster_name" => "elasticsearch", "status" => "green"}, health)
   end
 
-  it 'raises an exception on conflicting headers' do
+  it "raises an exception on conflicting headers" do
     assert_raises(Elastomer::Client::OpaqueIdError) { @client.cluster.state }
   end
 

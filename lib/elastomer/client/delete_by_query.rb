@@ -60,7 +60,7 @@ module Elastomer
         @client = client
         @query = query
         @params = params
-        @response_stats = { 'took' => 0, '_indices' => { '_all' => {} }, 'failures' => [] }
+        @response_stats = { "took" => 0, "_indices" => { "_all" => {} }, "failures" => [] }
       end
 
       attr_reader :client, :query, :params, :response_stats
@@ -95,9 +95,9 @@ module Elastomer
       # item - A bulk response item
       def accumulate(item)
         item = item["delete"]
-        (@response_stats['_indices'][item['_index']] ||= {}).merge!(categorize(item)) { |_, n, m| n + m }
-        @response_stats['_indices']['_all'].merge!(categorize(item)) { |_, n, m| n + m }
-        @response_stats['failures'] << item unless is_ok? item['status']
+        (@response_stats["_indices"][item["_index"]] ||= {}).merge!(categorize(item)) { |_, n, m| n + m }
+        @response_stats["_indices"]["_all"].merge!(categorize(item)) { |_, n, m| n + m }
+        @response_stats["failures"] << item unless is_ok? item["status"]
       end
 
       # Perform the Delete by Query action
@@ -106,12 +106,12 @@ module Elastomer
       def execute
         ops = Enumerator.new do |yielder|
           @client.scan(@query, @params.merge(:_source => false)).each_document do |hit|
-            yielder.yield([:delete, { _id: hit["_id"], _type: hit["_type"], _index: hit["_index"] }])
+            yielder.yield([:delete, { :_id => hit["_id"], :_type => hit["_type"], :_index => hit["_index"] }])
           end
         end
 
         stats = @client.bulk_stream_items(ops, @params) { |item| accumulate(item) }
-        @response_stats['took'] = stats['took']
+        @response_stats["took"] = stats["took"]
         @response_stats
       end
 

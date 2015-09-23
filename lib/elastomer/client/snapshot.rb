@@ -22,8 +22,8 @@ module Elastomer
       def initialize(client, repository = nil, name = nil)
         @client     = client
         # don't allow nil repository if snapshot name is not nil
-        @repository = @client.assert_param_presence(repository, 'repository name') unless repository.nil? && name.nil?
-        @name       = @client.assert_param_presence(name, 'snapshot name') unless name.nil?
+        @repository = @client.assert_param_presence(repository, "repository name") unless repository.nil? && name.nil?
+        @name       = @client.assert_param_presence(name, "snapshot name") unless name.nil?
       end
 
       attr_reader :client, :repository, :name
@@ -35,7 +35,7 @@ module Elastomer
       #
       # Returns true if the snapshot exists
       def exists?(params = {})
-        response = client.get '/_snapshot/{repository}/{snapshot}', update_params(params, :action => 'snapshot.exists')
+        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, :action => "snapshot.exists")
         response.success?
       rescue Elastomer::Client::Error => exception
         if exception.message =~ /SnapshotMissingException/
@@ -54,7 +54,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create(body = {}, params = {})
-        response = client.put '/_snapshot/{repository}/{snapshot}', update_params(params, :body => body, :action => 'snapshot.create')
+        response = client.put "/_snapshot/{repository}/{snapshot}", update_params(params, :body => body, :action => "snapshot.create")
         response.body
       end
 
@@ -66,8 +66,8 @@ module Elastomer
       # Returns the response body as a Hash
       def get(params = {})
         # Set snapshot name or we'll get the repository instead
-        snapshot = name || '_all'
-        response = client.get '/_snapshot/{repository}/{snapshot}', update_params(params, :snapshot => snapshot, :action => 'snapshot.get')
+        snapshot = name || "_all"
+        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, :snapshot => snapshot, :action => "snapshot.get")
         response.body
       end
 
@@ -78,7 +78,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def status(params = {})
-        response = client.get '/_snapshot{/repository}{/snapshot}/_status', update_params(params, :action => 'snapshot.status')
+        response = client.get "/_snapshot{/repository}{/snapshot}/_status", update_params(params, :action => "snapshot.status")
         response.body
       end
 
@@ -90,7 +90,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def restore(body = {}, params = {})
-        response = client.post '/_snapshot/{repository}/{snapshot}/_restore', update_params(params, :body => body, :action => 'snapshot.restore')
+        response = client.post "/_snapshot/{repository}/{snapshot}/_restore", update_params(params, :body => body, :action => "snapshot.restore")
         response.body
       end
 
@@ -101,7 +101,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete '/_snapshot/{repository}/{snapshot}', update_params(params, :action => 'snapshot.delete')
+        response = client.delete "/_snapshot/{repository}/{snapshot}", update_params(params, :action => "snapshot.delete")
         response.body
       end
 

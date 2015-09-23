@@ -37,10 +37,10 @@ module Elastomer
         yield mpercolate_obj = MultiPercolate.new(self, params)
         mpercolate_obj.call
       else
-        raise 'multi_percolate request body cannot be nil' if body.nil?
+        raise "multi_percolate request body cannot be nil" if body.nil?
         params ||= {}
 
-        response = self.post '{/index}{/type}/_mpercolate', params.merge(:body => body)
+        response = self.post "{/index}{/type}/_mpercolate", params.merge(:body => body)
         response.body
       end
     end

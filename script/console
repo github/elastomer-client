@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
-require 'irb'
-require 'rubygems'
-require 'bundler/setup'
+require "irb"
+require "rubygems"
+require "bundler/setup"
 
-$LOAD_PATH.unshift 'lib'
-require 'elastomer/client'
+$LOAD_PATH.unshift "lib"
+require "elastomer/client"
 
 IRB.start

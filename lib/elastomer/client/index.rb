@@ -514,7 +514,7 @@ module Elastomer
       # Examples
       #
       #   # block form
-      #   multi_percolate() do |m|
+      #   multi_percolate do |m|
       #     m.percolate({ :author => "pea53" }, { :type => 'default-type' })
       #     m.count({ :author => "pea53" }, { :type => 'type2' })
       #     ...

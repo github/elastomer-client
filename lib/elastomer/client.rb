@@ -1,9 +1,9 @@
-require 'addressable/template'
-require 'faraday'
-require 'multi_json'
-require 'semantic'
+require "addressable/template"
+require "faraday"
+require "multi_json"
+require "semantic"
 
-require 'elastomer/version'
+require "elastomer/version"
 
 module Elastomer
 
@@ -22,7 +22,7 @@ module Elastomer
     #   :opaque_id    - set to `true` to use the 'X-Opaque-Id' request header
     #
     def initialize( opts = {} )
-      host = opts.fetch :host, 'localhost'
+      host = opts.fetch :host, "localhost"
       port = opts.fetch :port, 9200
       @url = opts.fetch :url,  "http://#{host}:#{port}"
 
@@ -41,7 +41,7 @@ module Elastomer
 
     # Returns true if the server is available; returns false otherwise.
     def ping
-      response = head '/', :action => 'cluster.ping'
+      response = head "/", :action => "cluster.ping"
       response.success?
     rescue StandardError
       false
@@ -50,7 +50,7 @@ module Elastomer
 
     # Returns the version String of the attached ElasticSearch instance.
     def version
-      @version ||= info['version']['number']
+      @version ||= info["version"]["number"]
     end
 
     # Returns a Semantic::Version for the attached ElasticSearch instance.
@@ -61,7 +61,7 @@ module Elastomer
 
     # Returns the information Hash from the attached ElasticSearch instance.
     def info
-      response = get '/', :action => 'cluster.info'
+      response = get "/", :action => "cluster.info"
       response.body
     end
 
@@ -191,7 +191,7 @@ module Elastomer
 
         # wrap Faraday errors with appropriate Elastomer::Client error classes
         rescue Faraday::Error::ClientError => boom
-          error_name = boom.class.name.split('::').last
+          error_name = boom.class.name.split("::").last
           error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
           raise error_class.new(boom, method.upcase, path)
         end
@@ -295,7 +295,7 @@ module Elastomer
     # containing and 'error' field.
     def handle_errors( response )
       raise ServerError, response if response.status >= 500
-      raise RequestError, response if response.body.is_a?(Hash) && response.body['error']
+      raise RequestError, response if response.body.is_a?(Hash) && response.body["error"]
 
       response
     end
@@ -315,7 +315,7 @@ module Elastomer
     #
     # Returns the validated param as a String.
     # Raises an ArgumentError if the param is not valid.
-    def assert_param_presence( param, name = 'input value' )
+    def assert_param_presence( param, name = "input value" )
       case param
       when String, Symbol, Numeric
         param = param.to_s.strip
@@ -323,7 +323,7 @@ module Elastomer
         param
 
       when Array
-        param.flatten.map { |item| assert_param_presence(item, name) }.join(',')
+        param.flatten.map { |item| assert_param_presence(item, name) }.join(",")
 
       when nil
         raise ArgumentError, "#{name} cannot be nil"
@@ -337,7 +337,7 @@ module Elastomer
 end  # Elastomer
 
 # require all files in the `client` sub-directory
-Dir.glob(File.expand_path('../client/*.rb', __FILE__)).each { |fn| require fn }
+Dir.glob(File.expand_path("../client/*.rb", __FILE__)).each { |fn| require fn }
 
 # require all files in the `middleware` sub-directory
-Dir.glob(File.expand_path('../middleware/*.rb', __FILE__)).each { |fn| require fn }
+Dir.glob(File.expand_path("../middleware/*.rb", __FILE__)).each { |fn| require fn }

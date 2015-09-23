@@ -3,8 +3,8 @@ module Elastomer
 
     # Parse response bodies as JSON.
     class ParseJson < Faraday::Middleware
-      CONTENT_TYPE = 'Content-Type'.freeze
-      MIME_TYPE    = 'application/json'.freeze
+      CONTENT_TYPE = "Content-Type".freeze
+      MIME_TYPE    = "application/json".freeze
 
       def call(environment)
         @app.call(environment).on_complete do |env|
@@ -28,7 +28,7 @@ module Elastomer
 
       def response_type(env)
         type = env[:response_headers][CONTENT_TYPE].to_s
-        type = type.split(';', 2).first if type.index(';')
+        type = type.split(";", 2).first if type.index(";")
         type
       end
     end

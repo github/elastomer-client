@@ -1,6 +1,6 @@
-require 'active_support/notifications'
-require 'securerandom'
-require 'elastomer/client'
+require "active_support/notifications"
+require "securerandom"
+require "elastomer/client"
 
 module Elastomer
 
@@ -40,7 +40,7 @@ module Elastomer
     end
 
     # The name to subscribe to for notifications
-    NAME = 'request.client.elastomer'.freeze
+    NAME = "request.client.elastomer".freeze
 
     # Internal: Execute the given block and provide instrumentation info to
     # subscribers. The name we use for subscriptions is

@@ -26,8 +26,8 @@ module Elastomer
       #
       def initialize( client, name, type = nil )
         @client = client
-        @name   = @client.assert_param_presence(name, 'index name') unless name.nil?
-        @type   = @client.assert_param_presence(type, 'document type') unless type.nil?
+        @name   = @client.assert_param_presence(name, "index name") unless name.nil?
+        @type   = @client.assert_param_presence(type, "document type") unless type.nil?
       end
 
       attr_reader :client, :name, :type
@@ -68,15 +68,15 @@ module Elastomer
       def index( document, params = {} )
         overrides = from_document document
         params = update_params(params, overrides)
-        params[:action] = 'docs.index'
+        params[:action] = "docs.index"
 
         params.delete(:id) if params[:id].nil? || params[:id].to_s =~ /\A\s*\z/
 
         response =
             if params[:id]
-              client.put '/{index}/{type}/{id}', params
+              client.put "/{index}/{type}/{id}", params
             else
-              client.post '/{index}/{type}', params
+              client.post "/{index}/{type}", params
             end
 
         response.body
@@ -92,7 +92,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete '/{index}/{type}/{id}', update_params(params, :action => 'docs.delete')
+        response = client.delete "/{index}/{type}/{id}", update_params(params, :action => "docs.delete")
         response.body
       end
 
@@ -106,7 +106,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get '/{index}/{type}/{id}', update_params(params, :action => 'docs.get')
+        response = client.get "/{index}/{type}/{id}", update_params(params, :action => "docs.get")
         response.body
       end
 
@@ -120,7 +120,7 @@ module Elastomer
       #
       # Returns true if the document exists
       def exists?( params = {} )
-        response = client.head '/{index}/{type}/{id}', update_params(params, :action => 'docs.exists')
+        response = client.head "/{index}/{type}/{id}", update_params(params, :action => "docs.exists")
         response.success?
       end
       alias_method :exist?, :exists?
@@ -135,7 +135,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def source( params = {} )
-        response = client.get '/{index}/{type}/{id}/_source', update_params(params, :action => 'docs.source')
+        response = client.get "/{index}/{type}/{id}/_source", update_params(params, :action => "docs.source")
         response.body
       end
 
@@ -149,9 +149,9 @@ module Elastomer
       # Returns the response body as a Hash
       def multi_get( body, params = {} )
         overrides = from_document body
-        overrides[:action] = 'docs.multi_get'
+        overrides[:action] = "docs.multi_get"
 
-        response = client.get '{/index}{/type}/_mget', update_params(params, overrides)
+        response = client.get "{/index}{/type}/_mget", update_params(params, overrides)
         response.body
       end
       alias_method :mget, :multi_get
@@ -166,9 +166,9 @@ module Elastomer
       # Returns the response body as a Hash
       def update( script, params = {} )
         overrides = from_document script
-        overrides[:action] = 'docs.update'
+        overrides[:action] = "docs.update"
 
-        response = client.post '/{index}/{type}/{id}/_update', update_params(params, overrides)
+        response = client.post "/{index}/{type}/{id}/_update", update_params(params, overrides)
         response.body
       end
 
@@ -197,7 +197,7 @@ module Elastomer
       def search( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}{/type}/_search', update_params(params, :body => query, :action => 'docs.search')
+        response = client.get "/{index}{/type}/_search", update_params(params, :body => query, :action => "docs.search")
         response.body
       end
 
@@ -215,7 +215,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def search_shards( params = {} )
-        response = client.get '/{index}{/type}/_search_shards', update_params(params, :action => 'docs.search_shards')
+        response = client.get "/{index}{/type}/_search_shards", update_params(params, :action => "docs.search_shards")
         response.body
       end
 
@@ -242,7 +242,7 @@ module Elastomer
       def count( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}{/type}/_count', update_params(params, :body => query, :action => 'docs.count')
+        response = client.get "/{index}{/type}/_count", update_params(params, :body => query, :action => "docs.count")
         response.body
       end
 
@@ -273,7 +273,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def percolate(body, params = {})
-        response = client.get '/{index}/{type}{/id}/_percolate', update_params(params, :body => body, :action => 'percolator.percolate')
+        response = client.get "/{index}/{type}{/id}/_percolate", update_params(params, :body => body, :action => "percolator.percolate")
         response.body
       end
 
@@ -289,7 +289,7 @@ module Elastomer
       #
       # Returns the count
       def percolate_count(body, params = {})
-        response = client.get '/{index}/{type}{/id}/_percolate/count', update_params(params, :body => body, :action => 'percolator.percolate_count')
+        response = client.get "/{index}/{type}{/id}/_percolate/count", update_params(params, :body => body, :action => "percolator.percolate_count")
         response.body["total"]
       end
 
@@ -304,7 +304,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def termvector( params = {} )
-        response = client.get '/{index}/{type}/{id}/_termvector', update_params(params, :action => 'docs.termvector')
+        response = client.get "/{index}/{type}/{id}/_termvector", update_params(params, :action => "docs.termvector")
         response.body
       end
       alias_method :termvectors, :termvector
@@ -322,7 +322,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def multi_termvectors( body, params = {} )
-        response = client.get '{/index}{/type}/_mtermvectors', update_params(params, :body => body, :action => 'docs.multi_termvectors')
+        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, :body => body, :action => "docs.multi_termvectors")
         response.body
       end
       alias_method :multi_term_vectors, :multi_termvectors
@@ -354,7 +354,7 @@ Percolate
       def more_like_this( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}/{type}/{id}/_mlt', update_params(params, :body => query, :action => 'docs.more_like_this')
+        response = client.get "/{index}/{type}/{id}/_mlt", update_params(params, :body => query, :action => "docs.more_like_this")
         response.body
       end
 
@@ -378,7 +378,7 @@ Percolate
       def explain( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}/{type}/{id}/_explain', update_params(params, :body => query, :action => 'docs.explain')
+        response = client.get "/{index}/{type}/{id}/_explain", update_params(params, :body => query, :action => "docs.explain")
         response.body
       end
 
@@ -403,7 +403,7 @@ Percolate
       def validate( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get '/{index}{/type}/_validate/query', update_params(params, :body => query, :action => 'docs.validate')
+        response = client.get "/{index}{/type}/_validate/query", update_params(params, :body => query, :action => "docs.validate")
         response.body
       end
 
@@ -429,7 +429,7 @@ Percolate
       #
       # Returns the response body as a Hash
       def bulk( params = {}, &block )
-        raise 'a block is required' if block.nil?
+        raise "a block is required" if block.nil?
 
         params = {:index => self.name, :type => self.type}.merge params
         client.bulk params, &block
@@ -513,7 +513,7 @@ Percolate
       #
       # Returns the response body as a Hash
       def multi_search( params = {}, &block )
-        raise 'a block is required' if block.nil?
+        raise "a block is required" if block.nil?
 
         params = {:index => self.name, :type => self.type}.merge params
         client.multi_search params, &block
@@ -580,7 +580,7 @@ Percolate
       def update_params( params, overrides = nil )
         h = defaults.update params
         h.update overrides unless overrides.nil?
-        h[:routing] = h[:routing].join(',') if Array === h[:routing]
+        h[:routing] = h[:routing].join(",") if Array === h[:routing]
         h
       end
 

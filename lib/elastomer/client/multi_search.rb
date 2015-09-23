@@ -37,10 +37,10 @@ module Elastomer
         yield msearch_obj = MultiSearch.new(self, params)
         msearch_obj.call
       else
-        raise 'multi_search request body cannot be nil' if body.nil?
+        raise "multi_search request body cannot be nil" if body.nil?
         params ||= {}
 
-        response = self.post '{/index}{/type}/_msearch', params.merge(:body => body)
+        response = self.post "{/index}{/type}/_msearch", params.merge(:body => body)
         response.body
       end
     end

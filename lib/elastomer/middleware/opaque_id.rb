@@ -1,4 +1,4 @@
-require 'securerandom'
+require "securerandom"
 
 module Elastomer
   module Middleware
@@ -19,7 +19,7 @@ module Elastomer
     # header](https://github.com/elasticsearch/elasticsearch/issues/1202)
     # for more details.
     class OpaqueId < ::Faraday::Middleware
-      X_OPAQUE_ID = 'X-Opaque-Id'.freeze
+      X_OPAQUE_ID = "X-Opaque-Id".freeze
       COUNTER_MAX = 2**32 - 1
 
       # Faraday middleware implementation.
@@ -47,7 +47,7 @@ module Elastomer
         t = Thread.current
 
         unless t.key? :opaque_id_base
-          t[:opaque_id_base]    = (SecureRandom.urlsafe_base64(12) + '%08x').freeze
+          t[:opaque_id_base]    = (SecureRandom.urlsafe_base64(12) + "%08x").freeze
           t[:opaque_id_counter] = -1
         end
 

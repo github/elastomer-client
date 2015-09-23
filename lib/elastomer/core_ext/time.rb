@@ -1,4 +1,4 @@
-require 'time'
+require "time"
 
 class Time
   def to_json(ignore = nil)

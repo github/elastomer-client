@@ -10,8 +10,8 @@ module Elastomer
       # name       - The name of the warmer as a String
       def initialize(client, index_name, name)
         @client     = client
-        @index_name = @client.assert_param_presence(index_name, 'index name')
-        @name       = @client.assert_param_presence(name, 'warmer name')
+        @index_name = @client.assert_param_presence(index_name, "index name")
+        @name       = @client.assert_param_presence(name, "warmer name")
       end
 
       attr_reader :client, :index_name, :name
@@ -28,7 +28,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create(query, params = {})
-        response = client.put '/{index}{/type}/_warmer/{warmer}', defaults.update(params.update(:body => query))
+        response = client.put "/{index}{/type}/_warmer/{warmer}", defaults.update(params.update(:body => query))
         response.body
       end
 
@@ -39,7 +39,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete '/{index}{/type}/_warmer/{warmer}', defaults.update(params)
+        response = client.delete "/{index}{/type}/_warmer/{warmer}", defaults.update(params)
         response.body
       end
 
@@ -50,7 +50,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get(params = {})
-        response = client.get '/{index}{/type}/_warmer/{warmer}', defaults.update(params)
+        response = client.get "/{index}{/type}/_warmer/{warmer}", defaults.update(params)
         response.body
       end
 

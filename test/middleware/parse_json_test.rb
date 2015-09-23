@@ -1,4 +1,4 @@
-require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Middleware::ParseJson do
   let(:middleware) { Elastomer::Middleware::ParseJson.new(lambda {|env| Faraday::Response.new(env)})}
@@ -6,7 +6,7 @@ describe Elastomer::Middleware::ParseJson do
 
   def process(body, content_type = nil)
     env = { :body => body, :response_headers => Faraday::Utils::Headers.new(headers) }
-    env[:response_headers]['content-type'] = content_type if content_type
+    env[:response_headers]["content-type"] = content_type if content_type
     middleware.call(env)
   end
 
@@ -15,34 +15,34 @@ describe Elastomer::Middleware::ParseJson do
     assert_nil response.body
   end
 
-  it 'nullifies empty body' do
+  it "nullifies empty body" do
     response = process("")
     assert_nil response.body
   end
 
-  it 'nullifies blank body' do
+  it "nullifies blank body" do
     response = process(" ")
     assert_nil response.body
   end
 
-  it 'parses json body with empty type' do
+  it "parses json body with empty type" do
     response = process('{"a":1}')
-    assert_equal({'a' => 1}, response.body)
+    assert_equal({"a" => 1}, response.body)
   end
 
-  it 'parses json body of correct type' do
-    response = process('{"a":1}', 'application/json; charset=utf-8')
-    assert_equal({'a' => 1}, response.body)
+  it "parses json body of correct type" do
+    response = process('{"a":1}', "application/json; charset=utf-8")
+    assert_equal({"a" => 1}, response.body)
   end
 
-  it 'ignores json body if incorrect type' do
-    response = process('{"a":1}', 'application/xml; charset=utf-8')
+  it "ignores json body if incorrect type" do
+    response = process('{"a":1}', "application/xml; charset=utf-8")
     assert_equal('{"a":1}', response.body)
   end
 
-  it 'chokes on invalid json' do
-    assert_raises(Faraday::Error::ParsingError) { process '{!'      }
-    assert_raises(Faraday::Error::ParsingError) { process 'invalid' }
+  it "chokes on invalid json" do
+    assert_raises(Faraday::Error::ParsingError) { process "{!"      }
+    assert_raises(Faraday::Error::ParsingError) { process "invalid" }
 
     # surprisingly these are all valid according to MultiJson
     #

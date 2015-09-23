@@ -11,7 +11,7 @@ module Elastomer
       def initialize(client, index_name, id)
         @client = client
         @index_name = client.assert_param_presence(index_name, 'index name')
-        @id = id
+        @id = client.assert_param_presence(id, 'id')
       end
 
       attr_reader :client, :index_name, :id

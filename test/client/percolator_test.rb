@@ -44,5 +44,9 @@ describe Elastomer::Client::Percolator do
       percolator.create :query => { :match_all => { } }
       assert percolator.exists?, "Percolator query does not exist"
     end
+
+    it 'cannot delete all percolators by providing a nil id' do
+      assert_raises(ArgumentError) { percolator = @index.percolator nil }
+    end
   end
 end

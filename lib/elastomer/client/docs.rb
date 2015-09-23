@@ -261,6 +261,38 @@ module Elastomer
         @client.delete_by_query(query, update_params(params))
       end
 
+      # Matches a provided or existing document to the stored percolator
+      # queries. To match an existing document, pass `nil` as the body and
+      # include `:id` in the params.
+      #
+      # Examples
+      #
+      #   index.percolator(1).create :query => { :match => { :author => "pea53" } }
+      #   docs.percolate :doc => { :author => "pea53" }
+      #   docs.percolate nil, :id => 3
+      #
+      # Returns the response body as a Hash
+      def percolate(body, params = {})
+        response = client.get '/{index}/{type}{/id}/_percolate', update_params(params, :body => body, :action => 'percolator.percolate')
+        response.body
+      end
+
+      # Counts the queries that match a provided or existing document. To count
+      # matches for an existing document, pass `nil` as the body and include
+      # `:id` in the params.
+      #
+      # Examples
+      #
+      #   index.register_percolator_query 1, :query => { :match => { :author => "pea53" } }
+      #   docs.percolate_count :doc => { :author => "pea53" }
+      #   docs.percolate_count nil, :id => 3
+      #
+      # Returns the count
+      def percolate_count(body, params = {})
+        response = client.get '/{index}/{type}{/id}/_percolate/count', update_params(params, :body => body, :action => 'percolator.percolate_count')
+        response.body["total"]
+      end
+
       # Returns information and statistics on terms in the fields of a
       # particular document as stored in the index. The :id is provided as part
       # of the params hash.
@@ -485,6 +517,31 @@ Percolate
 
         params = {:index => self.name, :type => self.type}.merge params
         client.multi_search params, &block
+      end
+
+      # Execute an array of percolate actions in bulk. Results are returned in
+      # an array in the order the actions were sent. The current index name and
+      # type will be passed to the API call as part of the request parameters.
+      #
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-percolate.html#_multi_percolate_api
+      #
+      # params - Optional request parameters as a Hash
+      # block  - Passed to a MultiPercolate instance which assembles the
+      #          percolate actions into a single request.
+      #
+      # Examples
+      #
+      #   # block form
+      #   multi_percolate do |m|
+      #     m.percolate(:author => "pea53")
+      #     m.count(:author => "grantr")
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def multi_percolate(params = {}, &block)
+        params = defaults.merge params
+        client.multi_percolate(params, &block)
       end
 
       SPECIAL_KEYS = %w[index type id version version_type op_type routing parent timestamp ttl consistency replication refresh].freeze

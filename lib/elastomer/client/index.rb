@@ -501,6 +501,31 @@ module Elastomer
         client.multi_search params, &block
       end
 
+      # Execute an array of percolate actions in bulk. Results are returned in
+      # an array in the order the actions were sent. The current index name will
+      # be passed to the API call as part of the request parameters.
+      #
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-percolate.html#_multi_percolate_api
+      #
+      # params - Optional request parameters as a Hash
+      # block  - Passed to a MultiPercolate instance which assembles the
+      #          percolate actions into a single request.
+      #
+      # Examples
+      #
+      #   # block form
+      #   multi_percolate do |m|
+      #     m.percolate({ :author => "pea53" }, { :type => 'default-type' })
+      #     m.count({ :author => "pea53" }, { :type => 'type2' })
+      #     ...
+      #   end
+      #
+      # Returns the response body as a Hash
+      def multi_percolate(params = {}, &block)
+        params = defaults.merge params
+        client.multi_percolate(params, &block)
+      end
+
       # Provides access to warmer API commands. Index warmers run search
       # requests to warm up the index before it is available for
       # searching. Warmers are useful for searches that require heavy
@@ -531,6 +556,17 @@ module Elastomer
       # Returns a Hash of statistics about the delete operations
       def delete_by_query(query, params = nil)
         docs.delete_by_query(query, params)
+      end
+
+      # Constructs a Percolator with the given id on this index.
+      #
+      # Examples
+      #
+      #   index.percolator "1"
+      #
+      # Returns a Percolator
+      def percolator(id)
+        Percolator.new(client, name, id)
       end
 
       # Internal: Add default parameters to the `params` Hash and then apply

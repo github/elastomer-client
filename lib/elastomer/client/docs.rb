@@ -540,7 +540,7 @@ Percolate
       #
       # Returns the response body as a Hash
       def multi_percolate(params = {}, &block)
-        params = { :index => self.name, :type => self.type }.merge params
+        params = defaults.merge params
         client.multi_percolate(params, &block)
       end
 

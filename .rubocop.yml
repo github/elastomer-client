@@ -12,6 +12,8 @@
 #
 # If you disable a check, document why.
 
+AllCops:
+  DisabledByDefault: true
 
 StringLiterals:
   EnforcedStyle: double_quotes

@@ -2,4 +2,4 @@ PreCommit:
   RuboCop:
     enabled: true
     problem_on_unmodified_line: ignore
-    flags: ['--fail-level', 'error']
+    flags: ['--fail-level', 'error', '--format', 'emacs']

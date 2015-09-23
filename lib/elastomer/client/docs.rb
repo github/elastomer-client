@@ -267,7 +267,7 @@ module Elastomer
       #
       # Examples
       #
-      #   index.register_percolator_query 1, :query => { :match => { :author => "pea53" } }
+      #   index.percolator(1).create :query => { :match => { :author => "pea53" } }
       #   docs.percolate :doc => { :author => "pea53" }
       #   docs.percolate nil, :id => 3
       #

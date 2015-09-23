@@ -92,7 +92,7 @@ module Elastomer
       # doc    - A Hash of the document
       #
       # Returns this MultiPercolate instance.
-      def count(header, doc)
+      def count(doc, header = {})
         add_to_actions(:count => header)
         add_to_actions(:doc => doc)
       end

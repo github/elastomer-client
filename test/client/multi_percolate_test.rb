@@ -52,8 +52,8 @@ describe Elastomer::Client::MultiPercolate do
     h = $client.multi_percolate body
     response1, response2, response3 = h["responses"]
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
-    assert_equal 1, response3["total"]
+    assert_equal ["1", "3"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 2, response3["total"]
   end
 
   it 'performs multi percolate queries with .mpercolate' do
@@ -72,8 +72,8 @@ describe Elastomer::Client::MultiPercolate do
     h = $client.mpercolate body
     response1, response2, response3 = h["responses"]
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
-    assert_equal 1, response3["total"]
+    assert_equal ["1", "3"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 2, response3["total"]
   end
 
   it 'supports a nice block syntax' do
@@ -82,13 +82,13 @@ describe Elastomer::Client::MultiPercolate do
     h = $client.multi_percolate(:index => @name, :type => 'doc2') do |m|
       m.percolate :author => "pea53"
       m.percolate :author => "grantr"
-      m.count({}, { :author => "grantr" })
+      m.count({ :author => "grantr" })
     end
 
     response1, response2, response3 = h["responses"]
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
-    assert_equal 1, response3["total"]
+    assert_equal ["1", "3"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 2, response3["total"]
   end
 
   def populate!
@@ -120,6 +120,8 @@ describe Elastomer::Client::MultiPercolate do
     percolator1.create :query => { :match_all => { } }
     percolator2 = @index.percolator "2"
     percolator2.create :query => { :match => { :author => "pea53" } }
+    percolator2 = @index.percolator "3"
+    percolator2.create :query => { :match => { :author => "grantr" } }
 
     @index.refresh
   end

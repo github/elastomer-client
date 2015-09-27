@@ -1,0 +1,49 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://localhost:19200/_nodes/hot_threads
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.9.1
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/plain; charset=UTF-8
+      Content-Length:
+      - '1859'
+    body:
+      encoding: UTF-8
+      string: "::: [boxen][ommrbcOdS8mJAoB8VtF4BA][Chriss-MacBook-Air.local][inet[/127.0.0.1:19300]]{max_local_storage_nodes=1}\n
+        \  Hot threads at 2015-09-27T22:46:37.095Z, interval=500ms, busiestThreads=3,
+        ignoreIdleThreads=true:\n   \n    0.0% (215micros out of 500ms) cpu usage
+        by thread 'elasticsearch[boxen][scheduler][T#1]'\n     5/10 snapshots sharing
+        following 2 elements\n       java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)\n
+        \      java.lang.Thread.run(Thread.java:745)\n   \n    0.0% (129micros out
+        of 500ms) cpu usage by thread 'elasticsearch[boxen][[http_server_worker.default]][T#7]{Old
+        I/O server worker (parentId: -317135371, [id: 0xed18e5f5, /127.0.0.1:19300])}'\n
+        \    10/10 snapshots sharing following 14 elements\n       java.net.SocketInputStream.socketRead0(Native
+        Method)\n       java.net.SocketInputStream.read(SocketInputStream.java:152)\n
+        \      java.net.SocketInputStream.read(SocketInputStream.java:122)\n       java.net.SocketInputStream.read(SocketInputStream.java:210)\n
+        \      java.io.FilterInputStream.read(FilterInputStream.java:83)\n       java.io.PushbackInputStream.read(PushbackInputStream.java:139)\n
+        \      org.elasticsearch.common.netty.channel.socket.oio.OioWorker.process(OioWorker.java:64)\n
+        \      org.elasticsearch.common.netty.channel.socket.oio.AbstractOioWorker.run(AbstractOioWorker.java:73)\n
+        \      org.elasticsearch.common.netty.channel.socket.oio.OioWorker.run(OioWorker.java:51)\n
+        \      org.elasticsearch.common.netty.util.ThreadRenamingRunnable.run(ThreadRenamingRunnable.java:108)\n
+        \      org.elasticsearch.common.netty.util.internal.DeadLockProofWorker$1.run(DeadLockProofWorker.java:42)\n
+        \      java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)\n
+        \      java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)\n
+        \      java.lang.Thread.run(Thread.java:745)\n\n"
+    http_version: 
+  recorded_at: Sun, 27 Sep 2015 22:46:38 GMT
+recorded_with: VCR 2.9.3

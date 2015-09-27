@@ -39,9 +39,11 @@ describe Elastomer::Client::Nodes do
   end
 
   it "gets the hot threads for the node(s)" do
-    str = $client.nodes.hot_threads :read_timeout => 2
-    assert_instance_of String, str
-    assert_match %r/cpu usage by thread/, str
+    VCR.use_cassette("1.x") do
+      str = $client.nodes.hot_threads :read_timeout => 2
+      assert_instance_of String, str
+      assert_match %r/cpu usage by thread/, str
+    end
   end
 
   it "can be scoped to a single node" do

@@ -41,7 +41,8 @@ describe Elastomer::Client::Nodes do
   it "gets the hot threads for the node(s)" do
     str = $client.nodes.hot_threads :read_timeout => 2
     assert_instance_of String, str
-    assert_match %r/:::/, str
+    assert !str.nil?, "expected response to not be nil"
+    assert !str.empty?, "expected response to not be empty"
   end
 
   it "can be scoped to a single node" do

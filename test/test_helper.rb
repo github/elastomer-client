@@ -25,7 +25,7 @@ require "elastomer/client"
 # the client should always be stateless
 $client_params = {
   :port => ENV["BOXEN_ELASTICSEARCH_PORT"] || 9200,
-  :read_timeout => 2,
+  :read_timeout => 10,
   :open_timeout => 1,
   :opaque_id => false
 }

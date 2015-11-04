@@ -1,4 +1,8 @@
-## 0.8.0 (2015-09-23)
+## 0.8.1 (2015-11-04)
+- Replace yanked 0.8.0
+- Fix code style based on Rubocop recommendations
+
+## 0.8.0 (2015-09-23) yanked due to invalid build
 - BREAKING: Remove `Client#warmer` method
 - Add the Percolate API
 

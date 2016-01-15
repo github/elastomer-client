@@ -96,7 +96,7 @@ index.update_mapping :post,
 ```
 
 The `:post` type is given twice - once as a method argument, and once in the
-request body. This is an artifact of the ElasticSearch API. We could hide this
+request body. This is an artifact of the Elasticsearch API. We could hide this
 wart, but the philosophy of the elastomer-client is to be as faithful to the API
 as possible.
 
@@ -108,7 +108,7 @@ the process of decomposing text into searchable tokens. Understanding this
 process is important, and creating your own analyzers is as much an art form as
 it is science.
 
-ElasticSearch provides an [analyze](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-analyze.html)
+Elasticsearch provides an [analyze](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-analyze.html)
 API for exploring the analysis process and return tokens. We can see how
 individual fields will analyze text.
 
@@ -118,7 +118,7 @@ index.analyze "The Role of Morphology in Phoneme Prediction",
   :field => "post.title"
 ```
 
-And we can explore the default analyzers provided by ElasticSearch.
+And we can explore the default analyzers provided by Elasticsearch.
 
 ```ruby
 client.index.analyze "The Role of Morphology in Phoneme Prediction",

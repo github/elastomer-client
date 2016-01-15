@@ -31,7 +31,7 @@ $client_params = {
 }
 $client = Elastomer::Client.new $client_params
 
-# ensure we have an ElasticSearch server to test with
+# ensure we have an Elasticsearch server to test with
 raise "No server available at #{$client.url}" unless $client.available?
 
 puts "Elasticsearch version is #{$client.version}"
@@ -102,7 +102,7 @@ def es_version_always_returns_aliases?
   $client.semantic_version >= "1.4.3"
 end
 
-# ElasticSearch 1.3 added the `search_shards` API endpoint.
+# Elasticsearch 1.3 added the `search_shards` API endpoint.
 def es_version_supports_search_shards?
   $client.semantic_version >= "1.3.0"
 end

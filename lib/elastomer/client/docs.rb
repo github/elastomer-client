@@ -38,8 +38,8 @@ module Elastomer
       # new document will be created using POST semantics.
       #
       # There are several other document attributes that control how
-      # ElasticSearch will index the document. They are listed below. Please
-      # refer to the ElasticSearch documentation for a full explanation of each
+      # Elasticsearch will index the document. They are listed below. Please
+      # refer to the Elasticsearch documentation for a full explanation of each
       # and how it affects the indexing process.
       #
       #   :_id

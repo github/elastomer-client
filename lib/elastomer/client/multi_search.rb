@@ -49,7 +49,7 @@ module Elastomer
     # The MultiSearch class is a helper for accumulating and submitting
     # multi_search API requests. Instances of the MultiSearch class
     # accumulate searches and then issue a single API request to
-    # ElasticSearch, which runs all accumulated searches in parallel
+    # Elasticsearch, which runs all accumulated searches in parallel
     # and returns each result hash aggregated into an array of result
     # hashes.
     #

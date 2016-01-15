@@ -4,13 +4,13 @@ require "elastomer/client"
 
 module Elastomer
 
-  # So you want to get notifications from your ElasticSearch client? Well,
+  # So you want to get notifications from your Elasticsearch client? Well,
   # you've come to the right place!
   #
   #   require 'elastomer/notifications'
   #
   # Requiring this module will add ActiveSupport notifications to all
-  # ElasticSearch requests. To subscribe to those requests ...
+  # Elasticsearch requests. To subscribe to those requests ...
   #
   #   ActiveSupport::Notifications.subscribe('request.client.elastomer') do |name, start_time, end_time, _, payload|
   #     duration = end_time - start_time
@@ -45,7 +45,7 @@ module Elastomer
     # Internal: Execute the given block and provide instrumentation info to
     # subscribers. The name we use for subscriptions is
     # `request.client.elastomer` and a supplemental payload is provided with
-    # more information about the specific ElasticSearch request.
+    # more information about the specific Elasticsearch request.
     #
     # path   - The full request path as a String
     # body   - The request body as a String or `nil`

@@ -25,7 +25,6 @@ index.status
 index = client.index
 index.status :index => "blog"
 index.status :index => "users"
-
 ```
 
 You can operate on more than one index, too, by providing a list of index names.
@@ -129,13 +128,13 @@ client.index.analyze "The Role of Morphology in Phoneme Prediction",
 
 A common practice when dealing with non-changing data sets (event logs) is to
 create a new index for each week or month. Only the current index is written to,
-and the older indices can be made read only. Eventually, when it is time to
+and the older indices can be made read-only. Eventually, when it is time to
 expire the data, the older indices can be deleted from the cluster.
 
 Let's take a look at some simple event log maintenance using elastomer-client.
 
 ```ruby
-# the previous months event log
+# the previous month's event log
 index = client.index "event-log-2014-09"
 
 # optimize the index to have only 1 segment file (expunges deleted documents)
@@ -153,7 +152,7 @@ index.update_settings \
 ```
 
 Now we have a nicely optimized event log index that can be searched but cannot
-be written to. Some time in the future we can delete this index (but we should
+be written to. Sometime in the future we can delete this index (but we should
 take a [snapshot](snapshots.md) first).
 
 ```ruby

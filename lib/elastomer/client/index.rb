@@ -2,7 +2,7 @@ module Elastomer
   class Client
 
     # Provides access to index-level API commands. An index name is required for
-    # these API calls. If you want to operate on all inidces - flushing all
+    # these API calls. If you want to operate on all indices - flushing all
     # indices, for example - then you will need to use the "_all" index name.
     #
     # You can override the index name for one-off calls by passing in the
@@ -17,7 +17,7 @@ module Elastomer
 
     class Index
       # Create a new index client for making API requests that pertain to
-      # the health and management individual indexes.
+      # the health and management of individual indexes.
       #
       # client - Elastomer::Client used for HTTP requests to the server
       # name   - The name of the index as a String or an Array of names
@@ -181,7 +181,7 @@ module Elastomer
       #
       # name   - Name of the alias to look up
       # params - Parameters Hash
-      #   :ignore_unavailable - What to do is an specified index name doesn’t
+      #   :ignore_unavailable - What to do if a specified index name doesn’t
       #                         exist. If set to `true` then those indices are ignored.
       #
       # Examples
@@ -234,7 +234,8 @@ module Elastomer
         response.body
       end
 
-      # Performs the analysis process on a text and return the tokens breakdown of the text.
+      # Perform the analysis process on some text and return the tokens
+      # breakdown of the text.
       #
       # text   - The text to analyze as a String
       # params - Parameters Hash
@@ -304,7 +305,7 @@ module Elastomer
         response.body
       end
 
-      # Provides insight into on-going index shard recoveries. Recovery status
+      # Provides insight into ongoing index shard recoveries. Recovery status
       # may be reported for specific indices, or cluster-wide.
       #
       # params - Parameters Hash

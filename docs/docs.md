@@ -214,7 +214,7 @@ The `"count"` search type is much more efficient then setting the size to zero.
 These count queries will return more quickly and consume less memory inside
 Elasticsearch.
 
-There is also a `count` API method, but the `:serach_type` approach is even more
+There is also a `count` API method, but the `:search_type` approach is even more
 efficient than the count API.
 
 #### Deleting

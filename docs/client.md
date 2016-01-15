@@ -59,7 +59,7 @@ timeout can be set for each request.
 
 ```ruby
 client = Elastomer::Client.new \
-  :url          => "http:/localhost:19200",
+  :url          => "http://localhost:19200",
   :adapter      => :net_http_persistent,
   :open_timeout => 1,
   :read_timeout => 5

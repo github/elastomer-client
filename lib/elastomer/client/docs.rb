@@ -139,7 +139,7 @@ module Elastomer
         response.body
       end
 
-      # Allows to get multiple documents based on an index, type, and id (and possibly routing).
+      # Allows you to get multiple documents based on an index, type, and id (and possibly routing).
       #
       # body   - The request body as a Hash or a JSON encoded String
       # params - Parameters Hash
@@ -311,7 +311,7 @@ module Elastomer
       alias_method :term_vector, :termvector
       alias_method :term_vectors, :termvector
 
-      # Multi termvectors API allows  you to get multiple termvectors based on
+      # Multi termvectors API allows you to get multiple termvectors based on
       # an index, type and id. The response includes a docs array with all the
       # fetched termvectors, each element having the structure provided by the
       # `termvector` API.

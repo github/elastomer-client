@@ -48,7 +48,7 @@ module Elastomer
     end
 
     # Begin scrolling a query.
-    # See http://www.elasticsearch.org/guide/reference/api/search/scroll/
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
     #
     # opts   - Options Hash
     #   :query       - the query to scroll as a Hash or JSON encoded String
@@ -78,7 +78,7 @@ module Elastomer
     end
 
     # Continue scrolling a query.
-    # See http://www.elasticsearch.org/guide/reference/api/search/scroll/
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
     #
     # scroll_id - The current scroll ID as a String
     # scroll    - The keep alive time of the scrolling request (5 minutes by default)
@@ -113,8 +113,8 @@ module Elastomer
       # returned by the `query`. The Scroller supports both the 'scan' and the
       # 'scroll' search types.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/search/scroll/
-      # and the "Scan" section of http://www.elasticsearch.org/guide/reference/api/search/search-type/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
+      # and https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-search-type.html#scan
       #
       # client - Elastomer::Client used for HTTP requests to the server
       # query  - The query to scan as a Hash or a JSON encoded String

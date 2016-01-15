@@ -1,8 +1,8 @@
 # Elastomer Documents Component
 
 The documents components handles all API calls related to
-[indexing documents](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs.html)
-and [searching documents](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search.html).
+[indexing documents](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
+and [searching documents](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html).
 
 Access to the documents component is provided via the `docs` method on the index
 component or the `docs` method on the client. The `docs` method on the index

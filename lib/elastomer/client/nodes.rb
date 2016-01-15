@@ -45,7 +45,7 @@ module Elastomer
       #   info(:info => "os")
       #   info(:info => %w[os jvm process])
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-info.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-info.html
       #
       # Returns the response as a Hash
       def info( params = {} )
@@ -65,7 +65,7 @@ module Elastomer
       #   stats(:stats => "thread_pool")
       #   stats(:stats => %w[os process])
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html
       #
       # Returns the response as a Hash
       def stats( params = {} )
@@ -83,7 +83,7 @@ module Elastomer
       #   :interval - sampling interval [default is 500ms]
       #   :type     - the type to sample: "cpu", "wait", or "block"
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html
       #
       # Returns the response as a String
       def hot_threads( params = {} )
@@ -97,7 +97,7 @@ module Elastomer
       # params - Parameters Hash
       #   :node_id - a single node ID or Array of node IDs
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
       #
       # Returns the response as a Hash
       def shutdown( params = {} )

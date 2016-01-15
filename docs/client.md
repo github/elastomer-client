@@ -113,8 +113,8 @@ Elasticsearch unless the body is a String or an Array. If the body is a String
 it is assumed to already be JSON formatted, and it is sent to Elasticsearch as
 is without any modifications. When the body is an Array then all the items are
 joined with a newline character `\n` and a trailing newline is appended; this
-supports [bulk](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html)
-indexing and [multi-search](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-multi-search.html)
+supports [bulk](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
+indexing and [multi-search](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html)
 requests.
 
 **:read_timeout**

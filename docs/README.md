@@ -15,7 +15,7 @@ in action.
 To that end we have tried to be as faithful as possible to the Elasticsearch API
 with our implementation. There are a few places where it made sense to wrap the
 Elasticsearch API inside Ruby idioms. One notable location is the
-[scan-scroll](http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/scan-scroll.html)
+[scan-scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
 search type; the Elastomer Client provides a Ruby iterator to work with these
 types of queries.
 

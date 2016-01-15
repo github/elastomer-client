@@ -22,7 +22,7 @@ module Elastomer
     #   # same thing but using the URI request method
     #   delete_by_query(nil, { :q => '*:*', :type => 'tweet' })
     #
-    # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
+    # See https://www.elastic.co/guide/en/elasticsearch/plugins/current/delete-by-query-usage.html
     #
     # Returns a Hash of statistics about the delete operations, for example:
     #

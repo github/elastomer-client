@@ -8,7 +8,7 @@ module Elastomer
     # name - The name of the index as a String (optional)
     # type - The document type as a String (optional)
     #
-    # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs.html
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html
     #
     # Returns a Docs instance.
     def docs( name = nil, type = nil )
@@ -62,7 +62,7 @@ module Elastomer
       # document - The document (as a Hash or JSON encoded String) to add to the index
       # params   - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-index_.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
       #
       # Returns the response body as a Hash
       def index( document, params = {} )
@@ -88,7 +88,7 @@ module Elastomer
       # params - Parameters Hash
       #   :id - the ID of the document to delete
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-delete.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
       #
       # Returns the response body as a Hash
       def delete( params = {} )
@@ -102,7 +102,7 @@ module Elastomer
       # params - Parameters Hash
       #   :id - the ID of the document to get
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
       #
       # Returns the response body as a Hash
       def get( params = {} )
@@ -116,7 +116,7 @@ module Elastomer
       # params - Parameters Hash
       #   :id - the ID of the document to check
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
       #
       # Returns true if the document exists
       def exists?( params = {} )
@@ -131,7 +131,7 @@ module Elastomer
       # params - Parameters Hash
       #   :id - the ID of the document
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-get.html#_source
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#_source
       #
       # Returns the response body as a Hash
       def source( params = {} )
@@ -144,7 +144,7 @@ module Elastomer
       # body   - The request body as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-multi-get.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-get.html
       #
       # Returns the response body as a Hash
       def multi_get( body, params = {} )
@@ -161,7 +161,7 @@ module Elastomer
       # script - The script (as a Hash) used to update the document in place
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-update.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html
       #
       # Returns the response body as a Hash
       def update( script, params = {} )
@@ -189,9 +189,9 @@ module Elastomer
       #   # same thing but using the URI request method
       #   search(:q => '*:*', :type => 'tweet')
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-search.html
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-uri-request.html
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-body.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
       #
       # Returns the response body as a hash
       def search( query, params = nil )
@@ -211,7 +211,7 @@ module Elastomer
       #   :preference - which shard replicas to execute the search request on
       #   :local      - boolean value to use local cluster state
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-shards.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-shards.html
       #
       # Returns the response body as a hash
       def search_shards( params = {} )
@@ -236,7 +236,7 @@ module Elastomer
       #   # same thing but using the URI request method
       #   count(:q => '*:*', :type => 'tweet')
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-count.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html
       #
       # Returns the response body as a Hash
       def count( query, params = nil )
@@ -300,7 +300,7 @@ module Elastomer
       # params - Parameters Hash
       #   :id - the ID of the document to get
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-termvectors.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-termvectors.html
       #
       # Returns the response body as a hash
       def termvector( params = {} )
@@ -318,7 +318,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-multi-termvectors.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-termvectors.html
       #
       # Returns the response body as a hash
       def multi_termvectors( body, params = {} )
@@ -348,7 +348,7 @@ Percolate
       #   more_like_this({:from => 5, :size => 10}, :mlt_fields => "title",
       #                   :min_term_freq => 1, :type => "doc1", :id => 1)
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-more-like-this.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-more-like-this.html
       #
       # Returns the response body as a hash
       def more_like_this( query, params = nil )
@@ -372,7 +372,7 @@ Percolate
       #
       #   explain(:q => "message:search", :id => 1)
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-explain.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-explain.html
       #
       # Returns the response body as a hash
       def explain( query, params = nil )
@@ -397,7 +397,7 @@ Percolate
       #   # same thing but using the URI query parameter
       #   validate(:q => "post_date:foo", :explain => true)
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-validate.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-validate.html
       #
       # Returns the response body as a hash
       def validate( query, params = nil )
@@ -453,7 +453,7 @@ Percolate
       #     document['_source']
       #   end
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/scan-scroll.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
       #
       # Returns a new Scroller instance
       def scroll( query, opts = {} )
@@ -509,7 +509,7 @@ Percolate
       #     ...
       #   end
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-multi-search.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html
       #
       # Returns the response body as a Hash
       def multi_search( params = {}, &block )

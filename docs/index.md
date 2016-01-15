@@ -1,7 +1,7 @@
 # Elastomer Index Component
 
 The index component provides access to the
-[indices API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices.html)
+[indices API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
 used for index management, settings, mappings, and aliases. Index
 [warmers](warmers.md) and [templates](templates.md) are handled via their own
 components. Methods for adding documents to the index and searching those
@@ -102,13 +102,13 @@ as possible.
 
 #### Analysis
 
-The [analysis](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis.html)
+The [analysis](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html)
 process has the greatest impact on the relevancy of your search results. It is
 the process of decomposing text into searchable tokens. Understanding this
 process is important, and creating your own analyzers is as much an art form as
 it is science.
 
-Elasticsearch provides an [analyze](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-analyze.html)
+Elasticsearch provides an [analyze](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-analyze.html)
 API for exploring the analysis process and return tokens. We can see how
 individual fields will analyze text.
 

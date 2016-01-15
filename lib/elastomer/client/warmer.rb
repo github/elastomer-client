@@ -17,7 +17,7 @@ module Elastomer
       attr_reader :client, :index_name, :name
 
       # Create a warmer.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-warmers.html
       #
       # query  - The query the warmer should run
       # params - Parameters Hash
@@ -33,7 +33,7 @@ module Elastomer
       end
 
       # Delete a warmer.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-warmers.html#removing
       #
       # params   - Parameters Hash
       #
@@ -44,7 +44,7 @@ module Elastomer
       end
 
       # Get a warmer.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-warmers/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-warmers.html#warmer-retrieving
       #
       # params   - Parameters Hash
       #

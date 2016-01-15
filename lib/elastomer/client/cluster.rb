@@ -30,7 +30,7 @@ module Elastomer
       #   :wait_for_nodes - the request waits until the specified number N of nodes is available
       #   :timeout - how long to wait [default is "30s"]
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-health.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
       #
       # Returns the response as a Hash
       def health( params = {} )
@@ -48,7 +48,7 @@ module Elastomer
       #   :metrics - list of metrics to select as an Array
       #   :indices - a single index name or an Array of index names
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-state.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-state.html
       #
       # Returns the response as a Hash
       def state( params = {} )
@@ -63,7 +63,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-stats.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html
       #
       # Returns the response as a Hash
       def stats( params = {} )
@@ -76,7 +76,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-pending.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-pending.html
       #
       # Returns the response as a Hash
       def pending_tasks( params = {} )
@@ -97,7 +97,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-update-settings.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-update-settings.html
       #
       # Returns the response as a Hash
       def get_settings( params = {} )
@@ -113,7 +113,7 @@ module Elastomer
       # body   - The new settings as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-update-settings.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-update-settings.html
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
@@ -143,7 +143,7 @@ module Elastomer
       #     { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
       #   ])
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-reroute.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-reroute.html
       #
       # Returns the response as a Hash
       def reroute( commands, params = {} )
@@ -166,7 +166,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
@@ -187,7 +187,7 @@ module Elastomer
       #   get_aliases
       #   get_aliases( :index => 'users' )
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
@@ -213,7 +213,7 @@ module Elastomer
       #     { :add    => { :index => 'users-2', :alias => 'users' }}
       #   ])
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def update_aliases( actions, params = {} )

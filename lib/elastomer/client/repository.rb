@@ -20,7 +20,7 @@ module Elastomer
       attr_reader :client, :name
 
       # Check for the existence of the repository.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
       #
       # params - Parameters Hash
       #
@@ -38,7 +38,7 @@ module Elastomer
       alias_method :exist?, :exists?
 
       # Create the repository.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
       #
       # body   - The repository type and settings as a Hash or a JSON encoded String
       # params - Parameters Hash
@@ -50,7 +50,7 @@ module Elastomer
       end
 
       # Get repository type and settings.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
       #
       # params - Parameters Hash
       #
@@ -61,7 +61,7 @@ module Elastomer
       end
 
       # Get status information on snapshots in progress.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
       #
       # params - Parameters Hash
       #
@@ -72,7 +72,7 @@ module Elastomer
       end
 
       # Update the repository.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
       #
       # body   - The repository type and settings as a Hash or a JSON encoded String
       # params - Parameters Hash
@@ -84,7 +84,7 @@ module Elastomer
       end
 
       # Delete the repository.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
       #
       # params - Parameters Hash
       #

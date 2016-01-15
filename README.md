@@ -16,9 +16,9 @@ $ script/test
 ## Client
 
 The client provides a one-to-one mapping to the Elasticsearch [API
-endpoints](http://www.elasticsearch.org/guide/reference/api/). The API is
-decomposed into logical sections and accessed according to what you are trying
-to accomplish. Each logical section is represented as a [client
+endpoints](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html).
+The API is decomposed into logical sections and accessed according to what you
+are trying to accomplish. Each logical section is represented as a [client
 class](lib/elastomer/client) and a top-level accessor is provided for each.
 
 #### Cluster

@@ -7,7 +7,7 @@ module Elastomer
     # Bulk instance to assemble the operations called in the block into a
     # bulk request and dispatch it at the end of the block.
     #
-    # See http://www.elasticsearch.org/guide/reference/api/bulk/
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
     #
     # body   - Request body as a String (required if a block is _not_ given)
     # params - Optional request parameters as a Hash

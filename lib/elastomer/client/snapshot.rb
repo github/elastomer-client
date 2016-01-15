@@ -29,7 +29,7 @@ module Elastomer
       attr_reader :client, :repository, :name
 
       # Check for the existence of the snapshot.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
       #
       # params - Parameters Hash
       #
@@ -47,7 +47,7 @@ module Elastomer
       alias_method :exist?, :exists?
 
       # Create the snapshot.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
       #
       # body   - The snapshot options as a Hash or a JSON encoded String
       # params - Parameters Hash
@@ -59,7 +59,7 @@ module Elastomer
       end
 
       # Get snapshot progress information.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
       #
       # params - Parameters Hash
       #
@@ -72,7 +72,7 @@ module Elastomer
       end
 
       # Get detailed snapshot status.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
       #
       # params - Parameters Hash
       #
@@ -83,7 +83,7 @@ module Elastomer
       end
 
       # Restore the snapshot.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
       #
       # body   - The restore options as a Hash or a JSON encoded String
       # params - Parameters Hash
@@ -95,7 +95,7 @@ module Elastomer
       end
 
       # Delete the snapshot.
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot
       #
       # params - Parameters Hash
       #

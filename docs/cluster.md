@@ -2,8 +2,8 @@
 
 The cluster component deals with commands for managing cluster state and
 monitoring cluster health. All the commands found under the
-[cluster API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster.html)
-section of the ElasticSearch documentation are implemented by the
+[cluster API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html)
+section of the Elasticsearch documentation are implemented by the
 [`cluster.rb`](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client/cluster.rb)
 module and the [`nodes.rb`](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client/nodes.rb)
 module.
@@ -12,13 +12,13 @@ module.
 
 API endpoints dealing with cluster level information and settings are found in
 the [`Cluster`](lib/elastomer/client/cluster.rb) class. Each of these methods
-corresponds to an API endpoint described in the ElasticSearch documentation
+corresponds to an API endpoint described in the Elasticsearch documentation
 (linked to above). The params listed in the documentation can be passed to these
 methods, so we do not take too much trouble to enumerate them all.
 
 #### health
 
-The cluster [health API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-health.html)
+The cluster [health API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html)
 returns a very simple cluster health status report.
 
 ```ruby
@@ -50,8 +50,8 @@ client.cluster.health \
 #### state & stats
 
 If you need something more than basic health information, then the
-[`state`](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-state.html)
-and [`stats`](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-stats.html)
+[`state`](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-state.html)
+and [`stats`](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html)
 endpoints are the next methods to call. Please look through the API
 documentation linked to above for all the details. And you can play with these
 endpoints via an IRB session.
@@ -67,10 +67,10 @@ client.cluster.stats
 #### settings
 
 Cluster behavior is controlled via the
-[settings API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-update-settings.html).
+[settings API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-update-settings.html).
 The settings can be retrieved, and some settings can be modified at runtime to
 control shard allocations, routing, index replicas, and so forth. For example,
-when performing a [rolling restart](http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/_rolling_restarts.html)
+when performing a [rolling restart](https://www.elastic.co/guide/en/elasticsearch/guide/current/_rolling_restarts.html)
 of a cluster, disabling shard allocation between restarts can reduce the
 cluster recovery time.
 

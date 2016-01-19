@@ -1,8 +1,8 @@
 # Elastomer Client Component
 
 All methods in the Elastomer Client gem eventually make an HTTP request to
-ElasticSearch. The [`Elastomer::Client`](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client.rb)
-class is responsible for connecting to an ElasticSearch instance, making HTTP
+Elasticsearch. The [`Elastomer::Client`](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client.rb)
+class is responsible for connecting to an Elasticsearch instance, making HTTP
 requests, processing the response, and handling errors. Let's look at the
 details of how `Elastomer::Client` handles HTTP communication.
 
@@ -13,10 +13,10 @@ communication. Faraday provides a uniform wrapper around several different HTTP
 clients allowing any of these clients to be used at runtime. Faraday also has
 the concept of *middlewares* that operate on the HTTP request and response. We
 use Faraday middleware to encode and decode JSON messages exchanged with
-ElasticSearch.
+Elasticsearch.
 
 Without any options the `Elastomer::Client` will connect to the default
-ElasticSearch URL `http://localhost:9200`. The `Net:HTTP` client from the Ruby
+Elasticsearch URL `http://localhost:9200`. The `Net:HTTP` client from the Ruby
 standard library will be used.
 
 ```ruby
@@ -26,9 +26,9 @@ client.port  #=> 9200
 client.url   #=> 'http://localhost:9200'
 ```
 
-[Boxen](https://boxen.github.com) configures ElasticSearch to listen on port
+[Boxen](https://boxen.github.com) configures Elasticsearch to listen on port
 `19200` instead of the standard port. We can provide either the full URL or just
-a different port number if ElasticSearch is running on `localhost`.
+a different port number if Elasticsearch is running on `localhost`.
 
 ```ruby
 client = Elastomer::Client.new :port => 19200
@@ -39,7 +39,7 @@ client.url   #=> 'http://localhost:19200'
 client = Elastomer::Client.new :url => "http://localhost:19200"
 ```
 
-ElasticSearch works best with persistent connections. We can use the
+Elasticsearch works best with persistent connections. We can use the
 `Net::HTTP::Persistent` adapter with Faraday.
 
 ```ruby
@@ -49,7 +49,7 @@ client = Elastomer::Client.new \
 ```
 
 We also want to configure the `:open_timeout` (for making the initial connection
-to ElasticSearch) and the `:read_timeout` (used to limit each request). The open
+to Elasticsearch) and the `:read_timeout` (used to limit each request). The open
 timeout should be short - it defaults to 2 seconds. The read timeout should be
 longer, but it can vary depending upon the type of request you are making. Large
 bulk requests will take longer than a quick count query.
@@ -59,7 +59,7 @@ timeout can be set for each request.
 
 ```ruby
 client = Elastomer::Client.new \
-  :url          => "http:/localhost:19200",
+  :url          => "http://localhost:19200",
   :adapter      => :net_http_persistent,
   :open_timeout => 1,
   :read_timeout => 5
@@ -73,9 +73,9 @@ read timeout is reached. If the connection is left open and reused, then the
 returned data might actually be from a previous request. This can lead to all
 kinds of horrible data leaks.
 
-ElasticSearch provides an `X-Opaque-Id` request header. Any value set in this
+Elasticsearch provides an `X-Opaque-Id` request header. Any value set in this
 request header will be returned in the corresponding response header. This
-allows the client to correlate the response from ElasticSearch with the request
+allows the client to correlate the response from Elasticsearch with the request
 that was submitted. We have written an
 [OpaqueId](https://github.com/github/elastomer-client/blob/master/lib/elastomer/middleware/opaque_id.rb)
 middleware that will abort any request if the `X-Opaque-Id` headers disagree
@@ -109,12 +109,12 @@ HTTP request. The HTTP `head` method does not support a request body and ignores
 this parameter. The other HTTP methods all support request bodies.
 
 The `:body` value will be converted into JSON format before being sent to
-ElasticSearch unless the body is a String or an Array. If the body is a String
-it is assumed to already be JSON formatted, and it is sent to ElasticSearch as
+Elasticsearch unless the body is a String or an Array. If the body is a String
+it is assumed to already be JSON formatted, and it is sent to Elasticsearch as
 is without any modifications. When the body is an Array then all the items are
 joined with a newline character `\n` and a trailing newline is appended; this
-supports [bulk](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html)
-indexing and [multi-search](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-multi-search.html)
+supports [bulk](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
+indexing and [multi-search](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html)
 requests.
 
 **:read_timeout**
@@ -133,10 +133,10 @@ client.cluster.health \
 ```
 
 In the example above we are waiting for the named index to reach a green state.
-The `:timeout` of 5 seconds is passed to ElasticSearch. This call will return
+The `:timeout` of 5 seconds is passed to Elasticsearch. This call will return
 after 5 seconds even if the index has not yet reached green status. So we set
 our network call timeout to 7 seconds to ensure we don't kill the request before
-ElasticSearch has responded.
+Elasticsearch has responded.
 
 **:action** and **:context**
 
@@ -228,9 +228,9 @@ fatal, then the request is fundamentally flawed and should not be retried.
 Passing a malformed search query or trying to search an index that does not
 exist are both examples of fatal errors - the request will never succeed.
 
-If an error is not fatal then it can be retried. If the ElasticSearch cluster
+If an error is not fatal then it can be retried. If the Elasticsearch cluster
 has a full search queue then any query will fail. It not the fault of the user
-or the query itself - ElasticSearch just needs more capacity. The query can be
+or the query itself - Elasticsearch just needs more capacity. The query can be
 safely retried.
 
 Therein lies the rub, though. Retrying a search or any operation will continue

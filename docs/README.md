@@ -2,20 +2,20 @@
 
 We first started building the Elastomer Client gem when an
 [official client](https://github.com/elasticsearch/elasticsearch-ruby)
-was not yet available from ElasticSearch. We were looking for a client that
-provided a one-to-one mapping of the ElasticSearch APIs and avoided higher level
+was not yet available from Elasticsearch. We were looking for a client that
+provided a one-to-one mapping of the Elasticsearch APIs and avoided higher level
 complexity such as connection pooling, round-robin connections, thrift support,
-and the like. We think these things these things are bettered handled at
-different layers and by other software libraries.
+and the like. We think these things are better handled at different layers and
+by other software libraries.
 
-Our goal is to keep our ElasticSearch client simple and then compose
+Our goal is to keep our Elasticsearch client simple and then compose
 higher level functionality from smaller components. This is the UNIX philosophy
 in action.
 
-To that end we have tried to be as faithful as possible to the ElasticSearch API
+To that end we have tried to be as faithful as possible to the Elasticsearch API
 with our implementation. There are a few places where it made sense to wrap the
-ElasticSearch API inside Ruby idioms. One notable location is the
-[scan-scroll](http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/scan-scroll.html)
+Elasticsearch API inside Ruby idioms. One notable location is the
+[scan-scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
 search type; the Elastomer Client provides a Ruby iterator to work with these
 types of queries.
 

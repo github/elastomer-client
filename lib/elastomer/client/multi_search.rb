@@ -8,7 +8,7 @@ module Elastomer
     # the method will perform an API call, and it requires a bulk request
     # body and optional request parameters.
     #
-    # See http://www.elasticsearch.org/guide/reference/api/multi-search/
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html
     #
     # body   - Request body as a String (required if a block is not given)
     # params - Optional request parameters as a Hash
@@ -49,7 +49,7 @@ module Elastomer
     # The MultiSearch class is a helper for accumulating and submitting
     # multi_search API requests. Instances of the MultiSearch class
     # accumulate searches and then issue a single API request to
-    # ElasticSearch, which runs all accumulated searches in parallel
+    # Elasticsearch, which runs all accumulated searches in parallel
     # and returns each result hash aggregated into an array of result
     # hashes.
     #

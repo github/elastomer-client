@@ -1,7 +1,7 @@
 # Elastomer Index Component
 
 The index component provides access to the
-[indices API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices.html)
+[indices API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
 used for index management, settings, mappings, and aliases. Index
 [warmers](warmers.md) and [templates](templates.md) are handled via their own
 components. Methods for adding documents to the index and searching those
@@ -25,7 +25,6 @@ index.status
 index = client.index
 index.status :index => "blog"
 index.status :index => "users"
-
 ```
 
 You can operate on more than one index, too, by providing a list of index names.
@@ -96,19 +95,19 @@ index.update_mapping :post,
 ```
 
 The `:post` type is given twice - once as a method argument, and once in the
-request body. This is an artifact of the ElasticSearch API. We could hide this
+request body. This is an artifact of the Elasticsearch API. We could hide this
 wart, but the philosophy of the elastomer-client is to be as faithful to the API
 as possible.
 
 #### Analysis
 
-The [analysis](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/analysis.html)
+The [analysis](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html)
 process has the greatest impact on the relevancy of your search results. It is
 the process of decomposing text into searchable tokens. Understanding this
 process is important, and creating your own analyzers is as much an art form as
 it is science.
 
-ElasticSearch provides an [analyze](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-analyze.html)
+Elasticsearch provides an [analyze](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-analyze.html)
 API for exploring the analysis process and return tokens. We can see how
 individual fields will analyze text.
 
@@ -118,7 +117,7 @@ index.analyze "The Role of Morphology in Phoneme Prediction",
   :field => "post.title"
 ```
 
-And we can explore the default analyzers provided by ElasticSearch.
+And we can explore the default analyzers provided by Elasticsearch.
 
 ```ruby
 client.index.analyze "The Role of Morphology in Phoneme Prediction",
@@ -129,13 +128,13 @@ client.index.analyze "The Role of Morphology in Phoneme Prediction",
 
 A common practice when dealing with non-changing data sets (event logs) is to
 create a new index for each week or month. Only the current index is written to,
-and the older indices can be made read only. Eventually, when it is time to
+and the older indices can be made read-only. Eventually, when it is time to
 expire the data, the older indices can be deleted from the cluster.
 
 Let's take a look at some simple event log maintenance using elastomer-client.
 
 ```ruby
-# the previous months event log
+# the previous month's event log
 index = client.index "event-log-2014-09"
 
 # optimize the index to have only 1 segment file (expunges deleted documents)
@@ -153,7 +152,7 @@ index.update_settings \
 ```
 
 Now we have a nicely optimized event log index that can be searched but cannot
-be written to. Some time in the future we can delete this index (but we should
+be written to. Sometime in the future we can delete this index (but we should
 take a [snapshot](snapshots.md) first).
 
 ```ruby

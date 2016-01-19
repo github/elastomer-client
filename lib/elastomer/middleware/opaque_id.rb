@@ -4,7 +4,7 @@ module Elastomer
   module Middleware
 
     # This Faraday middleware implements the "X-Opaque-Id" request / response
-    # headers for ElasticSearch. The X-Opaque-Id header, when provided on the
+    # headers for Elasticsearch. The X-Opaque-Id header, when provided on the
     # request header, will be returned as a header in the response. This is
     # useful in environments which reuse connections to ensure that cross-talk
     # does not occur between two requests.
@@ -15,7 +15,7 @@ module Elastomer
     # `Elastomer::Client::OpaqueIdError` is raised. In this case no response
     # will be returned.
     #
-    # See [ElasticSearch "X-Opaque-Id"
+    # See [Elasticsearch "X-Opaque-Id"
     # header](https://github.com/elasticsearch/elasticsearch/issues/1202)
     # for more details.
     class OpaqueId < ::Faraday::Middleware

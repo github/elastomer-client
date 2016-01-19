@@ -1,6 +1,6 @@
 # Elastomer Client [![Build Status](https://travis-ci.org/github/elastomer-client.svg)](https://travis-ci.org/github/elastomer-client)
 
-Making a stupid simple ElasticSearch client so your project can be smarter!
+Making a stupid simple Elasticsearch client so your project can be smarter!
 
 ## Getting Started
 
@@ -15,10 +15,10 @@ $ script/test
 
 ## Client
 
-The client provides a one-to-one mapping to the ElasticSearch [API
-endpoints](http://www.elasticsearch.org/guide/reference/api/). The API is
-decomposed into logical sections and accessed according to what you are trying
-to accomplish. Each logical section is represented as a [client
+The client provides a one-to-one mapping to the Elasticsearch [API
+endpoints](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html).
+The API is decomposed into logical sections and accessed according to what you
+are trying to accomplish. Each logical section is represented as a [client
 class](lib/elastomer/client) and a top-level accessor is provided for each.
 
 #### Cluster
@@ -89,7 +89,7 @@ docs.index({
   :_id    => 1,
   :_type  => 'tweet',
   :author => '@pea53',
-  :tweet  => 'announcing Elastomer, the stupid simple ElasticSearch client'
+  :tweet  => 'announcing Elastomer, the stupid simple Elasticsearch client'
 })
 
 docs.search({:query => {:match_all => {}}}, :search_type => 'count')
@@ -98,7 +98,7 @@ docs.search({:query => {:match_all => {}}}, :search_type => 'count')
 #### Performance
 
 By default Elastomer uses Net::HTTP (via Faraday) to communicate with
-ElasticSearch. You may find that Excon performs better for your use. To enable
+Elasticsearch. You may find that Excon performs better for your use. To enable
 Excon, add it to your bundle and then change your Elastomer initialization
 thusly:
 

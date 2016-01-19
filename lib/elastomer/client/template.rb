@@ -30,7 +30,7 @@ module Elastomer
       alias_method :exist?, :exists?
 
       # Get the template from the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html#getting
       #
       # params - Parameters Hash
       #
@@ -41,7 +41,7 @@ module Elastomer
       end
 
       # Create the template on the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html
       #
       # template - The template as a Hash or a JSON encoded String
       # params   - Parameters Hash
@@ -53,7 +53,7 @@ module Elastomer
       end
 
       # Delete the template from the cluster.
-      # See http://www.elasticsearch.org/guide/reference/api/admin-indices-templates/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html#delete
       #
       # params - Parameters Hash
       #

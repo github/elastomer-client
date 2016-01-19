@@ -1,8 +1,8 @@
 # Elastomer Documents Component
 
 The documents components handles all API calls related to
-[indexing documents](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs.html)
-and [searching documents](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search.html).
+[indexing documents](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
+and [searching documents](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html).
 
 Access to the documents component is provided via the `docs` method on the index
 component or the `docs` method on the client. The `docs` method on the index
@@ -68,7 +68,7 @@ This will create a new document in the search index. But what do we do if there
 is a misspelling in the body of our blog post? We'll need to re-index the
 document.
 
-ElasticSearch assigned our document a unique identifier when we first added it
+Elasticsearch assigned our document a unique identifier when we first added it
 to the index. In order to change this document, we need to supply the unique
 identifier along with our modified document.
 
@@ -86,13 +86,13 @@ docs.index(
 *The `post_body` above is a variable representing the real body of the blog
 post. I don't want to type it over and over again.*
 
-You do not have to relay on the auto-generated IDs from ElasticSearch. You can
+You do not have to relay on the auto-generated IDs from Elasticsearch. You can
 always provide your own IDs; this is recommended if your documents are also
 stored in a database that provides unique IDs. Using the same IDs in both
 locations enables you to reconcile documents between the two.
 
 The `:_id` field is only one of several special fields that control document
-indexing in ElasticSearch. The full list of supported fields are enumerated in
+indexing in Elasticsearch. The full list of supported fields are enumerated in
 the `index`
 [method documentation](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client/docs.rb#L45-56).
 
@@ -160,7 +160,7 @@ client.docs.search \
   :type  => "post"
 ```
 
-The `search` method returns the query response from ElasticSearch as a ruby
+The `search` method returns the query response from Elasticsearch as a ruby
 Hash. All the keys are represented as Strings. The [hashie](https://github.com/intridea/hashie)
 project has some useful transforms and wrappers for working with these result
 sets, but that is left to the user to implement if they so desire. Elastomer
@@ -198,7 +198,7 @@ results["hits"]["total"]  #=> 1
 The search results always contain the total number of matched documents; even if
 the `:size` is set to zero or some other number. However this is very inefficient.
 
-ElasticSearch provides specific methods for obtaining the number of documents
+Elasticsearch provides specific methods for obtaining the number of documents
 that match a search. Instead we can specify a `:search_type` tailored for
 counting.
 
@@ -212,9 +212,9 @@ results["hits"]["total"]  #=> 1
 
 The `"count"` search type is much more efficient then setting the size to zero.
 These count queries will return more quickly and consume less memory inside
-ElasticSearch.
+Elasticsearch.
 
-There is also a `count` API method, but the `:serach_type` approach is even more
+There is also a `count` API method, but the `:search_type` approach is even more
 efficient than the count API.
 
 #### Deleting

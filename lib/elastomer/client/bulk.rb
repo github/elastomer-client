@@ -7,7 +7,7 @@ module Elastomer
     # Bulk instance to assemble the operations called in the block into a
     # bulk request and dispatch it at the end of the block.
     #
-    # See http://www.elasticsearch.org/guide/reference/api/bulk/
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
     #
     # body   - Request body as a String (required if a block is _not_ given)
     # params - Optional request parameters as a Hash
@@ -142,9 +142,9 @@ module Elastomer
     end
 
     # The Bulk class provides some abstractions and helper methods for working
-    # with the ElasticSearch bulk API command. Instances of the Bulk class
+    # with the Elasticsearch bulk API command. Instances of the Bulk class
     # accumulate indexing and delete operations and then issue a single bulk
-    # API request to ElasticSearch. Those operations are then executed by the
+    # API request to Elasticsearch. Those operations are then executed by the
     # cluster.
     #
     # A maximum request size can be set. As soon as the size of the request
@@ -183,12 +183,12 @@ module Elastomer
       # Set the request size in bytes. If the value is nil, then request size
       # limiting will not be used and a request will only be made when the call
       # method is called. It is up to the user to ensure that the request does
-      # not exceed ElasticSearch request size limits.
+      # not exceed Elasticsearch request size limits.
       #
       # If the value is a number greater than zero, then actions will be
       # buffered until the request size is met or exceeded. When this happens a
       # bulk request is issued, queued actions are cleared, and the response
-      # from ElasticSearch is returned.
+      # from Elasticsearch is returned.
       def request_size=( value )
         if value.nil?
           @request_size = nil
@@ -200,12 +200,12 @@ module Elastomer
       # Set the action count. If the value is nil, then action count limiting
       # will not be used and a request will only be made when the call method
       # is called. It is up to the user to ensure that the request does not
-      # exceed ElasticSearch request size limits.
+      # exceed Elasticsearch request size limits.
       #
       # If the value is a number greater than zero, then actions will be
       # buffered until the action count is met. When this happens a bulk
       # request is issued, queued actions are cleared, and the response from
-      # ElasticSearch is returned.
+      # Elasticsearch is returned.
       def action_count=(value)
         if value.nil?
           @action_count = nil

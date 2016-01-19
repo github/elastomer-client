@@ -10,7 +10,7 @@ module Elastomer
   class Client
 
     # Create a new client that can be used to make HTTP requests to the
-    # ElasticSearch server.
+    # Elasticsearch server.
     #
     # opts - The options Hash
     #   :host - the host as a String
@@ -48,18 +48,18 @@ module Elastomer
     end
     alias_method :available?, :ping
 
-    # Returns the version String of the attached ElasticSearch instance.
+    # Returns the version String of the attached Elasticsearch instance.
     def version
       @version ||= info["version"]["number"]
     end
 
-    # Returns a Semantic::Version for the attached ElasticSearch instance.
+    # Returns a Semantic::Version for the attached Elasticsearch instance.
     # See https://rubygems.org/gems/semantic
     def semantic_version
       Semantic::Version.new(version)
     end
 
-    # Returns the information Hash from the attached ElasticSearch instance.
+    # Returns the information Hash from the attached Elasticsearch instance.
     def info
       response = get "/", :action => "cluster.info"
       response.body

@@ -2,7 +2,7 @@ module Elastomer
   class Client
 
     # Provides access to index-level API commands. An index name is required for
-    # these API calls. If you want to operate on all inidces - flushing all
+    # these API calls. If you want to operate on all indices - flushing all
     # indices, for example - then you will need to use the "_all" index name.
     #
     # You can override the index name for one-off calls by passing in the
@@ -17,7 +17,7 @@ module Elastomer
 
     class Index
       # Create a new index client for making API requests that pertain to
-      # the health and management individual indexes.
+      # the health and management of individual indexes.
       #
       # client - Elastomer::Client used for HTTP requests to the server
       # name   - The name of the index as a String or an Array of names
@@ -35,8 +35,8 @@ module Elastomer
       # params - Parameters Hash
       #   :type - optional type mapping as a String
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-exists.html
-      # and http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-types-exists.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html
+      # and https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-types-exists.html
       #
       # Returns true if the index (or type) exists
       def exists?( params = {} )
@@ -50,7 +50,7 @@ module Elastomer
       # body   - The index settings and mappings as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-create-index.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
       #
       # Returns the response body as a Hash
       def create( body, params = {} )
@@ -62,7 +62,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-delete-index.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html
       #
       # Returns the response body as a Hash
       def delete( params = {} )
@@ -74,7 +74,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-open-close.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html
       #
       # Returns the response body as a Hash
       def open( params = {} )
@@ -86,7 +86,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-open-close.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html
       #
       # Returns the response body as a Hash
       def close( params = {} )
@@ -98,7 +98,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-get-settings.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-settings.html
       #
       # Returns the response body as a Hash
       def get_settings( params = {} )
@@ -112,7 +112,7 @@ module Elastomer
       # body   - The index settings as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-update-settings.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-update-settings.html
       #
       # Returns the response body as a Hash
       def update_settings( body, params = {} )
@@ -126,7 +126,7 @@ module Elastomer
       # params - Parameters Hash
       #   :type - specific document type as a String or Array of Strings
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-get-mapping.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-mapping.html
       #
       # Returns the response body as a Hash
       def get_mapping( params = {} )
@@ -141,7 +141,7 @@ module Elastomer
       # body   - The mapping values to update as a Hash or a JSON encoded String
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-put-mapping.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-mapping.html
       #
       # Returns the response body as a Hash
       def update_mapping( type, body, params = {} )
@@ -156,7 +156,7 @@ module Elastomer
       # type   - Name of the mapping to update as a String
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-delete-mapping.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-mapping.html
       #
       # Returns the response body as a Hash
       def delete_mapping( type, params = {} )
@@ -168,7 +168,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
@@ -181,7 +181,7 @@ module Elastomer
       #
       # name   - Name of the alias to look up
       # params - Parameters Hash
-      #   :ignore_unavailable - What to do is an specified index name doesn’t
+      #   :ignore_unavailable - What to do if a specified index name doesn’t
       #                         exist. If set to `true` then those indices are ignored.
       #
       # Examples
@@ -189,7 +189,7 @@ module Elastomer
       #   index.get_alias("*")       # returns all aliases for the current index
       #   index.get_alias("issue*")  # returns all aliases starting with "issue"
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def get_alias( name, params = {} )
@@ -208,7 +208,7 @@ module Elastomer
       #
       #   index.add_alias("foo", :routing => "foo")
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def add_alias( name, params = {} )
@@ -226,7 +226,7 @@ module Elastomer
       #   index.delete_alias("foo")
       #   index.delete_alias(["foo", "bar"])
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def delete_alias( name, params = {} )
@@ -234,12 +234,13 @@ module Elastomer
         response.body
       end
 
-      # Performs the analysis process on a text and return the tokens breakdown of the text.
+      # Perform the analysis process on some text and return the tokens
+      # breakdown of the text.
       #
       # text   - The text to analyze as a String
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-analyze.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-analyze.html
       #
       # Returns the response body as a Hash
       def analyze( text, params = {} )
@@ -253,7 +254,7 @@ module Elastomer
       # params - Parameters Hash
       #   :index - set to "_all" to refresh all indices
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-refresh.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
       #
       # Returns the response body as a Hash
       def refresh( params = {} )
@@ -266,7 +267,7 @@ module Elastomer
       # params - Parameters Hash
       #   :index - set to "_all" to flush all indices
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-flush.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-flush.html
       #
       # Returns the response body as a Hash
       def flush( params = {} )
@@ -280,7 +281,7 @@ module Elastomer
       # params - Parameters Hash
       #   :index - set to "_all" to optimize all indices
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-optimize.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-optimize.html
       #
       # Returns the response body as a Hash
       def optimize( params = {} )
@@ -296,7 +297,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/0.90/indices-gateway-snapshot.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/0.90/indices-gateway-snapshot.html
       #
       # Returns the response body as a Hash
       def snapshot( params = {} )
@@ -304,12 +305,12 @@ module Elastomer
         response.body
       end
 
-      # Provides insight into on-going index shard recoveries. Recovery status
+      # Provides insight into ongoing index shard recoveries. Recovery status
       # may be reported for specific indices, or cluster-wide.
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-recovery.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-recovery.html
       #
       # Returns the response body as a Hash
       def recovery( params = {} )
@@ -323,7 +324,7 @@ module Elastomer
       # params - Parameters Hash
       #   :index - set to "_all" to clear all index caches
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-clearcache.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-clearcache.html
       #
       # Returns the response body as a Hash
       def clear_cache( params = {} )
@@ -336,7 +337,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-stats.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html
       #
       # Returns the response body as a Hash
       def stats( params = {} )
@@ -351,7 +352,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-status.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-status.html
       #
       # Returns the response body as a Hash
       def status( params = {} )
@@ -364,7 +365,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-segments.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-segments.html
       #
       # Returns the response body as a Hash
       def segments( params = {} )
@@ -377,7 +378,7 @@ module Elastomer
       #
       # type - The document type as a String
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html
       #
       # Returns a Docs instance.
       def docs( type = nil )
@@ -403,7 +404,7 @@ module Elastomer
       #     ...
       #   end
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
       #
       # Returns the response body as a Hash
       def bulk( params = {}, &block )
@@ -431,7 +432,7 @@ module Elastomer
       #     document['_source']
       #   end
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/scan-scroll.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
       #
       # Returns a new Scroller instance
       def scroll( query, opts = {} )
@@ -460,7 +461,7 @@ module Elastomer
       #     document['_source']
       #   end
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/scan-scroll.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
       #
       # Returns a new Scroller instance
       def scan( query, opts = {} )
@@ -473,7 +474,7 @@ module Elastomer
       # will be passed to the multi_search API call as part of the request
       # parameters.
       #
-      # See http://www.elasticsearch.org/guide/reference/api/multi-search/
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html
       #
       # params - Parameters Hash that will be passed to the API call.
       # block  - Required block that is used to accumulate searches.
@@ -491,7 +492,7 @@ module Elastomer
       #     ...
       #   end
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-multi-search.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html
       #
       # Returns the response body as a Hash
       def multi_search( params = {}, &block )
@@ -541,7 +542,7 @@ module Elastomer
       #   index.warmer('warmer1').get
       #   index.warmer('warmer1').delete
       #
-      # See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-warmers.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-warmers.html
       #
       # Returns a new Warmer instance
       def warmer(warmer_name)

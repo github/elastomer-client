@@ -34,10 +34,11 @@ module Elastomer
       @open_timeout = opts.fetch :open_timeout, 2
       @adapter      = opts.fetch :adapter, Faraday.default_adapter
       @opaque_id    = opts.fetch :opaque_id, false
+      @auto_refresh = opts.fetch :auto_refresh, false
     end
 
     attr_reader :host, :port, :url
-    attr_reader :read_timeout, :open_timeout
+    attr_reader :read_timeout, :open_timeout, :auto_refresh
 
     # Returns true if the server is available; returns false otherwise.
     def ping

@@ -22,7 +22,6 @@ describe Elastomer::Client::DeleteByQuery do
       @docs.index({ :_id => 0, :name => "mittens" })
       @docs.index({ :_id => 1, :name => "luna" })
 
-      @index.refresh
       response = @index.delete_by_query(nil, :q => "name:mittens")
       assert_equal({
         "_all" => {
@@ -39,7 +38,6 @@ describe Elastomer::Client::DeleteByQuery do
         },
       }, response["_indices"])
 
-      @index.refresh
       response = @docs.multi_get :ids => [0, 1]
       refute_found response["docs"][0]
       assert_found response["docs"][1]
@@ -48,7 +46,6 @@ describe Elastomer::Client::DeleteByQuery do
     it "respects action_count" do
       @docs.index({ :_id => 0, :name => "mittens" })
       @docs.index({ :_id => 1, :name => "luna" })
-      @index.refresh
 
       response = @index.delete_by_query(nil, :action_count => 1)
 
@@ -69,7 +66,6 @@ describe Elastomer::Client::DeleteByQuery do
         },
       }, response["_indices"])
 
-      @index.refresh
       response = @docs.multi_get :ids => [0, 1]
       refute_found response["docs"][0]
       refute_found response["docs"][1]
@@ -94,7 +90,6 @@ describe Elastomer::Client::DeleteByQuery do
                   "found" => false } }] }) }
         end)
 
-      @index.refresh
       response = @index.delete_by_query(nil, :action_count => 1)
       assert_equal({
         "_all" => {
@@ -130,7 +125,6 @@ describe Elastomer::Client::DeleteByQuery do
                   "error" => "VersionConflictEngineException" } }] }) }
         end)
 
-      @index.refresh
       response = @index.delete_by_query(nil, :action_count => 1)
       assert_equal({
         "_all" => {

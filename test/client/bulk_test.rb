@@ -48,8 +48,6 @@ describe Elastomer::Client::Bulk do
     assert_bulk_index(h["items"][0])
     assert_bulk_index(h["items"][1])
 
-    @index.refresh
-
     h = @index.docs("tweet").get :id => 1
     assert_equal "pea53", h["_source"]["author"]
 
@@ -68,8 +66,6 @@ describe Elastomer::Client::Bulk do
 
     assert_bulk_index h["items"].first, "expected to index a book"
     assert_bulk_delete h["items"].last, "expected to delete a book"
-
-    @index.refresh
 
     h = @index.docs("book").get :id => 1
     assert !h["exists"], "was not successfully deleted"
@@ -93,8 +89,6 @@ describe Elastomer::Client::Bulk do
     book_id = items.last["create"]["_id"]
     assert_match %r/^\S{20,22}$/, book_id
 
-    @index.refresh
-
     h = @index.docs("tweet").get :id => 1
     assert_equal "pea53", h["_source"]["author"]
 
@@ -113,8 +107,6 @@ describe Elastomer::Client::Bulk do
 
     book_id2 = items.first["create"]["_id"]
     assert_match %r/^\S{20,22}$/, book_id2
-
-    @index.refresh
 
     h = @index.docs("book").get :id => book_id
     assert !h["exists"], "was not successfully deleted"
@@ -135,8 +127,6 @@ describe Elastomer::Client::Bulk do
     assert_bulk_index h["items"].first
     assert_bulk_create h["items"].last
 
-    @index.refresh
-
     h = @index.docs("tweet").get :id => 1
     assert_equal "pea53", h["_source"]["author"]
 
@@ -152,8 +142,6 @@ describe Elastomer::Client::Bulk do
 
     assert_bulk_index h["items"].first, "expected to index a book"
     assert_bulk_delete h["items"].last, "expected to delete a book"
-
-    @index.refresh
 
     h = @index.docs("book").get :id => 1
     assert !h["exists"], "was not successfully deleted"
@@ -187,7 +175,6 @@ describe Elastomer::Client::Bulk do
     assert_equal 4, ary.length
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
-    @index.refresh
     h = @index.docs.search :q => "*:*", :search_type => "count"
 
     assert_equal 10, h["hits"]["total"]
@@ -218,7 +205,6 @@ describe Elastomer::Client::Bulk do
     assert_equal 4, ary.length
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
-    @index.refresh
     h = @index.docs.search :q => "*:*", :search_type => "count"
 
     assert_equal 10, h["hits"]["total"]

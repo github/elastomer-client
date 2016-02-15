@@ -27,7 +27,8 @@ $client_params = {
   :port => ENV["BOXEN_ELASTICSEARCH_PORT"] || 9200,
   :read_timeout => 10,
   :open_timeout => 1,
-  :opaque_id => false
+  :opaque_id => false,
+  :auto_refresh => true
 }
 $client = Elastomer::Client.new $client_params
 

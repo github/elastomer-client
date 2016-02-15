@@ -238,3 +238,13 @@ to add load to a search cluster that might already be experiencing problems.
 Blindly retrying an operation might do more harm than good. It is left to the
 user to implement their own exponential back-off scheme or to implement some
 status / back-pressure system.
+
+### Automatically refreshing indices
+
+The annoyance of having to repeatedly inserting a call to `index.refresh` between writes/reads (especially in tests) can be alleviated by setting `auto_refresh => true` in the client settings:
+
+```ruby
+client = Elastomer::Client.new :auto_refresh => true
+```
+
+When `auto_refresh => true`, `index.refresh` will be called before all read operations.

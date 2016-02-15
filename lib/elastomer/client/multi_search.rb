@@ -40,6 +40,7 @@ module Elastomer
         raise "multi_search request body cannot be nil" if body.nil?
         params ||= {}
 
+        index("_all").refresh if @auto_refresh
         response = self.post "{/index}{/type}/_msearch", params.merge(:body => body)
         response.body
       end

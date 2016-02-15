@@ -197,6 +197,7 @@ module Elastomer
       def search( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
+        @client.index(@name).refresh if @client.auto_refresh
         response = client.get "/{index}{/type}/_search", update_params(params, :body => query, :action => "docs.search")
         response.body
       end
@@ -242,6 +243,7 @@ module Elastomer
       def count( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
+        @client.index(@name).refresh if @client.auto_refresh
         response = client.get "/{index}{/type}/_count", update_params(params, :body => query, :action => "docs.count")
         response.body
       end
@@ -354,6 +356,7 @@ Percolate
       def more_like_this( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
+        @client.index(@name).refresh if @client.auto_refresh
         response = client.get "/{index}/{type}/{id}/_mlt", update_params(params, :body => query, :action => "docs.more_like_this")
         response.body
       end
@@ -378,6 +381,7 @@ Percolate
       def explain( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
+        @client.index(@name).refresh if @client.auto_refresh
         response = client.get "/{index}/{type}/{id}/_explain", update_params(params, :body => query, :action => "docs.explain")
         response.body
       end

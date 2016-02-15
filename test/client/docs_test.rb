@@ -228,7 +228,6 @@ describe Elastomer::Client::Docs do
         "failed" => 0,
       },
     })
-    @index.refresh
     h = @docs.multi_get :ids => [1, 2]
     assert_found h["docs"][0]
     refute_found h["docs"][1]
@@ -247,7 +246,6 @@ describe Elastomer::Client::Docs do
               }
             }
           )
-      @index.refresh
       h = @docs.multi_get :ids => [1, 2]
       refute_found h["docs"][0]
       refute_found h["docs"][1]
@@ -334,8 +332,6 @@ describe Elastomer::Client::Docs do
       :_type  => "doc1",
       :title  => "the author of faraday",
       :author => "technoweenie"
-
-    @index.refresh
 
     h = @docs.more_like_this({
       :type => "doc1",
@@ -623,8 +619,6 @@ describe Elastomer::Client::Docs do
       :_type  => "doc2",
       :title  => "the author of rubber-band",
       :author => "grantr"
-
-    @index.refresh
   end
   # rubocop:enable Metrics/MethodLength
 

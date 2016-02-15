@@ -107,7 +107,5 @@ describe Elastomer::Client::Scroller do
       }
     end
     h["items"].each {|item| assert_bulk_index(item) }
-
-    @index.refresh
   end
 end

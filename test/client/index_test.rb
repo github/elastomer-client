@@ -288,7 +288,25 @@ describe Elastomer::Client::Index do
 
   describe "when an index exists" do
     before do
-      @index.create(nil)
+      @index.create(
+        :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
+        :mappings => {
+          :doco => {
+            :_source => { :enabled => false },
+            :_all    => { :enabled => false },
+            :properties => {
+              :title   => { :type => "string", :analyzer => "standard" },
+              :author  => { :type => "string", :index => "not_analyzed" },
+              :suggest => {
+                :type            => "completion",
+                :index_analyzer  => "simple",
+                :search_analyzer => "simple",
+                :payloads        => false
+              }
+            }
+          }
+        }
+      )
       wait_for_index(@name)
     end
 
@@ -392,20 +410,20 @@ describe Elastomer::Client::Index do
     it "performs multi percolate queries" do
       @index.docs.index \
         :_id    => 1,
-        :_type  => "doc2",
+        :_type  => "doco",
         :title  => "the author of logging",
         :author => "pea53"
 
       @index.docs.index \
         :_id    => 2,
-        :_type  => "doc2",
+        :_type  => "doco",
         :title  => "the author of rubber-band",
         :author => "grantr"
 
       @index.percolator("1").create :query => { :match_all => { } }
       @index.percolator("2").create :query => { :match => { :author => "pea53" } }
 
-      h = @index.multi_percolate(:type => "doc2") do |m|
+      h = @index.multi_percolate(:type => "doco") do |m|
         m.percolate :author => "pea53"
         m.percolate :author => "grantr"
         m.count({}, { :author => "grantr" })
@@ -415,6 +433,34 @@ describe Elastomer::Client::Index do
       assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
       assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
       assert_equal 1, response3["total"]
+    end
+
+    it "performs suggestion queries" do
+      @index.docs.index \
+        :_id     => 1,
+        :_type   => "doco",
+        :title   => "the magnificent",
+        :author  => "greg",
+        :suggest => {:input => %w[Greg greg], :output => "Greg", :weight => 2}
+
+      @index.docs.index \
+        :_id    => 2,
+        :_type  => "doco",
+        :title  => "the author of rubber-band",
+        :author => "grant",
+        :suggest => {:input => %w[Grant grant], :output => "Grant", :weight => 1}
+
+      @index.refresh
+      response = @index.suggest({:name => {:text => "gr", :completion => {:field => :suggest}}})
+
+      assert response.key?("name")
+      hash = response["name"].first
+      assert_equal "gr", hash["text"]
+
+      options = hash["options"]
+      assert_equal 2, options.length
+      assert_equal "Greg", options.first["text"]
+      assert_equal "Grant", options.last["text"]
     end
   end
 end

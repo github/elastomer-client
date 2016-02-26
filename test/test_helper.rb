@@ -1,10 +1,11 @@
+require "rubygems" unless defined? Gem
+require "bundler"
+Bundler.require(:default, :development)
+
 require "webmock/minitest"
 WebMock.allow_net_connect!
 
 require "securerandom"
-require "rubygems" unless defined? Gem
-require "bundler"
-Bundler.require(:default, :development)
 
 if ENV["COVERAGE"] == "true"
   require "simplecov"

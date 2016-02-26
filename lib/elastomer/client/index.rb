@@ -385,6 +385,19 @@ module Elastomer
         client.docs name, type
       end
 
+      # Exposes the `/_suggest` endpoint of the Elasticsearch API.
+      #
+      # query  - The query body as a Hash
+      # params - Parameters Hash
+      #
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html
+      #
+      # Returns the response body as a Hash
+      def suggest(query, params = {})
+        response = client.post "{/index}/_suggest", update_params(params, :body => query, :action => "index.suggest")
+        response.body
+      end
+
       # Perform bulk indexing and/or delete operations. The current index name
       # will be passed to the bulk API call as part of the request parameters.
       #

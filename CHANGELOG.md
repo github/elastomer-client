@@ -1,3 +1,7 @@
+## 0.9.0 (2016-02-26)
+- Adding support for the `/_suggest` API endpoint
+- Documentation cleanup - thank you Matt Wagner @wags
+
 ## 0.8.1 (2015-11-04)
 - Replace yanked 0.8.0
 - Fix code style based on Rubocop recommendations

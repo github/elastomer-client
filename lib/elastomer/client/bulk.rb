@@ -174,7 +174,7 @@ module Elastomer
         @actions = []
         @current_request_size = 0
         @current_action_count = 0
-        self.request_size = params.delete(:request_size)
+        self.request_size = params.delete(:request_size) || 10 * 1024 * 1024
         self.action_count = params.delete(:action_count)
       end
 

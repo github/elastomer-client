@@ -158,6 +158,7 @@ module Elastomer
     # immediately.
     #
     class Bulk
+      DEFAULT_REQUEST_SIZE = 10 * 2**20 # 10 MB
 
       # Create a new bulk client for handling some of the details of
       # accumulating documents to index and then formatting them properly for
@@ -174,7 +175,7 @@ module Elastomer
         @actions = []
         @current_request_size = 0
         @current_action_count = 0
-        self.request_size = params.delete(:request_size)
+        self.request_size = params.delete(:request_size) || DEFAULT_REQUEST_SIZE
         self.action_count = params.delete(:action_count)
       end
 

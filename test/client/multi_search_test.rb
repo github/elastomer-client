@@ -153,8 +153,6 @@ describe Elastomer::Client::MultiSearch do
       :_type  => "doc2",
       :title  => "the author of rubber-band",
       :author => "grantr"
-
-    @index.refresh
   end
   # rubocop:enable Metrics/MethodLength
 end

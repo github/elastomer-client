@@ -123,8 +123,6 @@ describe Elastomer::Client::MultiPercolate do
     percolator2.create :query => { :match => { :author => "pea53" } }
     percolator2 = @index.percolator "3"
     percolator2.create :query => { :match => { :author => "grantr" } }
-
-    @index.refresh
   end
   # rubocop:enable Metrics/MethodLength
 end

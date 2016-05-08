@@ -152,4 +152,18 @@ describe Elastomer::Client do
       assert_equal Semantic::Version.new(version_string), $client.semantic_version
     end
   end
+
+  it "supports automatically refreshing the index before each search" do
+    name = "elastomer-auto-refresh-test"
+    index = $client.index(name)
+    docs = index.docs("sometype")
+
+    index.delete() if index.exists?()
+    index.create(nil)
+    wait_for_index(name)
+    index.update_settings({:index => {"refresh_interval" => -1}})
+
+    docs.index({:_id => 1})
+    assert_equal(docs.search({:query => {:match_all => {}}})["hits"]["hits"].length, 1)
+  end
 end

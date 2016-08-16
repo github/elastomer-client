@@ -90,7 +90,8 @@ end
 #
 # Returns true if Elasticsearch version is 1.x.
 def es_version_1_x?
-  $client.semantic_version >= "1.0.0"
+  $client.semantic_version >= "1.0.0" &&
+  $client.semantic_version <  "2.0.0"
 end
 
 # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
@@ -99,7 +100,8 @@ end
 #
 # Returns true if Elasticsearch version is 2.x.
 def es_version_2_x?
-  $client.semantic_version >= "2.0.0"
+  $client.semantic_version >= "2.0.0" &&
+  $client.semantic_version <  "3.0.0"
 end
 
 # Elasticsearch 1.4 changed the response body for interacting with index

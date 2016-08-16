@@ -331,11 +331,10 @@ module Elastomer
 Percolate
 =end
 
-      # Search for documents similar to a specific document. The document
-      # :id is provided as part of the params hash. If the _all field is
-      # not enabled, :mlt_fields must be passed. A query cannot be present
-      # in the query body, but other fields like :size and :facets are
-      # allowed.
+      # Deprecated: Search for documents similar to a specific document. The
+      # document :id is provided as part of the params hash. If the _all field
+      # is not enabled, :mlt_fields must be passed. A query cannot be present in
+      # the query body, but other fields like :size and :facets are allowed.
       #
       # params - Parameters Hash
       #   :id - the ID of the document

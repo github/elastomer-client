@@ -55,26 +55,17 @@ describe Elastomer::Client::Cluster do
   end
 
   it "updates the cluster settings" do
-    @cluster.update_settings :transient => { "indices.ttl.interval" => "30" }
+    @cluster.update_settings :transient => { "indices.ttl.interval" => "30m" }
     h = @cluster.settings
 
-    #COMPATIBILITY
-    # ES 1.0 changed the default return format of cluster settings to always
-    # expand nested properties, e.g.
-    # {"indices.ttl.interval": "30"} changed to
-    # {"indices": {"ttl": {"interval":"30"}}}
+    value = h["transient"]["indices"]["ttl"]["interval"]
+    assert_equal "30m", value
 
-    # To support both versions, we check for either return format.
-    value = h["transient"]["indices.ttl.interval"] ||
-            h["transient"]["indices"]["ttl"]["interval"]
-    assert_equal "30", value
-
-    @cluster.update_settings :transient => { "indices.ttl.interval" => "60" }
+    @cluster.update_settings :transient => { "indices.ttl.interval" => "60m" }
     h = @cluster.settings
 
-    value = h["transient"]["indices.ttl.interval"] ||
-            h["transient"]["indices"]["ttl"]["interval"]
-    assert_equal "60", value
+    value = h["transient"]["indices"]["ttl"]["interval"]
+    assert_equal "60m", value
   end
 
   it "returns cluster stats" do

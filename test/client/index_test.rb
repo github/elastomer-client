@@ -288,6 +288,17 @@ describe Elastomer::Client::Index do
 
   describe "when an index exists" do
     before do
+      suggest = {
+        :type            => "completion",
+        :index_analyzer  => "simple",
+        :search_analyzer => "simple",
+        :payloads        => false
+      }
+
+      if es_version_2_x?
+        suggest[:analyzer] = suggest.delete(:index_analyzer)
+      end
+
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
         :mappings => {
@@ -297,12 +308,7 @@ describe Elastomer::Client::Index do
             :properties => {
               :title   => { :type => "string", :analyzer => "standard" },
               :author  => { :type => "string", :index => "not_analyzed" },
-              :suggest => {
-                :type            => "completion",
-                :index_analyzer  => "simple",
-                :search_analyzer => "simple",
-                :payloads        => false
-              }
+              :suggest => suggest
             }
           }
         }
@@ -349,11 +355,9 @@ describe Elastomer::Client::Index do
       end
     end
 
-    if es_version_1_x?
-      it "recovery" do
-        response = @index.recovery
-        assert_includes response, "elastomer-index-test"
-      end
+    it "recovery" do
+      response = @index.recovery
+      assert_includes response, "elastomer-index-test"
     end
 
     it "clears caches" do
@@ -370,9 +374,12 @@ describe Elastomer::Client::Index do
       end
     end
 
-    it "gets status" do
-      response = @index.status
-      assert_includes response["indices"], "elastomer-index-test"
+    # The /<index>/_status endpoint has been removed in ES 2.X
+    if es_version_1_x?
+      it "gets status" do
+        response = @index.status
+        assert_includes response["indices"], "elastomer-index-test"
+      end
     end
 
     it "gets segments" do

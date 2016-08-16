@@ -13,7 +13,7 @@ describe Elastomer::Client::Docs do
           :doc1 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
+              :title  => { :type => "string", :analyzer => "standard", :term_vector => "with_positions_offsets" },
               :author => { :type => "string", :index => "not_analyzed" }
             }
           },

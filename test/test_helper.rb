@@ -93,6 +93,15 @@ def es_version_1_x?
   $client.semantic_version >= "1.0.0"
 end
 
+# Elasticsearch 2.0 changed some request formats in a non-backward-compatible
+# way. Some tests need to know what version is running to structure requests
+# as expected.
+#
+# Returns true if Elasticsearch version is 2.x.
+def es_version_2_x?
+  $client.semantic_version >= "2.0.0"
+end
+
 # Elasticsearch 1.4 changed the response body for interacting with index
 # aliases. If an index does not contain any aliases, then an "aliases" key is no
 # longer returned in the response.
@@ -135,7 +144,7 @@ def run_snapshot_tests?
     begin
       create_repo("elastomer-client-snapshot-test")
       $run_snapshot_tests = true
-    rescue Elastomer::Client::Error => e
+    rescue Elastomer::Client::Error
       puts "Could not create a snapshot repo. Snapshot tests will be disabled."
       puts "To enable snapshot tests, add a path.repo setting to your elasticsearch.yml file."
       $run_snapshot_tests = false

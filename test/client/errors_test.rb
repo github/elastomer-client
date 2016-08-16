@@ -15,6 +15,29 @@ describe Elastomer::Client::Error do
     response = Faraday::Response.new(:body => {"error" => "IndexMissingException"})
     err = Elastomer::Client::Error.new(response)
     assert_equal "IndexMissingException", err.message
+    assert_equal "IndexMissingException", err.error
+
+    body = {
+      "error" => {
+        "index"         => "non-existent-index",
+        "reason"        => "no such index",
+        "resource.id"   => "non-existent-index",
+        "resource.type" => "index_or_alias",
+        "root_cause"=> [{
+          "index"         => "non-existent-index",
+          "reason"        => "no such index",
+          "resource.id"   => "non-existent-index",
+          "resource.type" => "index_or_alias",
+          "type"          => "index_not_found_exception"
+        }],
+       "type" => "index_not_found_exception"
+      },
+     "status" => 404
+    }
+    response = Faraday::Response.new(:body => body)
+    err = Elastomer::Client::Error.new(response)
+    assert_equal body["error"].to_s, err.message
+    assert_equal body["error"], err.error
   end
 
   it "is instantiated from another exception" do

@@ -17,6 +17,7 @@ module Elastomer
       #
       def initialize( *args )
         @status = nil
+        @error = nil
 
         case args.first
         when Exception
@@ -27,9 +28,11 @@ module Elastomer
         when Faraday::Response
           response = args.shift
           @status = response.status
-          body = response.body
 
-          message = body.is_a?(Hash) && body["error"] || body.to_s
+          body = response.body
+          @error = body["error"] if body.is_a?(Hash) && body.key?("error")
+
+          message = @error || body.to_s
           super message
 
         else
@@ -40,6 +43,10 @@ module Elastomer
       # Returns the status code from the `response` or nil if the Error was not
       # created with a response.
       attr_reader :status
+
+      # Returns the Elasticsearch error from the `response` or nil if the Error
+      # was not created with a response.
+      attr_reader :error
 
       # Indicates that the error is fatal. The request should not be tried
       # again.

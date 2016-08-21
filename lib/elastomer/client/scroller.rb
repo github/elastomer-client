@@ -23,6 +23,8 @@ module Elastomer
       Scroller.new(self, query, opts)
     end
 
+    # DEPRECATED in ES 2.1.0
+    #
     # Create a new Scroller instance for scrolling all results from a `query`
     # via "scan" semantics.
     #
@@ -56,7 +58,7 @@ module Elastomer
     #   :type        - the document type to search
     #   :scroll      - the keep alive time of the scrolling request (5 minutes by default)
     #   :size        - the number of documents per shard to fetch per scroll
-    #   :search_type - set to 'scan' for scan semantics
+    #   :search_type - set to 'scan' for scan semantics  # DEPRECATED in ES 2.1.0
     #
     # Examples
     #
@@ -85,7 +87,7 @@ module Elastomer
     #
     # Examples
     #
-    #   scroll_id = client.start_scroll('{"query":{"match_all":{}}}', :index => 'test', :search_type => 'scan')['_scroll_id']
+    #   scroll_id = client.start_scroll('{"query":{"match_all":{}}}', :index => 'test')['_scroll_id']
     #
     #   h = client.continue_scroll scroll_id   # scroll to get the next set of results
     #   scroll_id = h['_scroll_id']            # and store the scroll_id to use later
@@ -123,11 +125,11 @@ module Elastomer
       #   :type        - the document type to search
       #   :scroll      - the keep alive time of the scrolling request (5 minutes by default)
       #   :size        - the number of documents per shard to fetch per scroll
-      #   :search_type - set to 'scan' for scan query semantics
+      #   :search_type - set to 'scan' for scan semantics  # DEPRECATED in ES 2.1.0
       #
       # Examples
       #
-      #   scan = Scroller.new(client, {:search_type => 'scan', :query => {:match_all => {}}}, :index => 'test-1')
+      #   scan = Scroller.new(client, {:query => {:match_all => {}}}, :index => 'test-1')
       #   scan.each_document { |doc|
       #     doc['_id']
       #     doc['_source']

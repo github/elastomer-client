@@ -33,7 +33,15 @@ describe Elastomer::Client::Cluster do
     template = @template.get
     assert_equal [@name], template.keys
     assert_equal "test-elastomer*", template[@name]["template"]
-    assert_equal "3", template[@name]["settings"]["index.number_of_shards"]
-  end
 
+    if es_version_1_x?
+      assert_equal "3", template[@name]["settings"]["index.number_of_shards"]
+
+    elsif es_version_2_x?
+      assert_equal "3", template[@name]["settings"]["index"]["number_of_shards"]
+
+    else
+      assert false, "Unsupported Elasticsearch version #{$client.semantic_version}"
+    end
+  end
 end

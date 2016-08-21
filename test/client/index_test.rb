@@ -35,38 +35,16 @@ describe Elastomer::Client::Index do
       @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
       settings = @index.get_settings[@name]["settings"]
 
-      # COMPATIBILITY
-      # ES 1.0 changed the default return format of index settings to always
-      # expand nested properties, e.g.
-      # {"index.number_of_replicas": "1"} changed to
-      # {"index": {"number_of_replicas":"1"}}
-
-      # To support both versions, we check for either return format.
-      value = settings["index.number_of_shards"] ||
-              settings["index"]["number_of_shards"]
-      assert_equal "3", value
-      value = settings["index.number_of_replicas"] ||
-              settings["index"]["number_of_replicas"]
-      assert_equal "0", value
+      assert_equal "3", settings["index"]["number_of_shards"]
+      assert_equal "0", settings["index"]["number_of_replicas"]
     end
 
     it "creates an index with settings with .settings" do
       @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
       settings = @index.settings[@name]["settings"]
 
-      # COMPATIBILITY
-      # ES 1.0 changed the default return format of index settings to always
-      # expand nested properties, e.g.
-      # {"index.number_of_replicas": "1"} changed to
-      # {"index": {"number_of_replicas":"1"}}
-
-      # To support both versions, we check for either return format.
-      value = settings["index.number_of_shards"] ||
-              settings["index"]["number_of_shards"]
-      assert_equal "3", value
-      value = settings["index.number_of_replicas"] ||
-              settings["index"]["number_of_replicas"]
-      assert_equal "0", value
+      assert_equal "3", settings["index"]["number_of_shards"]
+      assert_equal "0", settings["index"]["number_of_replicas"]
     end
 
     it "adds mappings for document types" do
@@ -201,13 +179,22 @@ describe Elastomer::Client::Index do
     assert_mapping_exists @index.mapping[@name], "doco"
 
     response = @index.delete_mapping "doco"
-    assert_acknowledged response
 
-    mapping = @index.get_mapping
-    mapping = mapping[@name] if mapping.key? @name
-    mapping = mapping["mappings"] if mapping.key? "mappings"
+    if es_version_1_x?
+      assert_acknowledged response
 
-    assert_empty mapping, "no mappings are present"
+      mapping = @index.get_mapping
+      mapping = mapping[@name] if mapping.key? @name
+      mapping = mapping["mappings"] if mapping.key? "mappings"
+
+      assert_empty mapping, "no mappings are present"
+
+    elsif es_version_2_x?
+      assert_equal "No handler found for uri [/elastomer-index-test/doco] and method [DELETE]", response
+
+    else
+      assert false, "Unsupported Elasticsearch version #{$client.semantic_version}"
+    end
   end
 
   it "lists all aliases to the index" do

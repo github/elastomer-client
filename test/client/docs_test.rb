@@ -233,25 +233,18 @@ describe Elastomer::Client::Docs do
     assert_found h["docs"][0]
     refute_found h["docs"][1]
 
-    #COMPATIBILITY
-    # ES 1.0 normalized all search APIs to use a :query top level element.
-    # This broke compatibility with the ES 0.90 delete_by_query api. Since
-    # the query hash version of this api never worked with 0.90 in the first
-    # place, only test it if running 1.0.
-    if es_version_1_x?
-      h = @docs.delete_by_query(
-            :query => {
-              :filtered => {
-                :query => {:match_all => {}},
-                :filter => {:term => {:author => "pea53"}}
-              }
+    h = @docs.delete_by_query(
+          :query => {
+            :filtered => {
+              :query => {:match_all => {}},
+              :filter => {:term => {:author => "pea53"}}
             }
-          )
-      @index.refresh
-      h = @docs.multi_get :ids => [1, 2]
-      refute_found h["docs"][0]
-      refute_found h["docs"][1]
-    end
+          }
+        )
+    @index.refresh
+    h = @docs.multi_get :ids => [1, 2]
+    refute_found h["docs"][0]
+    refute_found h["docs"][1]
   end
 
   it "searches for documents" do
@@ -376,26 +369,14 @@ describe Elastomer::Client::Docs do
     h = @docs.validate :q => "*:*"
     assert_equal true, h["valid"]
 
-    #COMPATIBILITY
-    # ES 1.0 normalized all search APIs to use a :query top level element.
-    # This broke compatibility with the ES 0.90 validate api.
-    if es_version_1_x?
-      h = @docs.validate({
-        :query => {
-          :filtered => {
-            :query => {:match_all => {}},
-            :filter => {:term => {:author => "defunkt"}}
-          }
-        }
-      }, :type => %w[doc1 doc2] )
-    else
-      h = @docs.validate({
+    h = @docs.validate({
+      :query => {
         :filtered => {
           :query => {:match_all => {}},
           :filter => {:term => {:author => "defunkt"}}
         }
-      }, :type => %w[doc1 doc2] )
-    end
+      }
+    }, :type => %w[doc1 doc2] )
     assert_equal true, h["valid"]
   end
 

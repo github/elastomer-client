@@ -25,7 +25,7 @@ module Elastomer
     #
     #   # block form
     #   multi_search(:index => 'default-index') do |m|
-    #     m.search({:query => {:match_all => {}}, :search_type => :count)
+    #     m.search({:query => {:match_all => {}}, :size => 0)
     #     m.search({:query => {:field => {"foo" => "bar"}}}, :type => 'default-type')
     #     ...
     #   end

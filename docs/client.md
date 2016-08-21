@@ -182,12 +182,12 @@ client.expand_path("{/index}{/type}/_search", {
 #=> "/twitter/tweet/_search?q=*:*"
 
 client.expand_path("{/index}{/type}/_search", {
-  :index       => "twitter",
-  :type        => ["tweet", "user"],
-  :q           => "*:*"
-  :search_type => "count"
+  :index => "twitter",
+  :type  => ["tweet", "user"],
+  :q     => "*:*"
+  :size  => 0
 })
-#=> "/twitter/tweet,user/_search?q=*:*&search_type=count"
+#=> "/twitter/tweet,user/_search?q=*:*&size=0"
 ```
 
 In the examples above the path elements are optional. We can force them to be

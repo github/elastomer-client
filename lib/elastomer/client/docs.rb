@@ -503,7 +503,7 @@ Percolate
       # Examples
       #
       #   docs.multi_search do |m|
-      #     m.search({:query => {:match_all => {}}, :search_type => :count)
+      #     m.search({:query => {:match_all => {}}, :size => 0)
       #     m.search({:query => {:field => {"foo" => "bar"}}})
       #     ...
       #   end

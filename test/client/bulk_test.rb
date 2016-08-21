@@ -188,7 +188,7 @@ describe Elastomer::Client::Bulk do
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
-    h = @index.docs.search :q => "*:*", :search_type => "count"
+    h = @index.docs.search :q => "*:*", :size => 0
 
     assert_equal 10, h["hits"]["total"]
   end
@@ -219,7 +219,7 @@ describe Elastomer::Client::Bulk do
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
-    h = @index.docs.search :q => "*:*", :search_type => "count"
+    h = @index.docs.search :q => "*:*", :size => 0
 
     assert_equal 10, h["hits"]["total"]
   end

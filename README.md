@@ -92,7 +92,7 @@ docs.index({
   :tweet  => 'announcing Elastomer, the stupid simple Elasticsearch client'
 })
 
-docs.search({:query => {:match_all => {}}}, :search_type => 'count')
+docs.search({:query => {:match_all => {}}}, :size => 0)
 ```
 
 #### Performance

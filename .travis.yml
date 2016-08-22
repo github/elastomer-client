@@ -5,7 +5,7 @@ rvm:
 addons:
   apt:
     sources:
-      elasticsearch-2.3
+      elasticsearch-2.x
     packages:
       elasticsearch
 

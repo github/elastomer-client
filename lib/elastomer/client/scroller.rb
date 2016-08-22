@@ -23,7 +23,7 @@ module Elastomer
       Scroller.new(self, query, opts)
     end
 
-    # DEPRECATED in ES 2.1.0
+    # DEPRECATED in ES 2.1.0 - use a Scroll query sorted by _doc: https://www.elastic.co/guide/en/elasticsearch/reference/2.3/search-request-search-type.html#scan
     #
     # Create a new Scroller instance for scrolling all results from a `query`
     # via "scan" semantics.

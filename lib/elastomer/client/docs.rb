@@ -331,7 +331,8 @@ module Elastomer
 Percolate
 =end
 
-      # Deprecated: Search for documents similar to a specific document. The
+      # Deprecated - use the More Like This query: https://www.elastic.co/guide/en/elasticsearch/reference/2.3/query-dsl-mlt-query.html
+      # Search for documents similar to a specific document. The
       # document :id is provided as part of the params hash. If the _all field
       # is not enabled, :mlt_fields must be passed. A query cannot be present in
       # the query body, but other fields like :size and :facets are allowed.

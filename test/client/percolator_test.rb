@@ -46,7 +46,7 @@ describe Elastomer::Client::Percolator do
     end
 
     it "cannot delete all percolators by providing a nil id" do
-      assert_raises(ArgumentError) { percolator = @index.percolator nil }
+      assert_raises(ArgumentError) { @index.percolator nil }
     end
   end
 end

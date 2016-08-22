@@ -151,7 +151,7 @@ describe Elastomer::Client do
     end
 
     it "gets cluster version" do
-      assert_match /[\d\.]+/, $client.version
+      assert_match(/[\d\.]+/, $client.version)
     end
 
     it "gets semantic version" do

@@ -100,7 +100,7 @@ describe Elastomer::Client::Repository do
         response = repo.snapshot.get
         assert_equal ["test-snapshot"], response["snapshots"].collect { |info| info["snapshot"] }
 
-        snapshot2 = create_snapshot(repo, "test-snapshot2")
+        create_snapshot(repo, "test-snapshot2")
         response  = repo.snapshots.get
         snapshot_names = response["snapshots"].collect { |info| info["snapshot"] }
         assert_includes snapshot_names, "test-snapshot"

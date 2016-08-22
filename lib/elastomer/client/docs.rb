@@ -331,11 +331,11 @@ module Elastomer
 Percolate
 =end
 
-      # Search for documents similar to a specific document. The document
-      # :id is provided as part of the params hash. If the _all field is
-      # not enabled, :mlt_fields must be passed. A query cannot be present
-      # in the query body, but other fields like :size and :facets are
-      # allowed.
+      # Deprecated - use the More Like This query: https://www.elastic.co/guide/en/elasticsearch/reference/2.3/query-dsl-mlt-query.html
+      # Search for documents similar to a specific document. The
+      # document :id is provided as part of the params hash. If the _all field
+      # is not enabled, :mlt_fields must be passed. A query cannot be present in
+      # the query body, but other fields like :size and :facets are allowed.
       #
       # params - Parameters Hash
       #   :id - the ID of the document
@@ -504,7 +504,7 @@ Percolate
       # Examples
       #
       #   docs.multi_search do |m|
-      #     m.search({:query => {:match_all => {}}, :search_type => :count)
+      #     m.search({:query => {:match_all => {}}, :size => 0)
       #     m.search({:query => {:field => {"foo" => "bar"}}})
       #     ...
       #   end

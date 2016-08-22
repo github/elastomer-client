@@ -188,7 +188,7 @@ describe Elastomer::Client::Bulk do
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
-    h = @index.docs.search :q => "*:*", :search_type => "count"
+    h = @index.docs.search :q => "*:*", :size => 0
 
     assert_equal 10, h["hits"]["total"]
   end
@@ -219,7 +219,7 @@ describe Elastomer::Client::Bulk do
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
-    h = @index.docs.search :q => "*:*", :search_type => "count"
+    h = @index.docs.search :q => "*:*", :size => 0
 
     assert_equal 10, h["hits"]["total"]
   end
@@ -314,7 +314,7 @@ describe Elastomer::Client::Bulk do
       [:index, { :message => "tweet 3" }, { :_id => 3, :_type => "book", :_index => @index.name }]
     ]
     items = []
-    stats = $client.bulk_stream_items(ops, { :action_count => 2 }) { |item| items << item }
+    $client.bulk_stream_items(ops, { :action_count => 2 }) { |item| items << item }
     assert_equal(3, items.length)
     assert_bulk_index(items[0])
     assert_bulk_index(items[1])

@@ -196,26 +196,18 @@ results["hits"]["total"]  #=> 1
 ```
 
 The search results always contain the total number of matched documents; even if
-the `:size` is set to zero or some other number. However this is very inefficient.
+the `:size` is set to zero or some other number.
 
 Elasticsearch provides specific methods for obtaining the number of documents
-that match a search. Instead we can specify a `:search_type` tailored for
-counting.
+that match a search. Using the count API endpoint is another way to get the
+number of documents.
 
 ```ruby
-results = client.docs("blog", "post").search \
-  :q => "title:nerd",
-  :search_type => "count"
+results = client.docs("blog", "post").count \
+  :q => "title:nerd"
 
-results["hits"]["total"]  #=> 1
+results["count"]  #=> 1
 ```
-
-The `"count"` search type is much more efficient then setting the size to zero.
-These count queries will return more quickly and consume less memory inside
-Elasticsearch.
-
-There is also a `count` API method, but the `:search_type` approach is even more
-efficient than the count API.
 
 #### Deleting
 

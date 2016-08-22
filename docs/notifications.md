@@ -14,7 +14,7 @@ The event namespace is `request.client.elastomer`.
   :action  => "docs.search",
   :context => nil,
   :body    => "{\"query\":{\"match_all\":{}}}",
-  :url     => #<URI::HTTP:0x007fb6f3e98b60 URL:http://localhost:19200/index-test/_search?search_type = count>,
+  :url     => #<URI::HTTP:0x007fb6f3e98b60 URL:http://localhost:19200/index-test/_search?size=0>,
   :method  => :get,
   :status  => 200
 }

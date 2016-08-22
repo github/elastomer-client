@@ -35,38 +35,16 @@ describe Elastomer::Client::Index do
       @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
       settings = @index.get_settings[@name]["settings"]
 
-      # COMPATIBILITY
-      # ES 1.0 changed the default return format of index settings to always
-      # expand nested properties, e.g.
-      # {"index.number_of_replicas": "1"} changed to
-      # {"index": {"number_of_replicas":"1"}}
-
-      # To support both versions, we check for either return format.
-      value = settings["index.number_of_shards"] ||
-              settings["index"]["number_of_shards"]
-      assert_equal "3", value
-      value = settings["index.number_of_replicas"] ||
-              settings["index"]["number_of_replicas"]
-      assert_equal "0", value
+      assert_equal "3", settings["index"]["number_of_shards"]
+      assert_equal "0", settings["index"]["number_of_replicas"]
     end
 
     it "creates an index with settings with .settings" do
       @index.create :settings => { :number_of_shards => 3, :number_of_replicas => 0 }
       settings = @index.settings[@name]["settings"]
 
-      # COMPATIBILITY
-      # ES 1.0 changed the default return format of index settings to always
-      # expand nested properties, e.g.
-      # {"index.number_of_replicas": "1"} changed to
-      # {"index": {"number_of_replicas":"1"}}
-
-      # To support both versions, we check for either return format.
-      value = settings["index.number_of_shards"] ||
-              settings["index"]["number_of_shards"]
-      assert_equal "3", value
-      value = settings["index.number_of_replicas"] ||
-              settings["index"]["number_of_replicas"]
-      assert_equal "0", value
+      assert_equal "3", settings["index"]["number_of_shards"]
+      assert_equal "0", settings["index"]["number_of_replicas"]
     end
 
     it "adds mappings for document types" do
@@ -201,13 +179,22 @@ describe Elastomer::Client::Index do
     assert_mapping_exists @index.mapping[@name], "doco"
 
     response = @index.delete_mapping "doco"
-    assert_acknowledged response
 
-    mapping = @index.get_mapping
-    mapping = mapping[@name] if mapping.key? @name
-    mapping = mapping["mappings"] if mapping.key? "mappings"
+    if es_version_1_x?
+      assert_acknowledged response
 
-    assert_empty mapping, "no mappings are present"
+      mapping = @index.get_mapping
+      mapping = mapping[@name] if mapping.key? @name
+      mapping = mapping["mappings"] if mapping.key? "mappings"
+
+      assert_empty mapping, "no mappings are present"
+
+    elsif es_version_2_x?
+      assert_equal "No handler found for uri [/elastomer-index-test/doco] and method [DELETE]", response
+
+    else
+      assert false, "Unsupported Elasticsearch version #{$client.semantic_version}"
+    end
   end
 
   it "lists all aliases to the index" do
@@ -246,48 +233,45 @@ describe Elastomer::Client::Index do
     end
   end
 
-  # COMPATIBILITY ES 1.x removed English stopwords from the default analyzers,
-  # so create a custom one with the English stopwords added.
-  if es_version_1_x?
-    it "analyzes text and returns tokens" do
-      tokens = @index.analyze "Just a few words to analyze.", :analyzer => "standard", :index => nil
-      tokens = tokens["tokens"].map { |h| h["token"] }
-      assert_equal %w[just a few words to analyze], tokens
+  it "analyzes text and returns tokens" do
+    tokens = @index.analyze "Just a few words to analyze.", :analyzer => "standard", :index => nil
+    tokens = tokens["tokens"].map { |h| h["token"] }
+    assert_equal %w[just a few words to analyze], tokens
 
-      @index.create(
-        :settings => {
-          :number_of_shards => 1,
-          :number_of_replicas => 0,
-          :analysis => {
-            :analyzer => {
-              :english_standard => {
-                :type => :standard,
-                :stopwords => "_english_"
-              }
+    @index.create(
+      :settings => {
+        :number_of_shards => 1,
+        :number_of_replicas => 0,
+        :analysis => {
+          :analyzer => {
+            :english_standard => {
+              :type => :standard,
+              :stopwords => "_english_"
             }
           }
         }
-      )
-      wait_for_index(@name)
+      }
+    )
+    wait_for_index(@name)
 
-      tokens = @index.analyze "Just a few words to analyze.", :analyzer => "english_standard"
-      tokens = tokens["tokens"].map { |h| h["token"] }
-      assert_equal %w[just few words analyze], tokens
-    end
-  else
-    it "analyzes text and returns tokens" do
-      tokens = @index.analyze "Just a few words to analyze.", :index => nil
-      tokens = tokens["tokens"].map { |h| h["token"] }
-      assert_equal %w[just few words analyze], tokens
-
-      tokens = @index.analyze "Just a few words to analyze.", :analyzer => "simple", :index => nil
-      tokens = tokens["tokens"].map { |h| h["token"] }
-      assert_equal %w[just a few words to analyze], tokens
-    end
+    tokens = @index.analyze "Just a few words to analyze.", :analyzer => "english_standard"
+    tokens = tokens["tokens"].map { |h| h["token"] }
+    assert_equal %w[just few words analyze], tokens
   end
 
   describe "when an index exists" do
     before do
+      suggest = {
+        :type            => "completion",
+        :index_analyzer  => "simple",
+        :search_analyzer => "simple",
+        :payloads        => false
+      }
+
+      if es_version_2_x?
+        suggest[:analyzer] = suggest.delete(:index_analyzer)
+      end
+
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
         :mappings => {
@@ -297,12 +281,7 @@ describe Elastomer::Client::Index do
             :properties => {
               :title   => { :type => "string", :analyzer => "standard" },
               :author  => { :type => "string", :index => "not_analyzed" },
-              :suggest => {
-                :type            => "completion",
-                :index_analyzer  => "simple",
-                :search_analyzer => "simple",
-                :payloads        => false
-              }
+              :suggest => suggest
             }
           }
         }
@@ -349,11 +328,9 @@ describe Elastomer::Client::Index do
       end
     end
 
-    if es_version_1_x?
-      it "recovery" do
-        response = @index.recovery
-        assert_includes response, "elastomer-index-test"
-      end
+    it "recovery" do
+      response = @index.recovery
+      assert_includes response, "elastomer-index-test"
     end
 
     it "clears caches" do
@@ -370,9 +347,12 @@ describe Elastomer::Client::Index do
       end
     end
 
-    it "gets status" do
-      response = @index.status
-      assert_includes response["indices"], "elastomer-index-test"
+    # The /<index>/_status endpoint has been removed in ES 2.X
+    if es_version_1_x?
+      it "gets status" do
+        response = @index.status
+        assert_includes response["indices"], "elastomer-index-test"
+      end
     end
 
     it "gets segments" do

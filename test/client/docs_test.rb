@@ -13,7 +13,7 @@ describe Elastomer::Client::Docs do
           :doc1 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
+              :title  => { :type => "string", :analyzer => "standard", :term_vector => "with_positions_offsets" },
               :author => { :type => "string", :index => "not_analyzed" }
             }
           },
@@ -233,25 +233,18 @@ describe Elastomer::Client::Docs do
     assert_found h["docs"][0]
     refute_found h["docs"][1]
 
-    #COMPATIBILITY
-    # ES 1.0 normalized all search APIs to use a :query top level element.
-    # This broke compatibility with the ES 0.90 delete_by_query api. Since
-    # the query hash version of this api never worked with 0.90 in the first
-    # place, only test it if running 1.0.
-    if es_version_1_x?
-      h = @docs.delete_by_query(
-            :query => {
-              :filtered => {
-                :query => {:match_all => {}},
-                :filter => {:term => {:author => "pea53"}}
-              }
+    h = @docs.delete_by_query(
+          :query => {
+            :filtered => {
+              :query => {:match_all => {}},
+              :filter => {:term => {:author => "pea53"}}
             }
-          )
-      @index.refresh
-      h = @docs.multi_get :ids => [1, 2]
-      refute_found h["docs"][0]
-      refute_found h["docs"][1]
-    end
+          }
+        )
+    @index.refresh
+    h = @docs.multi_get :ids => [1, 2]
+    refute_found h["docs"][0]
+    refute_found h["docs"][1]
   end
 
   it "searches for documents" do
@@ -301,66 +294,57 @@ describe Elastomer::Client::Docs do
     h = @docs.count :q => "*:*", :type => "doc1,doc2"
     assert_equal 4, h["count"]
 
-    #COMPATIBILITY
-    # ES 1.0 normalized all search APIs to use a :query top level element.
-    # This broke compatibility with the ES 0.90 count api.
-    if es_version_1_x?
-      h = @docs.count({
-        :query => {
-          :filtered => {
-            :query => {:match_all => {}},
-            :filter => {:term => {:author => "defunkt"}}
-          }
-        }
-      }, :type => %w[doc1 doc2] )
-    else
-      h = @docs.count({
+    h = @docs.count({
+      :query => {
         :filtered => {
           :query => {:match_all => {}},
           :filter => {:term => {:author => "defunkt"}}
         }
-      }, :type => %w[doc1 doc2] )
-    end
+      }
+    }, :type => %w[doc1 doc2] )
     assert_equal 1, h["count"]
   end
 
-  it "searches for more like this" do
-    populate!
+  # The /_mlt endpoint has been removed from ES 2.X
+  if es_version_1_x?
+    it "searches for more like this" do
+      populate!
 
-    # for some reason, if there's no document indexed here all the mlt
-    # queries return zero results
-    @docs.index \
-      :_id    => 3,
-      :_type  => "doc1",
-      :title  => "the author of faraday",
-      :author => "technoweenie"
+      # for some reason, if there's no document indexed here all the mlt
+      # queries return zero results
+      @docs.index \
+        :_id    => 3,
+        :_type  => "doc1",
+        :title  => "the author of faraday",
+        :author => "technoweenie"
 
-    @index.refresh
+      @index.refresh
 
-    h = @docs.more_like_this({
-      :type => "doc1",
-      :id   => 1,
-      :mlt_fields    => "title",
-      :min_term_freq => 1
-    })
-    assert_equal 2, h["hits"]["total"]
+      h = @docs.more_like_this({
+        :type => "doc1",
+        :id   => 1,
+        :mlt_fields    => "title",
+        :min_term_freq => 1
+      })
+      assert_equal 2, h["hits"]["total"]
 
-    h = @docs.more_like_this({
-      :facets => {
-        "author" => {
-          :terms => {
-            :field => "author"
+      h = @docs.more_like_this({
+        :facets => {
+          "author" => {
+            :terms => {
+              :field => "author"
+            }
           }
         }
-      }
-    }, {
-      :type => "doc1",
-      :id   => 1,
-      :mlt_fields    => "title,author",
-      :min_term_freq => 1
-    })
-    assert_equal 2, h["hits"]["total"]
-    assert_equal 2, h["facets"]["author"]["total"]
+      }, {
+        :type => "doc1",
+        :id   => 1,
+        :mlt_fields    => "title,author",
+        :min_term_freq => 1
+      })
+      assert_equal 2, h["hits"]["total"]
+      assert_equal 2, h["facets"]["author"]["total"]
+    end
   end
 
   it "explains scoring" do
@@ -385,26 +369,14 @@ describe Elastomer::Client::Docs do
     h = @docs.validate :q => "*:*"
     assert_equal true, h["valid"]
 
-    #COMPATIBILITY
-    # ES 1.0 normalized all search APIs to use a :query top level element.
-    # This broke compatibility with the ES 0.90 validate api.
-    if es_version_1_x?
-      h = @docs.validate({
-        :query => {
-          :filtered => {
-            :query => {:match_all => {}},
-            :filter => {:term => {:author => "defunkt"}}
-          }
-        }
-      }, :type => %w[doc1 doc2] )
-    else
-      h = @docs.validate({
+    h = @docs.validate({
+      :query => {
         :filtered => {
           :query => {:match_all => {}},
           :filter => {:term => {:author => "defunkt"}}
         }
-      }, :type => %w[doc1 doc2] )
-    end
+      }
+    }, :type => %w[doc1 doc2] )
     assert_equal true, h["valid"]
   end
 
@@ -454,144 +426,142 @@ describe Elastomer::Client::Docs do
     assert_equal "mojombo", response["_source"]["author"]
   end
 
-  if es_version_1_x?
-    it "provides access to term vector statistics" do
-      populate!
+  it "provides access to term vector statistics" do
+    populate!
 
-      response = @docs.termvector :type => "doc2", :id => 1, :fields => "title"
+    response = @docs.termvector :type => "doc2", :id => 1, :fields => "title"
 
-      assert response["term_vectors"]["title"]
-      assert response["term_vectors"]["title"]["field_statistics"]
-      assert response["term_vectors"]["title"]["terms"]
-      assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
+    assert response["term_vectors"]["title"]
+    assert response["term_vectors"]["title"]["field_statistics"]
+    assert response["term_vectors"]["title"]["terms"]
+    assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
+  end
+
+  it "provides access to term vector statistics with .termvectors" do
+    populate!
+
+    response = @docs.termvectors :type => "doc2", :id => 1, :fields => "title"
+
+    assert response["term_vectors"]["title"]
+    assert response["term_vectors"]["title"]["field_statistics"]
+    assert response["term_vectors"]["title"]["terms"]
+    assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
+  end
+
+  it "provides access to term vector statistics with .term_vector" do
+    populate!
+
+    response = @docs.term_vector :type => "doc2", :id => 1, :fields => "title"
+
+    assert response["term_vectors"]["title"]
+    assert response["term_vectors"]["title"]["field_statistics"]
+    assert response["term_vectors"]["title"]["terms"]
+    assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
+  end
+
+  it "provides access to term vector statistics with .term_vectors" do
+    populate!
+
+    response = @docs.term_vectors :type => "doc2", :id => 1, :fields => "title"
+
+    assert response["term_vectors"]["title"]
+    assert response["term_vectors"]["title"]["field_statistics"]
+    assert response["term_vectors"]["title"]["terms"]
+    assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
+  end
+
+  it "provides access to multi term vector statistics" do
+    populate!
+
+    response = @docs.multi_termvectors({:ids => [1, 2]}, :type => "doc2", :fields => "title", :term_statistics => true)
+    docs = response["docs"]
+
+    assert docs
+    assert_equal(%w[1 2], docs.map { |h| h["_id"] }.sort)
+  end
+
+  it "provides access to multi term vector statistics with .multi_term_vectors" do
+    populate!
+
+    response = @docs.multi_term_vectors({:ids => [1, 2]}, :type => "doc2", :fields => "title", :term_statistics => true)
+    docs = response["docs"]
+
+    assert docs
+    assert_equal(%w[1 2], docs.map { |h| h["_id"] }.sort)
+  end
+
+  it "percolates a given document" do
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create :query => { :match => { :author => "pea53" } }
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create :query => { :match => { :author => "defunkt" } }
+    assert response["created"], "Couldn't create the percolator query"
+
+    response = @index.docs("doc1").percolate(:doc => { :author => "pea53" })
+    assert_equal 1, response["matches"].length
+    assert_equal "1", response["matches"][0]["_id"]
+  end
+
+  it "percolates an existing document" do
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create :query => { :match => { :author => "pea53" } }
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create :query => { :match => { :author => "defunkt" } }
+    assert response["created"], "Couldn't create the percolator query"
+
+    response = @index.docs("doc2").percolate(nil, :id => "1")
+    assert_equal 1, response["matches"].length
+    assert_equal "1", response["matches"][0]["_id"]
+  end
+
+  it "counts the matches for percolating a given document" do
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create :query => { :match => { :author => "pea53" } }
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create :query => { :match => { :author => "defunkt" } }
+    assert response["created"], "Couldn't create the percolator query"
+
+    count = @index.docs("doc1").percolate_count :doc => { :author => "pea53" }
+    assert_equal 1, count
+  end
+
+  it "counts the matches for percolating an existing document" do
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create :query => { :match => { :author => "pea53" } }
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create :query => { :match => { :author => "defunkt" } }
+    assert response["created"], "Couldn't create the percolator query"
+
+    count = @index.docs("doc2").percolate_count(nil, :id => "1")
+    assert_equal 1, count
+  end
+
+  it "performs multi percolate queries" do
+    @index.percolator("1").create :query => { :match_all => { } }
+    @index.percolator("2").create :query => { :match => { :author => "pea53" } }
+
+    h = @index.docs("doc2").multi_percolate do |m|
+      m.percolate :author => "pea53"
+      m.percolate :author => "grantr"
+      m.count({}, { :author => "grantr" })
     end
 
-    it "provides access to term vector statistics with .termvectors" do
-      populate!
-
-      response = @docs.termvectors :type => "doc2", :id => 1, :fields => "title"
-
-      assert response["term_vectors"]["title"]
-      assert response["term_vectors"]["title"]["field_statistics"]
-      assert response["term_vectors"]["title"]["terms"]
-      assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
-    end
-
-    it "provides access to term vector statistics with .term_vector" do
-      populate!
-
-      response = @docs.term_vector :type => "doc2", :id => 1, :fields => "title"
-
-      assert response["term_vectors"]["title"]
-      assert response["term_vectors"]["title"]["field_statistics"]
-      assert response["term_vectors"]["title"]["terms"]
-      assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
-    end
-
-    it "provides access to term vector statistics with .term_vectors" do
-      populate!
-
-      response = @docs.term_vectors :type => "doc2", :id => 1, :fields => "title"
-
-      assert response["term_vectors"]["title"]
-      assert response["term_vectors"]["title"]["field_statistics"]
-      assert response["term_vectors"]["title"]["terms"]
-      assert_equal %w[author logging of the], response["term_vectors"]["title"]["terms"].keys
-    end
-
-    it "provides access to multi term vector statistics" do
-      populate!
-
-      response = @docs.multi_termvectors({:ids => [1, 2]}, :type => "doc2", :fields => "title", :term_statistics => true)
-      docs = response["docs"]
-
-      assert docs
-      assert_equal(%w[1 2], docs.map { |h| h["_id"] }.sort)
-    end
-
-    it "provides access to multi term vector statistics with .multi_term_vectors" do
-      populate!
-
-      response = @docs.multi_term_vectors({:ids => [1, 2]}, :type => "doc2", :fields => "title", :term_statistics => true)
-      docs = response["docs"]
-
-      assert docs
-      assert_equal(%w[1 2], docs.map { |h| h["_id"] }.sort)
-    end
-
-    it "percolates a given document" do
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create :query => { :match => { :author => "pea53" } }
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create :query => { :match => { :author => "defunkt" } }
-      assert response["created"], "Couldn't create the percolator query"
-
-      response = @index.docs("doc1").percolate(:doc => { :author => "pea53" })
-      assert_equal 1, response["matches"].length
-      assert_equal "1", response["matches"][0]["_id"]
-    end
-
-    it "percolates an existing document" do
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create :query => { :match => { :author => "pea53" } }
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create :query => { :match => { :author => "defunkt" } }
-      assert response["created"], "Couldn't create the percolator query"
-
-      response = @index.docs("doc2").percolate(nil, :id => "1")
-      assert_equal 1, response["matches"].length
-      assert_equal "1", response["matches"][0]["_id"]
-    end
-
-    it "counts the matches for percolating a given document" do
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create :query => { :match => { :author => "pea53" } }
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create :query => { :match => { :author => "defunkt" } }
-      assert response["created"], "Couldn't create the percolator query"
-
-      count = @index.docs("doc1").percolate_count :doc => { :author => "pea53" }
-      assert_equal 1, count
-    end
-
-    it "counts the matches for percolating an existing document" do
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create :query => { :match => { :author => "pea53" } }
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create :query => { :match => { :author => "defunkt" } }
-      assert response["created"], "Couldn't create the percolator query"
-
-      count = @index.docs("doc2").percolate_count(nil, :id => "1")
-      assert_equal 1, count
-    end
-
-    it "performs multi percolate queries" do
-      @index.percolator("1").create :query => { :match_all => { } }
-      @index.percolator("2").create :query => { :match => { :author => "pea53" } }
-
-      h = @index.docs("doc2").multi_percolate do |m|
-        m.percolate :author => "pea53"
-        m.percolate :author => "grantr"
-        m.count({}, { :author => "grantr" })
-      end
-
-      response1, response2, response3 = h["responses"]
-      assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-      assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
-      assert_equal 1, response3["total"]
-    end
+    response1, response2, response3 = h["responses"]
+    assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 1, response3["total"]
   end
 
   # Create/index multiple documents.

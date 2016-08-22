@@ -28,7 +28,13 @@ describe Elastomer::Client do
       assert false, "exception was not raised when it should have been"
     rescue Elastomer::Client::Error => err
       assert_equal 404, err.status
-      assert_equal "IndexMissingException[[non-existent-index] missing]", err.message
+      if es_version_1_x?
+        assert_equal "IndexMissingException[[non-existent-index] missing]", err.message
+      elsif es_version_2_x?
+        assert_match %r/index_not_found_exception/, err.message
+      else
+        fail "Elasticserch #{$client.version} is not supported"
+      end
     end
   end
 
@@ -140,11 +146,12 @@ describe Elastomer::Client do
     it "gets cluster info" do
       h = $client.info
       assert h.key?("name"), "expected cluster name to be returned"
-      assert h.key?("status"), "expected cluster info status to be returned"
+      assert h.key?("version"), "expected cluster version information to be returned"
+      assert h["version"].key?("number"), "expected cluster version number to be returned"
     end
 
     it "gets cluster version" do
-      assert_match /[\d\.]+/, $client.version
+      assert_match(/[\d\.]+/, $client.version)
     end
 
     it "gets semantic version" do

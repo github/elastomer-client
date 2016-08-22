@@ -15,7 +15,7 @@ describe Elastomer::Client::DeleteByQuery do
   describe "when an index with documents exists" do
     before do
       @index.create(nil)
-      wait_for_index(@index_name)
+      wait_for_index(@index.name)
     end
 
     it "deletes by query" do

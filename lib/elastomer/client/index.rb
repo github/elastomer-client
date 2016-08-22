@@ -150,6 +150,10 @@ module Elastomer
       end
       alias_method :put_mapping, :update_mapping
 
+      # DEPRECATED: It is no longer possible to delete the mapping for a type.
+      # Instead you should delete the index and recreate it with new mappings.
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/2.3/indices-delete-mapping.html
+      #
       # Delete the mapping identified by `type`. This deletes all documents of
       # that type from the index.
       #
@@ -500,7 +504,7 @@ module Elastomer
       # Examples
       #
       #   index.multi_search do |m|
-      #     m.search({:query => {:match_all => {}}, :search_type => :count)
+      #     m.search({:query => {:match_all => {}}, :size => 0)
       #     m.search({:query => {:field => {"author" => "grantr"}}}, :type => 'tweet')
       #     ...
       #   end

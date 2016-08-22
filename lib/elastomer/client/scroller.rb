@@ -58,7 +58,7 @@ module Elastomer
     #   :type        - the document type to search
     #   :scroll      - the keep alive time of the scrolling request (5 minutes by default)
     #   :size        - the number of documents per shard to fetch per scroll
-    #   :search_type - set to 'scan' for scan semantics  # DEPRECATED in ES 2.1.0
+    #   :search_type - set to 'scan' for scan semantics  # DEPRECATED in ES 2.1.0 - use a Scroll query sorted by _doc: https://www.elastic.co/guide/en/elasticsearch/reference/2.3/search-request-search-type.html#scan
     #
     # Examples
     #
@@ -125,7 +125,7 @@ module Elastomer
       #   :type        - the document type to search
       #   :scroll      - the keep alive time of the scrolling request (5 minutes by default)
       #   :size        - the number of documents per shard to fetch per scroll
-      #   :search_type - set to 'scan' for scan semantics  # DEPRECATED in ES 2.1.0
+      #   :search_type - set to 'scan' for scan semantics  # DEPRECATED in ES 2.1.0 - use a Scroll query sorted by _doc: https://www.elastic.co/guide/en/elasticsearch/reference/2.3/search-request-search-type.html#scan
       #
       # Examples
       #

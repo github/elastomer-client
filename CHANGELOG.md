@@ -1,3 +1,6 @@
+## 2.0.1 (2016-09-01)
+- Fix bug in delete by query when routing is required
+
 ## 2.0.0 (2016-08-25)
 - Support Elasticsearch 2
 

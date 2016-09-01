@@ -106,7 +106,7 @@ module Elastomer
       def execute
         ops = Enumerator.new do |yielder|
           @client.scan(@query, @params.merge(:_source => false)).each_document do |hit|
-            yielder.yield([:delete, { :_id => hit["_id"], :_type => hit["_type"], :_index => hit["_index"] }])
+            yielder.yield([:delete, hit.select { |key, _| ["_index", "_type", "_id", "_routing"].include?(key) }])
           end
         end
 

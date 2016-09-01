@@ -156,8 +156,8 @@ describe Elastomer::Client::DeleteByQuery do
       wait_for_index(@index.name)
       docs = index.docs(type)
 
-      docs.index({ :_id => 0, :name => "mittens" })
-      docs.index({ :_id => 1, :name => "luna" })
+      docs.index({ :_id => 0, :_routing => "cat", :name => "mittens" })
+      docs.index({ :_id => 1, :_routing => "cat", :name => "luna" })
 
       index.refresh
       response = index.delete_by_query(nil, :q => "name:mittens")
@@ -177,7 +177,12 @@ describe Elastomer::Client::DeleteByQuery do
       }, response["_indices"])
 
       index.refresh
-      response = docs.multi_get :ids => [0, 1]
+      response = docs.multi_get({
+        :docs => [
+          { :_id => 0, :_routing => "cat" },
+          { :_id => 1, :_routing => "cat" },
+        ]
+      })
       refute_found response["docs"][0]
       assert_found response["docs"][1]
 

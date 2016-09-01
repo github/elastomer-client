@@ -147,5 +147,46 @@ describe Elastomer::Client::DeleteByQuery do
         },
       }, response["_indices"])
     end
+
+    it "deletes by query when routing is specified" do
+      index = $client.index "elastomer-delete-by-query-routing-test"
+      index.delete if index.exists?
+      type = "docs"
+      index.create({ :mappings => { type => { :_routing => { :required => true } } } })
+      wait_for_index(@index.name)
+      docs = index.docs(type)
+
+      docs.index({ :_id => 0, :_routing => "cat", :name => "mittens" })
+      docs.index({ :_id => 1, :_routing => "cat", :name => "luna" })
+
+      index.refresh
+      response = index.delete_by_query(nil, :q => "name:mittens")
+      assert_equal({
+        "_all" => {
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
+        },
+        index.name => {
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
+        },
+      }, response["_indices"])
+
+      index.refresh
+      response = docs.multi_get({
+        :docs => [
+          { :_id => 0, :_routing => "cat" },
+          { :_id => 1, :_routing => "cat" },
+        ]
+      })
+      refute_found response["docs"][0]
+      assert_found response["docs"][1]
+
+      index.delete if index.exists?
+    end
   end
 end

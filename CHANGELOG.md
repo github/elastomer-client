@@ -1,3 +1,6 @@
+## 2.0.0 (2016-08-25)
+- Support Elasticsearch 2
+
 ## 0.9.0 (2016-02-26)
 - Adding support for the `/_suggest` API endpoint
 - Documentation cleanup - thank you Matt Wagner @wags

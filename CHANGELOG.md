@@ -1,3 +1,7 @@
+## 2.1.0 (2016-01-02)
+- Added enforcement of maximum request size
+- Added some exception wrapping
+
 ## 2.0.1 (2016-09-01)
 - Fix bug in delete by query when routing is required
 

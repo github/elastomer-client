@@ -416,10 +416,10 @@ module Elastomer
       end
 
       # Internal: Raises a RequestSizeError if the given size is larger than
-      # the configured requst size or the client.max_request_size
+      # the configured client.max_request_size
       def check_action_size!( size )
-        return unless (request_size && size > request_size) || (size > client.max_request_size)
-        raise RequestSizeError, "Bulk action of size `#{size}` is too large"
+        return unless size > client.max_request_size
+        raise RequestSizeError, "Bulk action of size `#{size}` exceeds the maximum requst size: #{client.max_request_size}"
       end
 
     end

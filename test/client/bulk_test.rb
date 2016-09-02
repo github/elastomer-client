@@ -224,9 +224,12 @@ describe Elastomer::Client::Bulk do
     assert_equal 10, h["hits"]["total"]
   end
 
-  it "rejects documents that excceed the allowed bulk request size" do
+  it "rejects documents that excceed the maximum request size" do
+    client = Elastomer::Client.new($client_params.merge(:max_request_size => 300))
+    index  = client.index(@name)
+
     ary = []
-    ary << @index.bulk(:request_size => 300) do |b|
+    ary << index.bulk(:request_size => 300) do |b|
       2.times { |num|
         document = {:_id => num, :_type => "tweet", :author => "pea53", :message => "tweet #{num} is a 100 character request"}
         ary << b.index(document)
@@ -242,8 +245,8 @@ describe Elastomer::Client::Bulk do
     assert_equal 1, ary.length
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
-    @index.refresh
-    h = @index.docs.search :q => "*:*", :size => 0
+    index.refresh
+    h = index.docs.search :q => "*:*", :size => 0
 
     assert_equal 2, h["hits"]["total"]
   end

@@ -301,11 +301,22 @@ module Elastomer
       raise ServerError, response if response.status >= 500
 
       if response.body.is_a?(Hash) && (error = response.body["error"])
+        # ES 2.X style
         if error.is_a?(Hash)
-          raise IndexNotFoundError, response if "index_not_found_exception" == error["type"]
+          root_cause = Array(error["root_cause"]).first || error
+          case root_cause["type"]
+          when "index_not_found_exception"; raise IndexNotFoundError, response
+          when "query_parsing_exception"; raise QueryParsingError, response
+          end
+
+        # ES 1.X style
         elsif error.is_a?(String)
-          raise IndexNotFoundError, response if error =~ %r/IndexMissingException/
+          case error
+          when %r/IndexMissingException/; raise IndexNotFoundError, response
+          when %/QueryParsingException/; raise QueryParsingError, response
+          end
         end
+
         raise RequestError, response
       end
 

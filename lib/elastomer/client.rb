@@ -8,6 +8,7 @@ require "elastomer/version"
 module Elastomer
 
   class Client
+    MAX_REQUEST_SIZE = 250 * 2**20  # 250 MB
 
     # Create a new client that can be used to make HTTP requests to the
     # Elasticsearch server.
@@ -20,6 +21,7 @@ module Elastomer
     #   :open_timeout - the timeout in seconds when opening an HTTP connection
     #   :adapter      - the Faraday adapter to use (defaults to :excon)
     #   :opaque_id    - set to `true` to use the 'X-Opaque-Id' request header
+    #   :max_request_size - the maximum allowed request size in bytes (defaults to 250 MB)
     #
     def initialize( opts = {} )
       host = opts.fetch :host, "localhost"
@@ -30,14 +32,15 @@ module Elastomer
       @host = uri.host
       @port = uri.port
 
-      @read_timeout = opts.fetch :read_timeout, 5
-      @open_timeout = opts.fetch :open_timeout, 2
-      @adapter      = opts.fetch :adapter, Faraday.default_adapter
-      @opaque_id    = opts.fetch :opaque_id, false
+      @read_timeout     = opts.fetch :read_timeout, 5
+      @open_timeout     = opts.fetch :open_timeout, 2
+      @adapter          = opts.fetch :adapter, Faraday.default_adapter
+      @opaque_id        = opts.fetch :opaque_id, false
+      @max_request_size = opts.fetch :max_request_size, MAX_REQUEST_SIZE
     end
 
     attr_reader :host, :port, :url
-    attr_reader :read_timeout, :open_timeout
+    attr_reader :read_timeout, :open_timeout, :max_request_size
 
     # Returns true if the server is available; returns false otherwise.
     def ping
@@ -71,9 +74,10 @@ module Elastomer
     # Returns a Faraday::Connection
     def connection
       @connection ||= Faraday.new(url) do |conn|
-        conn.request  :encode_json
-        conn.response :parse_json
-        conn.request  :opaque_id if @opaque_id
+        conn.request(:encode_json)
+        conn.response(:parse_json)
+        conn.request(:opaque_id) if @opaque_id
+        conn.request(:limit_size, :max_request_size => max_request_size) if max_request_size
 
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)

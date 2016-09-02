@@ -81,6 +81,7 @@ module Elastomer
     SSLError         = Class.new Error
     ServerError      = Class.new Error
     RequestError     = Class.new Error
+    RequestSizeError = Class.new Error
 
     ServerError.fatal      = false
     TimeoutError.fatal     = false

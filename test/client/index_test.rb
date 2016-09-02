@@ -259,6 +259,13 @@ describe Elastomer::Client::Index do
     assert_equal %w[just few words analyze], tokens
   end
 
+  describe "when an index does not exist" do
+    it "raises an IndexNotFoundError on delete" do
+      index = $client.index("index-that-does-not-exist")
+      assert_raises(Elastomer::Client::IndexNotFoundError) { index.delete }
+    end
+  end
+
   describe "when an index exists" do
     before do
       suggest = {

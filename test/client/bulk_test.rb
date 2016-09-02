@@ -177,14 +177,14 @@ describe Elastomer::Client::Bulk do
         ary << b.index(document)
       }
       ary.compact!
-      assert_equal 3, ary.length
+      assert_equal 4, ary.length
 
       document = {:_id => 10, :_type => "tweet", :author => "pea53", :message => "tweet 10 is a 102 character request"}
       ary << b.index(document)
     end
     ary.compact!
 
-    assert_equal 4, ary.length
+    assert_equal 5, ary.length
     ary.each { |a| a["items"].each { |b| assert_bulk_index(b) } }
 
     @index.refresh
@@ -208,7 +208,7 @@ describe Elastomer::Client::Bulk do
         ary << b.index(document)
       }
       ary.compact!
-      assert_equal 3, ary.length
+      assert_equal 2, ary.length
 
       document = {:_id => 10, :_type => "tweet", :author => "pea53", :message => "this is tweet number 10"}
       ary << b.index(document)

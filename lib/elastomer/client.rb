@@ -313,7 +313,8 @@ module Elastomer
         elsif error.is_a?(String)
           case error
           when %r/IndexMissingException/; raise IndexNotFoundError, response
-          when %/QueryParsingException/; raise QueryParsingError, response
+          when %r/QueryParsingException/; raise QueryParsingError, response
+          when %r/ParseException/; raise QueryParsingError, response
           end
         end
 

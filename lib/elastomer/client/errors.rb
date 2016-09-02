@@ -83,6 +83,11 @@ module Elastomer
     RequestError     = Class.new Error
     RequestSizeError = Class.new Error
 
+    # Provide some nice errors for common Elasticsearch exceptions. These are
+    # all subclasses of the more general RequestError
+    IndexNotFoundError = Class.new RequestError
+    QueryParsingError  = Class.new RequestError
+
     ServerError.fatal      = false
     TimeoutError.fatal     = false
     ConnectionFailed.fatal = false

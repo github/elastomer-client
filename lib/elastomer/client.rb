@@ -299,7 +299,27 @@ module Elastomer
     # containing and 'error' field.
     def handle_errors( response )
       raise ServerError, response if response.status >= 500
-      raise RequestError, response if response.body.is_a?(Hash) && response.body["error"]
+
+      if response.body.is_a?(Hash) && (error = response.body["error"])
+        # ES 2.X style
+        if error.is_a?(Hash)
+          root_cause = Array(error["root_cause"]).first || error
+          case root_cause["type"]
+          when "index_not_found_exception"; raise IndexNotFoundError, response
+          when "query_parsing_exception"; raise QueryParsingError, response
+          end
+
+        # ES 1.X style
+        elsif error.is_a?(String)
+          case error
+          when %r/IndexMissingException/; raise IndexNotFoundError, response
+          when %r/QueryParsingException/; raise QueryParsingError, response
+          when %r/ParseException/; raise QueryParsingError, response
+          end
+        end
+
+        raise RequestError, response
+      end
 
       response
     end

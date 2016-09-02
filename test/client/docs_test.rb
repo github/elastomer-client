@@ -279,6 +279,14 @@ describe Elastomer::Client::Docs do
     end
   end
 
+  it "generates QueryParsingError exceptions on bad input when searching" do
+    query = {:query => {:query_string => {:query => "OR should fail"}}}
+    assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query, :type => %w[doc1 doc2]) }
+
+    query = {:query => {:foo_is_not_valid => {}}}
+    assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query, :type => %w[doc1 doc2]) }
+  end
+
   it "counts documents" do
     h = @docs.count :q => "*:*"
     assert_equal 0, h["count"]

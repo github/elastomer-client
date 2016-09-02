@@ -299,7 +299,15 @@ module Elastomer
     # containing and 'error' field.
     def handle_errors( response )
       raise ServerError, response if response.status >= 500
-      raise RequestError, response if response.body.is_a?(Hash) && response.body["error"]
+
+      if response.body.is_a?(Hash) && (error = response.body["error"])
+        if error.is_a?(Hash)
+          raise IndexNotFoundError, response if "index_not_found_exception" == error["type"]
+        elsif error.is_a?(String)
+          raise IndexNotFoundError, response if error =~ %r/IndexMissingException/
+        end
+        raise RequestError, response
+      end
 
       response
     end

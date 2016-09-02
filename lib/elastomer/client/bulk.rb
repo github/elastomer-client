@@ -158,7 +158,7 @@ module Elastomer
     # immediately.
     #
     class Bulk
-      DEFAULT_REQUEST_SIZE = 10 * 2**20 # 10 MB
+      DEFAULT_REQUEST_SIZE = 10 * 2**20  # 10 MB
 
       # Create a new bulk client for handling some of the details of
       # accumulating documents to index and then formatting them properly for
@@ -194,7 +194,10 @@ module Elastomer
         if value.nil?
           @request_size = nil
         else
-          @request_size = value.to_i <= 0 ? nil : value.to_i
+          value = value.to_i
+          value = nil if value <= 0
+          value = client.max_request_size if value > client.max_request_size
+          @request_size = value
         end
       end
 
@@ -370,26 +373,55 @@ module Elastomer
       # document - Optional document for the action as a Hash or JSON encoded String
       #
       # Returns the response from the bulk call if one was made or nil.
+      # Raises RequestSizeError if the given action is larger than the
+      #        configured requst size or the client.max_request_size
       def add_to_actions( action, document = nil )
-        action = MultiJson.dump action
-        @actions << action
-        @current_request_size += action.bytesize
-        @current_action_count += 1
+        action = MultiJson.dump(action)
+        size = action.bytesize
 
-        unless document.nil?
-          document = MultiJson.dump document unless String === document
-          @actions << document
-          @current_request_size += document.bytesize
+        if document
+          document = MultiJson.dump(document) unless document.is_a?(String)
+          size += document.bytesize
         end
 
-        if (request_size && @current_request_size >= request_size) ||
-           (action_count && @current_action_count >= action_count)
-          call
-        else
-          nil
+        check_action_size!(size)
+
+        response = nil
+        begin
+          response = call if ready_to_send?(size)
+        rescue StandardError => err
+          raise err
+        ensure
+          @actions << action
+          @actions << document unless document.nil?
+          @current_request_size += size
+          @current_action_count += 1
         end
+
+        response
       end
 
-    end  # Bulk
-  end  # Client
-end  # Elastomer
+      # Internal: Determines if adding `size` more bytes and one more action
+      # will bring the current bulk request over the `request_size` limit or the
+      # `action_count` limit. If this method returns true, then it is time to
+      # dispatch the bulk request.
+      #
+      # Returns `true` of `false`
+      def ready_to_send?( size )
+        total_request_size = @current_request_size + size
+        total_action_count = @current_action_count + 1
+
+        (request_size && total_request_size >= request_size) ||
+        (action_count && total_action_count >  action_count)
+      end
+
+      # Internal: Raises a RequestSizeError if the given size is larger than
+      # the configured requst size or the client.max_request_size
+      def check_action_size!( size )
+        return unless (request_size && size > request_size) || (size > client.max_request_size)
+        raise RequestSizeError, "Bulk action of size `#{size}` is too large"
+      end
+
+    end
+  end
+end

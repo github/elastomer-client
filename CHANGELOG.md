@@ -1,3 +1,6 @@
+## 2.1.1 (2016-01-02)
+- Bulk index only rejects documents larger than the maximum request size
+
 ## 2.1.0 (2016-01-02)
 - Added enforcement of maximum request size
 - Added some exception wrapping

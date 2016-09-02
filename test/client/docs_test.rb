@@ -283,7 +283,7 @@ describe Elastomer::Client::Docs do
     query = {:query => {:query_string => {:query => "OR should fail"}}}
     assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query, :type => %w[doc1 doc2]) }
 
-    query = {:query => {:foo_is_not_value => {}}}
+    query = {:query => {:foo_is_not_valid => {}}}
     assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query, :type => %w[doc1 doc2]) }
   end
 

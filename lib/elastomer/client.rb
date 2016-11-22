@@ -162,6 +162,9 @@ module Elastomer
       body = extract_body params
       path = expand_path path, params
 
+      # prevent excon from changing the encoding
+      body.freeze
+
       instrument(path, body, params) do
         begin
           response =

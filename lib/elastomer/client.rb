@@ -162,9 +162,6 @@ module Elastomer
       body = extract_body params
       path = expand_path path, params
 
-      # Prevent excon from changing the encoding (see https://github.com/github/elastomer-client/issues/138)
-      body.freeze
-
       instrument(path, body, params) do
         begin
           response =
@@ -234,7 +231,7 @@ module Elastomer
         body.join "\n"
       else
         MultiJson.dump body
-      end
+      end.freeze # Prevent excon from changing the encoding (see https://github.com/github/elastomer-client/issues/138)
     end
 
     # Internal: Apply path expansions to the `path` and append query

@@ -162,7 +162,7 @@ module Elastomer
       body = extract_body params
       path = expand_path path, params
 
-      # prevent excon from changing the encoding
+      # Prevent excon from changing the encoding (see https://github.com/github/elastomer-client/issues/138)
       body.freeze
 
       instrument(path, body, params) do

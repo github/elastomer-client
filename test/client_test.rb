@@ -97,6 +97,20 @@ describe Elastomer::Client do
       body = $client.extract_body :body => {:query => {:match_all => {}}}
       assert_equal '{"query":{"match_all":{}}}', body
     end
+
+    it "returns frozen strings" do
+      body = $client.extract_body :body => '{"query":{"match_all":{}}}'
+      assert_equal '{"query":{"match_all":{}}}', body
+      assert body.frozen?, "the body string should be frozen"
+
+      body = $client.extract_body :body => %w[foo bar baz]
+      assert_equal "foo\nbar\nbaz\n", body
+      assert body.frozen?, "Array body strings should be frozen"
+
+      body = $client.extract_body :body => {:query => {:match_all => {}}}
+      assert_equal '{"query":{"match_all":{}}}', body
+      assert body.frozen?, "JSON encoded body strings should be frozen"
+    end
   end
 
   describe "when validating parameters" do

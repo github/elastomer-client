@@ -7,5 +7,3 @@ if bundle check 1>/dev/null 2>&1; then
 else
     exec bundle install --binstubs --path vendor/gems "$@"
 fi
-
-overcommit --install

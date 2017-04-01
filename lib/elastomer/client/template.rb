@@ -24,8 +24,9 @@ module Elastomer
       attr_reader :client, :name
 
       # Returns true if the template already exists on the cluster.
-      def exists?
-        client.cluster.templates.key? name
+      def exists?( params = {} )
+        response = client.head "/_template/{template}", update_params(params, action: "template.exists")
+        response.success?
       end
       alias_method :exist?, :exists?
 

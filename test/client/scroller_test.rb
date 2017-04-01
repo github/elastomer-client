@@ -93,6 +93,20 @@ describe Elastomer::Client::Scroller do
     assert_equal 1, counts["book"]
   end
 
+  it "clears one or more scroll IDs" do
+    h = $client.start_scroll \
+      body: {query: {match_all: {}}},
+      index: @index.name,
+      type: "tweet",
+      scroll: "1m",
+      size: 10
+
+    refute_nil h["_scroll_id"], "response is missing a scroll ID"
+
+    response = $client.clear_scroll(h["_scroll_id"])
+    assert_empty response
+  end
+
   def populate!
     h = @index.bulk do |b|
       50.times { |num|

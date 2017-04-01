@@ -53,7 +53,7 @@ module Elastomer
     # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
     #
     # opts   - Options Hash
-    #   :query       - the query to scroll as a Hash or JSON encoded String
+    #   :body        - the query to scroll as a Hash or JSON encoded String
     #   :index       - the name of the index to search
     #   :type        - the document type to search
     #   :scroll      - the keep alive time of the scrolling request (5 minutes by default)
@@ -62,7 +62,7 @@ module Elastomer
     #
     # Examples
     #
-    #   h = client.start_scroll('{"query":{"match_all":{}},"sort":{"created":"desc"}}', :index => 'test')
+    #   h = client.start_scroll(:body => '{"query":{"match_all":{}},"sort":{"created":"desc"}}', :index => 'test')
     #   scroll_id = h['_scroll_id']
     #   h['hits']['hits'].each { |doc| ... }
     #
@@ -87,7 +87,7 @@ module Elastomer
     #
     # Examples
     #
-    #   scroll_id = client.start_scroll('{"query":{"match_all":{}}}', :index => 'test')['_scroll_id']
+    #   scroll_id = client.start_scroll(:body => '{"query":{"match_all":{}}}', :index => 'test')['_scroll_id']
     #
     #   h = client.continue_scroll scroll_id   # scroll to get the next set of results
     #   scroll_id = h['_scroll_id']            # and store the scroll_id to use later
@@ -100,6 +100,24 @@ module Elastomer
     # Returns the response body as a Hash.
     def continue_scroll( scroll_id, scroll = "5m" )
       response = get "/_search/scroll", :body => scroll_id, :scroll => scroll, :action => "search.scroll"
+      response.body
+    rescue RequestError => err
+      if err.error && err.error["caused_by"]["type"] == "search_context_missing_exception" \
+      || err.message =~ /SearchContextMissingException/
+        raise SearchContextMissing, "No search context found for scroll ID #{scroll_id.inspect}"
+      else
+        raise err
+      end
+    end
+
+    # Delete one or more scroll IDs.
+    # see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#_clear_scroll_api
+    #
+    # scroll_id - One or more scroll IDs
+    #
+    # Returns the response body as a Hash.
+    def clear_scroll( scroll_ids )
+      response = delete "/_search/scroll", :body => {scroll_id: Array(scroll_ids)}, :action => "search.clear_scroll"
       response.body
     end
 

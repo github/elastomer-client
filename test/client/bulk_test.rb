@@ -85,7 +85,7 @@ describe Elastomer::Client::Bulk do
     end
     items = h["items"]
 
-    assert_instance_of Fixnum, h["took"]
+    assert_instance_of Integer, h["took"]
 
     assert_bulk_index h["items"].first
     assert_bulk_create h["items"].last
@@ -130,7 +130,7 @@ describe Elastomer::Client::Bulk do
     end
     items = h["items"]
 
-    assert_instance_of Fixnum, h["took"]
+    assert_instance_of Integer, h["took"]
 
     assert_bulk_index h["items"].first
     assert_bulk_create h["items"].last
@@ -259,7 +259,7 @@ describe Elastomer::Client::Bulk do
       b.index document, params
     end
 
-    assert_instance_of Fixnum, response["took"]
+    assert_instance_of Integer, response["took"]
 
     items = response["items"]
     assert_bulk_index(items[0])
@@ -276,7 +276,7 @@ describe Elastomer::Client::Bulk do
       b.index doc2, { "id" => "bar", "type" => "tweet" }
     end
 
-    assert_instance_of Fixnum, response["took"]
+    assert_instance_of Integer, response["took"]
 
     items = response["items"]
     assert_bulk_index(items[0])
@@ -294,7 +294,7 @@ describe Elastomer::Client::Bulk do
       b.index document, params
     end
 
-    assert_instance_of Fixnum, response["took"]
+    assert_instance_of Integer, response["took"]
 
     items = response["items"]
     assert_bulk_index(items[0])
@@ -311,7 +311,7 @@ describe Elastomer::Client::Bulk do
       b.index document, params
     end
 
-    assert_instance_of Fixnum, response["took"]
+    assert_instance_of Integer, response["took"]
 
     items = response["items"]
     assert_bulk_index(items[0])

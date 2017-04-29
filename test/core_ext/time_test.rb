@@ -31,7 +31,7 @@ describe "JSON conversions for Time" do
 
   it "generates ISO8601 formatted time strings" do
     time = Time.utc(2013, 5, 3, 10, 1, 31)
-    assert_equal '"2013-05-03T10:01:31Z"', MultiJson.encode(time)
+    assert_equal '"2013-05-03T10:01:31.000Z"', MultiJson.encode(time)
   end
 
   it "indexes time fields" do
@@ -41,6 +41,6 @@ describe "JSON conversions for Time" do
     assert_created(h)
 
     doc = @docs.get(:type => "doc1", :id => h["_id"])
-    assert_equal "2013-05-03T10:01:31Z", doc["_source"]["created_at"]
+    assert_equal "2013-05-03T10:01:31.000Z", doc["_source"]["created_at"]
   end
 end

@@ -340,12 +340,18 @@ module Elastomer
       # can be retrieved with parameters.
       #
       # params - Parameters Hash
+      #   :stats - a single stats value or an Array of stats values
+      #
+      # Examples
+      #
+      #   stats(stats: "docs")
+      #   stats(stats: %w[flush merge])
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html
       #
       # Returns the response body as a Hash
       def stats( params = {} )
-        response = client.get "{/index}/_stats", update_params(params, :action => "index.stats")
+        response = client.get "{/index}/_stats{/stats}", update_params(params, :action => "index.stats")
         response.body
       end
 

@@ -1,4 +1,9 @@
-## 2.1.1 (2016-01-02)
+## 2.2.0 (2017-04-29)
+- Added a `clear_scroll` API
+- JSON timestamps include millisecodns by default
+- Removing Fixnum usage
+
+## 2.1.1 (2016-09-02)
 - Bulk index only rejects documents larger than the maximum request size
 
 ## 2.1.0 (2016-01-02)

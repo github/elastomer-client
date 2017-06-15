@@ -1,6 +1,6 @@
 ## 2.2.0 (2017-04-29)
 - Added a `clear_scroll` API
-- JSON timestamps include millisecodns by default
+- JSON timestamps include milliseconds by default
 - Removing Fixnum usage
 
 ## 2.1.1 (2016-09-02)

@@ -16,8 +16,9 @@ result=0
 
 export RBENV_VERSION="2.1.1-github"
 ruby -v
+gem install bundler
 script/bootstrap
-script/test || result=$?
+bundle exec rake test || result=$?
 
 if [ $result -ne 0 ]; then
     exit $result

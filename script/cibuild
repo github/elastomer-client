@@ -14,9 +14,11 @@ echo
 
 result=0
 
-export RBENV_VERSION="2.1.1-github"
+export RBENV_VERSION="2.3.3"
+if [ -d /usr/share/rbenv/shims ]; then
+    export PATH=/usr/share/rbenv/shims:$PATH
+fi
 ruby -v
-gem install bundler
 script/bootstrap
 bundle exec rake test || result=$?
 

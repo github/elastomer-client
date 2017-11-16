@@ -54,7 +54,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create( body, params = {} )
-        response = client.post "/{index}", update_params(params, :body => body, :action => "index.create")
+        response = client.put "/{index}", update_params(params, :body => body, :action => "index.create")
         response.body
       end
 
@@ -130,7 +130,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_mapping( params = {} )
-        response = client.get "/{index}{/type}/_mapping", update_params(params, :action => "index.get_mapping")
+        response = client.get "/{index}/_mapping{/type}", update_params(params, :action => "index.get_mapping")
         response.body
       end
       alias_method :mapping, :get_mapping
@@ -145,7 +145,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_mapping( type, body, params = {} )
-        response = client.put "/{index}/{type}/_mapping", update_params(params, :body => body, :type => type, :action => "index.update_mapping")
+        response = client.put "/{index}/_mapping/{type}", update_params(params, :body => body, :type => type, :action => "index.update_mapping")
         response.body
       end
       alias_method :put_mapping, :update_mapping

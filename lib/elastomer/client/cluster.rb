@@ -236,17 +236,7 @@ module Elastomer
       #
       # Returns the template definitions as a Hash
       def templates
-        # ES 1.x supports state filtering via a path segment called metrics.
-        # ES 0.90 uses query parameters instead.
-        if client.semantic_version >= "1.0.0"
-          h = state(:metrics => "metadata")
-        else
-          h = state(
-            :filter_blocks        => true,
-            :filter_nodes         => true,
-            :filter_routing_table => true,
-          )
-        end
+        h = state(:metrics => "metadata")
         h["metadata"]["templates"]
       end
 
@@ -255,17 +245,7 @@ module Elastomer
       #
       # Returns the indices definitions as a Hash
       def indices
-        # ES 1.x supports state filtering via a path segment called metrics.
-        # ES 0.90 uses query parameters instead.
-        if client.semantic_version >= "1.0.0"
-          h = state(:metrics => "metadata")
-        else
-          h = state(
-            :filter_blocks        => true,
-            :filter_nodes         => true,
-            :filter_routing_table => true,
-          )
-        end
+        h = state(:metrics => "metadata")
         h["metadata"]["indices"]
       end
 
@@ -275,17 +255,7 @@ module Elastomer
       #
       # Returns the nodes definitions as a Hash
       def nodes
-        # ES 1.x supports state filtering via a path segment called metrics.
-        # ES 0.90 uses query parameters instead.
-        if client.semantic_version >= "1.0.0"
-          h = state(:metrics => "nodes")
-        else
-          h = state(
-            :filter_blocks        => true,
-            :filter_metadata      => true,
-            :filter_routing_table => true,
-          )
-        end
+        h = state(:metrics => "nodes")
         h["nodes"]
       end
 

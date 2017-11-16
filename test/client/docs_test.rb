@@ -427,7 +427,7 @@ describe Elastomer::Client::Docs do
       populate!(b)
     end
 
-    assert_instance_of Integer, response["took"]
+    assert_kind_of Integer, response["took"]
 
     response = @docs.get(:id => 1, :type => "doc1")
     assert_found response

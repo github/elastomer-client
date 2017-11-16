@@ -151,6 +151,10 @@ def es_version_requires_repo_path?
   $client.semantic_version >= "1.6.0"
 end
 
+def default_index_settings
+  {settings: {index: {number_of_shards: 1, number_of_replicas: 0}}}
+end
+
 def run_snapshot_tests?
   unless defined? $run_snapshot_tests
     begin

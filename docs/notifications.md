@@ -41,7 +41,6 @@ The event namespace is `request.client.elastomer`.
 - docs.explain
 - docs.get
 - docs.index
-- docs.more_like_this
 - docs.multi_get
 - docs.multi_termvectors
 - docs.search

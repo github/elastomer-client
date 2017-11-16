@@ -331,33 +331,6 @@ module Elastomer
 Percolate
 =end
 
-      # Deprecated - use the More Like This query: https://www.elastic.co/guide/en/elasticsearch/reference/2.3/query-dsl-mlt-query.html
-      # Search for documents similar to a specific document. The
-      # document :id is provided as part of the params hash. If the _all field
-      # is not enabled, :mlt_fields must be passed. A query cannot be present in
-      # the query body, but other fields like :size and :facets are allowed.
-      #
-      # params - Parameters Hash
-      #   :id - the ID of the document
-      #
-      # Examples
-      #
-      #   more_like_this(:mlt_fields => "title", :min_term_freq => 1, :type => "doc1", :id => 1)
-      #
-      #   # with query hash
-      #   more_like_this({:from => 5, :size => 10}, :mlt_fields => "title",
-      #                   :min_term_freq => 1, :type => "doc1", :id => 1)
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-more-like-this.html
-      #
-      # Returns the response body as a hash
-      def more_like_this( query, params = nil )
-        query, params = extract_params(query) if params.nil?
-
-        response = client.get "/{index}/{type}/{id}/_mlt", update_params(params, :body => query, :action => "docs.more_like_this")
-        response.body
-      end
-
       # Compute a score explanation for a query and a specific document. This
       # can give useful feedback about why a document matched or didn't match
       # a query. The document :id is provided as part of the params hash.

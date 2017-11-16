@@ -150,24 +150,6 @@ module Elastomer
       end
       alias_method :put_mapping, :update_mapping
 
-      # DEPRECATED: It is no longer possible to delete the mapping for a type.
-      # Instead you should delete the index and recreate it with new mappings.
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/2.3/indices-delete-mapping.html
-      #
-      # Delete the mapping identified by `type`. This deletes all documents of
-      # that type from the index.
-      #
-      # type   - Name of the mapping to update as a String
-      # params - Parameters Hash
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-mapping.html
-      #
-      # Returns the response body as a Hash
-      def delete_mapping( type, params = {} )
-        response = client.delete "/{index}/{type}", update_params(params, :type => type, :action => "index.delete_mapping")
-        response.body
-      end
-
       # Return the aliases associated with this index.
       #
       # params - Parameters Hash

@@ -56,7 +56,6 @@ The event namespace is `request.client.elastomer`.
 - index.create
 - index.delete
 - index.delete_alias
-- index.delete_mapping
 - index.exists
 - index.flush
 - index.get_alias

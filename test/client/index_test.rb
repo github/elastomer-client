@@ -166,37 +166,6 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
   end
 
-  it "deletes document mappings" do
-    @index.create(
-      :mappings => {
-        :doco => {
-          :_source => { :enabled => false },
-          :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
-        }
-      }
-    )
-    assert_mapping_exists @index.mapping[@name], "doco"
-
-    response = @index.delete_mapping "doco"
-
-    if es_version_1_x?
-      assert_acknowledged response
-
-      mapping = @index.get_mapping
-      mapping = mapping[@name] if mapping.key? @name
-      mapping = mapping["mappings"] if mapping.key? "mappings"
-
-      assert_empty mapping, "no mappings are present"
-
-    elsif es_version_2_x?
-      assert_equal "No handler found for uri [/elastomer-index-test/doco] and method [DELETE]", response
-
-    else
-      assert false, "Unsupported Elasticsearch version #{$client.semantic_version}"
-    end
-  end
-
   it "lists all aliases to the index" do
     @index.create(nil)
 

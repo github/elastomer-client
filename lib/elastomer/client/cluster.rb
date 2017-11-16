@@ -236,8 +236,7 @@ module Elastomer
       #
       # Returns the template definitions as a Hash
       def templates
-        h = state(:metrics => "metadata")
-        h["metadata"]["templates"]
+        state(:metrics => "metadata").dig("metadata", "templates")
       end
 
       # List all indices currently defined. This is just a convenience method
@@ -245,8 +244,7 @@ module Elastomer
       #
       # Returns the indices definitions as a Hash
       def indices
-        h = state(:metrics => "metadata")
-        h["metadata"]["indices"]
+        state(:metrics => "metadata").dig("metadata", "indices")
       end
 
       # List all nodes currently part of the cluster. This is just a convenience
@@ -255,8 +253,7 @@ module Elastomer
       #
       # Returns the nodes definitions as a Hash
       def nodes
-        h = state(:metrics => "nodes")
-        h["nodes"]
+        state(:metrics => "nodes").dig("nodes")
       end
 
     end

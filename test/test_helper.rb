@@ -129,13 +129,6 @@ def es_version_supports_search_shards?
   $client.semantic_version >= "1.3.0"
 end
 
-# Elasticsearch 1.2 removed support for gateway snapshots.
-#
-# Returns true if Elasticsearch version supports gateway snapshots.
-def es_version_supports_gateway_snapshots?
-  $client.semantic_version <= "1.2.0"
-end
-
 # Elasticsearch 1.4.0 had a bug in its handling of the Mapping API where it
 # would not accept an Update request if the index had been created with the
 # _all field set to disabled. This bug was fixed in 1.4.1.

@@ -235,14 +235,10 @@ describe Elastomer::Client::Index do
     before do
       suggest = {
         :type            => "completion",
-        :index_analyzer  => "simple",
+        :analyzer        => "simple",
         :search_analyzer => "simple",
         :payloads        => false
       }
-
-      if es_version_2_x?
-        suggest[:analyzer] = suggest.delete(:index_analyzer)
-      end
 
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
@@ -292,14 +288,6 @@ describe Elastomer::Client::Index do
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    # COMPATIBILITY ES 1.2 removed support for the gateway snapshot API.
-    if es_version_supports_gateway_snapshots?
-      it "snapshots" do
-        response = @index.snapshot
-        assert_equal 0, response["_shards"]["failed"]
-      end
-    end
-
     it "recovery" do
       response = @index.recovery
       assert_includes response, "elastomer-index-test"
@@ -316,14 +304,6 @@ describe Elastomer::Client::Index do
         assert_includes response["indices"], "elastomer-index-test"
       else
         assert_includes response["_all"]["indices"], "elastomer-index-test"
-      end
-    end
-
-    # The /<index>/_status endpoint has been removed in ES 2.X
-    if es_version_1_x?
-      it "gets status" do
-        response = @index.status
-        assert_includes response["indices"], "elastomer-index-test"
       end
     end
 

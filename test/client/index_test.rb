@@ -178,28 +178,24 @@ describe Elastomer::Client::Index do
     $client.cluster.update_aliases :add => {:index => @name, :alias => "foofaloo"}
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_aliases)
 
-    if es_version_1_x?
-      assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
-      assert_equal({}, @index.get_alias("r*"))
-    end
+    assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
+    assert_equal({}, @index.get_alias("r*"))
   end
 
-  if es_version_1_x?
-    it "adds and deletes aliases to the index" do
-      @index.create(nil)
-      assert_empty @index.get_alias("*")
+  it "adds and deletes aliases to the index" do
+    @index.create(nil)
+    assert_empty @index.get_alias("*")
 
-      @index.add_alias "gondolin"
-      aliases = @index.get_alias("*")
-      assert_equal %w[gondolin], aliases[@name]["aliases"].keys.sort
+    @index.add_alias "gondolin"
+    aliases = @index.get_alias("*")
+    assert_equal %w[gondolin], aliases[@name]["aliases"].keys.sort
 
-      @index.add_alias "gondor"
-      aliases = @index.get_alias("*")
-      assert_equal %w[gondolin gondor], aliases[@name]["aliases"].keys.sort
+    @index.add_alias "gondor"
+    aliases = @index.get_alias("*")
+    assert_equal %w[gondolin gondor], aliases[@name]["aliases"].keys.sort
 
-      @index.delete_alias "gon*"
-      assert_empty @index.get_alias("*")
-    end
+    @index.delete_alias "gon*"
+    assert_empty @index.get_alias("*")
   end
 
   it "analyzes text and returns tokens" do

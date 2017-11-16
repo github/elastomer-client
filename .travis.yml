@@ -1,13 +1,21 @@
 language: ruby
 rvm:
   - 2.3.3
+env:
+  # NOTE: Ancient versions of Elasticsearch have different download URLs
+  - ES_VERSION=2.3.5 ES_DOWNLOAD_URL=https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz
+  - ES_VERSION=5.6.4 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+
+matrix:
+  allow_failures:
+    - env: ES_VERSION=5.6.4 ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
 
 # Configure a specific version of Elasticsearch
 # See: https://docs.travis-ci.com/user/database-setup/#Installing-ElasticSearch-on-trusty-container-based-infrastructure
 install:
-  - wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz
-  - tar -xzf elasticsearch-2.3.5.tar.gz
-  - ./elasticsearch-2.3.5/bin/elasticsearch &
+  - wget ${ES_DOWNLOAD_URL}
+  - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
+  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
 script:
   - wget -q --waitretry=1 --retry-connrefused -T 10 -O - http://127.0.0.1:9200
   - bundle install

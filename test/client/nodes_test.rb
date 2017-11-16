@@ -16,26 +16,24 @@ describe Elastomer::Client::Nodes do
     assert node.key?("indices"), "indices stats are returned"
   end
 
-  if es_version_1_x?
-    it "fitlers node info" do
-      h = $client.nodes.info(:info => "os")
-      node = h["nodes"].values.first
-      assert node.key?("os"), "expected os info to be present"
-      assert !node.key?("jvm"), "expected jvm info to be absent"
+  it "fitlers node info" do
+    h = $client.nodes.info(:info => "os")
+    node = h["nodes"].values.first
+    assert node.key?("os"), "expected os info to be present"
+    assert !node.key?("jvm"), "expected jvm info to be absent"
 
-      h = $client.nodes.info(:info => %w[jvm process])
-      node = h["nodes"].values.first
-      assert node.key?("jvm"), "expected jvm info to be present"
-      assert node.key?("process"), "expected process info to be present"
-      assert !node.key?("network"), "expected network info to be absent"
-    end
+    h = $client.nodes.info(:info => %w[jvm process])
+    node = h["nodes"].values.first
+    assert node.key?("jvm"), "expected jvm info to be present"
+    assert node.key?("process"), "expected process info to be present"
+    assert !node.key?("network"), "expected network info to be absent"
+  end
 
-    it "filters node stats" do
-      h = $client.nodes.stats(:stats => "http")
-      node = h["nodes"].values.first
-      assert node.key?("http"), "expected http stats to be present"
-      assert !node.key?("indices"), "expected indices stats to be absent"
-    end
+  it "filters node stats" do
+    h = $client.nodes.stats(:stats => "http")
+    node = h["nodes"].values.first
+    assert node.key?("http"), "expected http stats to be present"
+    assert !node.key?("indices"), "expected indices stats to be absent"
   end
 
   it "gets the hot threads for the node(s)" do

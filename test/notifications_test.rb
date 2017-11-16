@@ -46,10 +46,10 @@ describe Elastomer::Notifications do
 
   it "instruments index actions" do
     @index.exists?; assert_action_event("index.exists")
-    @index.create("number_of_replicas" => 0)
+    @index.create({settings: {index: {number_of_shards: 1, number_of_replicas: 0}}})
     assert_action_event("index.create")
     @index.get_settings; assert_action_event("index.get_settings")
-    @index.update_settings("number_of_replicas" => 0)
+    @index.update_settings(number_of_replicas: 0)
     assert_action_event("index.get_settings")
     @index.close; assert_action_event("index.close")
     @index.open; assert_action_event("index.open")
@@ -57,13 +57,13 @@ describe Elastomer::Notifications do
   end
 
   it "includes the response body in the payload" do
-    @index.create("number_of_replicas" => 0)
+    @index.create({settings: {index: {number_of_shards: 1, number_of_replicas: 0}}})
     event = @events.detect { |e| e.payload[:action] == "index.create" }
     assert event.payload[:response_body]
   end
 
   it "includes the request body in the payload" do
-    @index.create("number_of_replicas" => 0)
+    @index.create({settings: {index: {number_of_shards: 1, number_of_replicas: 0}}})
     event = @events.detect { |e| e.payload[:action] == "index.create" }
 
     payload = event.payload

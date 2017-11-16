@@ -70,7 +70,9 @@ describe Elastomer::Client::Cluster do
 
   it "returns cluster stats" do
     h = @cluster.stats
-    assert_equal %w[cluster_name indices nodes status timestamp], h.keys.sort
+    expected = %w[cluster_name indices nodes status timestamp]
+    expected.unshift("_nodes") if es_version_5_x?
+    assert_equal expected, h.keys.sort
   end
 
   it "returns a list of pending tasks" do

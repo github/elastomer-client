@@ -15,7 +15,7 @@ describe Elastomer::Client::Percolator do
   describe "when an index exists" do
     before do
       @index.create(nil)
-      wait_for_index(@index_name)
+      wait_for_index(@index.name)
     end
 
     it "creates a query" do

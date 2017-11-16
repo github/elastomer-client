@@ -34,7 +34,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def health( params = {} )
-        response = client.get "/_cluster/health{/index}", params.merge(:action => "cluster.health")
+        response = client.get "/_cluster/health{/index}", params.merge(action: "cluster.health")
         response.body
       end
 
@@ -52,7 +52,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def state( params = {} )
-        response = client.get "/_cluster/state{/metrics}{/indices}", params.merge(:action => "cluster.state")
+        response = client.get "/_cluster/state{/metrics}{/indices}", params.merge(action: "cluster.state")
         response.body
       end
 
@@ -67,7 +67,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get "/_cluster/stats", params.merge(:action => "cluster.stats")
+        response = client.get "/_cluster/stats", params.merge(action: "cluster.stats")
         response.body
       end
 
@@ -80,7 +80,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def pending_tasks( params = {} )
-        response = client.get "/_cluster/pending_tasks", params.merge(:action => "cluster.pending_tasks")
+        response = client.get "/_cluster/pending_tasks", params.merge(action: "cluster.pending_tasks")
         response.body
       end
 
@@ -101,7 +101,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def get_settings( params = {} )
-        response = client.get "/_cluster/settings", params.merge(:action => "cluster.get_settings")
+        response = client.get "/_cluster/settings", params.merge(action: "cluster.get_settings")
         response.body
       end
       alias_method :settings, :get_settings
@@ -117,7 +117,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
-        response = client.put "/_cluster/settings", params.merge(:body => body, :action => "cluster.update_settings")
+        response = client.put "/_cluster/settings", params.merge(body: body, action: "cluster.update_settings")
         response.body
       end
 
@@ -131,16 +131,16 @@ module Elastomer
       #
       # Examples
       #
-      #   reroute(:move => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' })
+      #   reroute(move: { index: 'test', shard: 0, from_node: 'node1', to_node: 'node2' })
       #
       #   reroute([
-      #     { :move     => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }},
-      #     { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
+      #     { move:     { index: 'test', shard: 0, from_node: 'node1', to_node: 'node2' }},
+      #     { allocate: { index: 'test', shard: 1, node: 'node3' }}
       #   ])
       #
-      #   reroute(:commands => [
-      #     { :move     => { :index => 'test', :shard => 0, :from_node => 'node1', :to_node => 'node2' }},
-      #     { :allocate => { :index => 'test', :shard => 1, :node => 'node3' }}
+      #   reroute(commands: [
+      #     { move:     { index: 'test', shard: 0, from_node: 'node1', to_node: 'node2' }},
+      #     { allocate: { index: 'test', shard: 1, node: 'node3' }}
       #   ])
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-reroute.html
@@ -152,12 +152,12 @@ module Elastomer
         elsif commands.is_a?(Hash)
           # Array() on a Hash does not do what you think it does - that is why
           # we are explicitly wrapping the Hash via [commands] here.
-          body = {:commands => [commands]}
+          body = {commands: [commands]}
         else
-          body = {:commands => Array(commands)}
+          body = {commands: Array(commands)}
         end
 
-        response = client.post "/_cluster/reroute", params.merge(:body => body, :action => "cluster.reroute")
+        response = client.post "/_cluster/reroute", params.merge(body: body, action: "cluster.reroute")
         response.body
       end
 
@@ -170,7 +170,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def shutdown( params = {} )
-        response = client.post "/_shutdown", params.merge(:action => "cluster.shutdown")
+        response = client.post "/_shutdown", params.merge(action: "cluster.shutdown")
         response.body
       end
 
@@ -185,13 +185,13 @@ module Elastomer
       # Examples
       #
       #   get_aliases
-      #   get_aliases( :index => 'users' )
+      #   get_aliases( index: 'users' )
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get "{/index}/_aliases", params.merge(:action => "cluster.get_aliases")
+        response = client.get "{/index}/_aliases", params.merge(action: "cluster.get_aliases")
         response.body
       end
       alias_method :aliases, :get_aliases
@@ -199,18 +199,18 @@ module Elastomer
       # Perform an aliases action on the cluster. We are just a teensy bit
       # clever here in that a single action can be given or an array of
       # actions. This API method will wrap the request in the appropriate
-      # {:actions => [...]} body construct.
+      # {actions: [...]} body construct.
       #
       # actions - An action Hash or an Array of action Hashes
       # params  - Parameters Hash
       #
       # Examples
       #
-      #   update_aliases(:add => { :index => 'users-1', :alias => 'users' })
+      #   update_aliases(add: { index: 'users-1', alias: 'users' })
       #
       #   update_aliases([
-      #     { :remove => { :index => 'users-1', :alias => 'users' }},
-      #     { :add    => { :index => 'users-2', :alias => 'users' }}
+      #     { remove: { index: 'users-1', alias: 'users' }},
+      #     { add:    { index: 'users-2', alias: 'users' }}
       #   ])
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
@@ -222,12 +222,12 @@ module Elastomer
         elsif actions.is_a?(Hash)
           # Array() on a Hash does not do what you think it does - that is why
           # we are explicitly wrapping the Hash via [actions] here.
-          body = {:actions => [actions]}
+          body = {actions: [actions]}
         else
-          body = {:actions => Array(actions)}
+          body = {actions: Array(actions)}
         end
 
-        response = client.post "/_aliases", params.merge(:body => body, :action => "cluster.update_aliases")
+        response = client.post "/_aliases", params.merge(body: body, action: "cluster.update_aliases")
         response.body
       end
 
@@ -236,7 +236,7 @@ module Elastomer
       #
       # Returns the template definitions as a Hash
       def templates
-        state(:metrics => "metadata").dig("metadata", "templates")
+        state(metrics: "metadata").dig("metadata", "templates")
       end
 
       # List all indices currently defined. This is just a convenience method
@@ -244,7 +244,7 @@ module Elastomer
       #
       # Returns the indices definitions as a Hash
       def indices
-        state(:metrics => "metadata").dig("metadata", "indices")
+        state(metrics: "metadata").dig("metadata", "indices")
       end
 
       # List all nodes currently part of the cluster. This is just a convenience
@@ -253,7 +253,7 @@ module Elastomer
       #
       # Returns the nodes definitions as a Hash
       def nodes
-        state(:metrics => "nodes").dig("nodes")
+        state(metrics: "nodes").dig("nodes")
       end
 
     end

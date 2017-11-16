@@ -23,8 +23,8 @@ module Elastomer
       end
 
       def match_content_type(env)
+        add_content_type!(env)
         if process_request?(env)
-          env[:request_headers][CONTENT_TYPE] ||= MIME_TYPE
           yield env[:body] unless env[:body].respond_to?(:to_str)
         end
       end
@@ -42,6 +42,13 @@ module Elastomer
         type = env[:request_headers][CONTENT_TYPE].to_s
         type = type.split(";", 2).first if type.index(";")
         type
+      end
+
+      def add_content_type!(env)
+        method = env[:method]
+        if method == :put || method == :post || has_body?(env)
+          env[:request_headers][CONTENT_TYPE] ||= MIME_TYPE
+        end
       end
     end
   end

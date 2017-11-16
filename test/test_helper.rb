@@ -104,6 +104,16 @@ def es_version_2_x?
   $client.semantic_version <  "3.0.0"
 end
 
+# Elasticsearch 5.0 changed some request formats in a non-backward-compatible
+# way. Some tests need to know what version is running to structure requests
+# as expected.
+#
+# Returns true if Elasticsearch version is 5.x.
+def es_version_5_x?
+  $client.semantic_version >= "5.0.0" &&
+  $client.semantic_version <  "6.0.0"
+end
+
 # Elasticsearch 1.4 changed the response body for interacting with index
 # aliases. If an index does not contain any aliases, then an "aliases" key is no
 # longer returned in the response.

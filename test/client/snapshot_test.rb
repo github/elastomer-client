@@ -7,7 +7,7 @@ describe Elastomer::Client::Snapshot do
     end
 
     @index_name = "elastomer-snapshot-test-index"
-    @index = $client.index(@index_name)
+    @index = $client.index(@index.name)
     @name = "elastomer-test"
   end
 

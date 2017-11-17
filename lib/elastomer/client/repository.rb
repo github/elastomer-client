@@ -28,11 +28,11 @@ module Elastomer
       def exists?(params = {})
         response = client.get "/_snapshot{/repository}", update_params(params, :action => "repository.exists")
         response.success?
-      rescue Elastomer::Client::Error => exception
-        if exception.message =~ /RepositoryMissingException/
+      rescue Elastomer::Client::Error => err
+        if err.error && err.error.dig("root_cause", 0, "type") == "repository_missing_exception"
           false
         else
-          raise exception
+          raise err
         end
       end
       alias_method :exist?, :exists?

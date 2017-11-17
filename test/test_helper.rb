@@ -84,16 +84,6 @@ def wait_for_index(name, status="yellow")
   )
 end
 
-# Elasticsearch 1.0 changed some request formats in a non-backward-compatible
-# way. Some tests need to know what version is running to structure requests
-# as expected.
-#
-# Returns true if Elasticsearch version is 1.x.
-def es_version_1_x?
-  $client.semantic_version >= "1.0.0" &&
-  $client.semantic_version <  "2.0.0"
-end
-
 # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
 # way. Some tests need to know what version is running to structure requests
 # as expected.
@@ -114,41 +104,8 @@ def es_version_5_x?
   $client.semantic_version <  "6.0.0"
 end
 
-# Elasticsearch 1.4 changed the response body for interacting with index
-# aliases. If an index does not contain any aliases, then an "aliases" key is no
-# longer returned in the response.
-#
-# Returns `true` if the response contains an "aliases" key.
-def es_version_always_returns_aliases?
-  $client.semantic_version <  "1.4.0" ||
-  $client.semantic_version >= "1.4.3"
-end
-
-# Elasticsearch 1.3 added the `search_shards` API endpoint.
-def es_version_supports_search_shards?
-  $client.semantic_version >= "1.3.0"
-end
-
-# Elasticsearch 1.2 removed support for gateway snapshots.
-#
-# Returns true if Elasticsearch version supports gateway snapshots.
-def es_version_supports_gateway_snapshots?
-  $client.semantic_version <= "1.2.0"
-end
-
-# Elasticsearch 1.4.0 had a bug in its handling of the Mapping API where it
-# would not accept an Update request if the index had been created with the
-# _all field set to disabled. This bug was fixed in 1.4.1.
-#
-# See: https://github.com/elastic/elasticsearch/pull/8426
-def es_version_supports_update_mapping_with__all_disabled?
-  $client.semantic_version != "1.4.0"
-end
-
-# Elasticsearch 1.6 requires the repo.path setting when creating
-# FS repositories.
-def es_version_requires_repo_path?
-  $client.semantic_version >= "1.6.0"
+def default_index_settings
+  {settings: {index: {number_of_shards: 1, number_of_replicas: 0}}}
 end
 
 def run_snapshot_tests?

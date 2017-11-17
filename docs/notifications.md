@@ -41,7 +41,6 @@ The event namespace is `request.client.elastomer`.
 - docs.explain
 - docs.get
 - docs.index
-- docs.more_like_this
 - docs.multi_get
 - docs.multi_termvectors
 - docs.search
@@ -57,7 +56,6 @@ The event namespace is `request.client.elastomer`.
 - index.create
 - index.delete
 - index.delete_alias
-- index.delete_mapping
 - index.exists
 - index.flush
 - index.get_alias
@@ -69,9 +67,7 @@ The event namespace is `request.client.elastomer`.
 - index.recovery
 - index.refresh
 - index.segments
-- index.snapshot
 - index.stats
-- index.status
 - index.update_mapping
 - index.update_settings
 - nodes.hot_threads

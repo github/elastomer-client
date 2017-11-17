@@ -150,24 +150,6 @@ module Elastomer
       end
       alias_method :put_mapping, :update_mapping
 
-      # DEPRECATED: It is no longer possible to delete the mapping for a type.
-      # Instead you should delete the index and recreate it with new mappings.
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/2.3/indices-delete-mapping.html
-      #
-      # Delete the mapping identified by `type`. This deletes all documents of
-      # that type from the index.
-      #
-      # type   - Name of the mapping to update as a String
-      # params - Parameters Hash
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-mapping.html
-      #
-      # Returns the response body as a Hash
-      def delete_mapping( type, params = {} )
-        response = client.delete "/{index}/{type}", update_params(params, :type => type, :action => "index.delete_mapping")
-        response.body
-      end
-
       # Return the aliases associated with this index.
       #
       # params - Parameters Hash
@@ -293,22 +275,6 @@ module Elastomer
         response.body
       end
 
-      # Deprecated: Explicitly snapshot (backup) one or more indices to the
-      # gateway. By default this happens periodically (every 1 second) but the
-      # period can be changed or disabled completely.
-      #
-      # This API was removed in ES 1.2.
-      #
-      # params - Parameters Hash
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/0.90/indices-gateway-snapshot.html
-      #
-      # Returns the response body as a Hash
-      def snapshot( params = {} )
-        response = client.post "{/index}/_gateway/snapshot", update_params(params, :action => "index.snapshot")
-        response.body
-      end
-
       # Provides insight into ongoing index shard recoveries. Recovery status
       # may be reported for specific indices, or cluster-wide.
       #
@@ -352,21 +318,6 @@ module Elastomer
       # Returns the response body as a Hash
       def stats( params = {} )
         response = client.get "{/index}/_stats{/stats}", update_params(params, :action => "index.stats")
-        response.body
-      end
-
-      # Deprecated: Retrieve the status of one or more indices. Recovery and
-      # snapshot status can be retrieved with parameters.
-      #
-      # This API was deprecated in 1.2 and is slated for removal.
-      #
-      # params - Parameters Hash
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-status.html
-      #
-      # Returns the response body as a Hash
-      def status( params = {} )
-        response = client.get "{/index}/_status", update_params(params, :action => "index.status")
         response.body
       end
 

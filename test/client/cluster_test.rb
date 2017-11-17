@@ -27,19 +27,17 @@ describe Elastomer::Client::Cluster do
     assert_instance_of Hash, h["metadata"], "the metadata are returned"
   end
 
-  if es_version_1_x?
-    it "filters cluster state by metrics" do
-      h = @cluster.state(:metrics => "nodes")
-      refute h.key("metadata"), "expected only nodes state"
-      h = @cluster.state(:metrics => "metadata")
-      refute h.key("nodes"), "expected only metadata state"
-    end
+  it "filters cluster state by metrics" do
+    h = @cluster.state(metrics: "nodes")
+    refute h.key("metadata"), "expected only nodes state"
+    h = @cluster.state(metrics: "metadata")
+    refute h.key("nodes"), "expected only metadata state"
+  end
 
-    it "filters cluster state by indices" do
-      @index.create({}) unless @index.exists?
-      h = @cluster.state(:metrics => "metadata", :indices => @name)
-      assert [@name], h["metadata"]["indices"].keys
-    end
+  it "filters cluster state by indices" do
+    @index.create(default_index_settings) unless @index.exists?
+    h = @cluster.state(metrics: "metadata", indices: @name)
+    assert [@name], h["metadata"]["indices"].keys
   end
 
   it "gets the cluster settings" do
@@ -55,13 +53,13 @@ describe Elastomer::Client::Cluster do
   end
 
   it "updates the cluster settings" do
-    @cluster.update_settings :transient => { "indices.ttl.interval" => "30m" }
+    @cluster.update_settings transient: { "indices.ttl.interval" => "30m" }
     h = @cluster.settings
 
     value = h["transient"]["indices"]["ttl"]["interval"]
     assert_equal "30m", value
 
-    @cluster.update_settings :transient => { "indices.ttl.interval" => "60m" }
+    @cluster.update_settings transient: { "indices.ttl.interval" => "60m" }
     h = @cluster.settings
 
     value = h["transient"]["indices"]["ttl"]["interval"]
@@ -82,7 +80,7 @@ describe Elastomer::Client::Cluster do
   end
 
   it "returns the list of indices in the cluster" do
-    @index.create({}) unless @index.exists?
+    @index.create(default_index_settings) unless @index.exists?
     indices = @cluster.indices
     assert !indices.empty?, "expected to see an index"
   end
@@ -96,7 +94,7 @@ describe Elastomer::Client::Cluster do
     before do
       @name = "elastomer-cluster-test"
       @index = $client.index @name
-      @index.create({}) unless @index.exists?
+      @index.create(default_index_settings) unless @index.exists?
       wait_for_index(@name)
     end
 
@@ -106,12 +104,10 @@ describe Elastomer::Client::Cluster do
 
     it "adds and gets an alias" do
       hash = @cluster.get_aliases
-      if es_version_always_returns_aliases?
-        assert_empty hash[@name]["aliases"]
-      end
+      assert_empty hash[@name]["aliases"]
 
       @cluster.update_aliases \
-        :add => {:index => @name, :alias => "elastomer-test-unikitty"}
+        add: {index: @name, alias: "elastomer-test-unikitty"}
 
       hash = @cluster.get_aliases
       assert_equal ["elastomer-test-unikitty"], hash[@name]["aliases"].keys
@@ -119,12 +115,10 @@ describe Elastomer::Client::Cluster do
 
     it "adds and gets an alias with .aliases" do
       hash = @cluster.aliases
-      if es_version_always_returns_aliases?
-        assert_empty hash[@name]["aliases"]
-      end
+      assert_empty hash[@name]["aliases"]
 
       @cluster.update_aliases \
-        :add => {:index => @name, :alias => "elastomer-test-unikitty"}
+        add: {index: @name, alias: "elastomer-test-unikitty"}
 
       hash = @cluster.aliases
       assert_equal ["elastomer-test-unikitty"], hash[@name]["aliases"].keys
@@ -132,14 +126,14 @@ describe Elastomer::Client::Cluster do
 
     it "removes an alias" do
       @cluster.update_aliases \
-        :add => {:index => @name, :alias => "elastomer-test-unikitty"}
+        add: {index: @name, alias: "elastomer-test-unikitty"}
 
       hash = @cluster.get_aliases
       assert_equal ["elastomer-test-unikitty"], hash[@name]["aliases"].keys
 
       @cluster.update_aliases([
-        {:add    => {:index => @name, :alias => "elastomer-test-SpongeBob-SquarePants"}},
-        {:remove => {:index => @name, :alias => "elastomer-test-unikitty"}}
+        {add:    {index: @name, alias: "elastomer-test-SpongeBob-SquarePants"}},
+        {remove: {index: @name, alias: "elastomer-test-unikitty"}}
       ])
 
       hash = @cluster.get_aliases
@@ -147,12 +141,12 @@ describe Elastomer::Client::Cluster do
     end
 
     it "accepts the full aliases actions hash" do
-      @cluster.update_aliases :actions => [
-        {:add => {:index => @name, :alias => "elastomer-test-He-Man"}},
-        {:add => {:index => @name, :alias => "elastomer-test-Skeletor"}}
+      @cluster.update_aliases actions: [
+        {add: {index: @name, alias: "elastomer-test-He-Man"}},
+        {add: {index: @name, alias: "elastomer-test-Skeletor"}}
       ]
 
-      hash = @cluster.get_aliases(:index => @name)
+      hash = @cluster.get_aliases(index: @name)
       assert_equal %w[elastomer-test-He-Man elastomer-test-Skeletor], hash[@name]["aliases"].keys.sort
     end
   end

@@ -270,13 +270,11 @@ describe Elastomer::Client::Docs do
   end
 
   it "supports the shards search API" do
-    if es_version_supports_search_shards?
-      h = @docs.search_shards(:type => "docs1")
+    h = @docs.search_shards(:type => "docs1")
 
-      assert h.key?("nodes"), "response contains \"nodes\" information"
-      assert h.key?("shards"), "response contains \"shards\" information"
-      assert h["shards"].is_a?(Array), "\"shards\" is an array"
-    end
+    assert h.key?("nodes"), "response contains \"nodes\" information"
+    assert h.key?("shards"), "response contains \"shards\" information"
+    assert h["shards"].is_a?(Array), "\"shards\" is an array"
   end
 
   it "generates QueryParsingError exceptions on bad input when searching" do
@@ -311,48 +309,6 @@ describe Elastomer::Client::Docs do
       }
     }, :type => %w[doc1 doc2] )
     assert_equal 1, h["count"]
-  end
-
-  # The /_mlt endpoint has been removed from ES 2.X
-  if es_version_1_x?
-    it "searches for more like this" do
-      populate!
-
-      # for some reason, if there's no document indexed here all the mlt
-      # queries return zero results
-      @docs.index \
-        :_id    => 3,
-        :_type  => "doc1",
-        :title  => "the author of faraday",
-        :author => "technoweenie"
-
-      @index.refresh
-
-      h = @docs.more_like_this({
-        :type => "doc1",
-        :id   => 1,
-        :mlt_fields    => "title",
-        :min_term_freq => 1
-      })
-      assert_equal 2, h["hits"]["total"]
-
-      h = @docs.more_like_this({
-        :facets => {
-          "author" => {
-            :terms => {
-              :field => "author"
-            }
-          }
-        }
-      }, {
-        :type => "doc1",
-        :id   => 1,
-        :mlt_fields    => "title,author",
-        :min_term_freq => 1
-      })
-      assert_equal 2, h["hits"]["total"]
-      assert_equal 2, h["facets"]["author"]["total"]
-    end
   end
 
   it "explains scoring" do

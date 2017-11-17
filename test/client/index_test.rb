@@ -105,10 +105,6 @@ describe Elastomer::Client::Index do
   end
 
   it "updates document mappings" do
-    unless es_version_supports_update_mapping_with__all_disabled?
-      skip "Mapping Update API is broken in this ES version."
-    end
-
     @index.create(
       :mappings => {
         :doco => {
@@ -136,10 +132,6 @@ describe Elastomer::Client::Index do
   end
 
   it "updates document mappings with .put_mapping" do
-    unless es_version_supports_update_mapping_with__all_disabled?
-      skip "Mapping Update API is broken in this ES version."
-    end
-
     @index.create(
       :mappings => {
         :doco => {
@@ -166,71 +158,31 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
   end
 
-  it "deletes document mappings" do
-    @index.create(
-      :mappings => {
-        :doco => {
-          :_source => { :enabled => false },
-          :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
-        }
-      }
-    )
-    assert_mapping_exists @index.mapping[@name], "doco"
-
-    response = @index.delete_mapping "doco"
-
-    if es_version_1_x?
-      assert_acknowledged response
-
-      mapping = @index.get_mapping
-      mapping = mapping[@name] if mapping.key? @name
-      mapping = mapping["mappings"] if mapping.key? "mappings"
-
-      assert_empty mapping, "no mappings are present"
-
-    elsif es_version_2_x?
-      assert_equal "No handler found for uri [/elastomer-index-test/doco] and method [DELETE]", response
-
-    else
-      assert false, "Unsupported Elasticsearch version #{$client.semantic_version}"
-    end
-  end
-
   it "lists all aliases to the index" do
     @index.create(nil)
-
-    if es_version_always_returns_aliases?
-      assert_equal({@name => {"aliases" => {}}}, @index.get_aliases)
-    else
-      assert_equal({@name => {}}, @index.get_aliases)
-    end
+    assert_equal({@name => {"aliases" => {}}}, @index.get_aliases)
 
     $client.cluster.update_aliases :add => {:index => @name, :alias => "foofaloo"}
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_aliases)
 
-    if es_version_1_x?
-      assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
-      assert_equal({}, @index.get_alias("r*"))
-    end
+    assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
+    assert_equal({}, @index.get_alias("r*"))
   end
 
-  if es_version_1_x?
-    it "adds and deletes aliases to the index" do
-      @index.create(nil)
-      assert_empty @index.get_alias("*")
+  it "adds and deletes aliases to the index" do
+    @index.create(nil)
+    assert_empty @index.get_alias("*")
 
-      @index.add_alias "gondolin"
-      aliases = @index.get_alias("*")
-      assert_equal %w[gondolin], aliases[@name]["aliases"].keys.sort
+    @index.add_alias "gondolin"
+    aliases = @index.get_alias("*")
+    assert_equal %w[gondolin], aliases[@name]["aliases"].keys.sort
 
-      @index.add_alias "gondor"
-      aliases = @index.get_alias("*")
-      assert_equal %w[gondolin gondor], aliases[@name]["aliases"].keys.sort
+    @index.add_alias "gondor"
+    aliases = @index.get_alias("*")
+    assert_equal %w[gondolin gondor], aliases[@name]["aliases"].keys.sort
 
-      @index.delete_alias "gon*"
-      assert_empty @index.get_alias("*")
-    end
+    @index.delete_alias "gon*"
+    assert_empty @index.get_alias("*")
   end
 
   it "analyzes text and returns tokens" do
@@ -270,14 +222,10 @@ describe Elastomer::Client::Index do
     before do
       suggest = {
         :type            => "completion",
-        :index_analyzer  => "simple",
+        :analyzer        => "simple",
         :search_analyzer => "simple",
         :payloads        => false
       }
-
-      if es_version_2_x?
-        suggest[:analyzer] = suggest.delete(:index_analyzer)
-      end
 
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
@@ -327,14 +275,6 @@ describe Elastomer::Client::Index do
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    # COMPATIBILITY ES 1.2 removed support for the gateway snapshot API.
-    if es_version_supports_gateway_snapshots?
-      it "snapshots" do
-        response = @index.snapshot
-        assert_equal 0, response["_shards"]["failed"]
-      end
-    end
-
     it "recovery" do
       response = @index.recovery
       assert_includes response, "elastomer-index-test"
@@ -351,14 +291,6 @@ describe Elastomer::Client::Index do
         assert_includes response["indices"], "elastomer-index-test"
       else
         assert_includes response["_all"]["indices"], "elastomer-index-test"
-      end
-    end
-
-    # The /<index>/_status endpoint has been removed in ES 2.X
-    if es_version_1_x?
-      it "gets status" do
-        response = @index.status
-        assert_includes response["indices"], "elastomer-index-test"
       end
     end
 

@@ -102,8 +102,7 @@ module Elastomer
       response = get "/_search/scroll", :body => scroll_id, :scroll => scroll, :action => "search.scroll"
       response.body
     rescue RequestError => err
-      if err.error && err.error["caused_by"]["type"] == "search_context_missing_exception" \
-      || err.message =~ /SearchContextMissingException/
+      if err.error && err.error["caused_by"]["type"] == "search_context_missing_exception"
         raise SearchContextMissing, "No search context found for scroll ID #{scroll_id.inspect}"
       else
         raise err

@@ -2,6 +2,9 @@ require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Client::Snapshot do
   before do
+    @index = nil
+    @restored_index = nil
+
     if !run_snapshot_tests?
       skip "To enable snapshot tests, add a path.repo setting to your elasticsearch.yml file."
     end

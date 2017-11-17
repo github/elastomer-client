@@ -16,7 +16,7 @@ describe Elastomer::Client::Nodes do
     assert node.key?("indices"), "indices stats are returned"
   end
 
-  it "fitlers node info" do
+  it "filters node info" do
     h = $client.nodes.info(:info => "os")
     node = h["nodes"].values.first
     assert node.key?("os"), "expected os info to be present"

@@ -104,16 +104,6 @@ def es_version_5_x?
   $client.semantic_version <  "6.0.0"
 end
 
-# Elasticsearch 1.4 changed the response body for interacting with index
-# aliases. If an index does not contain any aliases, then an "aliases" key is no
-# longer returned in the response.
-#
-# Returns `true` if the response contains an "aliases" key.
-def es_version_always_returns_aliases?
-  $client.semantic_version <  "1.4.0" ||
-  $client.semantic_version >= "1.4.3"
-end
-
 def default_index_settings
   {settings: {index: {number_of_shards: 1, number_of_replicas: 0}}}
 end

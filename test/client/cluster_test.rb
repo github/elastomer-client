@@ -104,9 +104,7 @@ describe Elastomer::Client::Cluster do
 
     it "adds and gets an alias" do
       hash = @cluster.get_aliases
-      if es_version_always_returns_aliases?
-        assert_empty hash[@name]["aliases"]
-      end
+      assert_empty hash[@name]["aliases"]
 
       @cluster.update_aliases \
         add: {index: @name, alias: "elastomer-test-unikitty"}
@@ -117,9 +115,7 @@ describe Elastomer::Client::Cluster do
 
     it "adds and gets an alias with .aliases" do
       hash = @cluster.aliases
-      if es_version_always_returns_aliases?
-        assert_empty hash[@name]["aliases"]
-      end
+      assert_empty hash[@name]["aliases"]
 
       @cluster.update_aliases \
         add: {index: @name, alias: "elastomer-test-unikitty"}

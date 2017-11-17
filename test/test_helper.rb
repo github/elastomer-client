@@ -114,11 +114,6 @@ def es_version_always_returns_aliases?
   $client.semantic_version >= "1.4.3"
 end
 
-# Elasticsearch 1.3 added the `search_shards` API endpoint.
-def es_version_supports_search_shards?
-  $client.semantic_version >= "1.3.0"
-end
-
 def default_index_settings
   {settings: {index: {number_of_shards: 1, number_of_replicas: 0}}}
 end

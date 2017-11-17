@@ -270,13 +270,11 @@ describe Elastomer::Client::Docs do
   end
 
   it "supports the shards search API" do
-    if es_version_supports_search_shards?
-      h = @docs.search_shards(:type => "docs1")
+    h = @docs.search_shards(:type => "docs1")
 
-      assert h.key?("nodes"), "response contains \"nodes\" information"
-      assert h.key?("shards"), "response contains \"shards\" information"
-      assert h["shards"].is_a?(Array), "\"shards\" is an array"
-    end
+    assert h.key?("nodes"), "response contains \"nodes\" information"
+    assert h.key?("shards"), "response contains \"shards\" information"
+    assert h["shards"].is_a?(Array), "\"shards\" is an array"
   end
 
   it "generates QueryParsingError exceptions on bad input when searching" do

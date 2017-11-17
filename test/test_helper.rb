@@ -84,16 +84,6 @@ def wait_for_index(name, status="yellow")
   )
 end
 
-# Elasticsearch 1.0 changed some request formats in a non-backward-compatible
-# way. Some tests need to know what version is running to structure requests
-# as expected.
-#
-# Returns true if Elasticsearch version is 1.x.
-def es_version_1_x?
-  $client.semantic_version >= "1.0.0" &&
-  $client.semantic_version <  "2.0.0"
-end
-
 # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
 # way. Some tests need to know what version is running to structure requests
 # as expected.

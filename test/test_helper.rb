@@ -119,21 +119,6 @@ def es_version_supports_search_shards?
   $client.semantic_version >= "1.3.0"
 end
 
-# Elasticsearch 1.4.0 had a bug in its handling of the Mapping API where it
-# would not accept an Update request if the index had been created with the
-# _all field set to disabled. This bug was fixed in 1.4.1.
-#
-# See: https://github.com/elastic/elasticsearch/pull/8426
-def es_version_supports_update_mapping_with__all_disabled?
-  $client.semantic_version != "1.4.0"
-end
-
-# Elasticsearch 1.6 requires the repo.path setting when creating
-# FS repositories.
-def es_version_requires_repo_path?
-  $client.semantic_version >= "1.6.0"
-end
-
 def default_index_settings
   {settings: {index: {number_of_shards: 1, number_of_replicas: 0}}}
 end

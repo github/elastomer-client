@@ -19,7 +19,7 @@ if [ -d /usr/share/rbenv/shims ]; then
     export PATH=/usr/share/rbenv/shims:$PATH
 fi
 ruby -v
-rm Gemfile.lock
+rm -f Gemfile.lock
 script/bootstrap
 bundle exec rake test || result=$?
 

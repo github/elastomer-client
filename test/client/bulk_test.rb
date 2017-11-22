@@ -87,10 +87,20 @@ describe Elastomer::Client::Bulk do
 
     assert_kind_of Integer, h["took"]
 
-    assert_bulk_index h["items"].first
-    assert_bulk_create h["items"].last
+    assert_equal 2, h["items"].length
 
-    book_id = items.last["create"]["_id"]
+    if es_version_2_x?
+      assert_bulk_index h["items"].first
+      assert_bulk_create h["items"].last
+      book_id = items.last["create"]["_id"]
+    elsif es_version_5_x?
+      assert_bulk_index h["items"].first
+      assert_bulk_index h["items"].last
+      book_id = items.last["index"]["_id"]
+    else
+      fail "Unknown ES version!"
+    end
+
     assert_match %r/^\S{20,22}$/, book_id
 
     @index.refresh
@@ -108,10 +118,22 @@ describe Elastomer::Client::Bulk do
     end
     items = h["items"]
 
-    assert_bulk_create h["items"].first, "expected to create a book"
-    assert_bulk_delete h["items"].last, "expected to delete a book"
+    assert_equal 2, h["items"].length
 
-    book_id2 = items.first["create"]["_id"]
+    if es_version_2_x?
+      assert_bulk_create h["items"].first, "expected to create a book"
+      assert_bulk_delete h["items"].last, "expected to delete a book"
+
+      book_id2 = items.first["create"]["_id"]
+    elsif es_version_5_x?
+      assert_bulk_index h["items"].first, "expected to create a book"
+      assert_bulk_delete h["items"].last, "expected to delete a book"
+
+      book_id2 = items.first["index"]["_id"]
+    else
+      fail "Unknown ES version!"
+    end
+
     assert_match %r/^\S{20,22}$/, book_id2
 
     @index.refresh

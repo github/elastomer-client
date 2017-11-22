@@ -29,5 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest",           "~> 5.10"
   spec.add_development_dependency "minitest-fail-fast", "~> 0.1.0"
   spec.add_development_dependency "webmock",            "~> 2.3"
+  spec.add_development_dependency "awesome_print",      "~> 1.8"
   spec.add_development_dependency "rake"
 end

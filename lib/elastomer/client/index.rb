@@ -274,6 +274,8 @@ module Elastomer
         response = client.post "{/index}/_forcemerge", update_params(params, :action => "index.forcemerge")
         response.body
       end
+      # DEPRECATED:  ES 5.X has removed the `/_optimize` endpoint.
+      alias_method :optimize, :forcemerge
 
       # Provides insight into ongoing index shard recoveries. Recovery status
       # may be reported for specific indices, or cluster-wide.

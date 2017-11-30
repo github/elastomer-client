@@ -2,6 +2,10 @@ require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Client::Warmer do
   before do
+    if es_version_5_x?
+      skip "warmers are not supported in ES 5.x."
+    end
+
     @name  = "elastomer-warmer-test"
     @index = $client.index(@name)
 
@@ -23,7 +27,7 @@ describe Elastomer::Client::Warmer do
   end
 
   after do
-    @index.delete if @index.exists?
+    @index.delete if defined?(@index) && @index.exists?
   end
 
   it "creates warmers" do

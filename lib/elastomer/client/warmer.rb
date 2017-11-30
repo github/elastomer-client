@@ -1,6 +1,8 @@
 module Elastomer
   class Client
 
+    # DEPRECATED: Warmers have been removed from Elasticsearch as of 5.0.
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/5.0/indices-warmers.html
     class Warmer
 
       # Create a new Warmer helper for making warmer API requests.
@@ -66,6 +68,7 @@ module Elastomer
       # See https://github.com/elasticsearch/elasticsearch/issues/5155
       def exists?
         response = get
+
         response != {}
       rescue Elastomer::Client::Error => exception
         if exception.message =~ /IndexWarmerMissingException/

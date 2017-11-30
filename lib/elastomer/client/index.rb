@@ -261,17 +261,17 @@ module Elastomer
         response.body
       end
 
-      # Optimize one or more indices. Optimizing an index allows for faster
-      # search operations but can be resource intensive.
+      # Force merge one or more indices. Force merging an index allows to
+      # reduce the number of segments but can be resource intensive.
       #
       # params - Parameters Hash
-      #   :index - set to "_all" to optimize all indices
+      #   :index - set to "_all" to force merge all indices
       #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-optimize.html
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html
       #
       # Returns the response body as a Hash
-      def optimize( params = {} )
-        response = client.post "{/index}/_optimize", update_params(params, :action => "index.optimize")
+      def forcemerge( params = {} )
+        response = client.post "{/index}/_forcemerge", update_params(params, :action => "index.forcemerge")
         response.body
       end
 

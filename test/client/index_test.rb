@@ -270,8 +270,8 @@ describe Elastomer::Client::Index do
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    it "optimizes" do
-      response = @index.optimize
+    it "force merges" do
+      response = @index.forcemerge
       assert_equal 0, response["_shards"]["failed"]
     end
 

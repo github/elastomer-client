@@ -1,7 +1,6 @@
 ## 2.3.0 (2017-11-29)
 - Remove Elasticsearch 1.x and earlier code paths
 - Fix CI and configure an Elasticsearch 5.6 build
-- BREAKING: Rename `Index#optimize` to `Index#forcemerge`
 
 ## 2.2.0 (2017-04-29)
 - Added a `clear_scroll` API

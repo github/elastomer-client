@@ -163,10 +163,32 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {"aliases" => {}}}, @index.get_aliases)
 
     $client.cluster.update_aliases :add => {:index => @name, :alias => "foofaloo"}
-    assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_aliases)
+    $client.cluster.update_aliases :add => {:index => @name, :alias => "bar"}
+
+    assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_aliases)
 
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
-    assert_equal({}, @index.get_alias("r*"))
+    assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_alias("*"))
+
+    # COMPATIBILITY
+    # ES 2.x returns an empty result when an alias does not exist for a full or partial match
+    # ES 5.6 returns an error when an alias does not exist for a full or partial match
+    if es_version_2_x?
+      assert_equal({}, @index.get_alias("not-there"))
+      assert_equal({}, @index.get_alias("not*"))
+    elsif es_version_5_x?
+      exception = assert_raises(Elastomer::Client::RequestError) do
+        @index.get_alias("not-there")
+      end
+      assert_equal("alias [not-there] missing", exception.message)
+
+      exception = assert_raises(Elastomer::Client::RequestError) do
+        @index.get_alias("not*")
+      end
+      assert_equal("alias [not*] missing", exception.message)
+    else
+      fail "Unknown Elasticsearch version!"
+    end
   end
 
   it "adds and deletes aliases to the index" do

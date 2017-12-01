@@ -72,7 +72,6 @@ module Elastomer
       # See https://github.com/elasticsearch/elasticsearch/issues/5155
       def exists?
         response = get
-
         response != {}
       rescue Elastomer::Client::Error => exception
         if exception.message =~ /IndexWarmerMissingException/

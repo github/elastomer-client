@@ -67,8 +67,8 @@ module Elastomer
     # as expected.
     #
     # Returns true if Elasticsearch version is 2.x.
-    def on_es_version_2_x?
-      semantic_version >= "2.0.0" && semantic_version <  "3.0.0"
+    def es_version_2_x?
+      version >= "2.0.0" && version <  "3.0.0"
     end
 
     # Elasticsearch 5.0 changed some request formats in a non-backward-compatible
@@ -76,8 +76,8 @@ module Elastomer
     # as expected.
     #
     # Returns true if Elasticsearch version is 5.x.
-    def on_es_version_5_x?
-      semantic_version >= "5.0.0" && semantic_version <  "6.0.0"
+    def es_version_5_x?
+      version >= "5.0.0" && version < "6.0.0"
     end
 
     # Returns the information Hash from the attached Elasticsearch instance.

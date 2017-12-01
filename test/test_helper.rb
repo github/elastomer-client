@@ -90,7 +90,7 @@ end
 #
 # Returns true if Elasticsearch version is 2.x.
 def es_version_2_x?
-  $client.on_es_version_2_x?
+  $client.es_version_2_x?
 end
 
 # Elasticsearch 5.0 changed some request formats in a non-backward-compatible
@@ -99,7 +99,7 @@ end
 #
 # Returns true if Elasticsearch version is 5.x.
 def es_version_5_x?
-  $client.on_es_version_5_x?
+  $client.es_version_5_x?
 end
 
 def default_index_settings

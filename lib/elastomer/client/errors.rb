@@ -104,5 +104,9 @@ module Elastomer
       ::Elastomer::Client.const_set(error_name, Class.new(Error))
     end
 
+    # Exception for operations that are unsupported with the version of
+    # Elasticsearch being used.
+    IncompatibleVersionException = Class.new Error
+
   end  # Client
 end  # Elastomer

@@ -48,6 +48,27 @@ module Elastomer
       DeleteByQuery.new(self, query, params).execute
     end
 
+    SEARCH_PARAMETERS = [
+      :q,
+      :df,
+      :analyzer,
+      :analyze_wildcard,
+      :batched_reduce_size,
+      :default_operator,
+      :lenient,
+      :explain,
+      :_source,
+      :stored_fields,
+      :sort,
+      :track_scores,
+      :timeout,
+      :terminate_after,
+      :from,
+      :size,
+      :search_type,
+      :scroll
+    ].to_set.freeze
+
     class DeleteByQuery
 
       # Create a new DeleteByQuery command for deleting documents matching a
@@ -105,14 +126,27 @@ module Elastomer
       # Returns a Hash of statistics about the bulk operation
       def execute
         ops = Enumerator.new do |yielder|
-          @client.scan(@query, @params.merge(:_source => false)).each_document do |hit|
+          @client.scan(@query, search_params).each_document do |hit|
             yielder.yield([:delete, hit.select { |key, _| ["_index", "_type", "_id", "_routing"].include?(key) }])
           end
         end
 
-        stats = @client.bulk_stream_items(ops, @params) { |item| accumulate(item) }
+        stats = @client.bulk_stream_items(ops, bulk_params) { |item| accumulate(item) }
         @response_stats["took"] = stats["took"]
         @response_stats
+      end
+
+      # Remove parameters that are not valid for the _search endpoint
+      def search_params
+        params = @params.merge(:_source => false)
+        params.select {|p, _| SEARCH_PARAMETERS.include? p}
+      end
+
+      # Remove parameters that are not valid for the _bulk endpoint
+      def bulk_params
+        params = @params.clone
+        params.delete(:q) if params.has_key?(:q)
+        params
       end
 
     end  # DeleteByQuery

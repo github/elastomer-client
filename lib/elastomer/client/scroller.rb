@@ -45,7 +45,13 @@ module Elastomer
     #
     # Returns a new Scroller instance
     def scan( query, opts = {} )
-      opts = opts.merge(:search_type => "scan")
+      if query.nil?
+        query = {}
+      elsif query.is_a? String
+        query = MultiJson.load(query)
+      end
+      query = query.merge(:sort => [:_doc])
+
       Scroller.new(self, query, opts)
     end
 

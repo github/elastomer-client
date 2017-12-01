@@ -26,6 +26,18 @@ describe Elastomer::Client::MultiPercolate do
           }
         }
 
+      # COMPATIBILITY
+      # percolator clause must now be defined in index mappings as ordinary data type for ES versions >= 5.x
+      if es_version_5_x?
+          @index.update_mapping("percolator",
+            :percolator => {
+              :properties => {
+                :query => { :type => "percolator" }
+              }
+            }
+          )
+      end
+
       wait_for_index(@name)
     end
 

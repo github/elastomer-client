@@ -55,8 +55,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
@@ -74,8 +74,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
@@ -110,7 +110,7 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
+          :properties => {:title  => $client.version_support.text(analyzer: "standard")}
         }
       }
     )
@@ -118,14 +118,14 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.update_mapping "doco", { :doco => { :properties => {
-      :author => { :type => "string", :index => "not_analyzed" }
+      :author => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "doco", "author"
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.update_mapping "mux_mool", { :mux_mool => { :properties => {
-      :song => { :type => "string", :index => "not_analyzed" }
+      :song => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -137,7 +137,7 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
+          :properties => {:title  => $client.version_support.text(analyzer: "standard")}
         }
       }
     )
@@ -145,14 +145,14 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.put_mapping "doco", { :doco => { :properties => {
-      :author => { :type => "string", :index => "not_analyzed" }
+      :author => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "doco", "author"
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.put_mapping "mux_mool", { :mux_mool => { :properties => {
-      :song => { :type => "string", :index => "not_analyzed" }
+      :song => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -234,8 +234,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title   => { :type => "string", :analyzer => "standard" },
-              :author  => { :type => "string", :index => "not_analyzed" },
+              :title   => $client.version_support.text(analyzer: "standard"),
+              :author  => $client.version_support.keyword,
               :suggest => suggest
             }
           }

@@ -4,6 +4,7 @@ require "multi_json"
 require "semantic"
 
 require "elastomer/version"
+require "elastomer/version_support"
 
 module Elastomer
 
@@ -377,6 +378,10 @@ module Elastomer
       else
         raise ArgumentError, "#{name} is invalid: #{param.inspect}"
       end
+    end
+
+    def version_support
+      @version_support ||= VersionSupport.new(self)
     end
 
   end  # Client

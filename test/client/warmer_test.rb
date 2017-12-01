@@ -16,8 +16,8 @@ describe Elastomer::Client::Warmer do
           :tweet => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :message => { :type => "string", :analyzer => "standard" },
-              :author  => { :type => "string", :index => "not_analyzed" }
+              :message => $client.version_support.text(analyzer: "standard"),
+              :author  => $client.version_support.keyword
             }
           }
         }

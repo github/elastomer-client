@@ -1,6 +1,8 @@
 module Elastomer
   class Client
 
+    # DEPRECATED: Warmers have been removed from Elasticsearch as of 5.0.
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/5.0/indices-warmers.html
     class Warmer
 
       # Create a new Warmer helper for making warmer API requests.
@@ -9,6 +11,10 @@ module Elastomer
       # index_name - The name of the index as a String
       # name       - The name of the warmer as a String
       def initialize(client, index_name, name)
+        unless client.es_version_2_x?
+          raise IncompatibleVersionException, "ES #{client.version} does not support warmers"
+        end
+
         @client     = client
         @index_name = @client.assert_param_presence(index_name, "index name")
         @name       = @client.assert_param_presence(name, "warmer name")

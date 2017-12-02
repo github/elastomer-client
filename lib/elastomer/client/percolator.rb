@@ -19,7 +19,7 @@ module Elastomer
                            elsif client.es_version_2_x?
                                '.percolator'
                            else
-                               raise SupportedVersionError "elastomer-client doesn't support Percolate API for ES version < 2.x or > 5.x"
+                               raise IncompatibleVersionException "Percolator API not supported for ES #{@client.version}"
                            end
       end
 

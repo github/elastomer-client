@@ -112,7 +112,7 @@ def default_index_mappings
   elsif es_version_2_x?
     {}
   else
-    raise SupportedVersionError "elastomer-client currently supports ES versions >= 2.x and <= 5.x only"
+    raise IncompatibleVersionException "Percolator API not supported for ES #{$client.version}"
   end
 end
 

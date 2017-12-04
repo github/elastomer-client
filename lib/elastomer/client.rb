@@ -4,6 +4,7 @@ require "multi_json"
 require "semantic"
 
 require "elastomer/version"
+require "elastomer/version_support"
 
 module Elastomer
 
@@ -60,24 +61,6 @@ module Elastomer
     # See https://rubygems.org/gems/semantic
     def semantic_version
       Semantic::Version.new(version)
-    end
-
-    # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
-    # way. Some tests need to know what version is running to structure requests
-    # as expected.
-    #
-    # Returns true if Elasticsearch version is 2.x.
-    def es_version_2_x?
-      version >= "2.0.0" && version <  "3.0.0"
-    end
-
-    # Elasticsearch 5.0 changed some request formats in a non-backward-compatible
-    # way. Some tests need to know what version is running to structure requests
-    # as expected.
-    #
-    # Returns true if Elasticsearch version is 5.x.
-    def es_version_5_x?
-      version >= "5.0.0" && version < "6.0.0"
     end
 
     # Returns the information Hash from the attached Elasticsearch instance.
@@ -377,6 +360,10 @@ module Elastomer
       else
         raise ArgumentError, "#{name} is invalid: #{param.inspect}"
       end
+    end
+
+    def version_support
+      @version_support ||= VersionSupport.new(version)
     end
 
   end  # Client

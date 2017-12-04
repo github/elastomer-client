@@ -55,8 +55,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
@@ -74,8 +74,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
@@ -110,7 +110,7 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
+          :properties => {:title  => $client.version_support.text(analyzer: "standard")}
         }
       }
     )
@@ -118,14 +118,14 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.update_mapping "doco", { :doco => { :properties => {
-      :author => { :type => "string", :index => "not_analyzed" }
+      :author => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "doco", "author"
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.update_mapping "mux_mool", { :mux_mool => { :properties => {
-      :song => { :type => "string", :index => "not_analyzed" }
+      :song => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -137,7 +137,7 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
+          :properties => {:title  => $client.version_support.text(analyzer: "standard")}
         }
       }
     )
@@ -145,14 +145,14 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.put_mapping "doco", { :doco => { :properties => {
-      :author => { :type => "string", :index => "not_analyzed" }
+      :author => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "doco", "author"
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.put_mapping "mux_mool", { :mux_mool => { :properties => {
-      :song => { :type => "string", :index => "not_analyzed" }
+      :song => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -170,13 +170,7 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
     assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_alias("*"))
 
-    # COMPATIBILITY
-    # ES 2.x returns an empty result when an alias does not exist for a full or partial match
-    # ES 5.6 returns an error when an alias does not exist for a full or partial match
-    if es_version_2_x?
-      assert_equal({}, @index.get_alias("not-there"))
-      assert_equal({}, @index.get_alias("not*"))
-    elsif es_version_5_x?
+    if fetching_non_existent_alias_returns_error?
       exception = assert_raises(Elastomer::Client::RequestError) do
         @index.get_alias("not-there")
       end
@@ -189,7 +183,8 @@ describe Elastomer::Client::Index do
       assert_equal("alias [not*] missing", exception.message)
       assert_equal(404, exception.status)
     else
-      fail "Unknown Elasticsearch version!"
+      assert_equal({}, @index.get_alias("not-there"))
+      assert_equal({}, @index.get_alias("not*"))
     end
   end
 
@@ -252,7 +247,7 @@ describe Elastomer::Client::Index do
 
       # COMPATIBILITY
       # ES 5.x drops support for index-time payloads
-      suggest[:payloads] = false if es_version_2_x?
+      suggest[:payloads] = false if index_time_payloads?
 
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
@@ -261,8 +256,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title   => { :type => "string", :analyzer => "standard" },
-              :author  => { :type => "string", :index => "not_analyzed" },
+              :title   => $client.version_support.text(analyzer: "standard"),
+              :author  => $client.version_support.keyword,
               :suggest => suggest
             }
           }

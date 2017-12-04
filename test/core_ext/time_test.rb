@@ -13,7 +13,7 @@ describe "JSON conversions for Time" do
           :doc1 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title      => { :type => "string", :index => "not_analyzed" },
+              :title      => $client.version_support.keyword,
               :created_at => { :type => "date" }
             }
           }

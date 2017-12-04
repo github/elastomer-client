@@ -230,7 +230,8 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def analyze( text, params = {} )
-        response = client.get "{/index}/_analyze", update_params(params, :body => text.to_s, :action => "index.analyze")
+        body = params.merge(:text => text.to_s).tap { |h| h.delete(:index) }
+        response = client.get "{/index}/_analyze", update_params(params, :body => body, :action => "index.analyze")
         response.body
       end
 

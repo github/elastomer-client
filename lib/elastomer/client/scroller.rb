@@ -129,7 +129,7 @@ module Elastomer
       end
 
       if query.has_key? :sort
-         raise ArgumentError, "#{query} cannot contain a sort #{query[:sort]}"
+         raise ArgumentError, "Query cannot contain a sort (found sort '#{query[:sort]}' in query: #{query})"
       end
 
       query.merge(:sort => [:_doc])

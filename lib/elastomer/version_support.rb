@@ -5,7 +5,13 @@ module Elastomer
     attr_reader :version
 
     # version - an Elasticsearch version string e.g., 2.3.5 or 5.3.0
+    #
+    # Raises ArgumentError if version is unsupported.
     def initialize(version)
+      if version < "2.3" || version >= "5.7"
+        raise ArgumentError, "Elasticsearch version #{version} is not supported by elastomer-client"
+      end
+
       @version = version
     end
 

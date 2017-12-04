@@ -38,7 +38,7 @@ raise "No server available at #{$client.url}" unless $client.available?
 puts "Elasticsearch version is #{$client.version}"
 
 # remove any lingering test indices from the cluster
-MiniTest::Unit.after_tests do
+MiniTest.after_run do
   $client.cluster.indices.keys.each do |name|
     next unless name =~ /^elastomer-/i
     $client.index(name).delete

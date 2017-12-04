@@ -90,8 +90,7 @@ end
 #
 # Returns true if Elasticsearch version is 2.x.
 def es_version_2_x?
-  $client.semantic_version >= "2.0.0" &&
-  $client.semantic_version <  "3.0.0"
+  $client.es_version_2_x?
 end
 
 # Elasticsearch 5.0 changed some request formats in a non-backward-compatible
@@ -100,8 +99,7 @@ end
 #
 # Returns true if Elasticsearch version is 5.x.
 def es_version_5_x?
-  $client.semantic_version >= "5.0.0" &&
-  $client.semantic_version <  "6.0.0"
+  $client.es_version_5_x?
 end
 
 def default_index_settings

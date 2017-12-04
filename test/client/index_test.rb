@@ -224,8 +224,11 @@ describe Elastomer::Client::Index do
         :type            => "completion",
         :analyzer        => "simple",
         :search_analyzer => "simple",
-        :payloads        => false
       }
+
+      # COMPATIBILITY
+      # ES 5.x drops support for index-time payloads
+      suggest[:payloads] = false if es_version_2_x?
 
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },

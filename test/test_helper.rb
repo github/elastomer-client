@@ -106,16 +106,6 @@ def default_index_settings
   {settings: {index: {number_of_shards: 1, number_of_replicas: 0}}}
 end
 
-def default_index_mappings
-  if es_version_5_x?
-    {mappings: {percolator: {properties: {query: { type: "percolator"}}}}}
-  elsif es_version_2_x?
-    {}
-  else
-    raise IncompatibleVersionException "Percolator API not supported for ES #{$client.version}"
-  end
-end
-
 def run_snapshot_tests?
   unless defined? $run_snapshot_tests
     begin

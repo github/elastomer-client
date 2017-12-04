@@ -14,16 +14,17 @@ module Elastomer
         @id = client.assert_param_presence(id, "id")
 
         # COMPATIBILITY
-        @percolator_type = if client.es_version_5_x?
-                               'percolator'
-                           elsif client.es_version_2_x?
-                               '.percolator'
-                           else
-                               raise IncompatibleVersionException "Percolator API not supported for ES #{@client.version}"
-                           end
+        @percolator_type =
+          if client.es_version_5_x?
+            'percolator'
+          elsif client.es_version_2_x?
+            '.percolator'
+          else
+            raise IncompatibleVersionException "Percolator API not supported for ES #{@client.version}"
+          end
       end
 
-      attr_reader :client, :index_name, :id, :percolator_type
+      attr_reader :client, :index_name, :id
 
       # Create a percolator query.
       #
@@ -34,7 +35,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create(body, params = {})
-        response = client.put("/{index}/{percolator_type}/{id}", defaults.merge(params.merge(:body => body, :action => "percolator.create")))
+        response = client.put("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(:body => body, :action => "percolator.create")))
         response.body
       end
 
@@ -47,7 +48,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get(params = {})
-        response = client.get("/{index}/{percolator_type}/{id}", defaults.merge(params.merge(:action => "percolator.get")))
+        response = client.get("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(:action => "percolator.get")))
         response.body
       end
 
@@ -60,7 +61,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete("/{index}/{percolator_type}/{id}", defaults.merge(params.merge(:action => "percolator.delete")))
+        response = client.delete("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(:action => "percolator.delete")))
         response.body
       end
 
@@ -78,7 +79,7 @@ module Elastomer
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        {:index => index_name, :id => id, :percolator_type => percolator_type}
+        {:index => index_name, :id => id}
       end
 
     end  # Percolator

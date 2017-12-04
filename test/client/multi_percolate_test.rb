@@ -7,7 +7,7 @@ describe Elastomer::Client::MultiPercolate do
     @index = $client.index(@name)
 
     unless @index.exists?
-      @index.create \
+      base_mappings_settings = {
         :settings => { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
         :mappings => {
           :doc1 => {
@@ -25,19 +25,14 @@ describe Elastomer::Client::MultiPercolate do
             }
           }
         }
+      }
 
       # COMPATIBILITY
-      # percolator clause must now be defined in index mappings as ordinary data type for ES versions >= 5.x
       if es_version_5_x?
-          @index.update_mapping("percolator",
-            :percolator => {
-              :properties => {
-                :query => { :type => "percolator" }
-              }
-            }
-          )
+        base_mappings_settings[:mappings] = { :percolator => { :properties => { :query => { :type => "percolator" } } } }
       end
 
+      @index.create base_mappings_settings
       wait_for_index(@name)
     end
 

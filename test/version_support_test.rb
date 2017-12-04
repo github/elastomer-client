@@ -2,16 +2,7 @@ require_relative './test_helper'
 
 describe Elastomer::VersionSupport do
   describe "ES 2.x" do
-    let(:client) do
-      client = Elastomer::Client.new(host: "fake.web", port: 8888)
-
-      def client.version
-        "2.3.5"
-      end
-
-      client
-    end
-    let(:version_support) { Elastomer::VersionSupport.new(client) }
+    let(:version_support) { Elastomer::VersionSupport.new("2.3.5") }
 
     describe "#keyword" do
       it "returns non_analyzed string" do
@@ -37,16 +28,7 @@ describe Elastomer::VersionSupport do
   end
 
   describe "ES 5.x" do
-    let(:client) do
-      client = Elastomer::Client.new(host: "fake.web", port: 8888)
-
-      def client.version
-        "5.6.0"
-      end
-
-      client
-    end
-    let(:version_support) { Elastomer::VersionSupport.new(client) }
+    let(:version_support) { Elastomer::VersionSupport.new("5.6.0") }
 
     describe "#keyword" do
       it "returns keyword" do

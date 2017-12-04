@@ -1,9 +1,18 @@
 module Elastomer
+  # VersionSupport holds methods that (a) encapsulate version differences; or
+  # (b) give an intention-revealing name to a conditional check.
   class VersionSupport
-    attr_reader :client
+    attr_reader :version
 
-    def initialize(client)
-      @client = client
+    # version - an Elasticsearch version string e.g., 2.3.5 or 5.3.0
+    def initialize(version)
+      @version = version
+    end
+
+    # COMPATIBILITY: Return a boolean indicating if this version supports warmers.
+    # Warmers were removed in ES 5.0.
+    def supports_warmers?
+      es_version_2_x?
     end
 
     # COMPATIBILITY: Return a "text"-type mapping for a field.
@@ -12,7 +21,7 @@ module Elastomer
     def text(**args)
       reject_args!(args, :type, :index)
 
-      if client.es_version_2_x?
+      if es_version_2_x?
         {type: "string"}.merge(args)
       else
         {type: "text"}.merge(args)
@@ -26,12 +35,31 @@ module Elastomer
     def keyword(**args)
       reject_args!(args, :type, :index)
 
-      if client.es_version_2_x?
+      if es_version_2_x?
         {type: "string", index: "not_analyzed"}.merge(args)
       else
         {type: "keyword"}.merge(args)
       end
     end
+
+    # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
+    # way. Some tests need to know what version is running to structure requests
+    # as expected.
+    #
+    # Returns true if Elasticsearch version is 2.x.
+    def es_version_2_x?
+      version >= "2.0.0" && version <  "3.0.0"
+    end
+
+    # Elasticsearch 5.0 changed some request formats in a non-backward-compatible
+    # way. Some tests need to know what version is running to structure requests
+    # as expected.
+    #
+    # Returns true if Elasticsearch version is 5.x.
+    def es_version_5_x?
+      version >= "5.0.0" && version < "6.0.0"
+    end
+
 
     private
 

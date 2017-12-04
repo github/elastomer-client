@@ -144,9 +144,7 @@ module Elastomer
 
       # Remove parameters that are not valid for the _bulk endpoint
       def bulk_params
-        params = @params.clone
-        params.delete(:q) if params.has_key?(:q)
-        params
+        @params.clone.tap { |p| p.delete(:q) }
       end
 
     end  # DeleteByQuery

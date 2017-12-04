@@ -181,11 +181,13 @@ describe Elastomer::Client::Index do
         @index.get_alias("not-there")
       end
       assert_equal("alias [not-there] missing", exception.message)
+      assert_equal(404, exception.status)
 
       exception = assert_raises(Elastomer::Client::RequestError) do
         @index.get_alias("not*")
       end
       assert_equal("alias [not*] missing", exception.message)
+      assert_equal(404, exception.status)
     else
       fail "Unknown Elasticsearch version!"
     end

@@ -1,5 +1,3 @@
-require 'active_support/core_ext/hash'
-
 module Elastomer
   class Client
 
@@ -146,7 +144,7 @@ module Elastomer
 
       # Remove parameters that are not valid for the _bulk endpoint
       def bulk_params
-        @params.except :q
+        @params.clone.tap { |p| p.delete(:q) }
       end
 
     end  # DeleteByQuery

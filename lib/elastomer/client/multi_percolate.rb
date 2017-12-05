@@ -80,7 +80,8 @@ module Elastomer
       #
       # Returns this MultiPercolate instance.
       def percolate(doc, header = {})
-        add_to_actions(:percolate => header)
+        merged = @params.merge(header)
+        add_to_actions(:percolate => merged)
         add_to_actions(:doc => doc)
       end
 
@@ -93,7 +94,8 @@ module Elastomer
       #
       # Returns this MultiPercolate instance.
       def count(doc, header = {})
-        add_to_actions(:count => header)
+        merged = @params.merge(header)
+        add_to_actions(:count => merged)
         add_to_actions(:doc => doc)
       end
 

@@ -48,9 +48,13 @@ describe Elastomer::Notifications do
     @index.exists?; assert_action_event("index.exists")
     @index.create(default_index_settings)
     assert_action_event("index.create")
+    wait_for_index(@index.name)
+
     @index.get_settings; assert_action_event("index.get_settings")
     @index.update_settings(number_of_replicas: 0)
     assert_action_event("index.get_settings")
+    wait_for_index(@index.name)
+
     @index.close; assert_action_event("index.close")
     @index.open; assert_action_event("index.open")
     @index.delete; assert_action_event("index.delete")

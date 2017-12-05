@@ -15,7 +15,7 @@ module Elastomer
 
         # COMPATIBILITY
         @percolator_type =
-          if client.version_support.es_version_5_x?
+          if client.version_support.percolator_type?
             'percolator'
           else
             '.percolator'

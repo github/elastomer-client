@@ -6,7 +6,7 @@ describe "Elastomer::Client::Warmer under ES 5.x" do
       skip "warmers are still supported in ES #{$client.version}."
     end
 
-    exception = assert_raises(Elastomer::Client::IncompatibleVersionException) do
+    assert_raises(Elastomer::Client::IncompatibleVersionException) do
       Elastomer::Client::Warmer.new($client, "index", "warmer")
     end
   end

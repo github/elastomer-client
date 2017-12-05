@@ -271,12 +271,12 @@ describe Elastomer::Client::Index do
     end
 
     it "force merges" do
-      if es_version_5_x?
-        response = @index.forcemerge
-      else
-        response = @index.optimize
-      end
+      response = @index.forcemerge
       assert_equal 0, response["_shards"]["failed"]
+    end
+
+    it "optimizes through force merge" do
+      assert_equal @index.method(:forcemerge),  @index.method(:optimize)
     end
 
     it "recovery" do

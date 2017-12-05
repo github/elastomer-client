@@ -66,10 +66,14 @@ module Elastomer
       version >= "5.0.0" && version < "6.0.0"
     end
 
-    # Wraps version check where ES version >= 5.x requires percolator type + field
-    # defined in mappings
-    def percolator_type?
-      es_version_5_x?
+    # Wraps version check and param gen where ES version >= 5.x requires
+    # percolator type + field defined in mappings
+    def percolator_type
+      if es_version_5_x?
+        "percolator"
+      else
+        ".percolator"
+      end
     end
 
     private

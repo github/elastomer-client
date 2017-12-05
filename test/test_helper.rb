@@ -185,4 +185,3 @@ end
 def requires_percolator_mapping?
   $client.version_support.es_version_5_x?
 end
-

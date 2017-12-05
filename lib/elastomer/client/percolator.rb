@@ -14,12 +14,7 @@ module Elastomer
         @id = client.assert_param_presence(id, "id")
 
         # COMPATIBILITY
-        @percolator_type =
-          if client.version_support.percolator_type?
-            'percolator'
-          else
-            '.percolator'
-          end
+        @percolator_type = client.version_support.percolator_type
       end
 
       attr_reader :client, :index_name, :id

@@ -180,6 +180,11 @@ def cluster_stats_includes_underscore_nodes?
 end
 
 # COMPATIBILITY
+# ES 2.0 deprecated the `filtered` query type. ES 5.0 removed it entirely.
+def filtered_query_removed?
+  $client.version_support.es_version_5_x?
+end
+
 # ES 5.6 percolator queries/document submissions require that an appropriate
 # percolator type and field within that type are defined on the index mappings
 def requires_percolator_mapping?

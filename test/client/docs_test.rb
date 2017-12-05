@@ -239,13 +239,12 @@ describe Elastomer::Client::Docs do
     refute_found h["docs"][1]
 
     h = @docs.delete_by_query(
-          :query => {
-            :filtered => {
-              :query => {:match_all => {}},
-              :filter => {:term => {:author => "pea53"}}
-            }
-          }
-        )
+      :query => {
+        :bool => {
+          :filter => {:term => {:author => "pea53"}}
+        }
+      }
+    )
     @index.refresh
     h = @docs.multi_get :ids => [1, 2]
     refute_found h["docs"][0]
@@ -307,8 +306,7 @@ describe Elastomer::Client::Docs do
 
     h = @docs.count({
       :query => {
-        :filtered => {
-          :query => {:match_all => {}},
+        :bool => {
           :filter => {:term => {:author => "defunkt"}}
         }
       }
@@ -345,8 +343,23 @@ describe Elastomer::Client::Docs do
           :filter => {:term => {:author => "defunkt"}}
         }
       }
-    }, :type => %w[doc1 doc2] )
-    assert_equal true, h["valid"]
+    }, :type => %w[doc1 doc2])
+
+    if filtered_query_removed?
+      refute h["valid"]
+    else
+      assert h["valid"]
+    end
+
+    h = @docs.validate({
+      :query => {
+        :bool => {
+          :filter => {:term => {:author => "defunkt"}}
+        }
+      }
+    }, :type => %w[doc1 doc2])
+
+    assert h["valid"]
   end
 
   it "updates documents" do

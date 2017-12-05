@@ -38,7 +38,7 @@ raise "No server available at #{$client.url}" unless $client.available?
 puts "Elasticsearch version is #{$client.version}"
 
 # remove any lingering test indices from the cluster
-MiniTest::Unit.after_tests do
+MiniTest.after_run do
   $client.cluster.indices.keys.each do |name|
     next unless name =~ /^elastomer-/i
     $client.index(name).delete
@@ -176,5 +176,12 @@ end
 # enough, this is not documented in the example response:
 # https://www.elastic.co/guide/en/elasticsearch/reference/5.6/cluster-stats.html
 def cluster_stats_includes_underscore_nodes?
+  $client.version_support.es_version_5_x?
+end
+
+# COMPATIBILITY
+# ES 5.6 percolator queries/document submissions require that an appropriate
+# percolator type and field within that type are defined on the index mappings
+def requires_percolator_mapping?
   $client.version_support.es_version_5_x?
 end

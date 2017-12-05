@@ -3,7 +3,7 @@ require File.expand_path("../../test_helper", __FILE__)
 describe Elastomer::Client::Warmer do
   before do
     unless $client.version_support.supports_warmers?
-      skip "warmers are not supported in ES #{client.version}"
+      skip "warmers are not supported in ES #{$client.version}"
     end
 
     @name  = "elastomer-warmer-test"

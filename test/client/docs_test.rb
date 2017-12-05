@@ -27,7 +27,7 @@ describe Elastomer::Client::Docs do
         }
 
       # COMPATIBILITY
-        if $client.version_support.es_version_5_x?
+        if requires_percolator_mapping?
         @index.update_mapping("percolator", { :properties => { :query => { :type => "percolator"}}})
       end
 

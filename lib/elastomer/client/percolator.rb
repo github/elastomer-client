@@ -15,12 +15,10 @@ module Elastomer
 
         # COMPATIBILITY
         @percolator_type =
-          if client.es_version_5_x?
+          if client.version_support.es_version_5_x?
             'percolator'
-          elsif client.es_version_2_x?
-            '.percolator'
           else
-            raise IncompatibleVersionException "Percolator API not supported for ES #{@client.version}"
+            '.percolator'
           end
       end
 

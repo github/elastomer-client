@@ -16,7 +16,7 @@ describe Elastomer::Client::Percolator do
     before do
       # COMPATIBILITY
       base_mappings =
-        if es_version_5_x?
+        if requires_percolator_mapping?
           { :mappings => { :percolator => { :properties => { :query => { :type => "percolator" } } } } }
         else
           nil

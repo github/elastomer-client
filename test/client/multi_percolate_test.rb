@@ -28,7 +28,7 @@ describe Elastomer::Client::MultiPercolate do
       }
 
       # COMPATIBILITY
-      if $client.version_support.es_version_5_x?
+      if requires_percolator_mapping?
         base_mappings_settings[:mappings] = { :percolator => { :properties => { :query => { :type => "percolator" } } } }
       end
 

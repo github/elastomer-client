@@ -178,3 +178,11 @@ end
 def cluster_stats_includes_underscore_nodes?
   $client.version_support.es_version_5_x?
 end
+
+# COMPATIBILITY
+# ES 5.6 percolator queries/document submissions require that an appropriate
+# percolator type and field within that type are defined on the index mappings
+def requires_percolator_mapping?
+  $client.version_support.es_version_5_x?
+end
+

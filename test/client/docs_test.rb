@@ -26,6 +26,11 @@ describe Elastomer::Client::Docs do
           }
         }
 
+      # COMPATIBILITY
+      if requires_percolator_mapping?
+        @index.update_mapping("percolator", { :properties => { :query => { :type => "percolator"}}})
+      end
+
       wait_for_index(@name)
     end
 
@@ -260,7 +265,7 @@ describe Elastomer::Client::Docs do
 
     h = @docs.search({
       :query => {:match_all => {}},
-      :filter => {:term => {:author => "defunkt"}}
+      :post_filter => {:term => {:author => "defunkt"}}
     }, :type => %w[doc1 doc2] )
     assert_equal 1, h["hits"]["total"]
 
@@ -476,6 +481,7 @@ describe Elastomer::Client::Docs do
     percolator2 = @index.percolator "2"
     response = percolator2.create :query => { :match => { :author => "defunkt" } }
     assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
 
     response = @index.docs("doc1").percolate(:doc => { :author => "pea53" })
     assert_equal 1, response["matches"].length
@@ -491,6 +497,7 @@ describe Elastomer::Client::Docs do
     percolator2 = @index.percolator "2"
     response = percolator2.create :query => { :match => { :author => "defunkt" } }
     assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
 
     response = @index.docs("doc2").percolate(nil, :id => "1")
     assert_equal 1, response["matches"].length
@@ -506,6 +513,7 @@ describe Elastomer::Client::Docs do
     percolator2 = @index.percolator "2"
     response = percolator2.create :query => { :match => { :author => "defunkt" } }
     assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
 
     count = @index.docs("doc1").percolate_count :doc => { :author => "pea53" }
     assert_equal 1, count
@@ -520,6 +528,7 @@ describe Elastomer::Client::Docs do
     percolator2 = @index.percolator "2"
     response = percolator2.create :query => { :match => { :author => "defunkt" } }
     assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
 
     count = @index.docs("doc2").percolate_count(nil, :id => "1")
     assert_equal 1, count
@@ -528,6 +537,7 @@ describe Elastomer::Client::Docs do
   it "performs multi percolate queries" do
     @index.percolator("1").create :query => { :match_all => { } }
     @index.percolator("2").create :query => { :match => { :author => "pea53" } }
+    @index.refresh
 
     h = @index.docs("doc2").multi_percolate do |m|
       m.percolate :author => "pea53"

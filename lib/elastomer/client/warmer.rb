@@ -11,7 +11,7 @@ module Elastomer
       # index_name - The name of the index as a String
       # name       - The name of the warmer as a String
       def initialize(client, index_name, name)
-        unless client.es_version_2_x?
+        unless client.version_support.supports_warmers?
           raise IncompatibleVersionException, "ES #{client.version} does not support warmers"
         end
 

@@ -69,7 +69,7 @@ describe Elastomer::Client::Cluster do
   it "returns cluster stats" do
     h = @cluster.stats
     expected = %w[cluster_name indices nodes status timestamp]
-    expected.unshift("_nodes") if es_version_5_x?
+    expected.unshift("_nodes") if cluster_stats_includes_underscore_nodes?
     assert_equal expected, h.keys.sort
   end
 

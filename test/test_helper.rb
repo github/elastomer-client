@@ -38,7 +38,7 @@ raise "No server available at #{$client.url}" unless $client.available?
 puts "Elasticsearch version is #{$client.version}"
 
 # remove any lingering test indices from the cluster
-MiniTest::Unit.after_tests do
+MiniTest.after_run do
   $client.cluster.indices.keys.each do |name|
     next unless name =~ /^elastomer-/i
     $client.index(name).delete
@@ -82,24 +82,6 @@ def wait_for_index(name, status="yellow")
     :wait_for_status => status,
     :timeout         => "5s"
   )
-end
-
-# Elasticsearch 2.0 changed some request formats in a non-backward-compatible
-# way. Some tests need to know what version is running to structure requests
-# as expected.
-#
-# Returns true if Elasticsearch version is 2.x.
-def es_version_2_x?
-  $client.es_version_2_x?
-end
-
-# Elasticsearch 5.0 changed some request formats in a non-backward-compatible
-# way. Some tests need to know what version is running to structure requests
-# as expected.
-#
-# Returns true if Elasticsearch version is 5.x.
-def es_version_5_x?
-  $client.es_version_5_x?
 end
 
 def default_index_settings
@@ -162,4 +144,37 @@ def with_tmp_snapshot(name = SecureRandom.uuid, &block)
     create_snapshot(repo, name)
     yield repo.snapshot(name), repo
   end
+end
+
+# The methods below are to support intention-revealing names about version
+# differences in the tests. If necessary for general operation they can be moved
+# into Elastomer::VersionSupport.
+
+# COMPATIBILITY
+# ES 5.x returns `index` bulk request as `index` responses whether or not the
+# document was created or updated. ES 2.x returns a `create` response if it was
+# created.
+def bulk_index_returns_create_for_new_documents?
+  $client.version_support.es_version_2_x?
+end
+
+# COMPATIBILITY
+# ES 5.x drops support for index-time payloads
+def index_time_payloads?
+  $client.version_support.es_version_2_x?
+end
+
+# COMPATIBILITY
+# ES 2.x returns an empty result when an alias does not exist for a full or partial match
+# ES 5.6 returns an error when an alias does not exist for a full or partial match
+def fetching_non_existent_alias_returns_error?
+  $client.version_support.es_version_5_x?
+end
+
+# COMPATIBILITY
+# ES 5.6 includes a _nodes key in the /_cluster/stats response. Strangely
+# enough, this is not documented in the example response:
+# https://www.elastic.co/guide/en/elasticsearch/reference/5.6/cluster-stats.html
+def cluster_stats_includes_underscore_nodes?
+  $client.version_support.es_version_5_x?
 end

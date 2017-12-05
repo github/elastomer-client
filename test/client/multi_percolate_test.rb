@@ -13,22 +13,22 @@ describe Elastomer::Client::MultiPercolate do
           :doc1 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           },
           :doc2 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
       }
 
       # COMPATIBILITY
-      if es_version_5_x?
+      if $client.version_support.es_version_5_x?
         base_mappings_settings[:mappings] = { :percolator => { :properties => { :query => { :type => "percolator" } } } }
       end
 

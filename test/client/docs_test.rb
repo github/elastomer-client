@@ -13,21 +13,21 @@ describe Elastomer::Client::Docs do
           :doc1 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "text", :analyzer => "standard", :term_vector => "with_positions_offsets" },
-              :author => { :type => "keyword", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard", term_vector: "with_positions_offsets"),
+              :author => $client.version_support.keyword
             }
           },
           :doc2 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "text", :analyzer => "standard", :term_vector => "with_positions_offsets" },
-              :author => { :type => "keyword", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard", term_vector: "with_positions_offsets"),
+              :author => $client.version_support.keyword
             }
           }
         }
 
       # COMPATIBILITY
-      if es_version_5_x?
+        if $client.version_support.es_version_5_x?
         @index.update_mapping("percolator", { :properties => { :query => { :type => "percolator"}}})
       end
 

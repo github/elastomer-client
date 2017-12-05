@@ -386,14 +386,14 @@ describe Elastomer::Client::Index do
         :_type   => "doco",
         :title   => "the magnificent",
         :author  => "greg",
-        :suggest => {:input => %w[Greg greg], :output => "Greg", :weight => 2}
+        :suggest => {:input => "greg", :weight => 2}
 
       @index.docs.index \
         :_id    => 2,
         :_type  => "doco",
         :title  => "the author of rubber-band",
         :author => "grant",
-        :suggest => {:input => %w[Grant grant], :output => "Grant", :weight => 1}
+        :suggest => {:input => "grant", :weight => 1}
 
       @index.refresh
       response = @index.suggest({:name => {:text => "gr", :completion => {:field => :suggest}}})
@@ -404,8 +404,36 @@ describe Elastomer::Client::Index do
 
       options = hash["options"]
       assert_equal 2, options.length
-      assert_equal "Greg", options.first["text"]
-      assert_equal "Grant", options.last["text"]
+      assert_equal "greg", options.first["text"]
+      assert_equal "grant", options.last["text"]
+    end
+
+    it "handles output parameter of field" do
+      document = {
+        _id:     1,
+        _type:   "doco",
+        title:   "the magnificent",
+        author:  "greg",
+        suggest: {input: %w[Greg greg], output: "Greg", weight: 2}
+      }
+
+      if supports_suggest_output?
+        # It is not an error to index `output`...
+        @index.docs.index(document)
+
+        # ...and `output` is used in the search response
+        @index.refresh
+        response = @index.suggest({:name => {:text => "gr", :completion => {:field => :suggest}}})
+        assert_equal "Greg", response.fetch("name").first.fetch("options").first.fetch("text")
+      else
+        # Indexing the document fails when `output` is provided
+        exception = assert_raises(Elastomer::Client::RequestError) do
+          @index.docs.index(document)
+        end
+
+        assert_equal 400, exception.status
+        assert_match /\[output\]/, exception.message
+      end
     end
   end
 end

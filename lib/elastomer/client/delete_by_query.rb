@@ -136,13 +136,13 @@ module Elastomer
         @response_stats
       end
 
-      # Remove parameters that are not valid for the _search endpoint
+      # Internal: Remove parameters that are not valid for the _search endpoint
       def search_params
         params = @params.merge(:_source => false)
         params.select {|p, _| SEARCH_PARAMETERS.include? p}
       end
 
-      # Remove parameters that are not valid for the _bulk endpoint
+      # Internal: Remove parameters that are not valid for the _bulk endpoint
       def bulk_params
         @params.clone.tap { |p| p.delete(:q) }
       end

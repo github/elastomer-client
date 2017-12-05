@@ -266,7 +266,7 @@ describe Elastomer::Client::Docs do
 
     h = @docs.search({
       :query => {:match_all => {}},
-      :filter => {:term => {:author => "defunkt"}}
+      :post_filter => {:term => {:author => "defunkt"}}
     }, :type => %w[doc1 doc2] )
     assert_equal 1, h["hits"]["total"]
 

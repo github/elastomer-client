@@ -137,8 +137,8 @@ Let's take a look at some simple event log maintenance using elastomer-client.
 # the previous month's event log
 index = client.index "event-log-2014-09"
 
-# optimize the index to have only 1 segment file (expunges deleted documents)
-index.optimize \
+# force merge the index to have only 1 segment file (expunges deleted documents)
+index.force merge \
   :max_num_segments => 1,
   :wait_for_merge   => true
 

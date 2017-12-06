@@ -432,7 +432,7 @@ describe Elastomer::Client::Index do
         end
 
         assert_equal 400, exception.status
-        assert_match /\[output\]/, exception.message
+        assert_match(/\[output\]/, exception.message)
       end
     end
   end

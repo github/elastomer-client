@@ -8,3 +8,4 @@
 Gemfile.lock
 *.gem
 tags
+.byebug_history

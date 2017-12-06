@@ -13,15 +13,15 @@ describe Elastomer::Client::Bulk do
           :tweet => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :message => { :type => "string", :analyzer => "standard" },
-              :author  => { :type => "string", :index => "not_analyzed" }
+              :message => $client.version_support.text(analyzer: "standard"),
+              :author  => $client.version_support.keyword
             }
           },
           :book => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
@@ -89,16 +89,14 @@ describe Elastomer::Client::Bulk do
 
     assert_equal 2, h["items"].length
 
-    if es_version_2_x?
+    if bulk_index_returns_create_for_new_documents?
       assert_bulk_index h["items"].first
       assert_bulk_create h["items"].last
       book_id = items.last["create"]["_id"]
-    elsif es_version_5_x?
+    else
       assert_bulk_index h["items"].first
       assert_bulk_index h["items"].last
       book_id = items.last["index"]["_id"]
-    else
-      fail "Unknown ES version!"
     end
 
     assert_match %r/^\S{20,22}$/, book_id
@@ -120,18 +118,16 @@ describe Elastomer::Client::Bulk do
 
     assert_equal 2, h["items"].length
 
-    if es_version_2_x?
+    if bulk_index_returns_create_for_new_documents?
       assert_bulk_create h["items"].first, "expected to create a book"
       assert_bulk_delete h["items"].last, "expected to delete a book"
 
       book_id2 = items.first["create"]["_id"]
-    elsif es_version_5_x?
+    else
       assert_bulk_index h["items"].first, "expected to create a book"
       assert_bulk_delete h["items"].last, "expected to delete a book"
 
       book_id2 = items.first["index"]["_id"]
-    else
-      fail "Unknown ES version!"
     end
 
     assert_match %r/^\S{20,22}$/, book_id2

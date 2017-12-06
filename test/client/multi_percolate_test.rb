@@ -7,25 +7,32 @@ describe Elastomer::Client::MultiPercolate do
     @index = $client.index(@name)
 
     unless @index.exists?
-      @index.create \
+      base_mappings_settings = {
         :settings => { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
         :mappings => {
           :doc1 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           },
           :doc2 => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
+      }
 
+      # COMPATIBILITY
+      if requires_percolator_mapping?
+        base_mappings_settings[:mappings] = { :percolator => { :properties => { :query => { :type => "percolator" } } } }
+      end
+
+      @index.create base_mappings_settings
       wait_for_index(@name)
     end
 

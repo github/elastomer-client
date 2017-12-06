@@ -1,22 +1,86 @@
-#!/bin/sh
+#!/bin/bash
 # Usage: script/cibuild
-# CI build script.
+# CI build script
 # This is tailored for the janky build machines.
-set -e
+
+set -ue
+
+# Only echo the tags when in CI_MODE
+begin_fold() {
+  local tag="$1"
+  if [ "${CI_MODE:-}" ]; then
+    echo "%%%FOLD {${tag}}%%%"
+  fi
+}
+
+# Only echo the tags when in CI_MODE
+end_fold() {
+  if [ "${CI_MODE:-}" ]; then
+    echo "%%%END FOLD%%%"
+  fi
+}
+
+function cleanup() {
+  echo
+  begin_fold "Shutting down services..."
+  $docker_compose down -v
+  end_fold
+}
+
+# Borrowed from script/bintools in github/ci
+output_fold() {
+  # Exit early if no label provided
+  if [ -z "$1" ]; then
+    echo "output_fold(): requires a label argument."
+    return
+  fi
+
+  exit_value=0  # exit_value is used to record exit status of the given command
+  label=$1      # human-readable label describing what's being folded up
+  shift 1       # having retrieved the output_fold()-specific arguments, strip them off $@
+
+  begin_fold "$label"
+
+  # run the remaining arguments. If the command exits non-0, the `||` will
+  # prevent the `-e` flag from seeing the failure exit code, and we'll see
+  # the second echo execute
+  "$@" || exit_value=$?
+
+  end_fold
+
+  # preserve the exit code from the subcommand.
+  return $exit_value
+}
+
+trap cleanup EXIT
+
+export ES_PORT=${ES_PORT:-19200}
+
+es_version=${ES_VERSION:-24}
+docker_compose="docker-compose --file docker/docker-compose.es${es_version}.yml --file docker/docker-compose.cibuild.yml"
 
 # change into root dir and setup path
 cd $(dirname "$0")/..
 PATH="$(pwd)/bin:$(pwd)/script:/usr/share/rbenv/shims:$PATH"
 
+echo "hostname: $(hostname)"
+
 # Write commit we're building at
+begin_fold "Commit info..."
 git log -n 1 || true
+end_fold
 echo
 
 result=0
 
+output_fold "Bootstrapping container..." $docker_compose build
+output_fold "Bringing up services..." $docker_compose up -d
+output_fold "Waiting for Elasticsearch..." script/poll-for-es
+echo
+
 export RBENV_VERSION="2.3.3"
 if [ -d /usr/share/rbenv/shims ]; then
-    export PATH=/usr/share/rbenv/shims:$PATH
+  export PATH=/usr/share/rbenv/shims:$PATH
 fi
 ruby -v
 rm -f Gemfile.lock
@@ -24,7 +88,7 @@ script/bootstrap
 bundle exec rake test || result=$?
 
 if [ $result -ne 0 ]; then
-    exit $result
+  exit $result
 fi
 
 # echo

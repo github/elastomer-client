@@ -2,6 +2,10 @@ require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Client::Warmer do
   before do
+    unless $client.version_support.supports_warmers?
+      skip "warmers are not supported in ES #{$client.version}"
+    end
+
     @name  = "elastomer-warmer-test"
     @index = $client.index(@name)
 
@@ -12,8 +16,8 @@ describe Elastomer::Client::Warmer do
           :tweet => {
             :_source => { :enabled => true }, :_all => { :enabled => false },
             :properties => {
-              :message => { :type => "string", :analyzer => "standard" },
-              :author  => { :type => "string", :index => "not_analyzed" }
+              :message => $client.version_support.text(analyzer: "standard"),
+              :author  => $client.version_support.keyword
             }
           }
         }
@@ -23,7 +27,7 @@ describe Elastomer::Client::Warmer do
   end
 
   after do
-    @index.delete if @index.exists?
+    @index.delete if defined?(@index) && @index.exists?
   end
 
   it "creates warmers" do

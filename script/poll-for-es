@@ -2,7 +2,7 @@
 #
 # This script will poll the Elasticsearch health endpoint until the cluster
 # reaches a yellow state which is good enough for testing. This script will poll
-# for up to 30 seconds waiting for Elasticserach to start. It will give up at
+# for up to 30 seconds waiting for Elasticsearch to start. It will give up at
 # that time and return a non-zero exit code.
 
 es_port=${ES_PORT:-9200}

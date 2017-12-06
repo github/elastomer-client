@@ -306,21 +306,10 @@ module Elastomer
       raise ServerError, response if response.status >= 500
 
       if response.body.is_a?(Hash) && (error = response.body["error"])
-        # ES 2.X style
-        if error.is_a?(Hash)
-          root_cause = Array(error["root_cause"]).first || error
-          case root_cause["type"]
-          when "index_not_found_exception"; raise IndexNotFoundError, response
-          when "query_parsing_exception"; raise QueryParsingError, response
-          end
-
-        # ES 1.X style
-        elsif error.is_a?(String)
-          case error
-          when %r/IndexMissingException/; raise IndexNotFoundError, response
-          when %r/QueryParsingException/; raise QueryParsingError, response
-          when %r/ParseException/; raise QueryParsingError, response
-          end
+        root_cause = Array(error["root_cause"]).first || error
+        case root_cause["type"]
+        when "index_not_found_exception"; raise IndexNotFoundError, response
+        when *version_support.query_parse_exception; raise QueryParsingError, response
         end
 
         raise RequestError, response

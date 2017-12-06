@@ -57,7 +57,7 @@ trap cleanup EXIT
 export ES_PORT=${ES_PORT:-19200}
 
 es_version=${ES_VERSION:-24}
-docker_compose="docker-compose --file docker/docker-compose.es${es_version}.yml"
+docker_compose="docker-compose --file docker/docker-compose.es${es_version}.yml --file docker/docker-compose.cibuild.yml"
 
 # change into root dir and setup path
 cd $(dirname "$0")/..

@@ -59,9 +59,9 @@ export ES_PORT=${ES_PORT:-19200}
 es_version=${ES_VERSION:-24}
 docker_compose="docker-compose --file docker/docker-compose.es${es_version}.yml --file docker/docker-compose.cibuild.yml"
 
-if [ "${CI_MODE:-}" ]; then
-  docker_compose="${docker_compose} --no-ansi"
-fi
+# if [ "${CI_MODE:-}" ]; then
+#   docker_compose="${docker_compose} --no-ansi"
+# fi
 
 # change into root dir and setup path
 cd $(dirname "$0")/..

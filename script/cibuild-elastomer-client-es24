@@ -5,4 +5,4 @@
 export ES_VERSION=24
 export CI_MODE=true
 
-script/cibuild
+script/cibuild-elastomer-client

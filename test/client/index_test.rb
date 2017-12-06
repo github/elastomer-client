@@ -353,6 +353,11 @@ describe Elastomer::Client::Index do
     end
 
     it "performs multi percolate queries" do
+      # COMPATIBILITY
+      if requires_percolator_mapping?
+        @index.update_mapping("percolator", { :properties => { :query => { :type => "percolator" } } })
+      end
+
       @index.docs.index \
         :_id    => 1,
         :_type  => "doco",
@@ -367,11 +372,12 @@ describe Elastomer::Client::Index do
 
       @index.percolator("1").create :query => { :match_all => { } }
       @index.percolator("2").create :query => { :match => { :author => "pea53" } }
+      @index.refresh
 
       h = @index.multi_percolate(:type => "doco") do |m|
         m.percolate :author => "pea53"
         m.percolate :author => "grantr"
-        m.count({}, { :author => "grantr" })
+        m.count({ :author => "grantr" }, {})
       end
 
       response1, response2, response3 = h["responses"]
@@ -431,8 +437,8 @@ describe Elastomer::Client::Index do
           @index.docs.index(document)
         end
 
-        assert_equal 400, exception.status
-        assert_match /\[output\]/, exception.message
+        assert_equal(400, exception.status)
+        assert_match(/\[output\]/, exception.message)
       end
     end
   end

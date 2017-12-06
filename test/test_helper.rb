@@ -198,3 +198,9 @@ end
 def supports_suggest_output?
   $client.version_support.es_version_2_x?
 end
+
+# COMPATIBILITY
+# ES 5 returns information about the number of cleared scroll IDs
+def returns_cleared_scroll_id_info?
+  $client.version_support.es_version_5_x?
+end

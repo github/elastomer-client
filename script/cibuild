@@ -75,7 +75,7 @@ result=0
 
 output_fold "Bootstrapping container..." $docker_compose build
 output_fold "Bringing up services..." $docker_compose up -d
-output_fold "Waiting for database..." script/poll-for-es
+output_fold "Waiting for Elasticsearch..." script/poll-for-es
 echo
 
 export RBENV_VERSION="2.3.3"

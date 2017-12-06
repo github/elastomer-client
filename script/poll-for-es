@@ -12,6 +12,9 @@ until $(curl -s "localhost:${es_port}/_cluster/health?wait_for_status=yellow&tim
   sleep 0.50
   count=$(($count+1))
   if [ "$count" -gt 60 ]; then
+    echo "Timed out waiting for Elasticsearch at localhost:${es_port}"
     exit 1
   fi
 done
+
+echo "Elasticsearch is ready at localhost:${es_port}"

@@ -4,6 +4,7 @@ require "multi_json"
 require "semantic"
 
 require "elastomer/version"
+require "elastomer/version_support"
 
 module Elastomer
 
@@ -60,24 +61,6 @@ module Elastomer
     # See https://rubygems.org/gems/semantic
     def semantic_version
       Semantic::Version.new(version)
-    end
-
-    # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
-    # way. Some tests need to know what version is running to structure requests
-    # as expected.
-    #
-    # Returns true if Elasticsearch version is 2.x.
-    def es_version_2_x?
-      version >= "2.0.0" && version <  "3.0.0"
-    end
-
-    # Elasticsearch 5.0 changed some request formats in a non-backward-compatible
-    # way. Some tests need to know what version is running to structure requests
-    # as expected.
-    #
-    # Returns true if Elasticsearch version is 5.x.
-    def es_version_5_x?
-      version >= "5.0.0" && version < "6.0.0"
     end
 
     # Returns the information Hash from the attached Elasticsearch instance.
@@ -323,21 +306,10 @@ module Elastomer
       raise ServerError, response if response.status >= 500
 
       if response.body.is_a?(Hash) && (error = response.body["error"])
-        # ES 2.X style
-        if error.is_a?(Hash)
-          root_cause = Array(error["root_cause"]).first || error
-          case root_cause["type"]
-          when "index_not_found_exception"; raise IndexNotFoundError, response
-          when "query_parsing_exception"; raise QueryParsingError, response
-          end
-
-        # ES 1.X style
-        elsif error.is_a?(String)
-          case error
-          when %r/IndexMissingException/; raise IndexNotFoundError, response
-          when %r/QueryParsingException/; raise QueryParsingError, response
-          when %r/ParseException/; raise QueryParsingError, response
-          end
+        root_cause = Array(error["root_cause"]).first || error
+        case root_cause["type"]
+        when "index_not_found_exception"; raise IndexNotFoundError, response
+        when *version_support.query_parse_exception; raise QueryParsingError, response
         end
 
         raise RequestError, response
@@ -377,6 +349,10 @@ module Elastomer
       else
         raise ArgumentError, "#{name} is invalid: #{param.inspect}"
       end
+    end
+
+    def version_support
+      @version_support ||= VersionSupport.new(version)
     end
 
   end  # Client

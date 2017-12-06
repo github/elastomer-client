@@ -55,8 +55,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
@@ -74,8 +74,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title  => { :type => "string", :analyzer => "standard" },
-              :author => { :type => "string", :index => "not_analyzed" }
+              :title  => $client.version_support.text(analyzer: "standard"),
+              :author => $client.version_support.keyword
             }
           }
         }
@@ -110,7 +110,7 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
+          :properties => {:title  => $client.version_support.text(analyzer: "standard")}
         }
       }
     )
@@ -118,14 +118,14 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.update_mapping "doco", { :doco => { :properties => {
-      :author => { :type => "string", :index => "not_analyzed" }
+      :author => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "doco", "author"
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.update_mapping "mux_mool", { :mux_mool => { :properties => {
-      :song => { :type => "string", :index => "not_analyzed" }
+      :song => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -137,7 +137,7 @@ describe Elastomer::Client::Index do
         :doco => {
           :_source => { :enabled => false },
           :_all    => { :enabled => false },
-          :properties => {:title  => { :type => "string", :analyzer => "standard" }}
+          :properties => {:title  => $client.version_support.text(analyzer: "standard")}
         }
       }
     )
@@ -145,14 +145,14 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.put_mapping "doco", { :doco => { :properties => {
-      :author => { :type => "string", :index => "not_analyzed" }
+      :author => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "doco", "author"
     assert_property_exists @index.mapping[@name], "doco", "title"
 
     @index.put_mapping "mux_mool", { :mux_mool => { :properties => {
-      :song => { :type => "string", :index => "not_analyzed" }
+      :song => $client.version_support.keyword
     }}}
 
     assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -163,10 +163,29 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {"aliases" => {}}}, @index.get_aliases)
 
     $client.cluster.update_aliases :add => {:index => @name, :alias => "foofaloo"}
-    assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_aliases)
+    $client.cluster.update_aliases :add => {:index => @name, :alias => "bar"}
+
+    assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_aliases)
 
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
-    assert_equal({}, @index.get_alias("r*"))
+    assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_alias("*"))
+
+    if fetching_non_existent_alias_returns_error?
+      exception = assert_raises(Elastomer::Client::RequestError) do
+        @index.get_alias("not-there")
+      end
+      assert_equal("alias [not-there] missing", exception.message)
+      assert_equal(404, exception.status)
+
+      exception = assert_raises(Elastomer::Client::RequestError) do
+        @index.get_alias("not*")
+      end
+      assert_equal("alias [not*] missing", exception.message)
+      assert_equal(404, exception.status)
+    else
+      assert_equal({}, @index.get_alias("not-there"))
+      assert_equal({}, @index.get_alias("not*"))
+    end
   end
 
   it "adds and deletes aliases to the index" do
@@ -228,7 +247,7 @@ describe Elastomer::Client::Index do
 
       # COMPATIBILITY
       # ES 5.x drops support for index-time payloads
-      suggest[:payloads] = false if es_version_2_x?
+      suggest[:payloads] = false if index_time_payloads?
 
       @index.create(
         :settings => { :number_of_shards => 1, :number_of_replicas => 0 },
@@ -237,8 +256,8 @@ describe Elastomer::Client::Index do
             :_source => { :enabled => false },
             :_all    => { :enabled => false },
             :properties => {
-              :title   => { :type => "string", :analyzer => "standard" },
-              :author  => { :type => "string", :index => "not_analyzed" },
+              :title   => $client.version_support.text(analyzer: "standard"),
+              :author  => $client.version_support.keyword,
               :suggest => suggest
             }
           }
@@ -273,9 +292,13 @@ describe Elastomer::Client::Index do
       assert_equal 0, response["_shards"]["failed"]
     end
 
-    it "optimizes" do
-      response = @index.optimize
+    it "force merges" do
+      response = @index.forcemerge
       assert_equal 0, response["_shards"]["failed"]
+    end
+
+    it "optimizes through force merge" do
+      assert_equal @index.method(:forcemerge),  @index.method(:optimize)
     end
 
     it "recovery" do
@@ -363,14 +386,14 @@ describe Elastomer::Client::Index do
         :_type   => "doco",
         :title   => "the magnificent",
         :author  => "greg",
-        :suggest => {:input => %w[Greg greg], :output => "Greg", :weight => 2}
+        :suggest => {:input => "greg", :weight => 2}
 
       @index.docs.index \
         :_id    => 2,
         :_type  => "doco",
         :title  => "the author of rubber-band",
         :author => "grant",
-        :suggest => {:input => %w[Grant grant], :output => "Grant", :weight => 1}
+        :suggest => {:input => "grant", :weight => 1}
 
       @index.refresh
       response = @index.suggest({:name => {:text => "gr", :completion => {:field => :suggest}}})
@@ -381,8 +404,36 @@ describe Elastomer::Client::Index do
 
       options = hash["options"]
       assert_equal 2, options.length
-      assert_equal "Greg", options.first["text"]
-      assert_equal "Grant", options.last["text"]
+      assert_equal "greg", options.first["text"]
+      assert_equal "grant", options.last["text"]
+    end
+
+    it "handles output parameter of field" do
+      document = {
+        _id:     1,
+        _type:   "doco",
+        title:   "the magnificent",
+        author:  "greg",
+        suggest: {input: %w[Greg greg], output: "Greg", weight: 2}
+      }
+
+      if supports_suggest_output?
+        # It is not an error to index `output`...
+        @index.docs.index(document)
+
+        # ...and `output` is used in the search response
+        @index.refresh
+        response = @index.suggest({:name => {:text => "gr", :completion => {:field => :suggest}}})
+        assert_equal "Greg", response.fetch("name").first.fetch("options").first.fetch("text")
+      else
+        # Indexing the document fails when `output` is provided
+        exception = assert_raises(Elastomer::Client::RequestError) do
+          @index.docs.index(document)
+        end
+
+        assert_equal 400, exception.status
+        assert_match /\[output\]/, exception.message
+      end
     end
   end
 end

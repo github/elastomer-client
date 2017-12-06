@@ -1,0 +1,8 @@
+#!/bin/bash
+# Usage: script/cibuild-es24
+# CI build script targeting Elasticsearch 2.4
+
+export ES_VERSION=24
+export CI_MODE=true
+
+script/cibuild

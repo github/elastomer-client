@@ -17,6 +17,7 @@ end
 
 require "minitest/spec"
 require "minitest/autorun"
+require "minitest/focus"
 
 # push the lib folder onto the load path
 $LOAD_PATH.unshift "lib"

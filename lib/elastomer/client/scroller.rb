@@ -23,10 +23,8 @@ module Elastomer
       Scroller.new(self, query, opts)
     end
 
-    # DEPRECATED in ES 2.1.0 - use a Scroll query sorted by _doc: https://www.elastic.co/guide/en/elasticsearch/reference/2.3/search-request-search-type.html#scan
-    #
     # Create a new Scroller instance for scrolling all results from a `query`
-    # via "scan" semantics.
+    # via "scan" semantics by sorting by _doc.
     #
     # query  - The query to scan as a Hash or a JSON encoded String
     # opts   - Options Hash
@@ -45,8 +43,7 @@ module Elastomer
     #
     # Returns a new Scroller instance
     def scan( query, opts = {} )
-      opts = opts.merge(:search_type => "scan")
-      Scroller.new(self, query, opts)
+      Scroller.new(self, add_sort_by_doc(query), opts)
     end
 
     # Begin scrolling a query.
@@ -120,7 +117,25 @@ module Elastomer
       response.body
     end
 
-    DEFAULT_OPTS = {
+    # Internal: Add sort by doc to query.
+    #
+    # Raises an exception if the query contains a sort already.
+    # Returns the query as a hash
+    def add_sort_by_doc(query)
+      if query.nil?
+        query = {}
+      elsif query.is_a? String
+        query = MultiJson.load(query)
+      end
+
+      if query.has_key? :sort
+         raise ArgumentError, "Query cannot contain a sort (found sort '#{query[:sort]}' in query: #{query})"
+      end
+
+      query.merge(:sort => [:_doc])
+    end
+
+  DEFAULT_OPTS = {
       :index => nil,
       :type => nil,
       :scroll => "5m",

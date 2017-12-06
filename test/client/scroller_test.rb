@@ -107,6 +107,10 @@ describe Elastomer::Client::Scroller do
     assert_empty response
   end
 
+  it "raises an exception on existing sort in query" do
+    assert_raises(ArgumentError) { @index.scan :sort => [:_doc] , :query => {} }
+  end
+
   def populate!
     h = @index.bulk do |b|
       50.times { |num|

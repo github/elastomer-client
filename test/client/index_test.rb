@@ -205,7 +205,7 @@ describe Elastomer::Client::Index do
   end
 
   it "analyzes text and returns tokens" do
-    tokens = @index.analyze "Just a few words to analyze.", :analyzer => "standard", :index => nil
+    tokens = @index.analyze({text: "Just a few words to analyze.", analyzer: "standard"}, index: nil)
     tokens = tokens["tokens"].map { |h| h["token"] }
     assert_equal %w[just a few words to analyze], tokens
 
@@ -225,7 +225,7 @@ describe Elastomer::Client::Index do
     )
     wait_for_index(@name)
 
-    tokens = @index.analyze "Just a few words to analyze.", :analyzer => "english_standard"
+    tokens = @index.analyze({text: "Just a few words to analyze.", analyzer: "english_standard"})
     tokens = tokens["tokens"].map { |h| h["token"] }
     assert_equal %w[just few words analyze], tokens
   end

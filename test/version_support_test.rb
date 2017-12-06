@@ -56,6 +56,11 @@ describe Elastomer::VersionSupport do
       end
     end
 
+    describe "native_delete_by_query?" do
+      it "returns false" do
+        refute version_support.native_delete_by_query?, "ES 2.X does not have native delete_by_query support"
+      end
+    end
   end
 
   describe "ES 5.x" do
@@ -78,6 +83,12 @@ describe Elastomer::VersionSupport do
           term_vector: "with_positions_offsets"
         }
         assert_equal(expected, version_support.text(term_vector: "with_positions_offsets"))
+      end
+    end
+
+    describe "native_delete_by_query?" do
+      it "returns true" do
+        assert version_support.native_delete_by_query?, "ES 5.X has native delete_by_query support"
       end
     end
   end

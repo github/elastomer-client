@@ -104,7 +104,13 @@ describe Elastomer::Client::Scroller do
     refute_nil h["_scroll_id"], "response is missing a scroll ID"
 
     response = $client.clear_scroll(h["_scroll_id"])
-    assert_empty response
+
+    if returns_cleared_scroll_id_info?
+      assert response["succeeded"]
+      assert_equal 1, response["num_freed"]
+    else
+      assert_empty response
+    end
   end
 
   it "raises an exception on existing sort in query" do

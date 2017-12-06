@@ -48,28 +48,31 @@ module Elastomer
       DeleteByQuery.new(self, query, params).execute
     end
 
-    SEARCH_PARAMETERS = [
-      :q,
-      :df,
-      :analyzer,
-      :analyze_wildcard,
-      :batched_reduce_size,
-      :default_operator,
-      :lenient,
-      :explain,
-      :_source,
-      :stored_fields,
-      :sort,
-      :track_scores,
-      :timeout,
-      :terminate_after,
-      :from,
-      :size,
-      :search_type,
-      :scroll
-    ].to_set.freeze
-
     class DeleteByQuery
+
+      SEARCH_PARAMETERS = %i[
+        index
+        type
+        q
+        df
+        analyzer
+        analyze_wildcard
+        batched_reduce_size
+        default_operator
+        lenient
+        explain
+        _source
+        stored_fields
+        sort
+        track_scores
+        timeout
+        terminate_after
+        from
+        size
+        search_type
+        scroll
+      ].to_set.freeze
+
 
       # Create a new DeleteByQuery command for deleting documents matching a
       # query

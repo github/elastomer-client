@@ -90,6 +90,10 @@ module Elastomer
       end
     end
 
+    # COMPATIBILITY
+    # ES 5.X supports `delete_by_query` natively again.
+    alias :native_delete_by_query? :es_version_5_x?
+
     private
 
     # Internal: Helper to reject arguments that shouldn't be passed because

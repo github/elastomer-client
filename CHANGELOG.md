@@ -1,6 +1,5 @@
-# WIP for 3.3.0 release
+# WIP for 3.0.0 release
 - Fixed swapped args in {Client,Index}#multi\_percolate count calls using block API
-
 
 ## 2.3.0 (2017-11-29)
 - Remove Elasticsearch 1.x and earlier code paths

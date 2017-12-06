@@ -8,7 +8,9 @@ services:
       - cluster.name=elastomer5.6
       - bootstrap.memory_lock=true
       - discovery.type=single-node
+      - xpack.monitoring.enabled=false
       - xpack.security.enabled=false
+      - xpack.watcher.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:

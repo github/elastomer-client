@@ -59,6 +59,10 @@ export ES_PORT=${ES_PORT:-19200}
 es_version=${ES_VERSION:-24}
 docker_compose="docker-compose --file docker/docker-compose.es${es_version}.yml --file docker/docker-compose.cibuild.yml"
 
+# if [ "${CI_MODE:-}" ]; then
+#   docker_compose="${docker_compose} --no-ansi"
+# fi
+
 # change into root dir and setup path
 cd $(dirname "$0")/..
 PATH="$(pwd)/bin:$(pwd)/script:/usr/share/rbenv/shims:$PATH"
@@ -66,18 +70,17 @@ PATH="$(pwd)/bin:$(pwd)/script:/usr/share/rbenv/shims:$PATH"
 echo "hostname: $(hostname)"
 
 # Write commit we're building at
-begin_fold "Commit info..."
-git log -n 1 || true
-end_fold
+output_fold "Commit info..." git log -n 1 || true
 echo
-
-result=0
 
 output_fold "Bootstrapping container..." $docker_compose build
 output_fold "Bringing up services..." $docker_compose up -d
 output_fold "Waiting for Elasticsearch..." script/poll-for-es
 echo
 
+result=0
+
+begin_fold "Ruby environment setup..."
 export RBENV_VERSION="2.3.3"
 if [ -d /usr/share/rbenv/shims ]; then
   export PATH=/usr/share/rbenv/shims:$PATH
@@ -85,6 +88,9 @@ fi
 ruby -v
 rm -f Gemfile.lock
 script/bootstrap
+end_fold
+echo
+
 bundle exec rake test || result=$?
 
 if [ $result -ne 0 ]; then

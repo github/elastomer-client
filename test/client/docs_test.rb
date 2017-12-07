@@ -158,7 +158,7 @@ describe Elastomer::Client::Docs do
         title: "The Adventures of Huckleberry Finn"
       }.merge(incompatible_indexing_directive)
 
-      assert_raises(Elastomer::Client::IncompatibleVersionException) do
+      assert_raises(Elastomer::Client::InvalidParameter) do
         @docs.index(doc)
       end
 
@@ -169,7 +169,7 @@ describe Elastomer::Client::Docs do
         "title" => "The Adventures of Huckleberry Finn"
       }.merge(incompatible_indexing_directive.stringify_keys)
 
-      assert_raises(Elastomer::Client::IncompatibleVersionException) do
+      assert_raises(Elastomer::Client::InvalidParameter) do
         @docs.index(doc)
       end
     end

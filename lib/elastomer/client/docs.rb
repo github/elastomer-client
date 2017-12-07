@@ -527,6 +527,9 @@ Percolate
       # document - A document Hash or JSON encoded String.
       #
       # Returns an options Hash extracted from the document.
+      #
+      # Raises Elastomer::Client::InvalidParameter if an unsupported indexing
+      # directive is used.
       def from_document( document )
         opts = {:body => document}
 
@@ -545,7 +548,7 @@ Percolate
           # felt it was best to consistently fail fast.
           client.version_support.unsupported_indexing_directives.each do |key, field|
             if document.key?(field) || document.key?(field.to_sym)
-              raise IncompatibleVersionException, "Elasticsearch #{client.version} does not support the '#{key}' indexing parameter"
+              raise InvalidParameter, "Elasticsearch #{client.version} does not support the '#{key}' indexing parameter"
             end
           end
         end

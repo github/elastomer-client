@@ -108,5 +108,8 @@ module Elastomer
     # Elasticsearch being used.
     IncompatibleVersionException = Class.new Error
 
+    # Exception for client-detected invalid Elasticsearch parameter
+    InvalidParameter = Class.new Error
+
   end  # Client
 end  # Elastomer

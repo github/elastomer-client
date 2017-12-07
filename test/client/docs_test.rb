@@ -1,4 +1,5 @@
 require File.expand_path("../../test_helper", __FILE__)
+require 'active_support/core_ext/hash'
 
 describe Elastomer::Client::Docs do
 
@@ -97,26 +98,81 @@ describe Elastomer::Client::Docs do
     assert_match %r/^\S{20,22}$/, h["_id"]
   end
 
-  it "extracts underscore attributes from the document" do
-    doc = {
-      :_id => "12",
-      :_type => "doc2",
-      :_routing => "author",
-      "_consistency" => "all",
-      :title => "The Adventures of Huckleberry Finn",
-      :author => "Mark Twain",
-      :_unknown => "unknown attribute"
-    }
+  describe "indexing directive fields" do
+    it "indexes fields that are not recognized as indexing directives" do
+      doc = {
+        _id: "12",
+        _type: "doc2",
+        title: "The Adventures of Huckleberry Finn",
+        author: "Mark Twain",
+        _unknown_1: "unknown attribute 1",
+        "_unknown_2" => "unknown attribute 2"
+      }
 
-    h = @docs.index doc
-    assert_created h
-    assert_equal "12", h["_id"]
+      h = @docs.index(doc)
+      assert_created h
+      assert_equal "12", h["_id"]
 
-    refute doc.key?(:_id)
-    refute doc.key?(:_type)
-    refute doc.key?(:_routing)
-    refute doc.key?("_consistency")
-    assert doc.key?(:_unknown)
+      indexed_doc = @docs.get(type: "doc2", id: "12")
+      expected = {
+        "title" => "The Adventures of Huckleberry Finn",
+        "author" => "Mark Twain",
+        "_unknown_1" => "unknown attribute 1",
+        "_unknown_2" => "unknown attribute 2"
+      }
+      assert_equal expected, indexed_doc["_source"]
+    end
+
+    it "extracts indexing directives from the document" do
+      doc = {
+        _id: "12",
+        "_type" => "doc2",
+        _routing: "author",
+        title: "The Adventures of Huckleberry Finn",
+        author: "Mark Twain"
+      }
+
+      h = @docs.index(doc)
+      assert_created h
+      assert_equal "12", h["_id"]
+
+      # Special keys are removed from the document hash
+      refute doc.key?(:_id)
+      refute doc.key?("_type")
+      refute doc.key?(:_routing)
+
+      indexed_doc = @docs.get(type: "doc2", id: "12")
+      expected = {
+        "title" => "The Adventures of Huckleberry Finn",
+        "author" => "Mark Twain",
+      }
+      assert_equal expected, indexed_doc["_source"]
+    end
+
+    # COMPATIBILITY: Fail fast on known indexing directives that aren't for this version of ES
+    it "raises an exception when a known indexing directive from an unsupported version is used" do
+      # Symbol keys
+      doc = {
+        _id: "12",
+        _type: "doc2",
+        title: "The Adventures of Huckleberry Finn"
+      }.merge(incompatible_indexing_directive)
+
+      assert_raises(Elastomer::Client::InvalidParameter) do
+        @docs.index(doc)
+      end
+
+      # String keys
+      doc = {
+        "_id" => "12",
+        "_type" => "doc2",
+        "title" => "The Adventures of Huckleberry Finn"
+      }.merge(incompatible_indexing_directive.stringify_keys)
+
+      assert_raises(Elastomer::Client::InvalidParameter) do
+        @docs.index(doc)
+      end
+    end
   end
 
   it "gets documents from the search index" do

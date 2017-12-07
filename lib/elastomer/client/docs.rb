@@ -40,7 +40,9 @@ module Elastomer
       # There are several other document attributes that control how
       # Elasticsearch will index the document. They are listed below. Please
       # refer to the Elasticsearch documentation for a full explanation of each
-      # and how it affects the indexing process.
+      # and how it affects the indexing process. These indexing directives vary
+      # by Elasticsearch version. Attempting to use a directive not supported
+      # by the Elasticsearch server will raise an exception.
       #
       #   :_id
       #   :_type
@@ -49,11 +51,17 @@ module Elastomer
       #   :_op_type
       #   :_routing
       #   :_parent
-      #   :_timestamp
-      #   :_ttl
-      #   :_consistency
-      #   :_replication
       #   :_refresh
+      #
+      # Elasticsearch 2.X only:
+      #
+      #   :_timestamp (deprecated)
+      #   :_ttl (deprecated)
+      #   :_consistency
+      #
+      # Elasticsearch 5.x only:
+      #
+      #   :_wait_for_active_shards
       #
       # If any of these attributes are present in the document they will be
       # removed from the document before it is indexed. This means that the
@@ -65,6 +73,9 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
       #
       # Returns the response body as a Hash
+      #
+      # Raises Elastomer::Client::InvalidParameter if an unsupported indexing
+      # directive is used.
       def index( document, params = {} )
         overrides = from_document document
         params = update_params(params, overrides)
@@ -517,9 +528,6 @@ Percolate
         client.multi_percolate(params, &block)
       end
 
-      SPECIAL_KEYS = %w[index type id version version_type op_type routing parent timestamp ttl consistency replication refresh].freeze
-      SPECIAL_KEYS_HASH = SPECIAL_KEYS.inject({}) { |h, k| h[k.to_sym] = "_#{k}"; h }.freeze
-
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document
       # will be returned as the value of the :body key.
@@ -530,13 +538,29 @@ Percolate
       # document - A document Hash or JSON encoded String.
       #
       # Returns an options Hash extracted from the document.
+      #
+      # Raises Elastomer::Client::InvalidParameter if an unsupported indexing
+      # directive is used.
       def from_document( document )
         opts = {:body => document}
 
         if document.is_a? Hash
-          SPECIAL_KEYS_HASH.each do |key, field|
+          client.version_support.indexing_directives.each do |key, field|
             opts[key] = document.delete field if document.key? field
             opts[key] = document.delete field.to_sym if document.key? field.to_sym
+          end
+
+          # COMPATIBILITY
+          # Fail fast if a consumer is attempting to use an indexing parameter
+          # for a different version of Elasticsearch. Elasticsearch 5+ is strict
+          # about parameter names so we need to either ignore these (in which
+          # case they would be indexed with the document) or fail-fast.
+          # Elasticsearch 2.X will happily ignore unknown parameters, but we
+          # felt it was best to consistently fail fast.
+          client.version_support.unsupported_indexing_directives.each do |key, field|
+            if document.key?(field) || document.key?(field.to_sym)
+              raise InvalidParameter, "Elasticsearch #{client.version} does not support the '#{key}' indexing parameter"
+            end
           end
         end
 

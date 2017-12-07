@@ -2,6 +2,22 @@ module Elastomer
   # VersionSupport holds methods that (a) encapsulate version differences; or
   # (b) give an intention-revealing name to a conditional check.
   class VersionSupport
+    COMMON_INDEXING_PARAMETER_NAMES = %i[
+      index
+      type
+      id
+      version
+      version_type
+      op_type
+      routing
+      parent
+      refresh
+    ].freeze
+    ES_2_X_INDEXING_PARAMETER_NAMES = %i[consistency ttl timestamp].freeze
+    ES_5_X_INDEXING_PARAMETER_NAMES = %i[wait_for_active_shards].freeze
+    KNOWN_INDEXING_PARAMETER_NAMES =
+      (COMMON_INDEXING_PARAMETER_NAMES + ES_2_X_INDEXING_PARAMETER_NAMES + ES_5_X_INDEXING_PARAMETER_NAMES).freeze
+
     attr_reader :version
 
     # version - an Elasticsearch version string e.g., 2.3.5 or 5.3.0
@@ -94,6 +110,33 @@ module Elastomer
     # ES 5.X supports `delete_by_query` natively again.
     alias :native_delete_by_query? :es_version_5_x?
 
+    # COMPATIBILITY
+    # Return a Hash of indexing request parameters that are valid for this
+    # version of Elasticsearch.
+    def indexing_directives
+      return @indexing_directives if defined?(@indexing_directives)
+
+      @indexing_directives = indexing_parameter_names.each_with_object({}) do |key, h|
+        h[key] = "_#{key}"
+      end
+      @indexing_directives.freeze
+    end
+
+    # COMPATIBILITY
+    # Return a Hash of indexing request parameters that are known to
+    # elastomer-client, but not supported by the current version of
+    # Elasticsearch.
+    def unsupported_indexing_directives
+      return @unsupported_indexing_directives if defined?(@unsupported_indexing_directives)
+
+      unsupported_keys = KNOWN_INDEXING_PARAMETER_NAMES - indexing_parameter_names
+
+      @unsupported_indexing_directives = unsupported_keys.each_with_object({}) do |key, h|
+        h[key] = "_#{key}"
+      end
+      @unsupported_indexing_directives.freeze
+    end
+
     private
 
     # Internal: Helper to reject arguments that shouldn't be passed because
@@ -103,6 +146,14 @@ module Elastomer
         if args.include?(name.to_s) || args.include?(name.to_sym)
           raise ArgumentError, "Argument '#{name}' is not allowed"
         end
+      end
+    end
+
+    def indexing_parameter_names
+      if es_version_2_x?
+        COMMON_INDEXING_PARAMETER_NAMES + ES_2_X_INDEXING_PARAMETER_NAMES
+      else
+        COMMON_INDEXING_PARAMETER_NAMES + ES_5_X_INDEXING_PARAMETER_NAMES
       end
     end
   end

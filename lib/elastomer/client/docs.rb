@@ -40,7 +40,9 @@ module Elastomer
       # There are several other document attributes that control how
       # Elasticsearch will index the document. They are listed below. Please
       # refer to the Elasticsearch documentation for a full explanation of each
-      # and how it affects the indexing process.
+      # and how it affects the indexing process. These indexing directives vary
+      # by Elasticsearch version. Attempting to use a directive not supported
+      # by the Elasticsearch server will raise an exception.
       #
       #   :_id
       #   :_type
@@ -49,11 +51,17 @@ module Elastomer
       #   :_op_type
       #   :_routing
       #   :_parent
-      #   :_timestamp
-      #   :_ttl
-      #   :_consistency
-      #   :_replication
       #   :_refresh
+      #
+      # Elasticsearch 2.X only:
+      #
+      #   :_timestamp (deprecated)
+      #   :_ttl (deprecated)
+      #   :_consistency
+      #
+      # Elasticsearch 5.x only:
+      #
+      #   :_wait_for_active_shards
       #
       # If any of these attributes are present in the document they will be
       # removed from the document before it is indexed. This means that the
@@ -65,6 +73,9 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
       #
       # Returns the response body as a Hash
+      #
+      # Raises Elastomer::Client::InvalidParameter if an unsupported indexing
+      # directive is used.
       def index( document, params = {} )
         overrides = from_document document
         params = update_params(params, overrides)

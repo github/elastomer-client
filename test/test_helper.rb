@@ -214,3 +214,9 @@ def incompatible_indexing_directive
     {_consistency: "all"}
   end
 end
+
+# COMPATIBILITY
+# Returns true if the Elasticsearch cluster will validate request parameters.
+def parameter_validation?
+  $client.version_support.es_version_5_x?
+end

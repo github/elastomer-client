@@ -85,7 +85,7 @@ describe Elastomer::Client::Error do
   else
     it "does not raise illegal argument exceptions" do
       begin
-        $client.get("/_cluster/health?wait_for_active_shards=10")
+        $client.get("/_cluster/health?consistency=all")
         assert true, "Exception was not raised"
       rescue Elastomer::Client::Error => err
         assert false, "Exception #{err} was raised"

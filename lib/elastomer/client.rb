@@ -309,6 +309,7 @@ module Elastomer
         root_cause = Array(error["root_cause"]).first || error
         case root_cause["type"]
         when "index_not_found_exception"; raise IndexNotFoundError, response
+        when "illegal_argument_exception"; raise InvalidParameter, response
         when *version_support.query_parse_exception; raise QueryParsingError, response
         end
 

@@ -72,4 +72,24 @@ describe Elastomer::Client::Error do
     assert !Elastomer::Client::ConnectionFailed.fatal, "Connection failures are not fatal"
     assert !Elastomer::Client::ServerError.fatal, "Server errors are not fatal"
   end
+
+  if parameter_validation?
+    it "wraps illegal argument exceptions" do
+      begin
+        $client.get("/_cluster/health?consistency=all")
+        assert false, "InvalidParameter exception was not raised"
+      rescue Elastomer::Client::InvalidParameter => err
+        assert_match(/request \[\/_cluster\/health\] contains unrecognized parameter: \[consistency\]/, err.message)
+      end
+    end
+  else
+    it "does not raise illegal argument exceptions" do
+      begin
+        $client.get("/_cluster/health?wait_for_active_shards=10")
+        assert true, "Exception was not raised"
+      rescue Elastomer::Client::Error => err
+        assert false, "Exception #{err} was raised"
+      end
+    end
+  end
 end

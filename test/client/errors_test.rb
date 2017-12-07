@@ -77,8 +77,8 @@ describe Elastomer::Client::Error do
     it "wraps illegal argument exceptions" do
       begin
         $client.get("/_cluster/health?consistency=all")
-        assert false, "InvalidParameter exception was not raised"
-      rescue Elastomer::Client::InvalidParameter => err
+        assert false, "IllegalArgument exception was not raised"
+      rescue Elastomer::Client::IllegalArgument => err
         assert_match(/request \[\/_cluster\/health\] contains unrecognized parameter: \[consistency\]/, err.message)
       end
     end

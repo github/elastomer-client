@@ -272,6 +272,10 @@ module Elastomer
         @client.delete_by_query(query, update_params(params))
       end
 
+      def native_delete_by_query(query, params = {})
+        @client.native_delete_by_query(query, update_params(params))
+      end
+
       # Matches a provided or existing document to the stored percolator
       # queries. To match an existing document, pass `nil` as the body and
       # include `:id` in the params.

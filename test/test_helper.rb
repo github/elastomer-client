@@ -19,6 +19,10 @@ require "minitest/spec"
 require "minitest/autorun"
 require "minitest/focus"
 
+# used in a couple test files, makes them available for all
+require "active_support/core_ext/enumerable"
+require 'active_support/core_ext/hash'
+
 # push the lib folder onto the load path
 $LOAD_PATH.unshift "lib"
 require "elastomer/client"

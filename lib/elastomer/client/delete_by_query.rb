@@ -5,7 +5,7 @@ module Elastomer
     # on a query.
     #
     # The return value follows the format returned by the Elasticsearch Delete
-    # by Query plugin: https://github.com/elastic/elasticsearch/blob/master/docs/plugins/delete-by-query.asciidoc#response-body
+    # by Query plugin: https://github.com/elastic/elasticsearch/blob/v2.4.6/docs/plugins/delete-by-query.asciidoc
     #
     # Internally, this method uses a combination of scroll and bulk delete
     # instead of the Delete by Query API, which was removed in Elasticsearch

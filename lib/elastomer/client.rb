@@ -91,6 +91,15 @@ module Elastomer
       end
     end
 
+    # Internal: Reset the client by removing the current Faraday::Connection. A
+    # new connection will be established on the next request.
+    #
+    # Returns this Client instance.
+    def reset!
+      @connection = nil
+      self
+    end
+
     # Internal: Sends an HTTP HEAD request to the server.
     #
     # path   - The path as a String
@@ -199,6 +208,9 @@ module Elastomer
           error_name = boom.class.name.split("::").last
           error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
           raise error_class.new(boom, method.upcase, path)
+        rescue OpaqueIdError => boom
+          reset!
+          raise boom
         end
       end
     end

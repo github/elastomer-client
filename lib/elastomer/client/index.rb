@@ -526,17 +526,38 @@ module Elastomer
         Warmer.new(client, name, warmer_name)
       end
 
-      # Delete documents from one or more indices and one or more types based
-      # on a query.
+      # Delete documents by query following either the native or
+      # application-level delete by query method.
       #
-      # See Client#delete_by_query for more information.
-      #
-      # Returns a Hash of statistics about the delete operations
+      # NOTE: The parameters and response format varies by version. To have more
+      # control over this, use app_delete_by_query or native_delete_by_query
+      # directly.
       def delete_by_query(query, params = nil)
-        docs.delete_by_query(query, params)
+        docs.send(client.version_support.delete_by_query_method, query, params)
       end
 
-      def native_delete_by_query(query, params = {})
+      # DEPRECATED: Delete documents from one or more indices and one or more types based
+      # on a query using application-level logic.
+      #
+      # See Client#app_delete_by_query for more information.
+      #
+      # Returns a Hash of statistics about the delete operations simulating the
+      # Elasticsearch 2.x delete by query plugin's output.
+      def app_delete_by_query(query, params = nil)
+        docs.app_delete_by_query(query, params)
+      end
+
+      # Delete documents from one or more indices and one or more types based
+      # on a query using Elasticsearch's _delete_by_query API.
+      #
+      # See Client#native_delete_by_query for more information.
+      #
+      # Returns a Hash of statistics about the delete operations as returned by
+      # _delete_by_query.
+      #
+      # Raises Elastomer::Client::IncompatibleVersionException if this version
+      # of Elasticsearch does not support _delete_by_query.
+      def native_delete_by_query(query, params = nil)
         docs.native_delete_by_query(query, params)
       end
 

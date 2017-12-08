@@ -143,6 +143,17 @@ module Elastomer
       @unsupported_indexing_directives.freeze
     end
 
+    # COMPATIBILITY
+    # Return a symbol representing the best supported delete_by_query
+    # implementation for this version of Elasticsearch.
+    def delete_by_query_method
+      if supports_native_delete_by_query?
+        :native_delete_by_query
+      else
+        :app_delete_by_query
+      end
+    end
+
     private
 
     # Internal: Helper to reject arguments that shouldn't be passed because

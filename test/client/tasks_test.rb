@@ -21,6 +21,13 @@ describe Elastomer::Client::Tasks do
     assert total_tasks > 0
   end
 
+  it "groups by parent->child relationships when get-all tasks API is grouped by 'parents'" do
+    h = @tasks.get :group_by => "parents"
+    parent_id = h["tasks"].keys.first
+    childs_parent_ref = h["tasks"][parent_id]["children"].first["parent_task_id"]
+    assert_equal parent_id, childs_parent_ref
+  end
+
   it "raises exception when get_by_id is called without required task & node IDs" do
     assert_raises(ArgumentError) do
       @tasks.get_by_id

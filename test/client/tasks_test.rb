@@ -14,10 +14,10 @@ describe Elastomer::Client::Tasks do
   end
 
   it "list all in-flight tasks" do
-    h = @tasks.get
+    h = @tasks.get :group_by => "nodes"
     assert h["nodes"].keys.size > 0
 
-    total_tasks = h["nodes"].map { |k,v| v["tasks"].keys.count }.sum
+    total_tasks = h["nodes"].map { |k, v| v["tasks"].keys.count }.sum
     assert total_tasks > 0
   end
 

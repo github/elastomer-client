@@ -1,6 +1,6 @@
-require File.expand_path("../../test_helper", __FILE__)
+require_relative "../test_helper"
 
-describe Elastomer::Client::DeleteByQuery do
+describe Elastomer::Client::AppDeleteByQuery do
 
   before do
     @index = $client.index "elastomer-delete-by-query-test"
@@ -23,7 +23,7 @@ describe Elastomer::Client::DeleteByQuery do
       @docs.index({ :_id => 1, :name => "luna" })
 
       @index.refresh
-      response = @index.delete_by_query(nil, :q => "name:mittens")
+      response = @index.app_delete_by_query(nil, :q => "name:mittens")
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -50,7 +50,7 @@ describe Elastomer::Client::DeleteByQuery do
       @docs.index({ :_id => 1, :name => "luna" })
       @index.refresh
 
-      response = @index.delete_by_query(nil, :action_count => 1)
+      response = @index.app_delete_by_query(nil, :action_count => 1)
 
       assert_requested(:post, /_bulk/, :times => 2)
 
@@ -95,7 +95,7 @@ describe Elastomer::Client::DeleteByQuery do
         end)
 
       @index.refresh
-      response = @index.delete_by_query(nil, :action_count => 1)
+      response = @index.app_delete_by_query(nil, :action_count => 1)
       assert_equal({
         "_all" => {
           "found" => 0,
@@ -131,7 +131,7 @@ describe Elastomer::Client::DeleteByQuery do
         end)
 
       @index.refresh
-      response = @index.delete_by_query(nil, :action_count => 1)
+      response = @index.app_delete_by_query(nil, :action_count => 1)
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -160,7 +160,7 @@ describe Elastomer::Client::DeleteByQuery do
       docs.index({ :_id => 1, :_routing => "cat", :name => "luna" })
 
       index.refresh
-      response = index.delete_by_query(nil, :q => "name:mittens")
+      response = index.app_delete_by_query(nil, :q => "name:mittens")
       assert_equal({
         "_all" => {
           "found" => 1,

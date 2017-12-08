@@ -1,5 +1,18 @@
 module Elastomer
   class Client
+    # Delete documents based on a query using the Elasticsearch _delete_by_query API.
+    #
+    # query  - The query body as a Hash
+    # params - Parameters Hash
+    #
+    # Examples
+    #
+    #   # request body query
+    #   native_delete_by_query({:query => {:match_all => {}}}, :type => 'tweet')
+    #
+    # See https://www.elastic.co/guide/en/elasticsearch/reference/5.6/docs-delete-by-query.html
+    #
+    # Returns a Hash containing the _delete_by_query response body.
     def native_delete_by_query(query, parameters = {})
       NativeDeleteByQuery.new(self, query, parameters).execute
     end
@@ -8,15 +21,16 @@ module Elastomer
       attr_reader :client, :query, :parameters
 
       PARAMETERS = %i[
-        index
-        type
         conflicts
+        index
+        q
+        refresh
         routing
         scroll_size
-        refresh
-        wait_for_completion
-        wait_for_active_shards
         timeout
+        type
+        wait_for_active_shards
+        wait_for_completion
       ].to_set.freeze
 
       def initialize(client, query, parameters)

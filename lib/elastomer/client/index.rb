@@ -536,6 +536,10 @@ module Elastomer
         docs.delete_by_query(query, params)
       end
 
+      def native_delete_by_query(query, params = {})
+        docs.native_delete_by_query(query, params)
+      end
+
       # Constructs a Percolator with the given id on this index.
       #
       # Examples

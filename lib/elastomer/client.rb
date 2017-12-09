@@ -69,15 +69,6 @@ module Elastomer
       response.body
     end
 
-    # Returns a Tasks instance for querying the cluster bound to this client for
-    # metadata about internal tasks in flight, and to submit administrative
-    # commands concerning those tasks.
-    #
-    # Returns a new Tasks object associated with this client
-    def tasks
-      Tasks.new(self)
-    end
-
     # Internal: Provides access to the Faraday::Connection used by this client
     # for all requests to the server.
     #

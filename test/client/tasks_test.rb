@@ -10,7 +10,6 @@ describe Elastomer::Client::Tasks do
   end
 
   after do
-    pass # nothing to do here yet...
   end
 
   it "list all in-flight tasks" do
@@ -23,8 +22,8 @@ describe Elastomer::Client::Tasks do
 
   it "groups by parent->child relationships when get-all tasks API is grouped by 'parents'" do
     h = @tasks.get :group_by => "parents"
-    parent_id = h["tasks"].keys.first
-    childs_parent_ref = h["tasks"][parent_id]["children"].first["parent_task_id"]
+    parent_id = h["tasks"].select { |k, v| v.key?("children") }.keys.first
+    childs_parent_ref = h.dig("tasks", parent_id, "children").first["parent_task_id"]
     assert_equal parent_id, childs_parent_ref
   end
 
@@ -36,13 +35,13 @@ describe Elastomer::Client::Tasks do
 
   it "raises exception when get_by_id is called w/invalid task ID is supplied" do
     node_id = @tasks.get["nodes"].map { |k, v| k }.first
-    assert_raises(Elastomer::Client::IllegalArgument) do
+    assert_raises(ArgumentError) do
       @tasks.get_by_id node_id, "task_id_should_be_integer"
     end
   end
 
   it "raises exception when get_by_id is called w/invalid node ID is supplied" do
-    assert_raises(Elastomer::Client::IllegalArgument) do
+    assert_raises(ArgumentError) do
       @tasks.get_by_id nil, 42
     end
   end
@@ -55,17 +54,47 @@ describe Elastomer::Client::Tasks do
     assert_equal(404, exception.status)
   end
 
-  it "raises exception when get_by_id is called with valid task & node params that's no longer registered" do
-    # acquire node and task IDs guaranteed to be "real" even if they are expired by the time the test call goes out
-    h = @tasks.get
-    first_node = h["nodes"].keys.first
-    node_id, task_id = h["nodes"][first_node]["tasks"].keys.first.split(":")
+  it "locates the task properly by ID when valid node and task IDs are supplied" do
+    Thread.new do
+      begin
+        name = "elastomer-tasks-tests".freeze
+        index = $client.index(name)
+        wait_for_index(name)
 
-    exception = assert_raises(Elastomer::Client::RequestError) do
-      @tasks.get_by_id node_id, task_id, {}
+        index.docs("person").bulk do |d|
+          (1..100).each do |i|
+            d.index \
+              :foo => "foo",
+              :bar => "bar",
+              :baz => "baz"
+          end
+        end
+        index.refresh
+        Kernel.sleep(0.01)
+      ensure
+        index.delete if index.exists?
+      end
     end
-    assert_match(/isn't running and hasn't stored its results/, exception.message)
-    assert_equal(404, exception.status)
+
+    target_tasks = []
+    3.times.each do
+      target_tasks = @tasks.get["nodes"]
+        .map { |k, v| v["tasks"] }
+        .flatten.map { |ts| ts.select { |k, v| /health/ =~ v["action"] } }
+        .flatten.reject { |t| t == {} }
+      break if target_tasks.size > 0
+    end
+    assert !target_tasks.empty?
+
+    found_by_id = false
+    target_tasks.each do |t|
+      t = t.values.first
+      resp = @tasks.get_by_id t["node"], t["id"]
+      found_by_id = resp["task"]["node"] == t["node"] && resp["task"]["id"] == t["id"]
+      break if found_by_id
+    end
+
+    assert found_by_id
   end
 
   it "raises exception when cancel_by_id is called without required task & node IDs" do
@@ -76,20 +105,20 @@ describe Elastomer::Client::Tasks do
 
   it "raises exception when cancel_by_id is called w/invalid task ID is supplied" do
     node_id = @tasks.get["nodes"].map { |k, v| k }.first
-    assert_raises(Elastomer::Client::IllegalArgument) do
+    assert_raises(ArgumentError) do
       @tasks.cancel_by_id node_id, "not_an_integer_id"
     end
   end
 
   it "raises exception when cancel_by_id is called w/invalid node IDs is supplied" do
-    assert_raises(Elastomer::Client::IllegalArgument) do
+    assert_raises(ArgumentError) do
       @tasks.cancel_by_id nil, 42
     end
   end
 
   # TODO: test this behavior MORE!
   it "raises exception when cancel_by_id is called w/invalid node and task IDs are supplied" do
-    exception = assert_raises(Elastomer::Client::IllegalArgument) do
+    assert_raises(ArgumentError) do
       @tasks.cancel_by_id "", "also_should_be_integer_id"
     end
   end

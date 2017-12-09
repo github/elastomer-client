@@ -1,9 +1,18 @@
 module Elastomer
   class Client
 
+    # Returns a Tasks instance for querying the cluster bound to this client for
+    # metadata about internal tasks in flight, and to submit administrative
+    # requests (like cancellation) concerning those tasks.
+    #
+    # Returns a new Tasks object associated with this client
+    def tasks
+      Tasks.new(self)
+    end
+
     class Tasks
 
-      # TODO - validate params from this whitelist at this point? this API is new and kind of all over the place right now...
+      # TODO - validate params from this whitelist
       PARAMETERS = %i[
         nodes
         actions
@@ -62,8 +71,8 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_by_id(node_id, task_id, params = {})
-        raise IllegalArgument, "no node ID argument provided" if node_id.to_s.empty?
-        raise IllegalArgument, "no task ID argument provided" unless task_id.to_i
+        raise ArgumentError, "invalid node ID provided: #{node_id.inspect}" if node_id.to_s.empty?
+        raise ArgumentError, "invalid task ID provided: #{task_id.inspect}" unless task_id.is_a?(Integer)
 
         # in this API, the task ID is included in the path, not as a request parameter.
         response = client.get "/_tasks/#{node_id}:#{task_id}", params
@@ -82,7 +91,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_by_parent_id(parent_task_id, params = {})
-        raise IllegalArgument, "no task ID of parent provided" unless parent_task_id.to_i
+        raise ArgumentError, "invalid parent task ID provided: #{task_id.inspect}" unless parent_task_id.is_a?(Integer)
 
         # in this API, we pass the parent task ID as a formatted parameter in a request to the _tasks endpoint
         formatted_parent = { :parent_task_id => "parentTaskId:#{parent_task_id}" }
@@ -119,8 +128,8 @@ module Elastomer
       #
       # Returns the response body as a Hash when timeout expires or target tasks complete
       def wait_by_id(node_id, task_id, timeout = "10s", params = {})
-        raise IllegalArgument, "no node ID provided" if node_id.to_s.empty?
-        raise IllegalArgument, "no task ID provided" unless task_id.to_i
+        raise ArgumentError, "invalid node ID provided: #{node_id.inspect}" if node_id.to_s.empty?
+        raise ArgumentError, "invalid task ID provided: #{task_id.inspect}" unless task_id.is_a?(Integer)
 
         params_with_wait = params.merge({ :wait_for_completion => true, :timeout => timeout })
         self.get_by_id(node_id, task_id, params_with_wait)
@@ -142,8 +151,8 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def cancel_by_id(node_id, task_id, params = {})
-        raise IllegalArgument, "no node ID provided" if node_id.to_s.empty?
-        raise IllegalArgument, "no task ID provided" unless task_id.to_i
+        raise ArgumentError, "invalid node ID provided: #{node_id.inspect}" if node_id.to_s.empty?
+        raise ArgumentError, "invalid task ID provided: #{task_id.inspect}" unless task_id.is_a?(Integer)
 
         response = client.post "/_tasks/#{node_id}:#{task_id}/_cancel", params
         response.body

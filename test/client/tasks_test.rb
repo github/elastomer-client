@@ -85,7 +85,7 @@ describe Elastomer::Client::Tasks do
     success = false
     target_tasks.each do |t|
       t = t.values.first
-      resp = @tasks.get_by_id t["node"], t["id"], { :wait_for_completion => true, :timeout => "10s" }
+      resp = @tasks.wait_by_id t["node"], t["id"], "10s"
       success = !resp.key?("node_failures")
       break if success
     end

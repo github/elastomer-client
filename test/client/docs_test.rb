@@ -275,20 +275,26 @@ describe Elastomer::Client::Docs do
     assert_equal %w[pea53 grantr], authors
 
     h = @docs.delete_by_query(:q => "author:grantr")
-    assert_equal(h["_indices"], {
-      "_all" => {
-        "found" => 1,
-        "deleted" => 1,
-        "missing" => 0,
-        "failed" => 0,
-      },
-      @name => {
-        "found" => 1,
-        "deleted" => 1,
-        "missing" => 0,
-        "failed" => 0,
-      },
-    })
+
+    if supports_native_delete_by_query?
+      assert_equal(1, h["deleted"])
+    else
+      assert_equal(h["_indices"], {
+        "_all" => {
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
+        },
+        @name => {
+          "found" => 1,
+          "deleted" => 1,
+          "missing" => 0,
+          "failed" => 0,
+        },
+      })
+    end
+
     @index.refresh
     h = @docs.multi_get :ids => [1, 2]
     assert_found h["docs"][0]

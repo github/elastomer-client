@@ -220,3 +220,9 @@ end
 def parameter_validation?
   $client.version_support.es_version_5_x?
 end
+
+# ES 5 supports native _delete_by_query, but the output and semantics are
+# different than the plugin which we modeled our delete by query on.
+def supports_native_delete_by_query?
+  $client.version_support.native_delete_by_query?
+end

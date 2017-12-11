@@ -152,7 +152,7 @@ def with_tmp_snapshot(name = SecureRandom.uuid, &block)
 end
 
 # Just some busy work in the background for tasks API to detect in test cases
-# 
+#
 # Returns the index reference so caller can delete it after the checks are performed
 def populate_background_index!(name)
   # make an index with a new client (in this thread, to avoid query check race after)

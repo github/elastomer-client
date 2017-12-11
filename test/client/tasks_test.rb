@@ -46,16 +46,21 @@ describe Elastomer::Client::Tasks do
     end
   end
 
-
   it "successfully waits for task to complete when wait_for_completion and timeout flags are set" do
-    # do some busy work in bkg thread to keep some tasks running longer
+    # poulate the index in a background thread to generate long-running tasks we can query
     populate_background_index!("elastomer-tasks-test-1")
 
     # ensure we can wait on completion of a task
     success = false
-    query_long_running_tasks.each do |t|
-      resp = @tasks.wait_by_id t["node"], t["id"], "10s"
-      success = !resp.key?("node_failures")
+    query_long_running_tasks.each do |ts|
+      t = ts.values.first
+      begin
+        resp = @tasks.wait_by_id t["node"], t["id"], "3s"
+        success = !resp.key?("node_failures")
+      rescue Elastomer::Client::ServerError => e
+        # this means the timeout expired before the task finished, but it's a good thing!
+        success = /Timed out waiting for completion/ =~ e.message
+      end
       break if success
     end
 
@@ -63,12 +68,14 @@ describe Elastomer::Client::Tasks do
   end
 
   it "locates the task properly by ID when valid node and task IDs are supplied" do
-    # do some busy work in bkg thread to keep some tasks running longer
+    # make an index with a new client (in this thread, to avoid query check race after)
+    # poulate the index in a background thread to generate long-running tasks we can query
     populate_background_index!("elastomer-tasks-test-2")
 
     # look up and verify found task
     found_by_id = false
-    query_long_running_tasks.each do |t|
+    query_long_running_tasks.each do |ts|
+      t = ts.values.first
       resp = @tasks.get_by_id t["node"], t["id"]
 
       # ES 5.x and 2.x responses are structured differently

@@ -153,45 +153,46 @@ end
 
 # just some busy work in the background for tasks API to detect in test cases
 def populate_background_index!(name)
-  name.freeze
-  Thread.new do
-    begin
-      thread_local_client = $client.dup
-      index = thread_local_client.index(name)
-      index.create({})
-      wait_for_index(name)
+  begin
+    # make an index with a new client (in this thread, to avoid query check race after)
+    name.freeze
+    index = $client.dup.index(name)
+    index.delete if index.exists?
+    index.create(default_index_settings)
+    wait_for_index(name)
 
-      index.docs("person").bulk do |d|
-        (1..100).each do |i|
-          d.index \
-            :foo => "foo",
-            :bar => "bar",
-            :baz => "baz"
+    # now do some busy work in background thread to generate bulk-indexing tasks
+    # we can query at the caller (main test thread)
+    Thread.new do
+      100.times.each do |i|
+        index.docs("person").bulk do |d|
+          (1..1000).each do |j|
+            d.index \
+              :foo => "foo_#{i}_#{j}",
+              :bar => "bar_#{i}_#{j}",
+              :baz => "baz_#{i}_#{j}"
+          end
         end
+        index.refresh
       end
-      index.refresh
-      Kernel.sleep(0.01)
-    ensure
-      index.delete if index.exists?
-      thread_local_client.close
     end
+  ensure
+    index.delete if index.exists?
   end
 end
 
 # when populate_background_index! is running, this query returns healthcheck tasks
 # that are long-running enough to be queried again for verification in test cases
 def query_long_running_tasks
+  Kernel.sleep(0.01)
   target_tasks = []
-
-  10.times.each do
+  100.times.each do
     target_tasks = @tasks.get["nodes"]
       .map { |k, v| v["tasks"] }
-      .flatten.map { |ts| ts.select { |k, v| /health/ =~ v["action"] } }
+      .flatten.map { |ts| ts.select { |k, v| /bulk/ =~ v["action"] } }
       .flatten.reject { |t| t.empty? }
     break if target_tasks.size > 0
   end
-
-  ap target_tasks # DEBUG, REMOVE!!
 
   target_tasks
 end

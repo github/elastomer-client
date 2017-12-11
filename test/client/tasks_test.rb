@@ -49,42 +49,11 @@ describe Elastomer::Client::Tasks do
 
   it "successfully waits for task to complete when wait_for_completion and timeout flags are set" do
     # do some busy work in bkg thread to keep some tasks running longer
-    Thread.new do
-      begin
-        name = "elastomer-tasks-tests".freeze
-        index = $client.index(name)
-        wait_for_index(name)
-
-        index.docs("person").bulk do |d|
-          (1..100).each do |i|
-            d.index \
-              :foo => "foo",
-              :bar => "bar",
-              :baz => "baz"
-          end
-        end
-        index.refresh
-        Kernel.sleep(0.01)
-      ensure
-        index.delete if index.exists?
-      end
-    end
-
-    # locate task(s) long running enough to be looked up by ID
-    target_tasks = []
-    5.times.each do
-      target_tasks = @tasks.get["nodes"]
-        .map { |k, v| v["tasks"] }
-        .flatten.map { |ts| ts.select { |k, v| /health/ =~ v["action"] } }
-        .flatten.reject { |t| t.empty? }
-      break if target_tasks.size > 0
-    end
-    assert !target_tasks.empty?
+    populate_background_index!("elastomer-tasks-test-1")
 
     # ensure we can wait on completion of a task
     success = false
-    target_tasks.each do |t|
-      t = t.values.first
+    query_long_running_tasks.each do |t|
       resp = @tasks.wait_by_id t["node"], t["id"], "10s"
       success = !resp.key?("node_failures")
       break if success
@@ -95,42 +64,11 @@ describe Elastomer::Client::Tasks do
 
   it "locates the task properly by ID when valid node and task IDs are supplied" do
     # do some busy work in bkg thread to keep some tasks running longer
-    Thread.new do
-      begin
-        name = "elastomer-tasks-tests".freeze
-        index = $client.index(name)
-        wait_for_index(name)
-
-        index.docs("person").bulk do |d|
-          (1..100).each do |i|
-            d.index \
-              :foo => "foo",
-              :bar => "bar",
-              :baz => "baz"
-          end
-        end
-        index.refresh
-        Kernel.sleep(0.01)
-      ensure
-        index.delete if index.exists?
-      end
-    end
-
-    # locate task(s) long running enough to be looked up by ID
-    target_tasks = []
-    5.times.each do
-      target_tasks = @tasks.get["nodes"]
-        .map { |k, v| v["tasks"] }
-        .flatten.map { |ts| ts.select { |k, v| /health/ =~ v["action"] } }
-        .flatten.reject { |t| t.empty? }
-      break if target_tasks.size > 0
-    end
-    assert !target_tasks.empty?
+    populate_background_index!("elastomer-tasks-test-2")
 
     # look up and verify found task
     found_by_id = false
-    target_tasks.each do |t|
-      t = t.values.first
+    query_long_running_tasks.each do |t|
       resp = @tasks.get_by_id t["node"], t["id"]
 
       # ES 5.x and 2.x responses are structured differently

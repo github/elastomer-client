@@ -31,9 +31,6 @@ module Elastomer
       #
       # Raises IncompatibleVersionException if caller attempts to access Tasks API on ES version < 5.0.0
       def initialize(client)
-        unless client.version_support.supports_tasks?
-          raise IncompatibleVersionException, "ES #{client.version} does not support tasks"
-        end
         @client = client
       end
 
@@ -46,8 +43,12 @@ module Elastomer
       # Examples
       #
       #   tasks.get
-      #   tasks.get :group_by => "parents"
       #   tasks.get :nodes => "DmteLdw1QmSgW3GZmjmoKA,DmteLdw1QmSgW3GZmjmoKB", :actions => "cluster:*", :detailed => true
+      #
+      # Examples (ES 5+ only)
+      #
+      #   tasks.get :group_by => "parents"
+      #   tasks.get :group_by => "parents", :actions => "*reindex", ...
       #
       # Returns the response body as a Hash
       def get(params = {})
@@ -102,14 +103,18 @@ module Elastomer
       # Wait for the specified amount of time (10 seconds by default) for some task(s) to complete.
       # Filters for task(s) to wait upon using same filter params as Tasks#get(params)
       #
+      # timeout         - maximum time to wait for target task to complete before returning, example: "5s"
       # params          - Hash of request params to include (mostly task filters in this context)
       #
       # Examples
       #
-      # tasks.wait_for("30s", {:actions => "*reindex", :nodes => "DmteLdw1QmSgW3GZmjmoKA,DmteLdw1QmSgW3GZmjmoKB"})
+      # tasks.wait_for :actions => "*health"
+      # tasks.wait_for("30s", :actions => "*reindex", :nodes => "DmteLdw1QmSgW3GZmjmoKA,DmteLdw1QmSgW3GZmjmoKB")
       #
       # Returns the response body as a Hash when timeout expires or target tasks complete
-      def wait_for(timeout = "10s", params = {})
+      # COMPATIBILITY WARNING: the response body differs between ES versions for this API
+      def wait_for(timeout = "10s", params = {}) 
+        params = params.merge(timeout) if timeout.is_a?(Hash)
         params_with_wait = params.merge({ :wait_for_completion => true, :timeout => timeout })
         self.get(params_with_wait)
       end

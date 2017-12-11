@@ -103,7 +103,7 @@ module Elastomer
       # Wait for the specified amount of time (10 seconds by default) for some task(s) to complete.
       # Filters for task(s) to wait upon using same filter params as Tasks#get(params)
       #
-      # timeout         - maximum time to wait for target task to complete before returning, example: "5s"
+      # timeout         - (optional) maximum time to wait for target task to complete before returning, example: "5s"
       # params          - Hash of request params to include (mostly task filters in this context)
       #
       # Examples
@@ -124,10 +124,12 @@ module Elastomer
       #
       # node_id                 - the ID of the node on which the target task is hosted
       # task_id                 - the ID of the task to wait on
+      # timeout                 - (optional) time for call to await target tasks completion before returning
       # params                  - Hash of request params to include (mostly task filters in this context)
       #
       # Examples
       #
+      # tasks.wait_by_id "DmteLdw1QmSgW3GZmjmoKA", 789
       # tasks.wait_by_id "DmteLdw1QmSgW3GZmjmoKA", 123, "15s"
       # tasks.wait_by_id "DmteLdw1QmSgW3GZmjmoKA", 456, "30s", :actions => "*search"
       #
@@ -136,6 +138,7 @@ module Elastomer
         raise ArgumentError, "invalid node ID provided: #{node_id.inspect}" if node_id.to_s.empty?
         raise ArgumentError, "invalid task ID provided: #{task_id.inspect}" unless task_id.is_a?(Integer)
 
+        params = params.merge(timeout) if timeout.is_a?(Hash)
         params_with_wait = params.merge({ :wait_for_completion => true, :timeout => timeout })
         self.get_by_id(node_id, task_id, params_with_wait)
       end

@@ -43,6 +43,18 @@ module Elastomer
     attr_reader :host, :port, :url
     attr_reader :read_timeout, :open_timeout, :max_request_size
 
+    # Returns a duplicate of this Client connection configured in the exact same
+    # fashion.
+    def dup
+      self.class.new \
+          url:              url,
+          read_timeout:     read_timeout,
+          open_timeout:     open_timeout,
+          adapter:          @adapter,
+          opaque_id:        @opaque_id,
+          max_request_size: max_request_size
+    end
+
     # Returns true if the server is available; returns false otherwise.
     def ping
       response = head "/", :action => "cluster.ping"

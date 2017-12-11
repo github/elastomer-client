@@ -55,6 +55,7 @@ describe Elastomer::Client::Tasks do
   end
 
   it "locates the task properly by ID when valid node and task IDs are supplied" do
+    # do some busy work in bkg thread to keep some tasks running longer
     Thread.new do
       begin
         name = "elastomer-tasks-tests".freeze
@@ -76,16 +77,18 @@ describe Elastomer::Client::Tasks do
       end
     end
 
+    # locate task(s) long running enough to be looked up by ID
     target_tasks = []
     3.times.each do
       target_tasks = @tasks.get["nodes"]
         .map { |k, v| v["tasks"] }
         .flatten.map { |ts| ts.select { |k, v| /health/ =~ v["action"] } }
-        .flatten.reject { |t| t == {} }
+        .flatten.reject { |t| t.empty? }
       break if target_tasks.size > 0
     end
     assert !target_tasks.empty?
 
+    # look up and verify found task
     found_by_id = false
     target_tasks.each do |t|
       t = t.values.first

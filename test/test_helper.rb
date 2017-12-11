@@ -151,34 +151,34 @@ def with_tmp_snapshot(name = SecureRandom.uuid, &block)
   end
 end
 
-# just some busy work in the background for tasks API to detect in test cases
+# Just some busy work in the background for tasks API to detect in test cases
+# 
+# Returns the index reference so caller can delete it after the checks are performed
 def populate_background_index!(name)
-  begin
-    # make an index with a new client (in this thread, to avoid query check race after)
-    name.freeze
-    index = $client.dup.index(name)
-    index.delete if index.exists?
-    index.create(default_index_settings)
-    wait_for_index(name)
+  # make an index with a new client (in this thread, to avoid query check race after)
+  name.freeze
+  index = $client.dup.index(name)
+  index.delete if index.exists?
+  index.create(default_index_settings)
+  wait_for_index(name)
 
-    # now do some busy work in background thread to generate bulk-indexing tasks
-    # we can query at the caller (main test thread)
-    Thread.new do
-      100.times.each do |i|
-        index.docs("person").bulk do |d|
-          (1..1000).each do |j|
-            d.index \
-              :foo => "foo_#{i}_#{j}",
-              :bar => "bar_#{i}_#{j}",
-              :baz => "baz_#{i}_#{j}"
-          end
+  # now do some busy work in background thread to generate bulk-indexing tasks
+  # we can query at the caller (main test thread)
+  Thread.new do
+    100.times.each do |i|
+      index.docs("person").bulk do |d|
+        (1..1000).each do |j|
+          d.index \
+            :foo => "foo_#{i}_#{j}",
+            :bar => "bar_#{i}_#{j}",
+            :baz => "baz_#{i}_#{j}"
         end
-        index.refresh
       end
+      index.refresh
     end
-  ensure
-    index.delete if index.exists?
   end
+
+  index
 end
 
 # when populate_background_index! is running, this query returns healthcheck tasks

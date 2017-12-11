@@ -47,49 +47,59 @@ describe Elastomer::Client::Tasks do
   end
 
   it "successfully waits for task to complete when wait_for_completion and timeout flags are set" do
-    # poulate the index in a background thread to generate long-running tasks we can query
-    populate_background_index!("elastomer-tasks-test-1")
+    test_index = nil
+    begin
+      # poulate the index in a background thread to generate long-running tasks we can query
+      test_index = populate_background_index!("elastomer-tasks-test-1")
 
-    # ensure we can wait on completion of a task
-    success = false
-    query_long_running_tasks.each do |ts|
-      t = ts.values.first
-      begin
-        resp = @tasks.wait_by_id t["node"], t["id"], "3s"
-        success = !resp.key?("node_failures")
-      rescue Elastomer::Client::ServerError => e
-        # this means the timeout expired before the task finished, but it's a good thing!
-        success = /Timed out waiting for completion/ =~ e.message
+      # ensure we can wait on completion of a task
+      success = false
+      query_long_running_tasks.each do |ts|
+        t = ts.values.first
+        begin
+          resp = @tasks.wait_by_id t["node"], t["id"], "3s"
+          success = !resp.key?("node_failures")
+        rescue Elastomer::Client::ServerError => e
+          # this means the timeout expired before the task finished, but it's a good thing!
+          success = /Timed out waiting for completion/ =~ e.message
+        end
+        break if success
       end
-      break if success
-    end
 
-    assert success
+      assert success
+    ensure
+      test_index.delete if test_index.exists?
+    end
   end
 
   it "locates the task properly by ID when valid node and task IDs are supplied" do
-    # make an index with a new client (in this thread, to avoid query check race after)
-    # poulate the index in a background thread to generate long-running tasks we can query
-    populate_background_index!("elastomer-tasks-test-2")
+    test_index = nil
+    begin
+      # make an index with a new client (in this thread, to avoid query check race after)
+      # poulate the index in a background thread to generate long-running tasks we can query
+      test_index = populate_background_index!("elastomer-tasks-test-2")
 
-    # look up and verify found task
-    found_by_id = false
-    query_long_running_tasks.each do |ts|
-      t = ts.values.first
-      resp = @tasks.get_by_id t["node"], t["id"]
+      # look up and verify found task
+      found_by_id = false
+      query_long_running_tasks.each do |ts|
+        t = ts.values.first
+        resp = @tasks.get_by_id t["node"], t["id"]
 
-      # ES 5.x and 2.x responses are structured differently
-      if $client.version_support.tasks_new_response_format?
-        found_by_id = resp["task"]["node"] == t["node"] && resp["task"]["id"] == t["id"]
-      else
-        nid, tid = resp["nodes"][t["node"]]["tasks"].keys.first.split(":")
-        found_by_id = nid == t["node"] && tid.to_i == t["id"]
+        # ES 5.x and 2.x responses are structured differently
+        if $client.version_support.tasks_new_response_format?
+          found_by_id = resp["task"]["node"] == t["node"] && resp["task"]["id"] == t["id"]
+        else
+          nid, tid = resp["nodes"][t["node"]]["tasks"].keys.first.split(":")
+          found_by_id = nid == t["node"] && tid.to_i == t["id"]
+        end
+
+        break if found_by_id
       end
 
-      break if found_by_id
+      assert found_by_id
+    ensure
+      test_index.delete if test_index.exists?
     end
-
-    assert found_by_id
   end
 
   it "raises exception when cancel_by_id is called without required task & node IDs" do

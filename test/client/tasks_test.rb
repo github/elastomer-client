@@ -72,7 +72,7 @@ describe Elastomer::Client::Tasks do
 
     # locate task(s) long running enough to be looked up by ID
     target_tasks = []
-    3.times.each do
+    5.times.each do
       target_tasks = @tasks.get["nodes"]
         .map { |k, v| v["tasks"] }
         .flatten.map { |ts| ts.select { |k, v| /health/ =~ v["action"] } }
@@ -118,7 +118,7 @@ describe Elastomer::Client::Tasks do
 
     # locate task(s) long running enough to be looked up by ID
     target_tasks = []
-    3.times.each do
+    5.times.each do
       target_tasks = @tasks.get["nodes"]
         .map { |k, v| v["tasks"] }
         .flatten.map { |ts| ts.select { |k, v| /health/ =~ v["action"] } }

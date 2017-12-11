@@ -167,4 +167,25 @@ describe Elastomer::Client do
       assert_equal Semantic::Version.new(version_string), $client.semantic_version
     end
   end
+
+  describe "duplicating a client connection" do
+    it "is configured the same" do
+      client = $client.dup
+
+      refute_same $client, client
+
+      assert_equal $client.host, client.host
+      assert_equal $client.port, client.port
+      assert_equal $client.url, client.url
+      assert_equal $client.read_timeout, client.read_timeout
+      assert_equal $client.open_timeout, client.open_timeout
+      assert_equal $client.max_request_size, client.max_request_size
+    end
+
+    it "has a unique connection" do
+      client = $client.dup
+
+      refute_same $client.connection, client.connection
+    end
+  end
 end

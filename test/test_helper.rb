@@ -159,15 +159,13 @@ def populate_background_index!(name)
   # make an index with a new client (in this thread, to avoid query check race after)
   name.freeze
   index = $client.dup.index(name)
-  index.delete if index.exists?
-  index.create(default_index_settings)
-  wait_for_index(name)
+  docs = index.docs("widget")
 
-  # now do some busy work in background thread to generate bulk-indexing tasks
-  # we can query at the caller (main test thread)
-  worker = Thread.new do
+  # do some busy work in background thread to generate bulk-indexing tasks we
+  # can query at the caller. return the thread ref so caller can join on it
+  Thread.new do
     100.times.each do |i|
-      index.docs("person").bulk do |d|
+      docs.bulk do |d|
         (1..1000).each do |j|
           d.index \
             :foo => "foo_#{i}_#{j}",
@@ -178,8 +176,6 @@ def populate_background_index!(name)
       index.refresh
     end
   end
-
-  return worker, index
 end
 
 # when populate_background_index! is running, this query returns healthcheck tasks

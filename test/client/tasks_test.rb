@@ -3,9 +3,14 @@ require_relative "../test_helper"
 describe Elastomer::Client::Tasks do
   before do
     @tasks = $client.tasks
+
+    @index = $client.index("elastomer-tasks-test")
+    @index.create(default_index_settings)
+    wait_for_index(@index.name)
   end
 
   after do
+    @index.delete if @index.exists?
   end
 
   it "list all in-flight tasks" do
@@ -48,10 +53,9 @@ describe Elastomer::Client::Tasks do
 
   it "successfully waits for task to complete when wait_for_completion and timeout flags are set" do
     test_thread = nil
-    test_index = nil
     begin
       # poulate the index in a background thread to generate long-running tasks we can query
-      test_thread, test_index = populate_background_index!("elastomer-tasks-test-1")
+      test_thread = populate_background_index!(@index.name)
 
       # ensure we can wait on completion of a task
       success = false
@@ -70,17 +74,15 @@ describe Elastomer::Client::Tasks do
       assert success
     ensure
       test_thread.join unless test_thread.nil?
-      test_index.delete if !test_index.nil? && test_index.exists?
     end
   end
 
   it "locates the task properly by ID when valid node and task IDs are supplied" do
     test_thread = nil
-    test_index = nil
     begin
       # make an index with a new client (in this thread, to avoid query check race after)
       # poulate the index in a background thread to generate long-running tasks we can query
-      test_thread, test_index = populate_background_index!("elastomer-tasks-test-2")
+      test_thread = populate_background_index!(@index.name)
 
       # look up and verify found task
       found_by_id = false
@@ -102,7 +104,6 @@ describe Elastomer::Client::Tasks do
       assert found_by_id
     ensure
       test_thread.join unless test_thread.nil?
-      test_index.delete if !test_index.nil? && test_index.exists?
     end
   end
 

@@ -37,7 +37,7 @@ module Elastomer
       es_version_2_x?
     end
 
-    # COMPATIBILITY: The Tasks API is evolving quickly; features, and request/response\
+    # COMPATIBILITY: The Tasks API is evolving quickly; features, and request/response
     # structure can differ across ES versions
     def tasks_new_response_format?
       es_version_5_x?

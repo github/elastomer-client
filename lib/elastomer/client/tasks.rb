@@ -80,22 +80,27 @@ module Elastomer
         response.body
       end
 
-      # Fetch results from the _tasks endpoint for a particular parent task's children.
+      # Fetch task details for all child tasks of the specified parent task.
+      # NOTE: the API docs note the behavior wrong for this call: "parentTaskId:<task_id>"
+      # is not the correct syntax for the parent_task_id param value. The correct
+      # value syntax is "<parent_node_id>:<parent_task_id>"
       #
+      # parent_node_id  - ID of the node the parent task is hosted by
       # parent_task_id  - ID of a parent task who's child tasks' data will be returned in the response
       # params          - Hash of request parameters to include
       #
       # Examples
       #
-      #   tasks.get_by_parent_id 1
-      #   tasks.get_by_parent_id 2, :nodes => "DmteLdw1QmSgW3GZmjmoKA"
+      #   tasks.get_by_parent_id "DmteLdw1QmSgW3GZmjmoKA", 123
+      #   tasks.get_by_parent_id "DmteLdw1QmSgW3GZmjmoKB", 456, :detailed => true
       #
       # Returns the response body as a Hash
-      def get_by_parent_id(parent_task_id, params = {})
-        raise ArgumentError, "invalid parent task ID provided: #{task_id.inspect}" unless parent_task_id.is_a?(Integer)
+      def get_by_parent_id(parent_node_id, parent_task_id, params = {})
+        raise ArgumentError, "invalid parent node ID provided: #{parent_node_id.inspect}" if node_id.to_s.empty?
+        raise ArgumentError, "invalid parent task ID provided: #{parent_task_id.inspect}" unless parent_task_id.is_a?(Integer)
 
         # in this API, we pass the parent task ID as a formatted parameter in a request to the _tasks endpoint
-        formatted_parent = { :parent_task_id => "parentTaskId:#{parent_task_id}" }
+        formatted_parent = { :parent_task_id => "#{parent_node_id}:#{parent_task_id}" }
         response = client.get "/_tasks", params.merge(formatted_parent)
         response.body
       end

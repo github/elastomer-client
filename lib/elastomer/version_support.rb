@@ -147,10 +147,10 @@ module Elastomer
     # Return a symbol representing the best supported delete_by_query
     # implementation for this version of Elasticsearch.
     def delete_by_query_method
-      if supports_native_delete_by_query?
-        :native_delete_by_query
-      else
+      if es_version_2_x?
         :app_delete_by_query
+      else
+        :native_delete_by_query
       end
     end
 

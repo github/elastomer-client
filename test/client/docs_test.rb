@@ -1,5 +1,4 @@
-require File.expand_path("../../test_helper", __FILE__)
-require 'active_support/core_ext/hash'
+require_relative "../test_helper"
 
 describe Elastomer::Client::Docs do
 

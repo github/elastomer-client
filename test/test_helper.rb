@@ -19,6 +19,10 @@ require "minitest/spec"
 require "minitest/autorun"
 require "minitest/focus"
 
+# used in a couple test files, makes them available for all
+require "active_support/core_ext/enumerable"
+require 'active_support/core_ext/hash'
+
 # push the lib folder onto the load path
 $LOAD_PATH.unshift "lib"
 require "elastomer/client"
@@ -145,6 +149,49 @@ def with_tmp_snapshot(name = SecureRandom.uuid, &block)
     create_snapshot(repo, name)
     yield repo.snapshot(name), repo
   end
+end
+
+# Just some busy work in the background for tasks API to detect in test cases
+#
+# Returns the thread and index references so caller can join the thread and delete
+# the index after the checks are performed
+def populate_background_index!(name)
+  # make an index with a new client (in this thread, to avoid query check race after)
+  name.freeze
+  index = $client.dup.index(name)
+  docs = index.docs("widget")
+
+  # do some busy work in background thread to generate bulk-indexing tasks we
+  # can query at the caller. return the thread ref so caller can join on it
+  Thread.new do
+    100.times.each do |i|
+      docs.bulk do |d|
+        (1..500).each do |j|
+          d.index \
+            :foo => "foo_#{i}_#{j}",
+            :bar => "bar_#{i}_#{j}",
+            :baz => "baz_#{i}_#{j}"
+        end
+      end
+      index.refresh
+    end
+  end
+end
+
+# when populate_background_index! is running, this query returns healthcheck tasks
+# that are long-running enough to be queried again for verification in test cases
+def query_long_running_tasks
+  Kernel.sleep(0.01)
+  target_tasks = []
+  100.times.each do
+    target_tasks = @tasks.get["nodes"]
+      .map { |k, v| v["tasks"] }
+      .flatten.map { |ts| ts.select { |k, v| /bulk/ =~ v["action"] } }
+      .flatten.reject { |t| t.empty? }
+    break if target_tasks.size > 0
+  end
+
+  target_tasks
 end
 
 # The methods below are to support intention-revealing names about version

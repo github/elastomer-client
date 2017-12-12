@@ -37,6 +37,12 @@ module Elastomer
       es_version_2_x?
     end
 
+    # COMPATIBILITY: The Tasks API is evolving quickly; features, and request/response
+    # structure can differ across ES versions
+    def tasks_new_response_format?
+      es_version_5_x?
+    end
+
     # COMPATIBILITY: Return a "text"-type mapping for a field.
     #
     # On ES 2.x, this will be a string field. On ES 5+, it will be a text field.

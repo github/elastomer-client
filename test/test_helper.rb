@@ -166,7 +166,7 @@ def populate_background_index!(name)
   Thread.new do
     100.times.each do |i|
       docs.bulk do |d|
-        (1..1000).each do |j|
+        (1..500).each do |j|
           d.index \
             :foo => "foo_#{i}_#{j}",
             :bar => "bar_#{i}_#{j}",

@@ -153,7 +153,8 @@ end
 
 # Just some busy work in the background for tasks API to detect in test cases
 #
-# Returns the index reference so caller can delete it after the checks are performed
+# Returns the thread and index references so caller can join the thread and delete
+# the index after the checks are performed
 def populate_background_index!(name)
   # make an index with a new client (in this thread, to avoid query check race after)
   name.freeze
@@ -164,7 +165,7 @@ def populate_background_index!(name)
 
   # now do some busy work in background thread to generate bulk-indexing tasks
   # we can query at the caller (main test thread)
-  Thread.new do
+  worker = Thread.new do
     100.times.each do |i|
       index.docs("person").bulk do |d|
         (1..1000).each do |j|
@@ -178,7 +179,7 @@ def populate_background_index!(name)
     end
   end
 
-  index
+  return worker, index
 end
 
 # when populate_background_index! is running, this query returns healthcheck tasks

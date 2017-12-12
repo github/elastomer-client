@@ -42,15 +42,16 @@ describe Elastomer::Client::Tasks do
 
   it "raises exception when get_by_id is called w/invalid node ID is supplied" do
     assert_raises(ArgumentError) do
-      @tasks.get_by_id nil, 42
+        @tasks.get_by_id nil, 42
     end
   end
 
   it "successfully waits for task to complete when wait_for_completion and timeout flags are set" do
+    test_thread = nil
     test_index = nil
     begin
       # poulate the index in a background thread to generate long-running tasks we can query
-      test_index = populate_background_index!("elastomer-tasks-test-1")
+      test_thread, test_index = populate_background_index!("elastomer-tasks-test-1")
 
       # ensure we can wait on completion of a task
       success = false
@@ -68,16 +69,18 @@ describe Elastomer::Client::Tasks do
 
       assert success
     ensure
-      test_index.delete if test_index.exists?
+      test_thread.join unless test_thread.nil?
+      test_index.delete if !test_index.nil? && test_index.exists?
     end
   end
 
   it "locates the task properly by ID when valid node and task IDs are supplied" do
+    test_thread = nil
     test_index = nil
     begin
       # make an index with a new client (in this thread, to avoid query check race after)
       # poulate the index in a background thread to generate long-running tasks we can query
-      test_index = populate_background_index!("elastomer-tasks-test-2")
+      test_thread, test_index = populate_background_index!("elastomer-tasks-test-2")
 
       # look up and verify found task
       found_by_id = false
@@ -98,7 +101,8 @@ describe Elastomer::Client::Tasks do
 
       assert found_by_id
     ensure
-      test_index.delete if test_index.exists?
+      test_thread.join unless test_thread.nil?
+      test_index.delete if !test_index.nil? && test_index.exists?
     end
   end
 

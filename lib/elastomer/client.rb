@@ -11,10 +11,12 @@ module Elastomer
   class Client
     MAX_REQUEST_SIZE = 250 * 2**20  # 250 MB
 
+    RETRYABLE_METHODS = %i[get head].freeze
+
     # Create a new client that can be used to make HTTP requests to the
     # Elasticsearch server.
     #
-    # opts - The options Hash
+    # Method params:
     #   :host - the host as a String
     #   :port - the port number of the server
     #   :url  - the URL as a String (overrides :host and :port)
@@ -23,25 +25,28 @@ module Elastomer
     #   :adapter      - the Faraday adapter to use (defaults to :excon)
     #   :opaque_id    - set to `true` to use the 'X-Opaque-Id' request header
     #   :max_request_size - the maximum allowed request size in bytes (defaults to 250 MB)
+    #   :max_retries      - the maximum number of request retires (defaults to 0)
     #
-    def initialize( opts = {} )
-      host = opts.fetch :host, "localhost"
-      port = opts.fetch :port, 9200
-      @url = opts.fetch :url,  "http://#{host}:#{port}"
+    def initialize(host: "localhost", port: 9200, url: nil,
+                   max_retries: 0, read_timeout: 5, open_timeout: 2,
+                   opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE)
+
+      @url = url || "http://#{host}:#{port}"
 
       uri = Addressable::URI.parse @url
       @host = uri.host
       @port = uri.port
 
-      @read_timeout     = opts.fetch :read_timeout, 5
-      @open_timeout     = opts.fetch :open_timeout, 2
-      @adapter          = opts.fetch :adapter, Faraday.default_adapter
-      @opaque_id        = opts.fetch :opaque_id, false
-      @max_request_size = opts.fetch :max_request_size, MAX_REQUEST_SIZE
+      @max_retries      = max_retries
+      @read_timeout     = read_timeout
+      @open_timeout     = open_timeout
+      @adapter          = adapter
+      @opaque_id        = opaque_id
+      @max_request_size = max_request_size
     end
 
     attr_reader :host, :port, :url
-    attr_reader :read_timeout, :open_timeout, :max_request_size
+    attr_reader :max_retries, :read_timeout, :open_timeout, :max_request_size
 
     # Returns a duplicate of this Client connection configured in the exact same
     # fashion.
@@ -175,15 +180,18 @@ module Elastomer
     # params - Parameters Hash
     #   :body         - Will be used as the request body
     #   :read_timeout - Optional read timeout (in seconds) for the request
+    #   :max_retires  - Optional retry number for the request
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
     # rubocop:disable Metrics/MethodLength
     def request( method, path, params )
-      read_timeout = params.delete :read_timeout
-      body = extract_body params
-      path = expand_path path, params
+      read_timeout = params.delete(:read_timeout)
+      request_max_retries = params.delete(:max_retries) || max_retries
+      body = extract_body(params)
+      path = expand_path(path, params)
 
+      retries = 0
       instrument(path, body, params) do
         begin
           response =
@@ -217,9 +225,11 @@ module Elastomer
 
         # wrap Faraday errors with appropriate Elastomer::Client error classes
         rescue Faraday::Error::ClientError => boom
-          error_name = boom.class.name.split("::").last
-          error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
-          raise error_class.new(boom, method.upcase, path)
+          error = wrap_faraday_error(boom, method, path)
+          if error.retry? && RETRYABLE_METHODS.include?(method)
+            retry if (retries += 1) <= request_max_retries
+          end
+          raise error
         rescue OpaqueIdError => boom
           reset!
           raise boom
@@ -227,6 +237,20 @@ module Elastomer
       end
     end
     # rubocop:enable Metrics/MethodLength
+
+    # Internal: Returns a new Elastomer::Client error that wraps the given
+    # Faraday error. A generic Error is returned if we cannot wrap the given
+    # Faraday error.
+    #
+    #   error  - The Faraday error
+    #   method - The request method
+    #   path   - The request path
+    #
+    def wrap_faraday_error(error, method, path)
+      error_name  = error.class.name.split("::").last
+      error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
+      error_class.new(error, method.upcase, path)
+    end
 
     # Internal: Extract the :body from the params Hash and convert it to a
     # JSON String format. If the params Hash does not contain a :body then no

@@ -191,7 +191,7 @@ module Elastomer
       body = extract_body(params)
       path = expand_path(path, params)
 
-      retries = 0
+      params[:retries] = retries = 0
       instrument(path, body, params) do
         begin
           response =
@@ -226,8 +226,10 @@ module Elastomer
         # wrap Faraday errors with appropriate Elastomer::Client error classes
         rescue Faraday::Error::ClientError => boom
           error = wrap_faraday_error(boom, method, path)
-          if error.retry? && RETRYABLE_METHODS.include?(method)
-            retry if (retries += 1) <= request_max_retries
+          if error.retry? && RETRYABLE_METHODS.include?(method) && (retries += 1) <= request_max_retries
+            params[:retries] = retries
+            sleep 0.075
+            retry
           end
           raise error
         rescue OpaqueIdError => boom
@@ -312,6 +314,7 @@ module Elastomer
       query_values = params.dup
       query_values.delete :action
       query_values.delete :context
+      query_values.delete :retries
 
       template.keys.map(&:to_sym).each do |key|
         value = query_values.delete key

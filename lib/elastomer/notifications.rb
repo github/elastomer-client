@@ -59,6 +59,7 @@ module Elastomer
         :type         => params[:type],
         :action       => params[:action],
         :context      => params[:context],
+        :retries      => params[:retries],
         :request_body => body,
         :body         => body   # for backwards compatibility
       }

@@ -15,8 +15,8 @@ module Elastomer
 
     # Create a new client that can be used to make HTTP requests to the
     # Elasticsearch server. If you use `:max_retries`, then any GET or HEAD
-    # request will be retried up this many times with a 75ms delay between the
-    # retry attempts. Only non-fatal exceptions will retried automatically.
+    # request will be retried up to this many times with a 75ms delay between
+    # the retry attempts. Only non-fatal exceptions will retried automatically.
     #
     # see lib/elastomer/client/errors.rb#L92-L94
     #

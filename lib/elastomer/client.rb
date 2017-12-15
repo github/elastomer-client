@@ -14,7 +14,11 @@ module Elastomer
     RETRYABLE_METHODS = %i[get head].freeze
 
     # Create a new client that can be used to make HTTP requests to the
-    # Elasticsearch server.
+    # Elasticsearch server. If you use `:max_retries`, then any GET or HEAD
+    # request will be retried up this many times with a 75ms delay between the
+    # retry attempts. Only non-fatal exceptions will retried automatically.
+    #
+    # see lib/elastomer/client/errors.rb#L92-L94
     #
     # Method params:
     #   :host - the host as a String

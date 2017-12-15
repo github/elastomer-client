@@ -69,6 +69,7 @@ module Elastomer
         payload[:method]        = response.env[:method]
         payload[:status]        = response.status
         payload[:response_body] = response.body
+        payload[:retries]       = params[:retries]
         response
       end
     end

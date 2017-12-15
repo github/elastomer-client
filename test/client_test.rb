@@ -1,4 +1,5 @@
 require File.expand_path("../test_helper", __FILE__)
+require "elastomer/notifications"
 
 describe Elastomer::Client do
 
@@ -30,6 +31,14 @@ describe Elastomer::Client do
       assert_equal 404, err.status
       assert_match %r/index_not_found_exception/, err.message
     end
+  end
+
+  it "wraps Faraday errors with our own exceptions" do
+    error = Faraday::TimeoutError.new("it took too long")
+    wrapped = $client.wrap_faraday_error(error, :get, "/_cat/indices")
+
+    assert_instance_of Elastomer::Client::TimeoutError, wrapped
+    assert_equal "it took too long :: GET /_cat/indices", wrapped.message
   end
 
   it "handles path expansions" do
@@ -186,6 +195,75 @@ describe Elastomer::Client do
       client = $client.dup
 
       refute_same $client.connection, client.connection
+    end
+  end
+
+  describe "automatic retry of requests" do
+    before do
+      @events = []
+      @subscriber = ActiveSupport::Notifications.subscribe do |*args|
+        @events << ActiveSupport::Notifications::Event.new(*args)
+      end
+    end
+
+    after do
+      @events.clear
+      ActiveSupport::Notifications.unsubscribe(@subscriber)
+    end
+
+    it "defaults to no retries" do
+      stub_request(:get, $client.url+"/_cat/indices").
+        to_timeout.then.
+        to_return({
+          headers: {"Content-Type" => "text/plain; charset=UTF-8"},
+          body: "green open test-index 1 0 0 0 159b 159b"
+        })
+
+      assert_raises(Elastomer::Client::ConnectionFailed) {
+        $client.get("/_cat/indices")
+      }
+    end
+
+    it "retries up to `max_retries` times" do
+      stub_request(:get, $client.url+"/test-index/_settings").
+        to_timeout.then.
+        to_timeout.then.
+        to_return({body: %q/{"acknowledged": true}/})
+
+      response = $client.index("test-index").settings(max_retries: 2)
+
+      assert_equal 2, @events.first.payload[:retries]
+      assert_equal({"acknowledged" => true}, response)
+    end
+
+    it "does not retry on PUT requests" do
+      stub_request(:put, $client.url+"/test-index").
+        to_timeout.then.
+        to_return({body: %q/{"acknowledged": true}/})
+
+      assert_raises(Elastomer::Client::ConnectionFailed) {
+        $client.index("test-index").create({}, max_retries: 1)
+      }
+    end
+
+    it "does not retry on POST requests" do
+      stub_request(:post, $client.url+"/test-index/_flush").
+        to_timeout.then.
+        to_return({body: %q/{"acknowledged": true}/})
+
+      assert_raises(Elastomer::Client::ConnectionFailed) {
+        $client.index("test-index").flush(max_retries: 1)
+      }
+    end
+
+    it "does not retry on DELETE requests" do
+      stub_request(:delete, $client.url+"/test-index").
+        to_timeout.then.
+        to_return({body: %q/{"acknowledged": true}/})
+
+      assert_raises(Elastomer::Client::ConnectionFailed) {
+        $client.index("test-index").delete(max_retries: 1)
+      }
     end
   end
 end

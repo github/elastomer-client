@@ -59,7 +59,6 @@ module Elastomer
         :type         => params[:type],
         :action       => params[:action],
         :context      => params[:context],
-        :retries      => params[:retries],
         :request_body => body,
         :body         => body   # for backwards compatibility
       }
@@ -70,6 +69,7 @@ module Elastomer
         payload[:method]        = response.env[:method]
         payload[:status]        = response.status
         payload[:response_body] = response.body
+        payload[:retries]       = params[:retries]
         response
       end
     end

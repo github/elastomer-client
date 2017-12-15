@@ -1,5 +1,10 @@
-# WIP for 3.0.0 release
+## 3.0.0 (2017-12-15)
 - Fixed swapped args in {Client,Index}#multi\_percolate count calls using block API
+- Support for Elasticsearch 5.x
+- Uses Elasticsearch's built-in `_delete_by_query` when supported
+- GET and HEAD requests are retried when possible
+- Add support for `_tasks` API
+- Replace `scan` queries with `scroll` sorted by `doc_id`
 
 ## 2.3.0 (2017-11-29)
 - Remove Elasticsearch 1.x and earlier code paths

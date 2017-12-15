@@ -30,9 +30,10 @@ module Elastomer
     #   :opaque_id    - set to `true` to use the 'X-Opaque-Id' request header
     #   :max_request_size - the maximum allowed request size in bytes (defaults to 250 MB)
     #   :max_retries      - the maximum number of request retires (defaults to 0)
+    #   :retry_delay      - delay in seconds between retries (defaults to 0.075)
     #
     def initialize(host: "localhost", port: 9200, url: nil,
-                   max_retries: 0, read_timeout: 5, open_timeout: 2,
+                   read_timeout: 5, open_timeout: 2, max_retries: 0, retry_delay: 0.075,
                    opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE)
 
       @url = url || "http://#{host}:#{port}"
@@ -41,16 +42,18 @@ module Elastomer
       @host = uri.host
       @port = uri.port
 
-      @max_retries      = max_retries
       @read_timeout     = read_timeout
       @open_timeout     = open_timeout
+      @max_retries      = max_retries
+      @retry_delay      = retry_delay
       @adapter          = adapter
       @opaque_id        = opaque_id
       @max_request_size = max_request_size
     end
 
     attr_reader :host, :port, :url
-    attr_reader :max_retries, :read_timeout, :open_timeout, :max_request_size
+    attr_reader :read_timeout, :open_timeout
+    attr_reader :max_retries, :retry_delay, :max_request_size
 
     # Returns a duplicate of this Client connection configured in the exact same
     # fashion.
@@ -232,7 +235,7 @@ module Elastomer
           error = wrap_faraday_error(boom, method, path)
           if error.retry? && RETRYABLE_METHODS.include?(method) && (retries += 1) <= request_max_retries
             params[:retries] = retries
-            sleep 0.075
+            sleep retry_delay
             retry
           end
           raise error

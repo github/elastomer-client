@@ -70,6 +70,17 @@ module Elastomer
       end
     end
 
+    # COMPATIBILITY: return a simple boolean value or legacy {"enabled": true/false}.
+    #
+    # https://www.elastic.co/guide/en/elasticsearch/reference/5.5/breaking_50_mapping_changes.html#_literal_norms_literal
+    def strict_boolean(b)
+      if es_version_2_x?
+        {enabled: b}
+      else
+        b
+      end 
+    end
+
     # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
     # way. Some tests need to know what version is running to structure requests
     # as expected.

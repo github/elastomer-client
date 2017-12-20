@@ -194,7 +194,7 @@ module Elastomer
       #     hits['hits'].each { |document| ... }
       #   end
       #
-      # Returns this Scan instance.
+      # Returns this Scroller instance.
       def each
         loop do
           body = do_scroll
@@ -209,6 +209,8 @@ module Elastomer
         end
 
         self
+      ensure
+        clear!
       end
 
       # Iterate over each document from the scan query. This method is just a
@@ -227,9 +229,22 @@ module Elastomer
       #     document['_source']
       #   end
       #
-      # Returns this Scan instance.
+      # Returns this Scroller instance.
       def each_document( &block )
         each { |hits| hits["hits"].each(&block) }
+      end
+
+      # Terminate the scroll query. This will remove the search context from the
+      # cluster and no further documents can be returned by this Scroller
+      # instance.
+      #
+      # Returns nil if the `scroll_id` is not valid; returns the reponse body if
+      # the `scroll_id` was cleared.
+      def clear!
+        return if scroll_id.nil?
+        client.clear_scroll(scroll_id)
+      rescue ::Elastomer::Client::IllegalArgument
+        nil
       end
 
       # Internal: Perform the actual scroll requests. This method wil call out

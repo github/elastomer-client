@@ -138,8 +138,8 @@ module Elastomer
     DEFAULT_OPTS = {
       index:   nil,
       type:    nil,
-      scroll:  "1m",
-      size:    100,
+      scroll:  "5m",
+      size:    50,
     }.freeze
 
     class Scroller

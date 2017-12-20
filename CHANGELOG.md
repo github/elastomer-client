@@ -1,3 +1,7 @@
+## 3.0.1 (2017-12-20)
+- Fixed argument passing to `app_delete_by_query`
+- Explicitly close scroll search contexts when scroll is complete
+
 ## 3.0.0 (2017-12-15)
 - Fixed swapped args in {Client,Index}#multi\_percolate count calls using block API
 - Support for Elasticsearch 5.x

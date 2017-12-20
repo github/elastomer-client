@@ -135,7 +135,7 @@ module Elastomer
       query.merge(:sort => [:_doc])
     end
 
-  DEFAULT_OPTS = {
+    DEFAULT_OPTS = {
       :index => nil,
       :type => nil,
       :scroll => "5m",

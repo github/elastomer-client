@@ -53,30 +53,6 @@ module Elastomer
 
     class AppDeleteByQuery
 
-      SEARCH_PARAMETERS = %i[
-        index
-        type
-        q
-        df
-        analyzer
-        analyze_wildcard
-        batched_reduce_size
-        default_operator
-        lenient
-        explain
-        _source
-        stored_fields
-        sort
-        track_scores
-        timeout
-        terminate_after
-        from
-        size
-        search_type
-        scroll
-      ].to_set.freeze
-
-
       # Create a new DeleteByQuery command for deleting documents matching a
       # query
       #
@@ -132,7 +108,8 @@ module Elastomer
       # Returns a Hash of statistics about the bulk operation
       def execute
         ops = Enumerator.new do |yielder|
-          @client.scan(@query, search_params).each_document do |hit|
+          scan = @client.scan(@query, search_params)
+          scan.each_document do |hit|
             yielder.yield([:delete, hit.select { |key, _| ["_index", "_type", "_id", "_routing"].include?(key) }])
           end
         end
@@ -144,15 +121,24 @@ module Elastomer
 
       # Internal: Remove parameters that are not valid for the _search endpoint
       def search_params
-        params = @params.merge(:_source => false)
-        params.select {|p, _| SEARCH_PARAMETERS.include? p}
+        return @search_params if defined?(@search_params)
+
+        @search_params = @params.merge(_source: false)
+        @search_params.delete(:action_count)
+        @search_params
       end
 
       # Internal: Remove parameters that are not valid for the _bulk endpoint
       def bulk_params
-        @params.clone.tap { |p| p.delete(:q) }
+        return @bulk_params if defined?(@bulk_params)
+
+        @bulk_params = @params.dup
+        return @bulk_params if @bulk_params.nil?
+
+        @bulk_params.delete(:q)
+        @bulk_params
       end
 
-    end  # AppDeleteByQuery
-  end  # Client
-end  # Elastomer
+    end
+  end
+end

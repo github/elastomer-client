@@ -135,11 +135,11 @@ module Elastomer
       query.merge(:sort => [:_doc])
     end
 
-  DEFAULT_OPTS = {
-      :index => nil,
-      :type => nil,
-      :scroll => "5m",
-      :size => 50,
+    DEFAULT_OPTS = {
+      index:   nil,
+      type:    nil,
+      scroll:  "5m",
+      size:    50,
     }.freeze
 
     class Scroller
@@ -151,7 +151,7 @@ module Elastomer
       # and https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-search-type.html#scan
       #
       # client - Elastomer::Client used for HTTP requests to the server
-      # query  - The query to scan as a Hash or a JSON encoded String
+      # query  - The query to scroll as a Hash or a JSON encoded String
       # opts   - Options Hash
       #   :index       - the name of the index to search
       #   :type        - the document type to search

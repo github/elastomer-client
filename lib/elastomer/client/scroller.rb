@@ -194,7 +194,7 @@ module Elastomer
       #     hits['hits'].each { |document| ... }
       #   end
       #
-      # Returns this Scan instance.
+      # Returns this Scroller instance.
       def each
         loop do
           body = do_scroll
@@ -229,7 +229,7 @@ module Elastomer
       #     document['_source']
       #   end
       #
-      # Returns this Scroller  instance.
+      # Returns this Scroller instance.
       def each_document( &block )
         each { |hits| hits["hits"].each(&block) }
       end

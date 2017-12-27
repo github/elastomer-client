@@ -38,6 +38,9 @@ module Elastomer
           raise IncompatibleVersionException, "Elasticsearch '#{client.version}' does not support _delete_by_query"
         end
 
+        # COMPATIBILITY: read_timeout param is invalid, must remove at last moment
+        parameters.select! { |k, _| k.to_sym != :read_timeout }
+
         parameters.keys.each do |key|
           unless PARAMETERS.include?(key) || PARAMETERS.include?(key.to_sym)
             raise IllegalArgument, "'#{key}' is not a valid _delete_by_query parameter"
@@ -47,7 +50,6 @@ module Elastomer
         @client = client
         @query = query
         @parameters = parameters
-
       end
 
       def execute

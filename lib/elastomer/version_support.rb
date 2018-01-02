@@ -13,7 +13,7 @@ module Elastomer
       parent
       refresh
     ].freeze
-    ES_2_X_INDEXING_PARAMETER_NAMES = %i[consistency ttl timestamp].freeze
+    ES_2_X_INDEXING_PARAMETER_NAMES = %i[type consistency ttl timestamp].freeze
     ES_5_X_INDEXING_PARAMETER_NAMES = %i[wait_for_active_shards].freeze
     KNOWN_INDEXING_PARAMETER_NAMES =
       (COMMON_INDEXING_PARAMETER_NAMES + ES_2_X_INDEXING_PARAMETER_NAMES + ES_5_X_INDEXING_PARAMETER_NAMES).freeze
@@ -78,7 +78,20 @@ module Elastomer
         {enabled: b}
       else
         b
-      end 
+      end
+    end
+
+    # COMPATIBILITY: handle _op_type -> op_type request param conversion for put-if-absent bnehavior
+    # Returns the (possibly mutated) params hash supplied by the caller.
+    #
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#operation-type
+    def op_type(params = {})
+      if es_version_5_x? && params.key?(:_op_type)
+        v = params[:_op_type]
+        params.delete(:_op_type)
+        params[:op_type] = v
+      end
+      params
     end
 
     # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
@@ -136,6 +149,7 @@ module Elastomer
       @indexing_directives = indexing_parameter_names.each_with_object({}) do |key, h|
         h[key] = "_#{key}"
       end
+      check_op_type(@indexing_directives) # hack: valid param loses underscore between ES 2.x & 5.x
       @indexing_directives.freeze
     end
 
@@ -151,7 +165,16 @@ module Elastomer
       @unsupported_indexing_directives = unsupported_keys.each_with_object({}) do |key, h|
         h[key] = "_#{key}"
       end
+      check_op_type(@unsupported_indexing_directives) # hack: valid param loses underscore between ES 2.x & 5.x
       @unsupported_indexing_directives.freeze
+    end
+
+    # COMPATIBILITY
+    # If _op_type param is found in map of symbols to request param names, check for ES 5.x and shim
+    def check_op_type(params = {})
+      if es_version_5_x? && params.key?(:op_type)
+        params[:op_type] = "op_type"
+      end
     end
 
     # COMPATIBILITY

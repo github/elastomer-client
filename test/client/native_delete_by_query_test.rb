@@ -72,6 +72,11 @@ describe Elastomer::Client::NativeDeleteByQuery do
         end
       end
 
+      it "removes :read_timeout param from native delete-by-query calls, since ES5 removes it" do
+        dbq = Elastomer::Client::NativeDeleteByQuery.new(@index.client, {}, read_timeout: "2m")
+        assert_equal dbq.parameters.key?(:read_timeout) || dbq.parameters.key?("read_timeout"), false
+      end
+
       it "deletes by query when routing is specified" do
         index = $client.index "elastomer-delete-by-query-routing-test"
         index.delete if index.exists?

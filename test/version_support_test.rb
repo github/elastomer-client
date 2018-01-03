@@ -115,5 +115,11 @@ describe Elastomer::VersionSupport do
         assert_includes(version_support.unsupported_indexing_directives.to_a, [:consistency, "_consistency"])
       end
     end
+
+    describe "#op_type_param" do
+      it "converts the supplied params key _op_type to op_type, if present" do
+        assert_equal(version_support.op_type(_op_type: "create"), {op_type: "create"})
+      end
+    end
   end
 end

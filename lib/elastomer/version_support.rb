@@ -135,6 +135,11 @@ module Elastomer
     end
 
     # COMPATIBILITY
+    #
+    # ES5 doesn't accept/ignore ambiguous or unexpected req params any more
+    alias :strict_request_params? :es_version_5_x?
+
+    # COMPATIBILITY
     # ES 5.X supports `delete_by_query` natively again.
     alias :native_delete_by_query? :es_version_5_x?
 

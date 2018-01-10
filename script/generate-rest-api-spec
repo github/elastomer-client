@@ -1,0 +1,113 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+require "bundler/setup"
+
+$LOAD_PATH.unshift "lib"
+require "elastomer/client"
+
+require "erb"
+
+class RestApiSpecGenerator
+  WORKING_DIR = "vendor/elasticsearch"
+
+  attr_reader :version, :class_version
+
+  def initialize
+    @version = "5.6.4"
+    @class_version = @version.split(".").slice(0,2).join("_")
+  end
+
+  def run
+    setup
+    ERB.new(DATA.read, 0, "-").result(binding)
+  ensure
+    reset
+  end
+
+  def working_dir_exists?
+    File.directory?(WORKING_DIR) && File.exists?(WORKING_DIR)
+  end
+
+  def setup
+    if !working_dir_exists?
+      system <<-SH
+        mkdir -p #{WORKING_DIR} &&
+        cd #{WORKING_DIR} &&
+        git init . &&
+        git remote add -f origin https://github.com/elastic/elasticsearch.git &&
+        git config core.sparsecheckout true &&
+        echo /rest-api-spec/src/main/resources/rest-api-spec/api/ >> .git/info/sparse-checkout &&
+        git pull origin master
+      SH
+    end
+
+    system <<-SH
+      cd #{WORKING_DIR} &&
+      git pull origin master &&
+      git checkout -q origin/#{version.split(".").slice(0,2).join(".")}
+    SH
+  end
+
+  def reset
+    system <<-SH
+      cd #{WORKING_DIR} &&
+      git checkout master
+    SH
+  end
+
+  def each_api
+    Dir.glob("#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/*.json").each do |filename|
+      next if filename =~ /\/_common\.json\Z/
+
+      hash = MultiJson.load(File.read(filename))
+      key = hash.keys.first
+      value = hash.values.first
+      yield(key, value)
+    end
+  end
+
+end
+
+
+puts RestApiSpecGenerator.new.run
+
+__END__
+module Elastomer::Client::RestApiSpec
+  class V<%= class_version %> < ApiSpec
+    def initialize
+      @rest_apis = {
+<% each_api do |name,data| -%>
+        "<%= name %>" => RestApi.new(
+          documentation: "<%= data["documentation"].to_s %>",
+          methods: <%= Array(data["methods"]).to_s %>,
+          body: <%= data["body"] ? data["body"].to_s : "nil" %>,
+<% url = data["url"] -%>
+          url: {
+            path: "<%= url["path"] %>",
+            paths: <%= Array(url["paths"]).to_s %>,
+<% if (parts = url["parts"]) && !parts.empty? -%>
+            parts: {
+<% parts.each do |k,v| -%>
+              "<%= k %>" => <%= v.to_s %>,
+<% end -%>
+            },
+<% end -%>
+<% if (params = url["params"]) && !params.empty? -%>
+            params: {
+<% params.each do |k,v| -%>
+              "<%= k %>" => <%= v.to_s %>,
+<% end -%>
+            }
+<% end -%>
+          }
+        ),
+<% end -%>
+      }
+
+      @common_params = {
+      }
+      super
+    end
+  end
+end

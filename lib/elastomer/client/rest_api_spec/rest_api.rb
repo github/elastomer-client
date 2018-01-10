@@ -12,7 +12,7 @@ module Elastomer::Client::RestApiSpec
     def_delegators :@url,
         :select_parts, :select_params
 
-    def initialize(documentation:, methods:, url:, body:)
+    def initialize(documentation:, methods:, url:, body: nil)
       @documentation = documentation
       @methods = Array(methods)
       @url = Url.new(url)
@@ -29,7 +29,7 @@ module Elastomer::Client::RestApiSpec
       attr_reader :parts
       attr_reader :params
 
-      def initialize(path:, paths:, parts:, params:)
+      def initialize(path:, paths: [], parts: {}, params: {})
         @path = path
         @paths = Array(paths)
         @parts = parts

@@ -11,18 +11,27 @@ require "erb"
 class RestApiSpecGenerator
   WORKING_DIR = "vendor/elasticsearch"
 
-  attr_reader :version, :class_version
+  attr_reader :version, :short_version, :class_version
 
-  def initialize
-    @version = "5.6.4"
-    @class_version = @version.split(".").slice(0,2).join("_")
+  def initialize(version = "5.6.4")
+    @version = version
+
+    sliced = @version.split(".").slice(0,2)
+    @short_version = sliced.join(".")
+    @class_version = sliced.join("_")
   end
 
   def run
     setup
-    ERB.new(DATA.read, 0, "-").result(binding)
+    File.open(ruby_spec_filename, "w") do |fd|
+      fd.puts ERB.new(DATA.read, 0, "-").result(binding)
+    end
   ensure
     reset
+  end
+
+  def ruby_spec_filename
+    "lib/elastomer/client/rest_api_spec/v#{class_version}.rb"
   end
 
   def working_dir_exists?
@@ -45,7 +54,7 @@ class RestApiSpecGenerator
     system <<-SH
       cd #{WORKING_DIR} &&
       git pull origin master &&
-      git checkout -q origin/#{version.split(".").slice(0,2).join(".")}
+      git checkout -q origin/#{short_version}
     SH
   end
 
@@ -67,12 +76,21 @@ class RestApiSpecGenerator
     end
   end
 
+  def each_common
+    filename = "#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json"
+    hash = MultiJson.load(File.read(filename))
+    hash["params"].each {|k,v| yield(k,v)}
+  end
+
 end
 
-
-puts RestApiSpecGenerator.new.run
+puts RestApiSpecGenerator.new(*ARGV).run
 
 __END__
+# Generated REST API spec file - DO NOT EDIT!
+# Date: <%= Time.now.strftime("%Y-%m-%d") %>
+# ES version: <%= version %>
+
 module Elastomer::Client::RestApiSpec
   class V<%= class_version %> < ApiSpec
     def initialize
@@ -104,8 +122,10 @@ module Elastomer::Client::RestApiSpec
         ),
 <% end -%>
       }
-
       @common_params = {
+<% each_common do |k,v| -%>
+        "<%= k %>" => <%= v.to_s %>,
+<% end -%>
       }
       super
     end

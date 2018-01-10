@@ -6,3 +6,6 @@ module Elastomer
     end
   end
 end
+
+require_relative "rest_api_spec/api_spec"
+require_relative "rest_api_spec/rest_api"

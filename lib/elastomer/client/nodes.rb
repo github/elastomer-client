@@ -41,15 +41,15 @@ module Elastomer
       #
       # Examples
       #
-      #   info(:info => "_all")
-      #   info(:info => "os")
-      #   info(:info => %w[os jvm process])
+      #   info(info: "_all")
+      #   info(info: "os")
+      #   info(info: %w[os jvm process])
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-info.html
       #
       # Returns the response as a Hash
       def info( params = {} )
-        response = client.get "/_nodes{/node_id}{/info}", update_params(params, :action => "nodes.info")
+        response = client.get "/_nodes{/node_id}{/info}", update_params(params, action: "nodes.info", rest_api: "nodes.info")
         response.body
       end
 
@@ -62,14 +62,14 @@ module Elastomer
       #
       # Examples
       #
-      #   stats(:stats => "thread_pool")
-      #   stats(:stats => %w[os process])
+      #   stats(stats: "thread_pool")
+      #   stats(stats: %w[os process])
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get "/_nodes{/node_id}/stats{/stats}", update_params(params, :action => "nodes.stats")
+        response = client.get "/_nodes{/node_id}/stats{/stats}", update_params(params, action: "nodes.stats", rest_api: "nodes.stats")
         response.body
       end
 
@@ -87,21 +87,7 @@ module Elastomer
       #
       # Returns the response as a String
       def hot_threads( params = {} )
-        response = client.get "/_nodes{/node_id}/hot_threads", update_params(params, :action => "nodes.hot_threads")
-        response.body
-      end
-
-      # Shutdown one or more nodes in the cluster. There is also a
-      # Cluster#shutdown command for shutting down the entire cluseter.
-      #
-      # params - Parameters Hash
-      #   :node_id - a single node ID or Array of node IDs
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
-      #
-      # Returns the response as a Hash
-      def shutdown( params = {} )
-        response = client.post "/_cluster/nodes{/node_id}/_shutdown", update_params(params, :action => "nodes.shutdown")
+        response = client.get "/_nodes{/node_id}/hot_threads", update_params(params, action: "nodes.hot_threads", rest_api: "nodes.hot_threads")
         response.body
       end
 

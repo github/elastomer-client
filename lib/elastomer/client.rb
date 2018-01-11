@@ -78,7 +78,10 @@ module Elastomer
 
     # Returns the version String of the attached Elasticsearch instance.
     def version
-      @version ||= info["version"]["number"]
+      @version ||= begin
+        response = get "/"
+        response.body.dig("version", "number")
+      end
     end
 
     # Returns a Semantic::Version for the attached Elasticsearch instance.
@@ -91,6 +94,12 @@ module Elastomer
     def info
       response = get "/", :action => "cluster.info"
       response.body
+    end
+
+    # Returns the ApiSpec for the specific version of Elasticsearch that this
+    # Client is connected to.
+    def api_spec
+      @api_spec ||= RestApiSpec.api_spec(version)
     end
 
     # Internal: Provides access to the Faraday::Connection used by this client

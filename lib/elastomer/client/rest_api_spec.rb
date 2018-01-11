@@ -24,7 +24,7 @@ module Elastomer
       # Internal: Load the specific ApiSpec version class for the given version.
       def self.load_api_spec(version)
         path = File.expand_path("../rest_api_spec/api_spec_v#{to_class_version(version)}.rb", __FILE__)
-        if File.exists? path
+        if File.exist? path
           load path
         else
           raise RuntimeError, "Unsupported REST API spec version: #{version}"

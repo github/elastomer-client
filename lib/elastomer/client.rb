@@ -332,11 +332,15 @@ module Elastomer
       query_values.delete :context
       query_values.delete :retries
 
+      rest_api = query_values.delete :rest_api
+
       template.keys.map(&:to_sym).each do |key|
         value = query_values.delete key
         value = assert_param_presence(value, key) unless path =~ /{\/#{key}}/ && value.nil?
         expansions[key] = value
       end
+
+      query_values = api_spec.select_params(api: rest_api, from: query_values) if rest_api
 
       uri = template.expand(expansions)
       uri.query_values = query_values unless query_values.empty?

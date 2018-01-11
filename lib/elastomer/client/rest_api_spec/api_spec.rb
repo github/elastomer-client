@@ -8,6 +8,7 @@ module Elastomer::Client::RestApiSpec
   class ApiSpec
 
     attr_reader :rest_apis
+    attr_reader :common_params
 
     def initialize
       @rest_apis ||= {}

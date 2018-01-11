@@ -29,6 +29,20 @@ module Elastomer::Client::RestApiSpec
       rest_api.select_params(from: from)
     end
 
+    # Given an API descriptor name and a single request parameter, returns
+    # `true` if the parameter is valid for the given API. This method always
+    # returns `true` if the API is unknown.
+    #
+    # api   - the api descriptor name as a String
+    # param - the request parameter name as a String
+    #
+    # Returns `true` if the param is valid for the API.
+    def valid_param?(api:, param:)
+      rest_api = get(api)
+      return true if rest_api.nil?
+      rest_api.valid_param?(param)
+    end
+
     # Given an API descriptor name and a set of request path parts, select those
     # parts that are accepted by the API endpoint.
     #
@@ -40,6 +54,20 @@ module Elastomer::Client::RestApiSpec
       rest_api = get(api)
       return from if rest_api.nil?
       rest_api.select_parts(from: from)
+    end
+
+    # Given an API descriptor name and a single path part, returns `true` if the
+    # path part is valid for the given API. This method always returns `true` if
+    # the API is unknown.
+    #
+    # api  - the api descriptor name as a String
+    # part - the path part name as a String
+    #
+    # Returns `true` if the path part is valid for the API.
+    def valid_part?(api:, part:)
+      rest_api = get(api)
+      return true if rest_api.nil?
+      rest_api.valid_part?(part)
     end
 
     # Select the common request parameters from the given params.

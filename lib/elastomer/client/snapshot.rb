@@ -35,7 +35,7 @@ module Elastomer
       #
       # Returns true if the snapshot exists
       def exists?(params = {})
-        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, :action => "snapshot.exists")
+        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, action: "snapshot.exists", rest_api: "snapshot.get")
         response.success?
       rescue Elastomer::Client::Error => err
         if err.error && err.error.dig("root_cause", 0, "type") == "snapshot_missing_exception"
@@ -54,7 +54,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create(body = {}, params = {})
-        response = client.put "/_snapshot/{repository}/{snapshot}", update_params(params, :body => body, :action => "snapshot.create")
+        response = client.put "/_snapshot/{repository}/{snapshot}", update_params(params, body: body, action: "snapshot.create", rest_api: "snapshot.create")
         response.body
       end
 
@@ -67,7 +67,7 @@ module Elastomer
       def get(params = {})
         # Set snapshot name or we'll get the repository instead
         snapshot = name || "_all"
-        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, :snapshot => snapshot, :action => "snapshot.get")
+        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, snapshot: snapshot, action: "snapshot.get", rest_api: "snapshot.get")
         response.body
       end
 
@@ -78,7 +78,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def status(params = {})
-        response = client.get "/_snapshot{/repository}{/snapshot}/_status", update_params(params, :action => "snapshot.status")
+        response = client.get "/_snapshot{/repository}{/snapshot}/_status", update_params(params, action: "snapshot.status", rest_api: "snapshot.status")
         response.body
       end
 
@@ -90,7 +90,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def restore(body = {}, params = {})
-        response = client.post "/_snapshot/{repository}/{snapshot}/_restore", update_params(params, :body => body, :action => "snapshot.restore")
+        response = client.post "/_snapshot/{repository}/{snapshot}/_restore", update_params(params, body: body, action: "snapshot.restore", rest_api: "snapshot.restore")
         response.body
       end
 
@@ -101,7 +101,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete "/_snapshot/{repository}/{snapshot}", update_params(params, :action => "snapshot.delete")
+        response = client.delete "/_snapshot/{repository}/{snapshot}", update_params(params, action: "snapshot.delete", rest_api: "snapshot.delete")
         response.body
       end
 
@@ -120,7 +120,7 @@ module Elastomer
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        { :repository => repository, :snapshot => name }
+        { repository: repository, snapshot: name }
       end
     end
   end

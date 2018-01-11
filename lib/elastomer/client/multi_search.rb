@@ -21,12 +21,12 @@ module Elastomer
     #   multi_search(request_body)
     #
     #   # index in URI
-    #   multi_search(request_body, :index => 'default-index')
+    #   multi_search(request_body, index: 'default-index')
     #
     #   # block form
-    #   multi_search(:index => 'default-index') do |m|
-    #     m.search({:query => {:match_all => {}}, :size => 0)
-    #     m.search({:query => {:field => {"foo" => "bar"}}}, :type => 'default-type')
+    #   multi_search(index: 'default-index') do |m|
+    #     m.search({query: {match_all: {}}, size: 0)
+    #     m.search({query: {field: {"foo" => "bar"}}}, type: 'default-type')
     #     ...
     #   end
     #
@@ -40,7 +40,7 @@ module Elastomer
         raise "multi_search request body cannot be nil" if body.nil?
         params ||= {}
 
-        response = self.post "{/index}{/type}/_msearch", params.merge(:body => body)
+        response = self.post "{/index}{/type}/_msearch", params.merge(body: body, action: "msearch", rest_api: "msearch")
         response.body
       end
     end

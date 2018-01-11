@@ -69,7 +69,7 @@ module Elastomer
 
     # Returns true if the server is available; returns false otherwise.
     def ping
-      response = head "/", :action => "cluster.ping"
+      response = head "/", action: "cluster.ping"
       response.success?
     rescue StandardError
       false
@@ -92,7 +92,7 @@ module Elastomer
 
     # Returns the information Hash from the attached Elasticsearch instance.
     def info
-      response = get "/", :action => "cluster.info"
+      response = get "/", action: "cluster.info"
       response.body
     end
 
@@ -111,7 +111,7 @@ module Elastomer
         conn.request(:encode_json)
         conn.response(:parse_json)
         conn.request(:opaque_id) if @opaque_id
-        conn.request(:limit_size, :max_request_size => max_request_size) if max_request_size
+        conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
 
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)
@@ -316,10 +316,10 @@ module Elastomer
     #
     # Examples
     #
-    #   expand_path('/foo{/bar}', {:bar => 'hello', :q => 'what', :p => 2})
+    #   expand_path('/foo{/bar}', {bar: 'hello', q: 'what', p: 2})
     #   #=> '/foo/hello?q=what&p=2'
     #
-    #   expand_path('/foo{/bar}{/baz}', {:baz => 'no bar'}
+    #   expand_path('/foo{/bar}{/baz}', {baz: 'no bar'}
     #   #=> '/foo/no%20bar'
     #
     # Returns an Addressable::Uri

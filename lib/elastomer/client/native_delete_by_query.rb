@@ -29,7 +29,7 @@ module Elastomer
 
         if rest_api = client.api_spec.get(REST_API)
           parameters.keys.each do |key|
-            unless rest_api.valid_param? key
+            unless rest_api.valid_param?(key) || rest_api.valid_part?(key)
               raise IllegalArgument, "'#{key}' is not a valid _delete_by_query parameter"
             end
           end

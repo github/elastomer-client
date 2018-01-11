@@ -39,12 +39,12 @@ module Elastomer::Client::RestApiSpec
         @params_set = Set.new(@params.keys)
       end
 
-      def select_parts(params:)
-        params.select {|k,v| @parts_set.include?(k.to_s)}
+      def select_parts(from:)
+        from.select {|k,v| @parts_set.include?(k.to_s)}
       end
 
-      def select_params(params:)
-        params.select {|k,v| @params_set.include?(k.to_s)}
+      def select_params(from:)
+        from.select {|k,v| @params_set.include?(k.to_s)}
       end
     end
   end

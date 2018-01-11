@@ -10,7 +10,7 @@ module Elastomer::Client::RestApiSpec
     attr_reader :body
 
     def_delegators :@url,
-        :select_parts, :select_params
+        :select_parts, :select_params, :valid_part?, :valid_param?
 
     def initialize(documentation:, methods:, url:, body: nil)
       @documentation = documentation
@@ -40,11 +40,19 @@ module Elastomer::Client::RestApiSpec
       end
 
       def select_parts(from:)
-        from.select {|k,v| @parts_set.include?(k.to_s)}
+        from.select {|k,v| valid_part?(k)}
+      end
+
+      def valid_part?(part)
+        @parts_set.include?(part.to_s)
       end
 
       def select_params(from:)
-        from.select {|k,v| @params_set.include?(k.to_s)}
+        from.select {|k,v| valid_param?(k)}
+      end
+
+      def valid_param?(param)
+        @params_set.include?(param.to_s)
       end
     end
   end

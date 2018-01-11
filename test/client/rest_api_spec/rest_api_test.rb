@@ -37,6 +37,12 @@ describe Elastomer::Client::RestApiSpec::RestApi do
     assert selected.key?("metric")
   end
 
+  it "identifies valid parts" do
+    assert @rest_api.valid_part? :index
+    assert @rest_api.valid_part? "metric"
+    refute @rest_api.valid_part? :nope
+  end
+
   it "selects valid request params" do
     hash = {
       local: true,
@@ -50,6 +56,12 @@ describe Elastomer::Client::RestApiSpec::RestApi do
     assert selected.key?(:local)
     assert selected.key?("flat_settings")
     assert selected.key?(:expand_wildcards)
+  end
+
+  it "identifies valid params" do
+    assert @rest_api.valid_param? :local
+    assert @rest_api.valid_param? "flat_settings"
+    refute @rest_api.valid_param? :nope
   end
 
   it "accesses the documentation url" do

@@ -43,6 +43,18 @@ module Elastomer
       es_version_5_x?
     end
 
+    # COMPATIBILITY: Return a boolean indicating if this version supports the
+    # `tasks.get` API - https://www.elastic.co/guide/en/elasticsearch/reference/5.x/tasks.html
+    def supports_tasks_get?
+      es_version_5_x?
+    end
+
+    # COMPATIBILITY: Return a boolean indicating if this version supports the
+    # `parent_task_id` param in the tasks API - https://www.elastic.co/guide/en/elasticsearch/reference/5.x/tasks.html
+    def supports_parent_task_id?
+      es_version_5_x?
+    end
+
     # COMPATIBILITY: Return a "text"-type mapping for a field.
     #
     # On ES 2.x, this will be a string field. On ES 5+, it will be a text field.

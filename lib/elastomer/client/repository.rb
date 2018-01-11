@@ -26,7 +26,7 @@ module Elastomer
       #
       # Returns true if the repository exists
       def exists?(params = {})
-        response = client.get "/_snapshot{/repository}", update_params(params, :action => "repository.exists")
+        response = client.get "/_snapshot{/repository}", update_params(params, action: "repository.exists", rest_api: "snapshot.get_repository")
         response.success?
       rescue Elastomer::Client::Error => err
         if err.error && err.error.dig("root_cause", 0, "type") == "repository_missing_exception"
@@ -45,7 +45,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create(body, params = {})
-        response = client.put "/_snapshot/{repository}", update_params(params, :body => body, :action => "repository.create")
+        response = client.put "/_snapshot/{repository}", update_params(params, body: body, action: "repository.create", rest_api: "snapshot.create_repository")
         response.body
       end
 
@@ -56,7 +56,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get(params = {})
-        response = client.get "/_snapshot{/repository}", update_params(params, :action => "repository.get")
+        response = client.get "/_snapshot{/repository}", update_params(params, action: "repository.get", rest_api: "snapshot.get_repository")
         response.body
       end
 
@@ -67,7 +67,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def status(params = {})
-        response = client.get "/_snapshot{/repository}/_status", update_params(params, :action => "repository.status")
+        response = client.get "/_snapshot{/repository}/_status", update_params(params, action: "repository.status", rest_api: "snapshot.status")
         response.body
       end
 
@@ -79,7 +79,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update(body, params = {})
-        response = client.put "/_snapshot/{repository}", update_params(params, :body => body, :action => "repository.update")
+        response = client.put "/_snapshot/{repository}", update_params(params, body: body, action: "repository.update", rest_api: "snapshot.create_repository")
         response.body
       end
 
@@ -90,7 +90,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete "/_snapshot/{repository}", update_params(params, :action => "repository.delete")
+        response = client.delete "/_snapshot/{repository}", update_params(params, action: "repository.delete", rest_api: "snapshot.delete_repository")
         response.body
       end
 
@@ -120,7 +120,7 @@ module Elastomer
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        { :repository => name }
+        { repository: name }
       end
     end
   end

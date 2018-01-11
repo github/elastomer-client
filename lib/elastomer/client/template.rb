@@ -25,7 +25,7 @@ module Elastomer
 
       # Returns true if the template already exists on the cluster.
       def exists?( params = {} )
-        response = client.head "/_template/{template}", update_params(params, action: "template.exists")
+        response = client.head "/_template/{template}", update_params(params, action: "template.exists", rest_api: "indices.exists_template")
         response.success?
       end
       alias_method :exist?, :exists?
@@ -37,7 +37,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get "/_template/{template}", update_params(params, :action => "template.get")
+        response = client.get "/_template/{template}", update_params(params, action: "template.get", rest_api: "indices.get_template")
         response.body
       end
 
@@ -49,7 +49,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create( template, params = {} )
-        response = client.put "/_template/{template}", update_params(params, :body => template, :action => "template.create")
+        response = client.put "/_template/{template}", update_params(params, body: template, action: "template.create", rest_api: "indices.put_template")
         response.body
       end
 
@@ -60,7 +60,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete "/_template/{template}", update_params(params, :action => "template.delete")
+        response = client.delete "/_template/{template}", update_params(params, action: "template.delete", rest_api: "indices.delete_template")
         response.body
       end
 
@@ -79,8 +79,8 @@ module Elastomer
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        { :template => name }
+        { template: name }
       end
-    end  # Template
-  end  # Client
-end  # Elastomer
+    end
+  end
+end

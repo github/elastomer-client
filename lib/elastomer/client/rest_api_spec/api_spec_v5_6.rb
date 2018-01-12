@@ -2346,6 +2346,7 @@ module Elastomer::Client::RestApiSpec
             },
             params: {
               "wait_for_completion" => {"type"=>"boolean", "description"=>"Wait for the matching tasks to complete (default: false)"},
+              "timeout" => {"type"=>"time", "description"=>"Explicit operation timeout"},
             }
           }
         ),
@@ -2364,6 +2365,7 @@ module Elastomer::Client::RestApiSpec
               "parent_task_id" => {"type"=>"string", "description"=>"Return tasks with specified parent task id (node_id:task_number). Set to -1 to return all."},
               "wait_for_completion" => {"type"=>"boolean", "description"=>"Wait for the matching tasks to complete (default: false)"},
               "group_by" => {"type"=>"enum", "description"=>"Group tasks by nodes or parent/child relationships", "options"=>["nodes", "parents"], "default"=>"nodes"},
+              "timeout" => {"type"=>"time", "description"=>"Explicit operation timeout"},
             }
           }
         ),

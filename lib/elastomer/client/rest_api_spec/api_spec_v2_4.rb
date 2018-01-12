@@ -2121,6 +2121,7 @@ module Elastomer::Client::RestApiSpec
               "parent_node" => {"type"=>"string", "description"=>"Return tasks with specified parent node."},
               "parent_task" => {"type"=>"string", "description"=>"Return tasks with specified parent task id (node_id:task_number). Set to -1 to return all."},
               "wait_for_completion" => {"type"=>"boolean", "description"=>"Wait for the matching tasks to complete (default: false)"},
+              "timeout" => {"type"=>"time", "description"=>"Explicit operation timeout"},
             }
           }
         ),

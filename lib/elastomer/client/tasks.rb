@@ -12,18 +12,6 @@ module Elastomer
 
     class Tasks
 
-      # TODO - validate params from this whitelist
-      PARAMETERS = %i[
-        nodes
-        actions
-        parent_task_id
-        wait_for_completion
-        pretty
-        detailed
-        timeout
-        group_by
-      ].to_set.freeze
-
       # Create a new Tasks for introspecting on internal cluster activity.
       # More context: https://www.elastic.co/guide/en/elasticsearch/reference/5.6/tasks.html
       #

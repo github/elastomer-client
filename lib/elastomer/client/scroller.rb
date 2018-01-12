@@ -12,7 +12,7 @@ module Elastomer
     #
     # Examples
     #
-    #   scroll = client.scroll('{"query":{"match_all":{}}}', :index => 'test')
+    #   scroll = client.scroll('{"query":{"match_all":{}}}', index: 'test')
     #   scroll.each_document do |document|
     #     document['_id']
     #     document['_source']
@@ -35,7 +35,7 @@ module Elastomer
     #
     # Examples
     #
-    #   scan = client.scan('{"query":{"match_all":{}}}', :index => 'test')
+    #   scan = client.scan('{"query":{"match_all":{}}}', index: 'test')
     #   scan.each_document do |document|
     #     document['_id']
     #     document['_source']
@@ -59,7 +59,7 @@ module Elastomer
     #
     # Examples
     #
-    #   h = client.start_scroll(:body => '{"query":{"match_all":{}},"sort":{"created":"desc"}}', :index => 'test')
+    #   h = client.start_scroll(body: '{"query":{"match_all":{}},"sort":{"created":"desc"}}', index: 'test')
     #   scroll_id = h['_scroll_id']
     #   h['hits']['hits'].each { |doc| ... }
     #
@@ -71,7 +71,7 @@ module Elastomer
     #
     # Returns the response body as a Hash.
     def start_scroll( opts = {} )
-      opts = opts.merge :action => "search.start_scroll"
+      opts = opts.merge action: "search.start_scroll", rest_api: "search"
       response = get "{/index}{/type}/_search", opts
       response.body
     end
@@ -84,7 +84,7 @@ module Elastomer
     #
     # Examples
     #
-    #   scroll_id = client.start_scroll(:body => '{"query":{"match_all":{}}}', :index => 'test')['_scroll_id']
+    #   scroll_id = client.start_scroll(body: '{"query":{"match_all":{}}}', index: 'test')['_scroll_id']
     #
     #   h = client.continue_scroll scroll_id   # scroll to get the next set of results
     #   scroll_id = h['_scroll_id']            # and store the scroll_id to use later
@@ -96,7 +96,7 @@ module Elastomer
     #
     # Returns the response body as a Hash.
     def continue_scroll( scroll_id, scroll = "5m" )
-      response = get "/_search/scroll", :body => {:scroll_id => scroll_id}, :scroll => scroll, :action => "search.scroll"
+      response = get "/_search/scroll", body: {scroll_id: scroll_id}, scroll: scroll, action: "search.scroll", rest_api: "scroll"
       response.body
     rescue RequestError => err
       if err.error && err.error["caused_by"]["type"] == "search_context_missing_exception"
@@ -113,7 +113,7 @@ module Elastomer
     #
     # Returns the response body as a Hash.
     def clear_scroll( scroll_ids )
-      response = delete "/_search/scroll", :body => {scroll_id: Array(scroll_ids)}, :action => "search.clear_scroll"
+      response = delete "/_search/scroll", body: {scroll_id: Array(scroll_ids)}, action: "search.clear_scroll", rest_api: "clear_scroll"
       response.body
     end
 
@@ -132,7 +132,7 @@ module Elastomer
          raise ArgumentError, "Query cannot contain a sort (found sort '#{query[:sort]}' in query: #{query})"
       end
 
-      query.merge(:sort => [:_doc])
+      query.merge(sort: [:_doc])
     end
 
     DEFAULT_OPTS = {
@@ -161,7 +161,7 @@ module Elastomer
       #
       # Examples
       #
-      #   scan = Scroller.new(client, {:query => {:match_all => {}}}, :index => 'test-1')
+      #   scan = Scroller.new(client, {query: {match_all: {}}}, index: 'test-1')
       #   scan.each_document { |doc|
       #     doc['_id']
       #     doc['_source']
@@ -170,7 +170,7 @@ module Elastomer
       def initialize( client, query, opts = {} )
         @client = client
 
-        @opts = DEFAULT_OPTS.merge({ :body => query }).merge(opts)
+        @opts = DEFAULT_OPTS.merge({ body: query }).merge(opts)
 
         @scroll_id = nil
         @offset = 0

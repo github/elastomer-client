@@ -1,0 +1,152 @@
+#!/usr/bin/env ruby
+# Usage:
+#
+#   script/generate-rest-api-spec <elasticsearch-version>
+#
+# Use this script to generate a REST API spec for the given
+# `elasticserach-version`. This will create a new `ApiSpec` class configured
+# to validate the request parameters for the particular Elasticsearch version.
+
+require "erb"
+require "rubygems"
+require "bundler/setup"
+
+$LOAD_PATH.unshift "lib"
+require "elastomer/client"
+
+class RestApiSpecGenerator
+  WORKING_DIR = "vendor/elasticsearch"
+
+  attr_reader :version, :short_version, :class_version
+
+  def initialize(version = "5.6")
+    @version = version
+
+    sliced = @version.split(".").slice(0,2)
+    @short_version = sliced.join(".")
+    @class_version = sliced.join("_")
+  end
+
+  # Setup the working directory and generate the Ruby API spec for the
+  # elasticsearch version.
+  def run
+    setup
+    File.open(ruby_spec_filename, "w") do |fd|
+      fd.puts ERB.new(DATA.read, 0, "-").result(binding)
+    end
+  ensure
+    reset
+  end
+
+  # The name of the Ruby API spec file for this particular Elasticsearch version.
+  def ruby_spec_filename
+    "lib/elastomer/client/rest_api_spec/api_spec_v#{class_version}.rb"
+  end
+
+  # Returns true if the elasticserach working directory exists.
+  def working_dir_exists?
+    File.directory?(WORKING_DIR) && File.exists?(WORKING_DIR)
+  end
+
+  # Iterate over each of the REST API specs yield the name and the descriptor
+  # hash for that particular API spec.
+  def each_api
+    Dir.glob("#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/*.json").each do |filename|
+      next if filename =~ /\/_common\.json\Z/
+
+      hash = MultiJson.load(File.read(filename))
+      key = hash.keys.first
+      value = hash.values.first
+      yield(key, value)
+    end
+  end
+
+  # Iterate over each of the common request parameters and yield them as key /
+  # value pairs.
+  def each_common
+    filename = "#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json"
+    if File.exists? filename
+      hash = MultiJson.load(File.read(filename))
+      hash["params"].each {|k,v| yield(k,v)}
+    end
+  end
+
+  # Perform a sparse checkout of the elasticsearch git repository and then check
+  # out the branch corresponding to the ES version passed to this script.
+  def setup
+    if !working_dir_exists?
+      system <<-SH
+        mkdir -p #{WORKING_DIR} &&
+        cd #{WORKING_DIR} &&
+        git init . &&
+        git remote add -f origin https://github.com/elastic/elasticsearch.git &&
+        git config core.sparsecheckout true &&
+        echo /rest-api-spec/src/main/resources/rest-api-spec/api/ >> .git/info/sparse-checkout &&
+        git pull origin master
+      SH
+    end
+
+    system <<-SH
+      cd #{WORKING_DIR} &&
+      git pull origin master &&
+      git checkout -q origin/#{short_version}
+    SH
+  end
+
+  # Reset the elasticsearch working directory back to the master branch of the
+  # git repository.
+  def reset
+    system <<-SH
+      cd #{WORKING_DIR} &&
+      git checkout master
+    SH
+  end
+end
+
+puts RestApiSpecGenerator.new(*ARGV).run
+
+__END__
+# Generated REST API spec file - DO NOT EDIT!
+# Date: <%= Time.now.strftime("%Y-%m-%d") %>
+# ES version: <%= version %>
+
+module Elastomer::Client::RestApiSpec
+  class ApiSpecV<%= class_version %> < ApiSpec
+    def initialize
+      @rest_apis = {
+<% each_api do |name,data| -%>
+        "<%= name %>" => RestApi.new(
+          documentation: "<%= data["documentation"].to_s %>",
+          methods: <%= Array(data["methods"]).to_s %>,
+          body: <%= data["body"] ? data["body"].to_s : "nil" %>,
+<% url = data["url"] -%>
+          url: {
+            path: "<%= url["path"] %>",
+            paths: <%= Array(url["paths"]).to_s %>,
+<% if (parts = url["parts"]) && !parts.empty? -%>
+            parts: {
+<% parts.each do |k,v| -%>
+              "<%= k %>" => <%= v.to_s %>,
+<% end -%>
+            },
+<% end -%>
+<% if (params = url["params"]) && !params.empty? -%>
+            params: {
+<% params.each do |k,v| -%>
+              "<%= k %>" => <%= v.to_s %>,
+<% end -%>
+            }
+<% end -%>
+          }
+        ),
+<% end -%>
+      }
+      @common_params = {
+<% each_common do |k,v| -%>
+        "<%= k %>" => <%= v.to_s %>,
+<% end -%>
+      }
+      super
+    end
+  end
+end

@@ -34,7 +34,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def health( params = {} )
-        response = client.get "/_cluster/health{/index}", params.merge(action: "cluster.health")
+        response = client.get "/_cluster/health{/index}", params.merge(action: "cluster.health", rest_api: "cluster.health")
         response.body
       end
 
@@ -52,7 +52,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def state( params = {} )
-        response = client.get "/_cluster/state{/metrics}{/indices}", params.merge(action: "cluster.state")
+        response = client.get "/_cluster/state{/metrics}{/indices}", params.merge(action: "cluster.state", rest_api: "cluster.state")
         response.body
       end
 
@@ -67,7 +67,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def stats( params = {} )
-        response = client.get "/_cluster/stats", params.merge(action: "cluster.stats")
+        response = client.get "/_cluster/stats", params.merge(action: "cluster.stats", rest_api: "cluster.stats")
         response.body
       end
 
@@ -80,7 +80,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def pending_tasks( params = {} )
-        response = client.get "/_cluster/pending_tasks", params.merge(action: "cluster.pending_tasks")
+        response = client.get "/_cluster/pending_tasks", params.merge(action: "cluster.pending_tasks", rest_api: "cluster.pending_tasks")
         response.body
       end
 
@@ -101,7 +101,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def get_settings( params = {} )
-        response = client.get "/_cluster/settings", params.merge(action: "cluster.get_settings")
+        response = client.get "/_cluster/settings", params.merge(action: "cluster.get_settings", rest_api: "cluster.get_settings")
         response.body
       end
       alias_method :settings, :get_settings
@@ -117,7 +117,7 @@ module Elastomer
       #
       # Returns the response as a Hash
       def update_settings( body, params = {} )
-        response = client.put "/_cluster/settings", params.merge(body: body, action: "cluster.update_settings")
+        response = client.put "/_cluster/settings", params.merge(body: body, action: "cluster.update_settings", rest_api: "cluster.put_settings")
         response.body
       end
 
@@ -157,20 +157,7 @@ module Elastomer
           body = {commands: Array(commands)}
         end
 
-        response = client.post "/_cluster/reroute", params.merge(body: body, action: "cluster.reroute")
-        response.body
-      end
-
-      # Shutdown the entire cluster. There is also a Nodes#shutdown method for
-      # shutting down individual nodes.
-      #
-      # params - Parameters Hash
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html
-      #
-      # Returns the response as a Hash
-      def shutdown( params = {} )
-        response = client.post "/_shutdown", params.merge(action: "cluster.shutdown")
+        response = client.post "/_cluster/reroute", params.merge(body: body, action: "cluster.reroute", rest_api: "cluster.reroute")
         response.body
       end
 
@@ -181,6 +168,7 @@ module Elastomer
       #
       # params - Parameters Hash
       #   :index - an index name or Array of index names
+      #   :name  - an alias name or Array of alias names
       #
       # Examples
       #
@@ -191,7 +179,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_aliases( params = {} )
-        response = client.get "{/index}/_aliases", params.merge(action: "cluster.get_aliases")
+        response = client.get "{/index}/_alias{/name}", params.merge(action: "cluster.get_aliases", rest_api: "indices.get_alias")
         response.body
       end
       alias_method :aliases, :get_aliases
@@ -227,7 +215,7 @@ module Elastomer
           body = {actions: Array(actions)}
         end
 
-        response = client.post "/_aliases", params.merge(body: body, action: "cluster.update_aliases")
+        response = client.post "/_aliases", params.merge(body: body, action: "cluster.update_aliases", rest_api: "indices.update_aliases")
         response.body
       end
 

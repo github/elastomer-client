@@ -24,11 +24,11 @@ module Elastomer
       # Examples
       #
       #   percolator = $client.index("default-index").percolator "1"
-      #   percolator.create :query => { :match_all => { } }
+      #   percolator.create query: { match_all: { } }
       #
       # Returns the response body as a Hash
       def create(body, params = {})
-        response = client.put("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(:body => body, :action => "percolator.create")))
+        response = client.put("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(body: body, action: "percolator.create")))
         response.body
       end
 
@@ -41,7 +41,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get(params = {})
-        response = client.get("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(:action => "percolator.get")))
+        response = client.get("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(action: "percolator.get")))
         response.body
       end
 
@@ -54,7 +54,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(:action => "percolator.delete")))
+        response = client.delete("/{index}/#{@percolator_type}/{id}", defaults.merge(params.merge(action: "percolator.delete")))
         response.body
       end
 
@@ -72,7 +72,7 @@ module Elastomer
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        {:index => index_name, :id => id}
+        {index: index_name, id: id}
       end
 
     end  # Percolator

@@ -39,11 +39,6 @@ describe Elastomer::Notifications do
     nodes.hot_threads; assert_action_event("nodes.hot_threads")
   end
 
-  it "instruments node shutdown" do
-    client = stub_client(:post, "/_cluster/nodes/_shutdown")
-    client.nodes.shutdown; assert_action_event("nodes.shutdown")
-  end
-
   it "instruments index actions" do
     @index.exists?; assert_action_event("index.exists")
     @index.create(default_index_settings)

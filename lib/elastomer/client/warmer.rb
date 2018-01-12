@@ -34,7 +34,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def create(query, params = {})
-        response = client.put "/{index}{/type}/_warmer/{warmer}", defaults.update(params.update(:body => query))
+        response = client.put "/{index}{/type}/_warmer/{warmer}", update_params(params, body: query, action: "warmer.create", rest_api: "indices.put_warmer")
         response.body
       end
 
@@ -45,7 +45,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete(params = {})
-        response = client.delete "/{index}{/type}/_warmer/{warmer}", defaults.update(params)
+        response = client.delete "/{index}{/type}/_warmer/{warmer}", update_params(params, action: "warmer.delete", rest_api: "indices.delete_warmer")
         response.body
       end
 
@@ -56,7 +56,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get(params = {})
-        response = client.get "/{index}{/type}/_warmer/{warmer}", defaults.update(params)
+        response = client.get "/{index}{/type}/_warmer/{warmer}", update_params(params, action: "warmer.get", rest_api: "indices.get_warmer")
         response.body
       end
 
@@ -82,9 +82,16 @@ module Elastomer
       end
       alias_method :exist?, :exists?
 
+      # Internal:
+      def update_params(params, overrides = nil)
+        h = defaults.update params
+        h.update overrides unless overrides.nil?
+        h
+      end
+
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        {:index => index_name, :warmer => name}
+        {index: index_name, warmer: name}
       end
     end
   end

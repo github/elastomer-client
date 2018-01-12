@@ -31,10 +31,12 @@ module Elastomer
     #   :max_request_size - the maximum allowed request size in bytes (defaults to 250 MB)
     #   :max_retries      - the maximum number of request retires (defaults to 0)
     #   :retry_delay      - delay in seconds between retries (defaults to 0.075)
+    #   :strict_params    - set to `true` to raise exceptions when invalid request params are used
     #
     def initialize(host: "localhost", port: 9200, url: nil,
                    read_timeout: 5, open_timeout: 2, max_retries: 0, retry_delay: 0.075,
-                   opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE)
+                   opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE,
+                   strict_params: false)
 
       @url = url || "http://#{host}:#{port}"
 
@@ -49,11 +51,14 @@ module Elastomer
       @adapter          = adapter
       @opaque_id        = opaque_id
       @max_request_size = max_request_size
+      @strict_params    = strict_params
     end
 
     attr_reader :host, :port, :url
     attr_reader :read_timeout, :open_timeout
     attr_reader :max_retries, :retry_delay, :max_request_size
+    attr_reader :strict_params
+    alias :strict_params? :strict_params
 
     # Returns a duplicate of this Client connection configured in the exact same
     # fashion.
@@ -69,7 +74,7 @@ module Elastomer
 
     # Returns true if the server is available; returns false otherwise.
     def ping
-      response = head "/", :action => "cluster.ping"
+      response = head "/", action: "cluster.ping"
       response.success?
     rescue StandardError
       false
@@ -78,7 +83,10 @@ module Elastomer
 
     # Returns the version String of the attached Elasticsearch instance.
     def version
-      @version ||= info["version"]["number"]
+      @version ||= begin
+        response = get "/"
+        response.body.dig("version", "number")
+      end
     end
 
     # Returns a Semantic::Version for the attached Elasticsearch instance.
@@ -89,8 +97,14 @@ module Elastomer
 
     # Returns the information Hash from the attached Elasticsearch instance.
     def info
-      response = get "/", :action => "cluster.info"
+      response = get "/", action: "cluster.info"
       response.body
+    end
+
+    # Returns the ApiSpec for the specific version of Elasticsearch that this
+    # Client is connected to.
+    def api_spec
+      @api_spec ||= RestApiSpec.api_spec(version)
     end
 
     # Internal: Provides access to the Faraday::Connection used by this client
@@ -102,7 +116,7 @@ module Elastomer
         conn.request(:encode_json)
         conn.response(:parse_json)
         conn.request(:opaque_id) if @opaque_id
-        conn.request(:limit_size, :max_request_size => max_request_size) if max_request_size
+        conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
 
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)
@@ -307,10 +321,10 @@ module Elastomer
     #
     # Examples
     #
-    #   expand_path('/foo{/bar}', {:bar => 'hello', :q => 'what', :p => 2})
+    #   expand_path('/foo{/bar}', {bar: 'hello', q: 'what', p: 2})
     #   #=> '/foo/hello?q=what&p=2'
     #
-    #   expand_path('/foo{/bar}{/baz}', {:baz => 'no bar'}
+    #   expand_path('/foo{/bar}{/baz}', {baz: 'no bar'}
     #   #=> '/foo/no%20bar'
     #
     # Returns an Addressable::Uri
@@ -323,10 +337,20 @@ module Elastomer
       query_values.delete :context
       query_values.delete :retries
 
+      rest_api = query_values.delete :rest_api
+
       template.keys.map(&:to_sym).each do |key|
         value = query_values.delete key
         value = assert_param_presence(value, key) unless path =~ /{\/#{key}}/ && value.nil?
         expansions[key] = value
+      end
+
+      if rest_api
+        query_values = if strict_params?
+          api_spec.validate_params!(api: rest_api, params: query_values)
+        else
+          api_spec.select_params(api: rest_api, from: query_values)
+        end
       end
 
       uri = template.expand(expansions)

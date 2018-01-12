@@ -1,4 +1,5 @@
 /bin
+/vendor/elasticsearch
 /vendor/gems
 /.bundle
 /.rbenv-version

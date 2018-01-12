@@ -15,9 +15,6 @@ describe Elastomer::Middleware::OpaqueId do
         ]
       }
 
-      stub.get("/") { |env|
-        [ 200, {}, {"version" => {"number" => "1.0.0"}}  ]
-      }
       stub.get("/_cluster/state") { |env|
         [ 200, {"X-Opaque-Id" => "00000000-0000-0000-0000-000000000000"}, %q[{"foo":"bar"}] ]
       }
@@ -28,6 +25,7 @@ describe Elastomer::Middleware::OpaqueId do
         :adapter   => [:test, stubs]
 
     @client = Elastomer::Client.new opts
+    @client.instance_variable_set(:@version, "5.6.4")
   end
 
   it 'generates an "X-Opaque-Id" header' do

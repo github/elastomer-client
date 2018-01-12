@@ -79,7 +79,7 @@ module Elastomer
       def index( document, params = {} )
         overrides = from_document document
         params = update_params(params, overrides)
-        params[:action] = "docs.index"
+        params.merge!(action: "docs.index", rest_api: "index")
 
         params.delete(:id) if params[:id].nil? || params[:id].to_s =~ /\A\s*\z/
 
@@ -103,7 +103,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def delete( params = {} )
-        response = client.delete "/{index}/{type}/{id}", update_params(params, :action => "docs.delete")
+        response = client.delete "/{index}/{type}/{id}", update_params(params, action: "docs.delete", rest_api: "delete")
         response.body
       end
 
@@ -117,7 +117,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get( params = {} )
-        response = client.get "/{index}/{type}/{id}", update_params(params, :action => "docs.get")
+        response = client.get "/{index}/{type}/{id}", update_params(params, action: "docs.get", rest_api: "get")
         response.body
       end
 
@@ -131,7 +131,7 @@ module Elastomer
       #
       # Returns true if the document exists
       def exists?( params = {} )
-        response = client.head "/{index}/{type}/{id}", update_params(params, :action => "docs.exists")
+        response = client.head "/{index}/{type}/{id}", update_params(params, action: "docs.exists", rest_api: "exists")
         response.success?
       end
       alias_method :exist?, :exists?
@@ -146,7 +146,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def source( params = {} )
-        response = client.get "/{index}/{type}/{id}/_source", update_params(params, :action => "docs.source")
+        response = client.get "/{index}/{type}/{id}/_source", update_params(params, action: "docs.source", rest_api: "get_source")
         response.body
       end
 
@@ -160,7 +160,7 @@ module Elastomer
       # Returns the response body as a Hash
       def multi_get( body, params = {} )
         overrides = from_document body
-        overrides[:action] = "docs.multi_get"
+        overrides.merge!(action: "docs.multi_get", rest_api: "mget")
 
         response = client.get "{/index}{/type}/_mget", update_params(params, overrides)
         response.body
@@ -177,7 +177,7 @@ module Elastomer
       # Returns the response body as a Hash
       def update( script, params = {} )
         overrides = from_document script
-        overrides[:action] = "docs.update"
+        overrides.merge!(action: "docs.update", rest_api: "update")
 
         response = client.post "/{index}/{type}/{id}/_update", update_params(params, overrides)
         response.body
@@ -195,10 +195,10 @@ module Elastomer
       # Examples
       #
       #   # request body query
-      #   search({:query => {:match_all => {}}}, :type => 'tweet')
+      #   search({query: {match_all: {}}}, type: 'tweet')
       #
       #   # same thing but using the URI request method
-      #   search(:q => '*:*', :type => 'tweet')
+      #   search(q: '*:*', type: 'tweet')
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
@@ -208,7 +208,7 @@ module Elastomer
       def search( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_search", update_params(params, :body => query, :action => "docs.search")
+        response = client.get "/{index}{/type}/_search", update_params(params, body: query, action: "docs.search", rest_api: "search")
         response.body
       end
 
@@ -226,7 +226,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def search_shards( params = {} )
-        response = client.get "/{index}{/type}/_search_shards", update_params(params, :action => "docs.search_shards")
+        response = client.get "/{index}{/type}/_search_shards", update_params(params, action: "docs.search_shards", rest_api: "search_shards")
         response.body
       end
 
@@ -242,10 +242,10 @@ module Elastomer
       # Examples
       #
       #   # request body query
-      #   count({:match_all => {}}, :type => 'tweet')
+      #   count({match_all: {}}, type: 'tweet')
       #
       #   # same thing but using the URI request method
-      #   count(:q => '*:*', :type => 'tweet')
+      #   count(q: '*:*', type: 'tweet')
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html
       #
@@ -253,7 +253,7 @@ module Elastomer
       def count( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_count", update_params(params, :body => query, :action => "docs.count")
+        response = client.get "/{index}{/type}/_count", update_params(params, body: query, action: "docs.count", rest_api: "count")
         response.body
       end
 
@@ -304,13 +304,13 @@ module Elastomer
       #
       # Examples
       #
-      #   index.percolator(1).create :query => { :match => { :author => "pea53" } }
-      #   docs.percolate :doc => { :author => "pea53" }
-      #   docs.percolate nil, :id => 3
+      #   index.percolator(1).create query: { match: { author: "pea53" } }
+      #   docs.percolate doc: { author: "pea53" }
+      #   docs.percolate nil, id: 3
       #
       # Returns the response body as a Hash
       def percolate(body, params = {})
-        response = client.get "/{index}/{type}{/id}/_percolate", update_params(params, :body => body, :action => "percolator.percolate")
+        response = client.get "/{index}/{type}{/id}/_percolate", update_params(params, body: body, action: "percolator.percolate", rest_api: "percolate")
         response.body
       end
 
@@ -320,13 +320,13 @@ module Elastomer
       #
       # Examples
       #
-      #   index.register_percolator_query 1, :query => { :match => { :author => "pea53" } }
-      #   docs.percolate_count :doc => { :author => "pea53" }
-      #   docs.percolate_count nil, :id => 3
+      #   index.register_percolator_query 1, query: { match: { author: "pea53" } }
+      #   docs.percolate_count doc: { author: "pea53" }
+      #   docs.percolate_count nil, id: 3
       #
       # Returns the count
       def percolate_count(body, params = {})
-        response = client.get "/{index}/{type}{/id}/_percolate/count", update_params(params, :body => body, :action => "percolator.percolate_count")
+        response = client.get "/{index}/{type}{/id}/_percolate/count", update_params(params, body: body, action: "percolator.percolate_count", rest_api: "count_percolate")
         response.body["total"]
       end
 
@@ -341,7 +341,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def termvector( params = {} )
-        response = client.get "/{index}/{type}/{id}/_termvector", update_params(params, :action => "docs.termvector")
+        response = client.get "/{index}/{type}/{id}/_termvectors", update_params(params, action: "docs.termvector", rest_api: "termvectors")
         response.body
       end
       alias_method :termvectors, :termvector
@@ -359,7 +359,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def multi_termvectors( body, params = {} )
-        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, :body => body, :action => "docs.multi_termvectors")
+        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, body: body, action: "docs.multi_termvectors", rest_api: "mtermvectors")
         response.body
       end
       alias_method :multi_term_vectors, :multi_termvectors
@@ -378,9 +378,9 @@ Percolate
       #
       # Examples
       #
-      #   explain({:query => {:term => {"message" => "search"}}}, :id => 1)
+      #   explain({query: {term: {"message" => "search"}}}, id: 1)
       #
-      #   explain(:q => "message:search", :id => 1)
+      #   explain(q: "message:search", id: 1)
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-explain.html
       #
@@ -388,7 +388,7 @@ Percolate
       def explain( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}/{type}/{id}/_explain", update_params(params, :body => query, :action => "docs.explain")
+        response = client.get "/{index}/{type}/{id}/_explain", update_params(params, body: query, action: "docs.explain", rest_api: "explain")
         response.body
       end
 
@@ -402,10 +402,10 @@ Percolate
       # Examples
       #
       #   # request body query
-      #   validate({:query => {:query_string => {:query => "*:*"}}}, :explain => true)
+      #   validate({query: {query_string: {query: "*:*"}}}, explain: true)
       #
       #   # same thing but using the URI query parameter
-      #   validate(:q => "post_date:foo", :explain => true)
+      #   validate(q: "post_date:foo", explain: true)
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-validate.html
       #
@@ -413,7 +413,7 @@ Percolate
       def validate( query, params = nil )
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_validate/query", update_params(params, :body => query, :action => "docs.validate")
+        response = client.get "/{index}{/type}/_validate/query", update_params(params, body: query, action: "docs.validate", rest_api: "indices.validate_query")
         response.body
       end
 
@@ -441,7 +441,7 @@ Percolate
       def bulk( params = {}, &block )
         raise "a block is required" if block.nil?
 
-        params = {:index => self.name, :type => self.type}.merge params
+        params = {index: self.name, type: self.type}.merge params
         client.bulk params, &block
       end
 
@@ -467,7 +467,7 @@ Percolate
       #
       # Returns a new Scroller instance
       def scroll( query, opts = {} )
-        opts = {:index => name, :type => type}.merge opts
+        opts = {index: name, type: type}.merge opts
         client.scroll query, opts
       end
 
@@ -494,7 +494,7 @@ Percolate
       #
       # Returns a new Scroller instance
       def scan( query, opts = {} )
-        opts = {:index => name, :type => type}.merge opts
+        opts = {index: name, type: type}.merge opts
         client.scan query, opts
       end
 
@@ -514,8 +514,8 @@ Percolate
       # Examples
       #
       #   docs.multi_search do |m|
-      #     m.search({:query => {:match_all => {}}, :size => 0)
-      #     m.search({:query => {:field => {"foo" => "bar"}}})
+      #     m.search({query: {match_all: {}}, size: 0)
+      #     m.search({query: {field: {"foo" => "bar"}}})
       #     ...
       #   end
       #
@@ -525,7 +525,7 @@ Percolate
       def multi_search( params = {}, &block )
         raise "a block is required" if block.nil?
 
-        params = {:index => self.name, :type => self.type}.merge params
+        params = {index: self.name, type: self.type}.merge params
         client.multi_search params, &block
       end
 
@@ -543,8 +543,8 @@ Percolate
       #
       #   # block form
       #   multi_percolate do |m|
-      #     m.percolate(:author => "pea53")
-      #     m.count(:author => "grantr")
+      #     m.percolate(author: "pea53")
+      #     m.count(author: "grantr")
       #     ...
       #   end
       #
@@ -568,7 +568,7 @@ Percolate
       # Raises Elastomer::Client::IllegalArgument if an unsupported indexing
       # directive is used.
       def from_document( document )
-        opts = {:body => document}
+        opts = {body: document}
 
         if document.is_a? Hash
           client.version_support.indexing_directives.each do |key, field|
@@ -609,7 +609,7 @@ Percolate
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        { :index => name, :type => type }
+        { index: name, type: type }
       end
 
       # Internal: Allow params to be passed as the first argument to

@@ -77,7 +77,33 @@ module Elastomer::Client::RestApiSpec
     # Returns a new Hash containing the valid common request params
     def select_common_params(from:)
       return from if @common_params.empty?
-      from.select {|k,v| @common_params_set.include?(k.to_s)}
+      from.select {|k,v| valid_common_param?(k)}
+    end
+
+    # Returns `true` if the param is a common request parameter.
+    def valid_common_param?(param)
+      @common_params_set.include?(param.to_s)
+    end
+
+    # Given an API descriptor name and a set of request parameters, ensure that
+    # all the request parameters are valid for the API endpoint. If an invalid
+    # parameter is found then an IllegalArgument exception is raised.
+    #
+    # api  - the api descriptor name as a String
+    # from - the Hash containing the request params
+    #
+    # Returns the params unmodified
+    # Raises an IllegalArgument exception if an invalid parameter is found.
+    def validate_params!(api:, params:)
+      rest_api = get(api)
+      return params if rest_api.nil?
+
+      params.keys.each do |key|
+        unless rest_api.valid_param?(key) || valid_common_param?(key)
+          raise ::Elastomer::Client::IllegalArgument, "'#{key}' is not a valid parameter for the '#{api}' API"
+        end
+      end
+      params
     end
 
     # Internal: Retrieve the `RestApi` descriptor for the given named `api`. If

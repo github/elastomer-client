@@ -31,10 +31,12 @@ module Elastomer
     #   :max_request_size - the maximum allowed request size in bytes (defaults to 250 MB)
     #   :max_retries      - the maximum number of request retires (defaults to 0)
     #   :retry_delay      - delay in seconds between retries (defaults to 0.075)
+    #   :strict_params    - set to `true` to raise exceptions when invalid request params are used
     #
     def initialize(host: "localhost", port: 9200, url: nil,
                    read_timeout: 5, open_timeout: 2, max_retries: 0, retry_delay: 0.075,
-                   opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE)
+                   opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE,
+                   strict_params: false)
 
       @url = url || "http://#{host}:#{port}"
 
@@ -49,11 +51,14 @@ module Elastomer
       @adapter          = adapter
       @opaque_id        = opaque_id
       @max_request_size = max_request_size
+      @strict_params    = strict_params
     end
 
     attr_reader :host, :port, :url
     attr_reader :read_timeout, :open_timeout
     attr_reader :max_retries, :retry_delay, :max_request_size
+    attr_reader :strict_params
+    alias :strict_params? :strict_params
 
     # Returns a duplicate of this Client connection configured in the exact same
     # fashion.
@@ -340,7 +345,13 @@ module Elastomer
         expansions[key] = value
       end
 
-      query_values = api_spec.select_params(api: rest_api, from: query_values) if rest_api
+      if rest_api
+        query_values = if strict_params?
+          api_spec.validate_params!(api: rest_api, params: query_values)
+        else
+          api_spec.select_params(api: rest_api, from: query_values)
+        end
+      end
 
       uri = template.expand(expansions)
       uri.query_values = query_values unless query_values.empty?

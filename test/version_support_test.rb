@@ -61,18 +61,6 @@ describe Elastomer::VersionSupport do
         refute version_support.native_delete_by_query?, "ES 2.X does not have native delete_by_query support"
       end
     end
-
-    describe "#indexing_directives" do
-      it "returns a Hash of indexing parameter name to field name" do
-        assert_includes(version_support.indexing_directives.to_a, [:consistency, "_consistency"])
-      end
-    end
-
-    describe "#unsupported_indexing_directives" do
-      it "returns a Hash of indexing parameter name to field name" do
-        assert_includes(version_support.unsupported_indexing_directives.to_a, [:wait_for_active_shards, "_wait_for_active_shards"])
-      end
-    end
   end
 
   describe "ES 5.x" do
@@ -101,18 +89,6 @@ describe Elastomer::VersionSupport do
     describe "native_delete_by_query?" do
       it "returns true" do
         assert version_support.native_delete_by_query?, "ES 5.X has native delete_by_query support"
-      end
-    end
-
-    describe "#indexing_directives" do
-      it "returns a Hash of indexing parameter name to field name" do
-        assert_includes(version_support.indexing_directives.to_a, [:wait_for_active_shards, "_wait_for_active_shards"])
-      end
-    end
-
-    describe "#unsupported_indexing_directives" do
-      it "returns an Hash of indexing parameter names to field name" do
-        assert_includes(version_support.unsupported_indexing_directives.to_a, [:consistency, "_consistency"])
       end
     end
 

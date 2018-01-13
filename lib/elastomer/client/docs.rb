@@ -15,7 +15,6 @@ module Elastomer
       Docs.new self, name, type
     end
 
-
     class Docs
       # Create a new document client for making API requests that pertain to
       # the indexing and searching of documents in a search index.
@@ -554,6 +553,11 @@ Percolate
         client.multi_percolate(params, &block)
       end
 
+      SPECIAL_KEYS= %i[
+        index type id version version_type op_type routing parent timestamp ttl
+        consistency replication refresh wait_for_active_shards
+      ].inject({}) { |h,k| h[k] = "_#{k}"; h }.freeze
+
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document
       # will be returned as the value of the :body key.
@@ -571,22 +575,9 @@ Percolate
         opts = {body: document}
 
         if document.is_a? Hash
-          client.version_support.indexing_directives.each do |key, field|
+          SPECIAL_KEYS.each do |key, field|
             opts[key] = document.delete field if document.key? field
             opts[key] = document.delete field.to_sym if document.key? field.to_sym
-          end
-
-          # COMPATIBILITY
-          # Fail fast if a consumer is attempting to use an indexing parameter
-          # for a different version of Elasticsearch. Elasticsearch 5+ is strict
-          # about parameter names so we need to either ignore these (in which
-          # case they would be indexed with the document) or fail-fast.
-          # Elasticsearch 2.X will happily ignore unknown parameters, but we
-          # felt it was best to consistently fail fast.
-          client.version_support.unsupported_indexing_directives.each do |key, field|
-            if document.key?(field) || document.key?(field.to_sym)
-              raise IllegalArgument, "Elasticsearch #{client.version} does not support the '#{key}' indexing parameter"
-            end
           end
         end
 

@@ -2,21 +2,6 @@ module Elastomer
   # VersionSupport holds methods that (a) encapsulate version differences; or
   # (b) give an intention-revealing name to a conditional check.
   class VersionSupport
-    COMMON_INDEXING_PARAMETER_NAMES = %i[
-      index
-      type
-      id
-      version
-      version_type
-      op_type
-      routing
-      parent
-      refresh
-    ].freeze
-    ES_2_X_INDEXING_PARAMETER_NAMES = %i[consistency ttl timestamp].freeze
-    ES_5_X_INDEXING_PARAMETER_NAMES = %i[wait_for_active_shards].freeze
-    KNOWN_INDEXING_PARAMETER_NAMES =
-      (COMMON_INDEXING_PARAMETER_NAMES + ES_2_X_INDEXING_PARAMETER_NAMES + ES_5_X_INDEXING_PARAMETER_NAMES).freeze
 
     attr_reader :version
 
@@ -156,35 +141,6 @@ module Elastomer
     alias :native_delete_by_query? :es_version_5_x?
 
     # COMPATIBILITY
-    # Return a Hash of indexing request parameters that are valid for this
-    # version of Elasticsearch.
-    def indexing_directives
-      return @indexing_directives if defined?(@indexing_directives)
-
-      @indexing_directives = indexing_parameter_names.each_with_object({}) do |key, h|
-        h[key] = "_#{key}"
-      end
-      fix_op_type!(@indexing_directives) # hack: valid param loses underscore between ES 2.x & 5.x
-      @indexing_directives.freeze
-    end
-
-    # COMPATIBILITY
-    # Return a Hash of indexing request parameters that are known to
-    # elastomer-client, but not supported by the current version of
-    # Elasticsearch.
-    def unsupported_indexing_directives
-      return @unsupported_indexing_directives if defined?(@unsupported_indexing_directives)
-
-      unsupported_keys = KNOWN_INDEXING_PARAMETER_NAMES - indexing_parameter_names
-
-      @unsupported_indexing_directives = unsupported_keys.each_with_object({}) do |key, h|
-        h[key] = "_#{key}"
-      end
-      fix_op_type!(@unsupported_indexing_directives) # hack: valid param loses underscore between ES 2.x & 5.x
-      @unsupported_indexing_directives.freeze
-    end
-
-    # COMPATIBILITY
     # Internal: VersionSupport maintains dynamically-created lists of acceptable and unacceptable
     # request params by ES version. This just shims that list since those params have leading
     # underscores by default. If we end up with >1 such param, let's make a real thing to handle this.
@@ -217,12 +173,5 @@ module Elastomer
       end
     end
 
-    def indexing_parameter_names
-      if es_version_2_x?
-        COMMON_INDEXING_PARAMETER_NAMES + ES_2_X_INDEXING_PARAMETER_NAMES
-      else
-        COMMON_INDEXING_PARAMETER_NAMES + ES_5_X_INDEXING_PARAMETER_NAMES
-      end
-    end
   end
 end

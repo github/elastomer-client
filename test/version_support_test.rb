@@ -92,10 +92,5 @@ describe Elastomer::VersionSupport do
       end
     end
 
-    describe "#op_type_param" do
-      it "converts the supplied params key _op_type to op_type, if present" do
-        assert_equal(version_support.op_type(_op_type: "create"), {op_type: "create"})
-      end
-    end
   end
 end

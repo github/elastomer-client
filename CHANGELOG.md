@@ -1,3 +1,7 @@
+## 3.1.0 (2018-01-19)
+- Added the `strict_params` flag for enforcing params passed to the REST API
+- Added the `RestApiSpec` module and classes for enforcing strict params
+
 ## 3.0.1 (2017-12-20)
 - Fixed argument passing to `app_delete_by_query`
 - Explicitly close scroll search contexts when scroll is complete

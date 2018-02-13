@@ -1,6 +1,8 @@
 language: ruby
 rvm:
-  - 2.3.3
+  - 2.3.5
+  - 2.4.3
+  - 2.5.0
 env:
   # NOTE: Ancient versions of Elasticsearch have different download URLs
   - ES_VERSION=2.3.5 ES_DOWNLOAD_URL=https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz

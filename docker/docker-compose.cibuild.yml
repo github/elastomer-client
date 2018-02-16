@@ -4,5 +4,5 @@ networks:
   default:
     ipam:
       config:
-        - subnet: 192.168.42.0/26
-          gateway: 192.168.42.1
+        - subnet: 192.168.0.0/26
+          gateway: 192.168.0.1

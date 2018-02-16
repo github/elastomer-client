@@ -32,8 +32,10 @@ module Elastomer
         env[:request_headers][X_OPAQUE_ID] = uuid
 
         @app.call(env).on_complete do |renv|
-          if uuid != renv[:response_headers][X_OPAQUE_ID]
-            raise ::Elastomer::Client::OpaqueIdError, "conflicting 'X-Opaque-Id' headers"
+          response_uuid = renv[:response_headers][X_OPAQUE_ID]
+          if uuid != response_uuid
+            raise ::Elastomer::Client::OpaqueIdError,
+                  "Conflicting 'X-Opaque-Id' headers: request #{uuid.inspect}, response #{response_uuid.inspect}"
           end
         end
       end

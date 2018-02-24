@@ -1,5 +1,6 @@
 ## 3.1.1 (2018-02-24)
 - Output opaque ID information when a conflict is detected
+- Updating the `semantic` gem
 
 ## 3.1.0 (2018-01-19)
 - Added the `strict_params` flag for enforcing params passed to the REST API

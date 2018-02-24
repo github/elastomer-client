@@ -37,6 +37,15 @@ describe Elastomer::Middleware::OpaqueId do
     assert_raises(Elastomer::Client::OpaqueIdError) { @client.cluster.state }
   end
 
+  it 'generates a UUID per call' do
+    opaque_id = Elastomer::Middleware::OpaqueId.new
+
+    uuid1 = opaque_id.generate_uuid
+    uuid2 = opaque_id.generate_uuid
+
+    assert uuid1 != uuid2, "UUIDs should be unique"
+  end
+
   it 'generates a UUID per thread' do
     opaque_id = Elastomer::Middleware::OpaqueId.new
     uuids = []
@@ -55,5 +64,4 @@ describe Elastomer::Middleware::OpaqueId do
     bases = uuids.map { |uuid| uuid[0,16] }
     assert_equal 3, bases.uniq.length, "each thread did not get a unique base ID"
   end
-
 end

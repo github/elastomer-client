@@ -48,29 +48,24 @@ module Elastomer
       def generate_uuid
         t = Thread.current
 
-        unless t.thread_variable? :opaque_id_base
-          t.thread_variable_set(:opaque_id_base, (SecureRandom.urlsafe_base64(12) + "%08x").freeze)
-          t.thread_variable_set(:opaque_id_counter, -1)
+        unless t.key? :opaque_id_base
+          t[:opaque_id_base]    = (SecureRandom.urlsafe_base64(12) + "%08x").freeze
+          t[:opaque_id_counter] = -1
         end
 
-        base    = t.thread_variable_get(:opaque_id_base)
-        counter = t.thread_variable_get(:opaque_id_counter)
-
-        counter += 1
-        counter = 0 if counter > COUNTER_MAX
-        t.thread_variable_set(:opaque_id_counter, counter)
-
-        base % counter
+        t[:opaque_id_counter] += 1
+        t[:opaque_id_counter] = 0 if t[:opaque_id_counter] > COUNTER_MAX
+        t[:opaque_id_base] % t[:opaque_id_counter]
       end
 
-    end
-  end
+    end  # OpaqueId
+  end  # Middleware
 
   # Error raised when a conflict is detected between the UUID sent in the
   # 'X-Opaque-Id' request header and the one received in the response header.
   Client::OpaqueIdError = Class.new Client::Error
 
-end
+end  # Elastomer
 
 Faraday::Request.register_middleware \
-  opaque_id: ::Elastomer::Middleware::OpaqueId
+  :opaque_id => ::Elastomer::Middleware::OpaqueId

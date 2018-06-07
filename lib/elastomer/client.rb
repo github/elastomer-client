@@ -117,6 +117,7 @@ module Elastomer
         conn.response(:parse_json)
         conn.request(:opaque_id) if @opaque_id
         conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
+        conn.request(:elastomer_compress, lazy_supports_gzip: lambda { version_support.supports_gzip? })
 
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)

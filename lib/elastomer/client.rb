@@ -32,11 +32,14 @@ module Elastomer
     #   :max_retries      - the maximum number of request retires (defaults to 0)
     #   :retry_delay      - delay in seconds between retries (defaults to 0.075)
     #   :strict_params    - set to `true` to raise exceptions when invalid request params are used
+    #   :es_version       - set to the Elasticsearch version (example: "5.6.6") to avoid an HTTP request to get the version.
+    #   :compress_body    - set to true to enable request body compression (default: false)
+    #   :compression      - The compression level (0-9) when request body compression is enabled (default: Zlib::DEFAULT_COMPRESSION)
     #
     def initialize(host: "localhost", port: 9200, url: nil,
                    read_timeout: 5, open_timeout: 2, max_retries: 0, retry_delay: 0.075,
                    opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE,
-                   strict_params: false)
+                   strict_params: false, es_version: nil, compress_body: false, compression: Zlib::DEFAULT_COMPRESSION)
 
       @url = url || "http://#{host}:#{port}"
 
@@ -52,12 +55,18 @@ module Elastomer
       @opaque_id        = opaque_id
       @max_request_size = max_request_size
       @strict_params    = strict_params
+      @es_version       = es_version
+      @compress_body    = compress_body
+      @compression      = compression
     end
 
     attr_reader :host, :port, :url
     attr_reader :read_timeout, :open_timeout
     attr_reader :max_retries, :retry_delay, :max_request_size
     attr_reader :strict_params
+    attr_reader :es_version
+    attr_reader :compress_body
+    attr_reader :compression
     alias :strict_params? :strict_params
 
     # Returns a duplicate of this Client connection configured in the exact same
@@ -83,6 +92,8 @@ module Elastomer
 
     # Returns the version String of the attached Elasticsearch instance.
     def version
+      return es_version unless es_version.nil?
+
       @version ||= begin
         response = get "/"
         response.body.dig("version", "number")
@@ -117,7 +128,7 @@ module Elastomer
         conn.response(:parse_json)
         conn.request(:opaque_id) if @opaque_id
         conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
-        conn.request(:elastomer_compress, lazy_supports_gzip: lambda { version_support.supports_gzip? })
+        conn.request(:elastomer_compress, compression: compression) if compress_body
 
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)

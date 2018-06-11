@@ -1,5 +1,6 @@
 require "addressable/template"
 require "faraday"
+require "faraday_middleware"
 require "multi_json"
 require "semantic"
 
@@ -113,8 +114,10 @@ module Elastomer
     # Returns a Faraday::Connection
     def connection
       @connection ||= Faraday.new(url) do |conn|
-        conn.request(:encode_json)
         conn.response(:parse_json)
+        # Request compressed responses from ES and decompress them
+        conn.use(:gzip)
+        conn.request(:encode_json)
         conn.request(:opaque_id) if @opaque_id
         conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
 

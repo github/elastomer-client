@@ -11,6 +11,8 @@ module Elastomer
     class Compress < Faraday::Middleware
       CONTENT_ENCODING = "Content-Encoding"
       GZIP = "gzip"
+      # An Ethernet packet can hold 1500 bytes. No point in compressing anything smaller than that (plus some wiggle room).
+      MIN_BYTES_FOR_COMPRESSION = 1400
 
       attr_reader :compression
 
@@ -23,7 +25,7 @@ module Elastomer
 
       def call(env)
         if body = env[:body]
-          if body.is_a?(String)
+          if body.is_a?(String) && body.bytesize > MIN_BYTES_FOR_COMPRESSION
             output = StringIO.new
             output.set_encoding("BINARY")
             gz = Zlib::GzipWriter.new(output, compression, Zlib::DEFAULT_STRATEGY)

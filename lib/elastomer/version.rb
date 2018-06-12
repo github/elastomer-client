@@ -1,5 +1,5 @@
 module Elastomer
-  VERSION = "3.1.1"
+  VERSION = "3.1.2"
 
   def self.version
     VERSION

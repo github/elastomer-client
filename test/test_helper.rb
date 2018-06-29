@@ -43,6 +43,17 @@ raise "No server available at #{$client.url}" unless $client.available?
 
 puts "Elasticsearch version is #{$client.version}"
 
+# COMPATIBILITY
+# Returns true if the Elasticsearch cluster defaults to supporting compression.
+def supports_compressed_bodies_by_default?
+  $client.version_support.es_version_5_x?
+end
+
+# Now that we have the version, re-create the client with compression if supported.
+if supports_compressed_bodies_by_default?
+  $client = Elastomer::Client.new $client_params.merge(compress_body: true)
+end
+
 # remove any lingering test indices from the cluster
 MiniTest.after_run do
   $client.cluster.indices.keys.each do |name|

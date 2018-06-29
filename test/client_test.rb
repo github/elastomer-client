@@ -171,6 +171,15 @@ describe Elastomer::Client do
       assert_match(/[\d\.]+/, $client.version)
     end
 
+    it "does not make an HTTP request for version if it is provided at create time" do
+      request = stub_request(:get, "#{$client.url}/")
+
+      client = Elastomer::Client.new $client_params.merge(es_version: "5.6.6")
+      assert_equal "5.6.6", client.version
+
+      assert_not_requested request
+    end
+
     it "gets semantic version" do
       version_string = $client.version
       assert_equal Semantic::Version.new(version_string), $client.semantic_version

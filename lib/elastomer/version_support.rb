@@ -161,6 +161,11 @@ module Elastomer
       end
     end
 
+    # ES 5.X supports GZip-compressed request bodies, but ES 2.4 doesn't?
+    def supports_gzip?
+      es_version_5_x?
+    end
+
     private
 
     # Internal: Helper to reject arguments that shouldn't be passed because

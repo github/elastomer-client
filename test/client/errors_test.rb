@@ -71,6 +71,7 @@ describe Elastomer::Client::Error do
     assert !Elastomer::Client::TimeoutError.fatal, "Timeouts are not fatal"
     assert !Elastomer::Client::ConnectionFailed.fatal, "Connection failures are not fatal"
     assert !Elastomer::Client::ServerError.fatal, "Server errors are not fatal"
+    assert !Elastomer::Client::RejectedExecutionError.fatal, "Rejected execution errors are not fatal"
   end
 
   if parameter_validation?

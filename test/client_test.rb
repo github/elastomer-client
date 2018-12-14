@@ -33,6 +33,30 @@ describe Elastomer::Client do
     end
   end
 
+  it "raises an error on rejected execution exceptions" do
+    rejected_execution_response = {
+      error: {
+        root_cause: [{
+          type: "es_rejected_execution_exception",
+          reason: "rejected execution of org.elasticsearch.transport.TransportService$7@5a787cd5 on EsThreadPoolExecutor[bulk, queue capacity = 200, org.elasticsearch.common.util.concurrent.EsThreadPoolExecutor@1338862c[Running, pool size = 32, active threads = 32, queued tasks = 213, completed tasks = 193082975]]"
+        }],
+        type: "es_rejected_execution_exception",
+        reason: "rejected execution of org.elasticsearch.transport.TransportService$7@5a787cd5 on EsThreadPoolExecutor[bulk, queue capacity = 200, org.elasticsearch.common.util.concurrent.EsThreadPoolExecutor@1338862c[Running, pool size = 32, active threads = 32, queued tasks = 213, completed tasks = 193082975]]"
+      }
+    }.to_json
+
+    stub_request(:post, $client.url+"/_bulk").to_return({
+      body: rejected_execution_response
+    })
+
+    begin
+      $client.post "/_bulk"
+      assert false, "exception was not raised when it should have been"
+    rescue Elastomer::Client::RejectedExecutionError => err
+      assert_match %r/es_rejected_execution_exception/, err.message
+    end
+  end
+
   it "wraps Faraday errors with our own exceptions" do
     error = Faraday::TimeoutError.new("it took too long")
     wrapped = $client.wrap_faraday_error(error, :get, "/_cat/indices")

@@ -407,6 +407,7 @@ module Elastomer
         case root_cause["type"]
         when "index_not_found_exception"; raise IndexNotFoundError, response
         when "illegal_argument_exception"; raise IllegalArgument, response
+        when "es_rejected_execution_exception"; raise RejectedExecutionError, response
         when *version_support.query_parse_exception; raise QueryParsingError, response
         end
 

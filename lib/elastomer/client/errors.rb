@@ -85,13 +85,15 @@ module Elastomer
 
     # Provide some nice errors for common Elasticsearch exceptions. These are
     # all subclasses of the more general RequestError
-    IndexNotFoundError   = Class.new RequestError
-    QueryParsingError    = Class.new RequestError
-    SearchContextMissing = Class.new RequestError
+    IndexNotFoundError     = Class.new RequestError
+    QueryParsingError      = Class.new RequestError
+    SearchContextMissing   = Class.new RequestError
+    RejectedExecutionError = Class.new RequestError
 
-    ServerError.fatal      = false
-    TimeoutError.fatal     = false
-    ConnectionFailed.fatal = false
+    ServerError.fatal            = false
+    TimeoutError.fatal           = false
+    ConnectionFailed.fatal       = false
+    RejectedExecutionError.fatal = false
 
     # Define an Elastomer::Client exception class on the fly for
     # Faraday exception classes that we don't specifically wrap.

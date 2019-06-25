@@ -41,6 +41,23 @@ describe Elastomer::Client::Docs do
     @index.delete if @index.exists?
   end
 
+  it "raises error when writing same document twice" do
+    document = {
+      :_id => "documentid",
+      :_type => "doc2",
+      :_op_type => "create",
+      :title => "the author of logging",
+      :author => "pea53"
+    }
+    h = @docs.index document.dup
+
+    assert_created h
+
+    assert_raises(Elastomer::Client::DocumentAlreadyExistsError) do
+      @docs.index document.dup
+    end
+  end
+
   it "autogenerates IDs for documents" do
     h = @docs.index \
           :_type  => "doc2",

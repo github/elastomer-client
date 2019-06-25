@@ -53,10 +53,9 @@ describe Elastomer::Client::Docs do
 
     assert_created h
 
-    exception = assert_raises(Elastomer::Client::DocumentAlreadyExistsError) do
+    assert_raises(Elastomer::Client::DocumentAlreadyExistsError) do
       @docs.index document.dup
     end
-    assert_equal "[doc2][documentid]: document already exists", exception.error["reason"]
   end
 
   it "autogenerates IDs for documents" do

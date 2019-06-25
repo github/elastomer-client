@@ -408,6 +408,7 @@ module Elastomer
         when "index_not_found_exception"; raise IndexNotFoundError, response
         when "illegal_argument_exception"; raise IllegalArgument, response
         when "es_rejected_execution_exception"; raise RejectedExecutionError, response
+        when "document_already_exists_exception"; raise DocumentAlreadyExistsError, response
         when *version_support.query_parse_exception; raise QueryParsingError, response
         end
 

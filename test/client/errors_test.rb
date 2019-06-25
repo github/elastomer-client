@@ -65,7 +65,7 @@ describe Elastomer::Client::Error do
     assert Elastomer::Client::ParsingError.fatal, "Parsing error is fatal"
     assert Elastomer::Client::SSLError.fatal, "SSL error is fatal"
     assert Elastomer::Client::RequestError.fatal, "Request error is fatal"
-    assert Elastomer::Client::DocumentAlreadyExistsError.fatal, "Request error is fatal"
+    assert Elastomer::Client::DocumentAlreadyExistsError.fatal, "DocumentAlreadyExistsError error is fatal"
   end
 
   it "has some non-fatal subclasses" do

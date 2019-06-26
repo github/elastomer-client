@@ -1,3 +1,6 @@
+## 3.1.5 (2019-06-26)
+- Add new more granular exception type
+
 ## 3.1.1 (2018-02-24)
 - Output opaque ID information when a conflict is detected
 - Updating the `semantic` gem

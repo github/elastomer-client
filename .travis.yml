@@ -12,7 +12,7 @@ install:
   - wget ${ES_DOWNLOAD_URL}
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
-  - rm Gemfile.lock
+  - pwd
   - bundle install
   - wget --quiet --waitretry=1 --retry-connrefused --timeout=10 --output-document=- http://127.0.0.1:9200
 

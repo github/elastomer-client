@@ -36,11 +36,14 @@ module Elastomer
     #   :es_version       - set to the Elasticsearch version (example: "5.6.6") to avoid an HTTP request to get the version.
     #   :compress_body    - set to true to enable request body compression (default: false)
     #   :compression      - The compression level (0-9) when request body compression is enabled (default: Zlib::DEFAULT_COMPRESSION)
+    #   :basic_auth       - a Hash containing basic authentication :username and :password values to use on connections
+    #   :token_auth       - an authentication token as a String to use on connections (overrides :basic_auth)
     #
     def initialize(host: "localhost", port: 9200, url: nil,
                    read_timeout: 5, open_timeout: 2, max_retries: 0, retry_delay: 0.075,
                    opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE,
-                   strict_params: false, es_version: nil, compress_body: false, compression: Zlib::DEFAULT_COMPRESSION)
+                   strict_params: false, es_version: nil, compress_body: false, compression: Zlib::DEFAULT_COMPRESSION,
+                   basic_auth: nil, token_auth: nil)
 
       @url = url || "http://#{host}:#{port}"
 
@@ -59,6 +62,8 @@ module Elastomer
       @es_version       = es_version
       @compress_body    = compress_body
       @compression      = compression
+      @basic_auth       = basic_auth
+      @token_auth       = token_auth
     end
 
     attr_reader :host, :port, :url
@@ -79,7 +84,9 @@ module Elastomer
           open_timeout:     open_timeout,
           adapter:          @adapter,
           opaque_id:        @opaque_id,
-          max_request_size: max_request_size
+          max_request_size: max_request_size,
+          basic_auth:       @basic_auth,
+          token_auth:       @token_auth
     end
 
     # Returns true if the server is available; returns false otherwise.
@@ -133,14 +140,20 @@ module Elastomer
         conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
         conn.request(:elastomer_compress, compression: compression) if compress_body
 
+        conn.options[:timeout]      = read_timeout
+        conn.options[:open_timeout] = open_timeout
+
+        if @token_auth.present?
+          conn.token_auth(@token_auth)
+        elsif @basic_auth.present?
+          conn.basic_auth(@basic_auth.fetch(:username), @basic_auth.fetch(:password))
+        end
+
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)
         else
           conn.adapter(@adapter)
         end
-
-        conn.options[:timeout]      = read_timeout
-        conn.options[:open_timeout] = open_timeout
       end
     end
 

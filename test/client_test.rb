@@ -88,6 +88,58 @@ describe Elastomer::Client do
     }
   end
 
+  describe "authorization" do
+    it "can use basic authentication" do
+      client_params = $client_params.merge(basic_auth: {
+        username: "my_user",
+        password: "my_secret_password"
+      })
+      client = Elastomer::Client.new client_params
+
+      connection = Faraday::Connection.new
+      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
+
+      Faraday.stub(:new, $client_params[:url], connection) do
+        client.ping
+      end
+
+      assert basic_auth_spy.has_been_called_with?("my_user", "my_secret_password")
+    end
+
+    it "can use token authentication" do
+      client_params = $client_params.merge(token_auth: "my_secret_token")
+      client = Elastomer::Client.new client_params
+
+      connection = Faraday::Connection.new
+      token_auth_spy = Spy.on(connection, :token_auth).and_return(nil)
+
+      Faraday.stub(:new, $client_params[:url], connection) do
+        client.ping
+      end
+
+      assert token_auth_spy.has_been_called_with?("my_secret_token")
+    end
+
+    it "prefers token authentication over basic" do
+      client_params = $client_params.merge(basic_auth: {
+        username: "my_user",
+        password: "my_secret_password"
+      }, token_auth: "my_secret_token")
+      client = Elastomer::Client.new client_params
+
+      connection = Faraday::Connection.new
+      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
+      token_auth_spy = Spy.on(connection, :token_auth).and_return(nil)
+
+      Faraday.stub(:new, $client_params[:url], connection) do
+        client.ping
+      end
+
+      refute basic_auth_spy.has_been_called?
+      assert token_auth_spy.has_been_called_with?("my_secret_token")
+    end
+  end
+
   describe "when extracting and converting :body params" do
     it "deletes the :body from the params (or it gets the hose)" do
       params = { :body => nil, :q => "what what?" }

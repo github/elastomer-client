@@ -25,6 +25,7 @@ notifications:
   email: false
 
 sudo: false
+dist: trusty
 jdk:
  - oraclejdk8
 addons:

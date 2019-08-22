@@ -11,7 +11,7 @@ env:
 # See: https://docs.travis-ci.com/user/database-setup/#Installing-ElasticSearch-on-trusty-container-based-infrastructure
 install:
   - sudo apt install openjdk-8-jdk
-  - sudo update-java-alternatives --set java-1.8.0-openjdk-amd64
+  - update-java-alternatives -l
   - wget ${ES_DOWNLOAD_URL}
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &

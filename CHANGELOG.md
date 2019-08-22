@@ -1,3 +1,8 @@
+## 3.2.0 (2019-08-22)
+- Add config based basic and token auth to `Elastomer::Client#connection`
+- Filter `Elastomer::Client#inspect` output to hide basic and token auth info,
+  and reduce noisiness when debugging
+
 ## 3.1.5 (2019-06-26)
 - Add new more granular exception type
 

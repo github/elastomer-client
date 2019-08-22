@@ -12,6 +12,7 @@ module Elastomer
 
   class Client
     IVAR_BLACK_LIST = [:@basic_auth, :@token_auth]
+    IVAR_NOISY_LIST = [:@api_spec, :@cluster, :@connection]
 
     MAX_REQUEST_SIZE = 250 * 2**20  # 250 MB
 
@@ -475,7 +476,9 @@ module Elastomer
     end
 
     def inspect
-      public_vars = self.instance_variables.map do |var|
+      public_vars = self.instance_variables.reject do |var|
+        IVAR_NOISY_LIST.include?(var)
+      end.map do |var|
         "#{var}=#{IVAR_BLACK_LIST.include?(var) ? "[FILTERED]" : instance_variable_get(var).inspect}"
       end.join(", ")
       "<##{self.class}:#{self.object_id.to_s(16)} #{public_vars}>"

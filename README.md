@@ -105,3 +105,17 @@ thusly:
 ```ruby
 Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
 ```
+
+## Releasing
+
+1. Create a new branch from `master`
+2. Bump the version number in `lib/elastomer/version.rb`
+3. Update `CHANGELOG.md` with info about the new version
+4. Execute `bin/rake build`. This will place a new gem file in the `pkg/` folder.
+5. Run `gem install pkg/elastomer-client-{VERSION}.gem` to install the new gem locally
+6. Start an `irb` session, `require "elastomer/client"` and make sure things work as you expect
+7. Once everything is working as you expect, commit the version bump and open a PR
+8. Once you get approval and merge it to master, pull down a fresh copy of master and then...
+9. Run `rake release`
+10. If necessary, manually push the new version to rubygems.org
+11. 🕺 💃 🎉

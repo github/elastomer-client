@@ -3,6 +3,7 @@ require "faraday"
 require "faraday_middleware"
 require "multi_json"
 require "semantic"
+require "zlib"
 
 require "elastomer/version"
 require "elastomer/version_support"
@@ -10,6 +11,8 @@ require "elastomer/version_support"
 module Elastomer
 
   class Client
+    IVAR_BLACK_LIST = [:@basic_auth, :@token_auth]
+
     MAX_REQUEST_SIZE = 250 * 2**20  # 250 MB
 
     RETRYABLE_METHODS = %i[get head].freeze
@@ -471,6 +474,12 @@ module Elastomer
       @version_support ||= VersionSupport.new(version)
     end
 
+    def inspect
+      public_vars = self.instance_variables.map do |var|
+        "#{var}=#{IVAR_BLACK_LIST.include?(var) ? "[FILTERED]" : instance_variable_get(var).inspect}"
+      end.join(", ")
+      "<##{self.class}:#{self.object_id.to_s(16)} #{public_vars}>"
+    end
   end  # Client
 end  # Elastomer
 

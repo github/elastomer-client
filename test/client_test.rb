@@ -88,6 +88,19 @@ describe Elastomer::Client do
     }
   end
 
+  it "hides basic_auth and token_auth params from inspection" do
+    client_params = $client_params.merge(basic_auth: {
+      username: "my_user",
+      password: "my_secret_password"
+    }, token_auth: "my_secret_token")
+    client = Elastomer::Client.new client_params
+    refute_match(/my_user/, client.inspect)
+    refute_match(/my_secret_password/, client.inspect)
+    refute_match(/my_secret_token/, client.inspect)
+    assert_match(/@basic_auth=\[FILTERED\]/, client.inspect)
+    assert_match(/@token_auth=\[FILTERED\]/, client.inspect)
+  end
+
   describe "authorization" do
     it "can use basic authentication" do
       client_params = $client_params.merge(basic_auth: {

@@ -10,7 +10,7 @@ Get started by cloning and running a few scripts:
 $ git clone https://github.com/github/elastomer-client.git
 $ cd elastomer-client
 $ script/bootstrap
-$ rake test
+$ bundle exec rake test
 ```
 
 ## Client

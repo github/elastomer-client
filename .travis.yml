@@ -1,6 +1,4 @@
 language: ruby
-jdk:
- - oraclejdk8
 rvm:
   - 2.3.8
 env:
@@ -27,3 +25,9 @@ notifications:
   email: false
 
 sudo: false
+jdk:
+ - oraclejdk8
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer

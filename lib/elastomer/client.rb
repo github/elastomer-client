@@ -147,10 +147,10 @@ module Elastomer
         conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout
 
-        if @token_auth.present?
+        if token_auth?
           conn.token_auth(@token_auth)
-        elsif @basic_auth.present?
-          conn.basic_auth(@basic_auth.fetch(:username), @basic_auth.fetch(:password))
+        elsif basic_auth?
+          conn.basic_auth(@basic_auth[:username], @basic_auth[:password])
         end
 
         if @adapter.is_a?(Array)
@@ -482,6 +482,23 @@ module Elastomer
         "#{var}=#{IVAR_BLACK_LIST.include?(var) ? "[FILTERED]" : instance_variable_get(var).inspect}"
       end.join(", ")
       "<##{self.class}:#{self.object_id.to_s(16)} #{public_vars}>"
+    end
+
+    private
+
+    def token_auth?
+      present_for_auth?(@token_auth)
+    end
+
+    def basic_auth?
+      @basic_auth.is_a?(Hash) &&
+        present_for_auth?(@basic_auth[:username]) &&
+        present_for_auth?(@basic_auth[:password])
+    end
+
+    # Cheap implementation of ActiveSupport's Object#present?
+    def present_for_auth?(object)
+      object.respond_to?(:empty?) ? !object.empty? : !!object
     end
   end  # Client
 end  # Elastomer

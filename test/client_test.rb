@@ -119,6 +119,38 @@ describe Elastomer::Client do
       assert basic_auth_spy.has_been_called_with?("my_user", "my_secret_password")
     end
 
+    it "ignores basic authentication if password is missing" do
+      client_params = $client_params.merge(basic_auth: {
+        username: "my_user"
+      })
+      client = Elastomer::Client.new client_params
+
+      connection = Faraday::Connection.new
+      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
+
+      Faraday.stub(:new, $client_params[:url], connection) do
+        client.ping
+      end
+
+      refute basic_auth_spy.has_been_called?
+    end
+
+    it "ignores basic authentication if username is missing" do
+      client_params = $client_params.merge(basic_auth: {
+        password: "my_secret_password"
+      })
+      client = Elastomer::Client.new client_params
+
+      connection = Faraday::Connection.new
+      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
+
+      Faraday.stub(:new, $client_params[:url], connection) do
+        client.ping
+      end
+
+      refute basic_auth_spy.has_been_called?
+    end
+
     it "can use token authentication" do
       client_params = $client_params.merge(token_auth: "my_secret_token")
       client = Elastomer::Client.new client_params

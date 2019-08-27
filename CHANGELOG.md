@@ -1,3 +1,6 @@
+## 3.2.1 (2019-08-27)
+- Ignore basic_auth unless username and password are present
+
 ## 3.2.0 (2019-08-22)
 - Add config based basic and token auth to `Elastomer::Client#connection`
 - Filter `Elastomer::Client#inspect` output to hide basic and token auth info,

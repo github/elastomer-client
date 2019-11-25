@@ -17,8 +17,7 @@ $ bundle exec rake test
 
 The client provides a one-to-one mapping to the Elasticsearch [API
 endpoints](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html).
-The API is decomposed into logical sections and accessed according to what you
-are trying to accomplish. Each logical section is represented as a [client
+Logical sections of APIs is used to access the accomplishment. Each logical section is represented as a [client
 class](lib/elastomer/client) and a top-level accessor is provided for each.
 
 #### Cluster

@@ -42,8 +42,7 @@ client.cluster.templates
 
 #### Index
 
-The methods in the [Index](lib/elastomer/client/index.rb) class deal with the
-management of indexes in the cluster. This includes setting up type mappings
+Index has methods to manage clusters.This includes setting up type mappings
 and adjusting settings. The actual indexing and search of documents are
 handled by the Docs class (discussed next).
 

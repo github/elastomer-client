@@ -1,3 +1,6 @@
+## 3.2.2 (2020-02-25)
+- Update Webmock to ~> 3.5 to support Ruby 2.6+ (#222)
+
 ## 3.2.1 (2019-08-27)
 - Ignore basic_auth unless username and password are present
 

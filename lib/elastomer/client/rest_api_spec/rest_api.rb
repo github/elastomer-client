@@ -15,7 +15,7 @@ module Elastomer::Client::RestApiSpec
     def initialize(documentation:, methods:, url:, body: nil)
       @documentation = documentation
       @methods = Array(methods)
-      @url = Url.new(url)
+      @url = Url.new(**url)
       @body = body
     end
 

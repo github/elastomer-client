@@ -146,7 +146,6 @@ describe Elastomer::Client::Bulk do
       b.index  '{"author":"pea53", "message":"just a test tweet"}', :_id => 1, :_type => "tweet"
       b.create '{"author":"John Scalzi", "title":"Old Mans War"}',  :_id => 1, :_type => "book"
     end
-    items = h["items"]
 
     assert_kind_of Integer, h["took"]
 

@@ -78,17 +78,6 @@ module Elastomer
       end
     end
 
-    # COMPATIBILITY: handle _op_type -> op_type request param conversion for put-if-absent bnehavior
-    # Returns the (possibly mutated) params hash supplied by the caller.
-    #
-    # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#operation-type
-    def op_type(params = {})
-      if es_version_5_x? && (params.key?(:_op_type) || params.key?("_op_type"))
-        params[:op_type] = params.delete(:_op_type)
-      end
-      params
-    end
-
     # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
     # way. Some tests need to know what version is running to structure requests
     # as expected.
@@ -139,16 +128,6 @@ module Elastomer
     # COMPATIBILITY
     # ES 5.X supports `delete_by_query` natively again.
     alias :native_delete_by_query? :es_version_5_x?
-
-    # COMPATIBILITY
-    # Internal: VersionSupport maintains dynamically-created lists of acceptable and unacceptable
-    # request params by ES version. This just shims that list since those params have leading
-    # underscores by default. If we end up with >1 such param, let's make a real thing to handle this.
-    def fix_op_type!(params = {})
-      if es_version_5_x? && params.key?(:op_type)
-        params[:op_type] = "op_type"
-      end
-    end
 
     # COMPATIBILITY
     # Return a symbol representing the best supported delete_by_query

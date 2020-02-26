@@ -82,7 +82,7 @@ echo
 result=0
 
 begin_fold "Ruby environment setup..."
-export RBENV_VERSION="2.3.3"
+export RBENV_VERSION="${RBENV_VERSION:-2.3.3}"
 if [ -d /usr/share/rbenv/shims ]; then
   export PATH=/usr/share/rbenv/shims:$PATH
 fi

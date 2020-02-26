@@ -160,12 +160,10 @@ describe Elastomer::Client::Bulk do
     h = @index.docs("book").get :id => 1
     assert_equal "John Scalzi", h["_source"]["author"]
 
-
     h = @index.bulk do |b|
       b.index '{"author":"Tolkien", "title":"The Silmarillion"}', :_id => 2, :_type => "book"
       b.delete :_id => 1, :_type => "book"
     end
-    items = h["items"]
 
     assert_bulk_index h["items"].first, "expected to index a book"
     assert_bulk_delete h["items"].last, "expected to delete a book"

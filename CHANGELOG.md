@@ -1,3 +1,6 @@
+## 3.2.3 (2020-02-26)
+- Fix warnings in Ruby 2.7 whan passing a Hash to a method that is expecting keyword arguments
+
 ## 3.2.2 (2020-02-25)
 - Update Webmock to ~> 3.5 to support Ruby 2.6+ (#222)
 

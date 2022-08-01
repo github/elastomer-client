@@ -238,7 +238,7 @@ module Elastomer
       # cluster and no further documents can be returned by this Scroller
       # instance.
       #
-      # Returns nil if the `scroll_id` is not valid; returns the reponse body if
+      # Returns nil if the `scroll_id` is not valid; returns the response body if
       # the `scroll_id` was cleared.
       def clear!
         return if scroll_id.nil?

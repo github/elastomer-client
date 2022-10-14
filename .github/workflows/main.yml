@@ -1,0 +1,47 @@
+name: CI build Workflow
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            ES_VERSION: 2.3.5
+            ES_DOWNLOAD_URL: >-
+              https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz
+          - os: ubuntu-latest
+            ES_VERSION: 2.4.6
+            ES_DOWNLOAD_URL: >-
+              https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz
+          - os: ubuntu-latest
+            ES_VERSION: 5.6.15
+            ES_DOWNLOAD_URL: >-
+              https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+    steps:
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |-
+          sudo apt-get update
+          sudo apt-get install -y oracle-java8-installer
+      - uses: actions/checkout@v3
+      - run: 'wget ${ES_DOWNLOAD_URL}'
+        env: &ref_0
+          ES_VERSION: '${{ matrix.ES_VERSION }}'
+          ES_DOWNLOAD_URL: '${{ matrix.ES_DOWNLOAD_URL }}'
+      - run: 'tar -xzf elasticsearch-${ES_VERSION}.tar.gz'
+        env: *ref_0
+      - run: './elasticsearch-${ES_VERSION}/bin/elasticsearch &'
+        env: *ref_0
+      - run: gem install bundler
+      - run: bundle install
+      - run: >-
+          wget --quiet --waitretry=1 --retry-connrefused --timeout=10
+          --output-document=- http://127.0.0.1:9200
+      - run: bundle exec rake test

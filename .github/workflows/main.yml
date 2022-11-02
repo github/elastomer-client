@@ -38,7 +38,5 @@ jobs:
       - run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d'
       - run: gem install bundler
       - run: bundle install
-      - run: >-
-          wget --quiet --waitretry=1 --retry-connrefused --timeout=10
-          --output-document=- http://127.0.0.1:9200
+      - run: script/poll-for-es
       - run: bundle exec rake test

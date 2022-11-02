@@ -11,6 +11,7 @@ jobs:
     runs-on: '${{ matrix.os }}'
     strategy:
       matrix:
+        ruby-version: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0', '3.1']
         include:
           - os: ubuntu-latest
             ES_VERSION: 2.4.6
@@ -28,7 +29,7 @@ jobs:
           sudo apt-get install -y openjdk-8-jre-headless
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.3.8' # Not needed with a .ruby-version file
+          ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - uses: actions/checkout@v3
       - run: 'wget ${{ matrix.ES_DOWNLOAD_URL }}'

@@ -1,4 +1,4 @@
-# Elastomer Client [![Build Status](https://travis-ci.org/github/elastomer-client.svg?branch=master)](https://travis-ci.org/github/elastomer-client)
+# Elastomer Client [![CI build Workflow](https://github.com/github/elastomer-client/actions/workflows/main.yml/badge.svg)](https://github.com/github/elastomer-client/actions/workflows/main.yml)
 
 Making a stupid simple Elasticsearch client so your project can be smarter!
 

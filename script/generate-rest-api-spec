@@ -133,7 +133,8 @@ module Elastomer::Client::RestApiSpec
 <% end -%>
             },
 <% end -%>
-<% if (params = url["params"]) && !params.empty? -%>
+<% params = data["params"] || url["params"] -%>
+<% if !params.nil? && !params.empty? -%>
             params: {
 <% params.each do |k,v| -%>
               "<%= k %>" => <%= v.to_s %>,

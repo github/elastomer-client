@@ -32,7 +32,7 @@ class RestApiSpecGenerator
   def run
     setup
     File.open(ruby_spec_filename, "w") do |fd|
-      fd.puts ERB.new(DATA.read, 0, "-").result(binding)
+      fd.puts ERB.new(DATA.read, trim_mode: "-").result(binding)
     end
   ensure
     reset
@@ -51,7 +51,7 @@ class RestApiSpecGenerator
   # Iterate over each of the REST API specs yield the name and the descriptor
   # hash for that particular API spec.
   def each_api
-    Dir.glob("#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/*.json").each do |filename|
+    Dir.glob("#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/*.json").sort.each do |filename|
       next if filename =~ /\/_common\.json\Z/
 
       hash = MultiJson.load(File.read(filename))
@@ -82,23 +82,23 @@ class RestApiSpecGenerator
         git remote add -f origin https://github.com/elastic/elasticsearch.git &&
         git config core.sparsecheckout true &&
         echo /rest-api-spec/src/main/resources/rest-api-spec/api/ >> .git/info/sparse-checkout &&
-        git pull origin master
+        git pull origin main
       SH
     end
 
     system <<-SH
       cd #{WORKING_DIR} &&
-      git pull origin master &&
+      git pull origin main &&
       git checkout -q origin/#{short_version}
     SH
   end
 
-  # Reset the elasticsearch working directory back to the master branch of the
+  # Reset the elasticsearch working directory back to the main branch of the
   # git repository.
   def reset
     system <<-SH
       cd #{WORKING_DIR} &&
-      git checkout master
+      git checkout main
     SH
   end
 end

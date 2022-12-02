@@ -13,18 +13,21 @@ require "bundler/setup"
 
 $LOAD_PATH.unshift "lib"
 require "elastomer/client"
+require "elastomer/version_support"
 
 class RestApiSpecGenerator
   WORKING_DIR = "vendor/elasticsearch"
 
   attr_reader :version, :short_version, :class_version
 
-  def initialize(version = "5.6")
+  def initialize(version = "7.17")
     @version = version
 
     sliced = @version.split(".").slice(0,2)
     @short_version = sliced.join(".")
     @class_version = sliced.join("_")
+
+    @version_support = Elastomer::VersionSupport.new(version)
   end
 
   # Setup the working directory and generate the Ruby API spec for the
@@ -116,7 +119,7 @@ module Elastomer::Client::RestApiSpec
       @rest_apis = {
 <% each_api do |name,data| -%>
         "<%= name %>" => RestApi.new(
-          documentation: "<%= data["documentation"].to_s %>",
+          documentation: "<%= @version_support.es_version_7_plus? ? data["documentation"]["url"].to_s : data["documentation"].to_s %>",
           methods: <%= Array(data["methods"]).to_s %>,
           body: <%= data["body"] ? data["body"].to_s : "nil" %>,
 <% url = data["url"] -%>

@@ -9,7 +9,7 @@ module Elastomer
     #
     # Raises ArgumentError if version is unsupported.
     def initialize(version)
-      if version < "2.3" || version >= "5.7"
+      if version < "2.3" || version >= "8.0"
         raise ArgumentError, "Elasticsearch version #{version} is not supported by elastomer-client"
       end
 
@@ -25,19 +25,19 @@ module Elastomer
     # COMPATIBILITY: The Tasks API is evolving quickly; features, and request/response
     # structure can differ across ES versions
     def tasks_new_response_format?
-      es_version_5_x?
+      es_version_5_plus?
     end
 
     # COMPATIBILITY: Return a boolean indicating if this version supports the
     # `tasks.get` API - https://www.elastic.co/guide/en/elasticsearch/reference/5.x/tasks.html
     def supports_tasks_get?
-      es_version_5_x?
+      es_version_5_plus?
     end
 
     # COMPATIBILITY: Return a boolean indicating if this version supports the
     # `parent_task_id` param in the tasks API - https://www.elastic.co/guide/en/elasticsearch/reference/5.x/tasks.html
     def supports_parent_task_id?
-      es_version_5_x?
+      es_version_5_plus?
     end
 
     # COMPATIBILITY: Return a "text"-type mapping for a field.
@@ -83,34 +83,35 @@ module Elastomer
     #
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#operation-type
     def op_type(params = {})
-      if es_version_5_x? && (params.key?(:_op_type) || params.key?("_op_type"))
+      if es_version_5_plus? && (params.key?(:_op_type) || params.key?("_op_type"))
         params[:op_type] = params.delete(:_op_type)
       end
       params
     end
 
-    # Elasticsearch 2.0 changed some request formats in a non-backward-compatible
+    # Elasticsearch changes some request formats in a non-backward-compatible
     # way. Some tests need to know what version is running to structure requests
     # as expected.
-    #
+
     # Returns true if Elasticsearch version is 2.x.
     def es_version_2_x?
       version >= "2.0.0" && version <  "3.0.0"
     end
 
-    # Elasticsearch 5.0 changed some request formats in a non-backward-compatible
-    # way. Some tests need to know what version is running to structure requests
-    # as expected.
-    #
-    # Returns true if Elasticsearch version is 5.x.
-    def es_version_5_x?
-      version >= "5.0.0" && version < "6.0.0"
+    # Returns true if Elasticsearch version is 5.x or higher.
+    def es_version_5_plus?
+      version >= "5.0.0"
+    end
+
+    # Returns true if Elasticsearch version is 7.x or higher.
+    def es_version_7_plus?
+      version >= "7.0.0"
     end
 
     # Wraps version check and param gen where ES version >= 5.x requires
     # percolator type + field defined in mappings
     def percolator_type
-      if es_version_5_x?
+      if es_version_5_plus?
         "percolator"
       else
         ".percolator"
@@ -134,18 +135,18 @@ module Elastomer
     # COMPATIBILITY
     #
     # ES5 doesn't accept/ignore ambiguous or unexpected req params any more
-    alias :strict_request_params? :es_version_5_x?
+    alias :strict_request_params? :es_version_5_plus?
 
     # COMPATIBILITY
     # ES 5.X supports `delete_by_query` natively again.
-    alias :native_delete_by_query? :es_version_5_x?
+    alias :native_delete_by_query? :es_version_5_plus?
 
     # COMPATIBILITY
     # Internal: VersionSupport maintains dynamically-created lists of acceptable and unacceptable
     # request params by ES version. This just shims that list since those params have leading
     # underscores by default. If we end up with >1 such param, let's make a real thing to handle this.
     def fix_op_type!(params = {})
-      if es_version_5_x? && params.key?(:op_type)
+      if es_version_5_plus? && params.key?(:op_type)
         params[:op_type] = "op_type"
       end
     end
@@ -163,7 +164,7 @@ module Elastomer
 
     # ES 5.X supports GZip-compressed request bodies, but ES 2.4 doesn't?
     def supports_gzip?
-      es_version_5_x?
+      es_version_5_plus?
     end
 
     private

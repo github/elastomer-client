@@ -25,9 +25,9 @@ describe Elastomer::Client::Repository do
   end
 
   it "cannot create a repo without a name" do
-    lambda {
+    _(lambda {
       create_repo(nil)
-    }.must_raise ArgumentError
+    }).must_raise ArgumentError
   end
 
   it "gets repos" do
@@ -67,10 +67,10 @@ describe Elastomer::Client::Repository do
 
   it "cannot update a repo without a name" do
     with_tmp_repo do |repo|
-      lambda {
+      _(lambda {
         settings = repo.get[repo.name]["settings"]
         $client.repository.update(:type => "fs", :settings => settings.merge("compress" => true))
-      }.must_raise ArgumentError
+      }).must_raise ArgumentError
     end
   end
 
@@ -83,9 +83,9 @@ describe Elastomer::Client::Repository do
   end
 
   it "cannot delete a repo without a name" do
-    lambda {
+    _(lambda {
       $client.repository.delete
-    }.must_raise ArgumentError
+    }).must_raise ArgumentError
   end
 
   it "gets snapshots" do

@@ -36,7 +36,7 @@ $client_params = {
   opaque_id: false,
   strict_params: true
 }
-$client = Elastomer::Client.new $client_params
+$client = Elastomer::Client.new(**$client_params)
 
 # ensure we have an Elasticsearch server to test with
 raise "No server available at #{$client.url}" unless $client.available?
@@ -51,7 +51,7 @@ end
 
 # Now that we have the version, re-create the client with compression if supported.
 if supports_compressed_bodies_by_default?
-  $client = Elastomer::Client.new $client_params.merge(compress_body: true)
+  $client = Elastomer::Client.new(**$client_params.merge(compress_body: true))
 end
 
 # remove any lingering test indices from the cluster

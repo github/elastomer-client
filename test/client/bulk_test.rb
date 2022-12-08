@@ -240,7 +240,7 @@ describe Elastomer::Client::Bulk do
   end
 
   it "rejects documents that excceed the maximum request size" do
-    client = Elastomer::Client.new($client_params.merge(:max_request_size => 300))
+    client = Elastomer::Client.new(**$client_params.merge(:max_request_size => 300))
     index  = client.index(@name)
 
     ary = []

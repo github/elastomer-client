@@ -24,7 +24,7 @@ describe Elastomer::Middleware::OpaqueId do
         :opaque_id => true,
         :adapter   => [:test, stubs]
 
-    @client = Elastomer::Client.new opts
+    @client = Elastomer::Client.new(**opts)
     @client.instance_variable_set(:@version, "5.6.4")
   end
 

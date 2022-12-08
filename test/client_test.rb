@@ -93,7 +93,7 @@ describe Elastomer::Client do
       username: "my_user",
       password: "my_secret_password"
     }, token_auth: "my_secret_token")
-    client = Elastomer::Client.new client_params
+    client = Elastomer::Client.new(**client_params)
     refute_match(/my_user/, client.inspect)
     refute_match(/my_secret_password/, client.inspect)
     refute_match(/my_secret_token/, client.inspect)
@@ -107,7 +107,7 @@ describe Elastomer::Client do
         username: "my_user",
         password: "my_secret_password"
       })
-      client = Elastomer::Client.new client_params
+      client = Elastomer::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -123,7 +123,7 @@ describe Elastomer::Client do
       client_params = $client_params.merge(basic_auth: {
         username: "my_user"
       })
-      client = Elastomer::Client.new client_params
+      client = Elastomer::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -139,7 +139,7 @@ describe Elastomer::Client do
       client_params = $client_params.merge(basic_auth: {
         password: "my_secret_password"
       })
-      client = Elastomer::Client.new client_params
+      client = Elastomer::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -153,7 +153,7 @@ describe Elastomer::Client do
 
     it "can use token authentication" do
       client_params = $client_params.merge(token_auth: "my_secret_token")
-      client = Elastomer::Client.new client_params
+      client = Elastomer::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       token_auth_spy = Spy.on(connection, :token_auth).and_return(nil)
@@ -170,7 +170,7 @@ describe Elastomer::Client do
         username: "my_user",
         password: "my_secret_password"
       }, token_auth: "my_secret_token")
-      client = Elastomer::Client.new client_params
+      client = Elastomer::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -295,7 +295,7 @@ describe Elastomer::Client do
     it "does not make an HTTP request for version if it is provided at create time" do
       request = stub_request(:get, "#{$client.url}/")
 
-      client = Elastomer::Client.new $client_params.merge(es_version: "5.6.6")
+      client = Elastomer::Client.new(**$client_params.merge(es_version: "5.6.6"))
       assert_equal "5.6.6", client.version
 
       assert_not_requested request

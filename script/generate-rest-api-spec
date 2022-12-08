@@ -74,6 +74,39 @@ class RestApiSpecGenerator
     end
   end
 
+  def generate_methods(data)
+    if @version_support.es_version_7_plus?
+       data["url"]["paths"].map{|h| h["methods"]}.flatten.uniq
+    else
+      Array(data["methods"]).to_s
+    end
+  end
+
+  def generate_path(url)
+    if @version_support.es_version_7_plus?
+      url["paths"].map{|h| h["path"]}.flatten.uniq.first
+    else
+      url["path"]
+    end
+  end
+
+  def generate_paths(url)
+    if @version_support.es_version_7_plus?
+      url["paths"].map{|h| h["path"]}.flatten.uniq
+    else
+      Array(url["paths"]).to_s
+    end
+  end
+
+  def generate_parts(url)
+    if @version_support.es_version_7_plus?
+      url["paths"].map{|h| h["parts"]}.compact.reduce({}, :merge)
+    else
+      url["parts"]
+    end
+  end
+
+
   # Perform a sparse checkout of the elasticsearch git repository and then check
   # out the branch corresponding to the ES version passed to this script.
   def setup
@@ -117,23 +150,23 @@ module Elastomer::Client::RestApiSpec
   class ApiSpecV<%= class_version %> < ApiSpec
     def initialize
       @rest_apis = {
-<% each_api do |name,data| -%>
+      <%- each_api do |name,data| -%>
+        <%- url = data["url"] -%>
         "<%= name %>" => RestApi.new(
           documentation: "<%= @version_support.es_version_7_plus? ? data["documentation"]["url"].to_s : data["documentation"].to_s %>",
-          methods: <%= Array(data["methods"]).to_s %>,
+          methods: <%= generate_methods(data) %>,
           body: <%= data["body"] ? data["body"].to_s : "nil" %>,
-<% url = data["url"] -%>
           url: {
-            path: "<%= url["path"] %>",
-            paths: <%= Array(url["paths"]).to_s %>,
-<% if (parts = url["parts"]) && !parts.empty? -%>
+            path: "<%= generate_path(url) %>",
+            paths: <%= generate_paths(url) %>,
+<% if (parts = generate_parts(url)) && !parts.empty? -%>
             parts: {
 <% parts.each do |k,v| -%>
               "<%= k %>" => <%= v.to_s %>,
 <% end -%>
             },
 <% end -%>
-<% params = data["params"] || url["params"] -%>
+<% params = @version_support.es_version_7_plus? ? data["params"] : url["params"] -%>
 <% if !params.nil? && !params.empty? -%>
             params: {
 <% params.each do |k,v| -%>

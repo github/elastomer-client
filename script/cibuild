@@ -54,7 +54,7 @@ output_fold() {
 
 trap cleanup EXIT
 
-export ES_PORT=${ES_PORT:-19200}
+export ES_PORT=${ES_PORT:-9200}
 
 es_version=${ES_VERSION:-24}
 docker_compose="docker-compose --file docker/docker-compose.es${es_version}.yml"

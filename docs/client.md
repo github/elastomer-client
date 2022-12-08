@@ -26,25 +26,12 @@ client.port  #=> 9200
 client.url   #=> 'http://localhost:9200'
 ```
 
-[Boxen](https://boxen.github.com) configures Elasticsearch to listen on port
-`19200` instead of the standard port. We can provide either the full URL or just
-a different port number if Elasticsearch is running on `localhost`.
-
-```ruby
-client = Elastomer::Client.new :port => 19200
-client.host  #=> 'localhost'
-client.port  #=> 19200
-client.url   #=> 'http://localhost:19200'
-
-client = Elastomer::Client.new :url => "http://localhost:19200"
-```
-
 Elasticsearch works best with persistent connections. We can use the
 `Net::HTTP::Persistent` adapter with Faraday.
 
 ```ruby
 client = Elastomer::Client.new \
-  :port    => 19200,
+  :port    => 9200,
   :adapter => :net_http_persistent
 ```
 
@@ -59,7 +46,7 @@ timeout can be set for each request.
 
 ```ruby
 client = Elastomer::Client.new \
-  :url          => "http://localhost:19200",
+  :url          => "http://localhost:9200",
   :adapter      => :net_http_persistent,
   :open_timeout => 1,
   :read_timeout => 5
@@ -84,7 +71,7 @@ the `:opaque_id` flag.
 
 ```ruby
 client = Elastomer::Client.new \
-  :url       => "http://localhost:19200",
+  :url       => "http://localhost:9200",
   :adapter   => :net_http_persistent,
   :opaque_id => true
 ```

@@ -12,7 +12,7 @@ documents components are equivalent.
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new :port => 19200
+client = Elastomer::Client.new :port => 9200
 
 docs1 = client.index("blog").docs("post")
 docs2 = client.docs("blog", "post")

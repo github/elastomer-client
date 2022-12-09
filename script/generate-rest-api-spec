@@ -74,6 +74,14 @@ class RestApiSpecGenerator
     end
   end
 
+  def generate_documentation(data)
+    if @version_support.es_version_7_plus?
+      data["documentation"]["url"].to_s
+    else
+      data["documentation"].to_s
+    end
+  end
+
   def generate_methods(data)
     if @version_support.es_version_7_plus?
        data["url"]["paths"].map{|h| h["methods"]}.flatten.uniq
@@ -103,6 +111,14 @@ class RestApiSpecGenerator
       url["paths"].map{|h| h["parts"]}.compact.reduce({}, :merge)
     else
       url["parts"]
+    end
+  end
+
+  def generate_params(data)
+    if @version_support.es_version_7_plus?
+      data["params"]
+    else
+      data["url"]["params"]
     end
   end
 
@@ -153,7 +169,7 @@ module Elastomer::Client::RestApiSpec
       <%- each_api do |name,data| -%>
         <%- url = data["url"] -%>
         "<%= name %>" => RestApi.new(
-          documentation: "<%= @version_support.es_version_7_plus? ? data["documentation"]["url"].to_s : data["documentation"].to_s %>",
+          documentation: "<%= generate_documentation(data) %>",
           methods: <%= generate_methods(data) %>,
           body: <%= data["body"] ? data["body"].to_s : "nil" %>,
           url: {
@@ -166,7 +182,7 @@ module Elastomer::Client::RestApiSpec
 <% end -%>
             },
 <% end -%>
-<% params = @version_support.es_version_7_plus? ? data["params"] : url["params"] -%>
+<% params = generate_params(data) -%>
 <% if !params.nil? && !params.empty? -%>
             params: {
 <% params.each do |k,v| -%>

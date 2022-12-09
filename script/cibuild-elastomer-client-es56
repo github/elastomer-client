@@ -1,8 +1,0 @@
-#!/bin/bash
-# Usage: script/cibuild-es56
-# CI build script targeting Elasticsearch 5.6
-
-export ES_VERSION=56
-export CI_MODE=true
-
-script/cibuild

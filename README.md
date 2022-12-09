@@ -2,17 +2,6 @@
 
 Making a stupid simple Elasticsearch client so your project can be smarter!
 
-## Getting Started
-
-Get started by cloning and running a few scripts:
-
-```
-$ git clone https://github.com/github/elastomer-client.git
-$ cd elastomer-client
-$ script/bootstrap
-$ bundle exec rake test
-```
-
 ## Client
 
 The client provides a one-to-one mapping to the Elasticsearch [API
@@ -105,6 +94,38 @@ thusly:
 ```ruby
 Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
 ```
+
+## Development
+
+Get started by cloning and running a few scripts:
+
+```
+1. Bootstrap the project: script/bootstrap
+2. Run ES in Docker (see below)
+3. Run tests
+  - for ES 7: ES_PORT=9207 rake test
+  - for ES 5: ES_PORT=9205 rake test
+```
+
+
+Run ES 5 and ES 7:
+```
+cd docker
+docker compose --profile all up
+```
+
+Run only ES 7:
+```
+cd docker
+docker compose --profile es7 up
+```
+
+Run only ES 5:
+```
+cd docker
+docker compose --profile es5 up
+```
+
 
 ## Releasing
 

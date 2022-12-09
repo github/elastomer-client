@@ -1,4 +1,5 @@
 require_relative "../test_helper"
+require "json"
 
 describe Elastomer::Client::Bulk do
 
@@ -9,22 +10,13 @@ describe Elastomer::Client::Bulk do
     unless @index.exists?
       @index.create \
         :settings => { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
-        :mappings => {
-          :tweet => {
-            :_source => { :enabled => true }, :_all => { :enabled => false },
-            :properties => {
-              :message => $client.version_support.text(analyzer: "standard"),
-              :author  => $client.version_support.keyword
-            }
-          },
-          :book => {
-            :_source => { :enabled => true }, :_all => { :enabled => false },
-            :properties => {
-              :title  => $client.version_support.text(analyzer: "standard"),
-              :author => $client.version_support.keyword
-            }
+        :mappings => mappings_wrapper("book", {
+          :_source => { :enabled => true },
+          :properties => {
+            :title  => $client.version_support.text(analyzer: "standard"),
+            :author => $client.version_support.keyword
           }
-        }
+        })
 
       wait_for_index(@name)
     end
@@ -36,10 +28,10 @@ describe Elastomer::Client::Bulk do
 
   it "performs bulk index actions" do
     body = [
-      '{"index" : {"_id":"1", "_type":"tweet", "_index":"elastomer-bulk-test"}}',
-      '{"author":"pea53", "message":"just a test tweet"}',
-      '{"index" : {"_id":"1", "_type":"book", "_index":"elastomer-bulk-test"}}',
-      '{"author":"John Scalzi", "title":"Old Mans War"}',
+      {index: maybe_type("book", {_id:"1", _index:"elastomer-bulk-test"})}.to_json,
+      '{"author":"One", "title":"Book 1"}',
+      {index: maybe_type("book", {_id:"2", _index:"elastomer-bulk-test"})}.to_json,
+      '{"author":"Two", "title":"Book 2"}',
       nil
     ]
     body = body.join "\n"
@@ -50,17 +42,17 @@ describe Elastomer::Client::Bulk do
 
     @index.refresh
 
-    h = @index.docs("tweet").get :id => 1
-    assert_equal "pea53", h["_source"]["author"]
-
     h = @index.docs("book").get :id => 1
-    assert_equal "John Scalzi", h["_source"]["author"]
+    assert_equal "One", h["_source"]["author"]
+
+    h = @index.docs("book").get :id => 2
+    assert_equal "Two", h["_source"]["author"]
 
 
     body = [
-      '{"index" : {"_id":"2", "_type":"book"}}',
-      '{"author":"Tolkien", "title":"The Silmarillion"}',
-      '{"delete" : {"_id":"1", "_type":"book"}}',
+      {index: maybe_type("book", {_id:"3"})}.to_json,
+      '{"author":"Three", "title":"Book 3"}',
+      {delete: maybe_type("book", {_id: "1"})}.to_json,
       nil
     ]
     body = body.join "\n"
@@ -74,8 +66,8 @@ describe Elastomer::Client::Bulk do
     h = @index.docs("book").get :id => 1
     assert !h["exists"], "was not successfully deleted"
 
-    h = @index.docs("book").get :id => 2
-    assert_equal "Tolkien", h["_source"]["author"]
+    h = @index.docs("book").get :id => 3
+    assert_equal "Three", h["_source"]["author"]
   end
 
   it "supports a nice block syntax" do

@@ -285,3 +285,28 @@ end
 def supports_native_delete_by_query?
   $client.version_support.native_delete_by_query?
 end
+
+# COMPATIBILITY
+# ES 7 drops mapping types, so don't wrap with a mapping type for ES 7+
+def mappings_wrapper(type, body)
+  if $client.version_support.es_version_7_plus?
+    body
+  else
+    {
+      :_default_ => {
+        :dynamic => "strict"
+      },
+      type => body
+    }
+  end
+end
+
+# COMPATIBILITY
+# ES 7 drops mapping types, so maybe return type as a String
+def maybe_type(type, body)
+  if $client.version_support.es_version_7_plus?
+    body
+  else
+    body.merge({_type: type})
+  end
+end

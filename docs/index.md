@@ -15,7 +15,7 @@ called.
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new :port => 19200
+client = Elastomer::Client.new :port => 9200
 
 # you can provide an index name
 index = client.index "blog"

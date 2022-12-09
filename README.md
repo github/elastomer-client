@@ -99,13 +99,12 @@ Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
 
 Get started by cloning and running a few scripts:
 
-```
-1. Bootstrap the project: script/bootstrap
+1. Bootstrap the project
+    - `script/bootstrap`
 2. Run ES in Docker (see below)
 3. Run tests
-  - for ES 7: ES_PORT=9207 rake test
-  - for ES 5: ES_PORT=9205 rake test
-```
+    - for ES 7: `ES_PORT=9207 rake test`
+    - for ES 5: `ES_PORT=9205 rake test`
 
 
 Run ES 5 and ES 7:

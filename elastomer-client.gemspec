@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "faraday_middleware", "~> 0.12"
   spec.add_dependency "multi_json",  "~> 1.12"
   spec.add_dependency "semantic",    "~> 1.6"
+  spec.add_dependency "sorbet-runtime", ">= 0.5.10588"
 
   spec.add_development_dependency "activesupport",      "~> 7.0"
   spec.add_development_dependency "bundler",            "~> 2.3"
@@ -38,6 +39,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-minitest"
   spec.add_development_dependency "rubocop-performance"
   spec.add_development_dependency "rubocop-rake"
+  spec.add_development_dependency "sorbet",             ">= 0.5.10588"
   spec.add_development_dependency "spy",                "~> 1.0"
+  spec.add_development_dependency "tapioca",            "~> 0.10"
   spec.add_development_dependency "webmock",            "~> 3.18"
 end

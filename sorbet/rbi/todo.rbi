@@ -4,7 +4,6 @@
 
 # typed: false
 
-module ::MiniTest; end
 module ActiveSupport::Notifications; end
 module ActiveSupport::Notifications::Event; end
 module Gem::Ext::BuildError; end

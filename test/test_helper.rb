@@ -49,7 +49,7 @@ if supports_compressed_bodies_by_default?
 end
 
 # remove any lingering test indices from the cluster
-MiniTest.after_run do
+Minitest.after_run do
   $client.cluster.indices.keys.each do |name|
     next unless name =~ /^elastomer-/i
     $client.index(name).delete

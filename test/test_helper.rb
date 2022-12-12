@@ -9,14 +9,6 @@ WebMock.allow_net_connect!
 
 require "securerandom"
 
-if ENV["COVERAGE"] == "true"
-  require "simplecov"
-  SimpleCov.start do
-    add_filter "/test/"
-    add_filter "/vendor/"
-  end
-end
-
 require "minitest/spec"
 require "minitest/autorun"
 require "minitest/focus"

@@ -17,7 +17,7 @@ module Elastomer
     IVAR_BLACK_LIST = [:@basic_auth, :@token_auth]
     IVAR_NOISY_LIST = [:@api_spec, :@cluster]
 
-    MAX_REQUEST_SIZE = 250 * 2**20  # 250 MB
+    MAX_REQUEST_SIZE = 250 * 1024 * 1024  # 250 MB
 
     RETRYABLE_METHODS = %i[get head].freeze
 
@@ -157,7 +157,7 @@ module Elastomer
         end
 
         if @adapter.is_a?(Array)
-          conn.adapter(*@adapter)
+          T.unsafe(conn).adapter(*@adapter)
         else
           conn.adapter(@adapter)
         end

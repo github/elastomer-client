@@ -89,7 +89,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def get_by_parent_id(parent_node_id, parent_task_id, params = {})
-        raise ArgumentError, "invalid parent node ID provided: #{parent_node_id.inspect}" if node_id.to_s.empty?
+        raise ArgumentError, "invalid parent node ID provided: #{parent_node_id.inspect}" if parent_node_id.to_s.empty?
         raise ArgumentError, "invalid parent task ID provided: #{parent_task_id.inspect}" unless parent_task_id.is_a?(Integer)
 
         parent_task_id = "#{parent_node_id}:#{parent_task_id}"

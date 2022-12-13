@@ -65,7 +65,7 @@ module Elastomer
 
       Enumerator.new do |yielder|
         ops.each do |action, *args|
-          response = bulk_obj.send(action, *args)
+          response = T.unsafe(bulk_obj).send(action, *args)
           yielder.yield response unless response.nil?
         end
 
@@ -161,7 +161,7 @@ module Elastomer
     # immediately.
     #
     class Bulk
-      DEFAULT_REQUEST_SIZE = 10 * 2**20  # 10 MB
+      DEFAULT_REQUEST_SIZE = 10 * 1024 * 1024  # 10 MB
 
       # Create a new bulk client for handling some of the details of
       # accumulating documents to index and then formatting them properly for

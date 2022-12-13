@@ -46,7 +46,7 @@ puts "Elasticsearch version is #{$client.version}"
 # COMPATIBILITY
 # Returns true if the Elasticsearch cluster defaults to supporting compression.
 def supports_compressed_bodies_by_default?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # Now that we have the version, re-create the client with compression if supported.
@@ -226,29 +226,29 @@ end
 
 # COMPATIBILITY
 # ES 2.x returns an empty result when an alias does not exist for a full or partial match
-# ES 5.6 returns an error when an alias does not exist for a full or partial match
+# ES 5.6+ returns an error when an alias does not exist for a full or partial match
 def fetching_non_existent_alias_returns_error?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
-# ES 5.6 includes a _nodes key in the /_cluster/stats response. Strangely
+# ES 5.6+ includes a _nodes key in the /_cluster/stats response. Strangely
 # enough, this is not documented in the example response:
 # https://www.elastic.co/guide/en/elasticsearch/reference/5.6/cluster-stats.html
 def cluster_stats_includes_underscore_nodes?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
 # ES 2.0 deprecated the `filtered` query type. ES 5.0 removed it entirely.
 def filtered_query_removed?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # ES 5.6 percolator queries/document submissions require that an appropriate
 # percolator type and field within that type are defined on the index mappings
 def requires_percolator_mapping?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
@@ -259,9 +259,9 @@ def supports_suggest_output?
 end
 
 # COMPATIBILITY
-# ES 5 returns information about the number of cleared scroll IDs
+# ES 5+ returns information about the number of cleared scroll IDs
 def returns_cleared_scroll_id_info?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
@@ -277,7 +277,7 @@ end
 # COMPATIBILITY
 # Returns true if the Elasticsearch cluster will validate request parameters.
 def parameter_validation?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # ES 5 supports native _delete_by_query, but the output and semantics are

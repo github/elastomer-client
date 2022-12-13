@@ -22,7 +22,7 @@ describe Elastomer::Client::Tasks do
   end
 
   it "groups by parent->child relationships when get-all tasks API is grouped by 'parents'" do
-    unless $client.version_support.es_version_5_x?
+    unless $client.version_support.es_version_5_plus?
       skip "Tasks API is not supported in ES version #{$client.version}"
     end
 

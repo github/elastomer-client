@@ -17,12 +17,14 @@ describe Elastomer::Client::Cluster do
 
   it "gets the cluster health" do
     h = @cluster.health
+
     assert h.key?("cluster_name"), "the cluster name is returned"
     assert h.key?("status"), "the cluster status is returned"
   end
 
   it "gets the cluster state" do
     h = @cluster.state
+
     assert h.key?("cluster_name"), "the cluster name is returned"
     assert h.key?("master_node"), "the master node is returned"
     assert_instance_of Hash, h["nodes"], "the node list is returned"
@@ -31,25 +33,30 @@ describe Elastomer::Client::Cluster do
 
   it "filters cluster state by metrics" do
     h = @cluster.state(metrics: "nodes")
+
     refute h.key("metadata"), "expected only nodes state"
     h = @cluster.state(metrics: "metadata")
+
     refute h.key("nodes"), "expected only metadata state"
   end
 
   it "filters cluster state by indices" do
     @index.create(default_index_settings) unless @index.exists?
     h = @cluster.state(metrics: "metadata", indices: @name)
-    assert [@name], h["metadata"]["indices"].keys
+
+    assert_equal [@name], h["metadata"]["indices"].keys
   end
 
   it "gets the cluster settings" do
     h = @cluster.get_settings
+
     assert_instance_of Hash, h["persistent"], "the persistent settings are returned"
     assert_instance_of Hash, h["transient"], "the transient settings are returned"
   end
 
   it "gets the cluster settings with .settings" do
     h = @cluster.settings
+
     assert_instance_of Hash, h["persistent"], "the persistent settings are returned"
     assert_instance_of Hash, h["transient"], "the transient settings are returned"
   end
@@ -59,12 +66,14 @@ describe Elastomer::Client::Cluster do
     h = @cluster.settings
 
     value = h["transient"]["indices"]["ttl"]["interval"]
+
     assert_equal "30m", value
 
     @cluster.update_settings transient: { "indices.ttl.interval" => "60m" }
     h = @cluster.settings
 
     value = h["transient"]["indices"]["ttl"]["interval"]
+
     assert_equal "60m", value
   end
 
@@ -72,11 +81,13 @@ describe Elastomer::Client::Cluster do
     h = @cluster.stats
     expected = %w[cluster_name indices nodes status timestamp]
     expected.unshift("_nodes") if cluster_stats_includes_underscore_nodes?
+
     assert_equal expected, h.keys.sort
   end
 
   it "returns a list of pending tasks" do
     h = @cluster.pending_tasks
+
     assert_equal %w[tasks], h.keys.sort
     assert h["tasks"].is_a?(Array), "the tasks lists is always an Array even if empty"
   end
@@ -84,12 +95,14 @@ describe Elastomer::Client::Cluster do
   it "returns the list of indices in the cluster" do
     @index.create(default_index_settings) unless @index.exists?
     indices = @cluster.indices
-    assert !indices.empty?, "expected to see an index"
+
+    refute_empty indices, "expected to see an index"
   end
 
   it "returns the list of nodes in the cluster" do
     nodes = @cluster.nodes
-    assert !nodes.empty?, "we have to have some nodes"
+
+    refute_empty nodes, "we have to have some nodes"
   end
 
   describe "when working with aliases" do
@@ -106,23 +119,27 @@ describe Elastomer::Client::Cluster do
 
     it "adds and gets an alias" do
       hash = @cluster.get_aliases
+
       assert_empty hash[@name]["aliases"]
 
       @cluster.update_aliases \
         add: {index: @name, alias: "elastomer-test-unikitty"}
 
       hash = @cluster.get_aliases
+
       assert_equal ["elastomer-test-unikitty"], hash[@name]["aliases"].keys
     end
 
     it "adds and gets an alias with .aliases" do
       hash = @cluster.aliases
+
       assert_empty hash[@name]["aliases"]
 
       @cluster.update_aliases \
         add: {index: @name, alias: "elastomer-test-unikitty"}
 
       hash = @cluster.aliases
+
       assert_equal ["elastomer-test-unikitty"], hash[@name]["aliases"].keys
     end
 
@@ -131,6 +148,7 @@ describe Elastomer::Client::Cluster do
         add: {index: @name, alias: "elastomer-test-unikitty"}
 
       hash = @cluster.get_aliases
+
       assert_equal ["elastomer-test-unikitty"], hash[@name]["aliases"].keys
 
       @cluster.update_aliases([
@@ -139,6 +157,7 @@ describe Elastomer::Client::Cluster do
       ])
 
       hash = @cluster.get_aliases
+
       assert_equal ["elastomer-test-SpongeBob-SquarePants"], hash[@name]["aliases"].keys
     end
 
@@ -149,6 +168,7 @@ describe Elastomer::Client::Cluster do
       ]
 
       hash = @cluster.get_aliases(index: @name)
+
       assert_equal %w[elastomer-test-He-Man elastomer-test-Skeletor], hash[@name]["aliases"].keys.sort
     end
   end

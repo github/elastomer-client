@@ -51,6 +51,7 @@ describe Elastomer::Client::MultiSearch do
     body = body.join "\n"
     h = $client.multi_search body
     response1, response2 = h["responses"]
+
     assert_equal 4, response1["hits"]["total"]
     assert_equal 1, response2["hits"]["total"]
     assert_equal "2", response2["hits"]["hits"][0]["_id"]
@@ -63,6 +64,7 @@ describe Elastomer::Client::MultiSearch do
     body = body.join "\n"
     h = $client.multi_search body, index: @name
     response1 = h["responses"].first
+
     assert_equal 1, response1["hits"]["total"]
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
   end
@@ -80,6 +82,7 @@ describe Elastomer::Client::MultiSearch do
     body = body.join "\n"
     h = $client.msearch body
     response1, response2 = h["responses"]
+
     assert_equal 4, response1["hits"]["total"]
     assert_equal 1, response2["hits"]["total"]
     assert_equal "2", response2["hits"]["hits"][0]["_id"]
@@ -92,6 +95,7 @@ describe Elastomer::Client::MultiSearch do
     body = body.join "\n"
     h = $client.msearch body, index: @name
     response1 = h["responses"].first
+
     assert_equal 1, response1["hits"]["total"]
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
   end

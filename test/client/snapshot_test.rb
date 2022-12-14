@@ -23,16 +23,19 @@ describe Elastomer::Client::Snapshot do
   it "determines if a snapshot exists" do
     with_tmp_repo do |repo|
       snapshot = repo.snapshot(@name)
-      assert_equal false, snapshot.exists?
-      assert_equal false, snapshot.exist?
+
+      refute_predicate snapshot, :exists?
+      refute_predicate snapshot, :exist?
       snapshot.create({}, wait_for_completion: true)
-      assert_equal true, snapshot.exist?
+
+      assert_predicate snapshot, :exist?
     end
   end
 
   it "creates snapshots" do
     with_tmp_repo do |repo|
       response = repo.snapshot(@name).create({}, wait_for_completion: true)
+
       assert_equal @name, response["snapshot"]["snapshot"]
     end
   end
@@ -41,6 +44,7 @@ describe Elastomer::Client::Snapshot do
     @index.create(number_of_shards: 1, number_of_replicas: 0)
     with_tmp_repo do |repo|
       response = repo.snapshot(@name).create({indices: [@index_name]}, wait_for_completion: true)
+
       assert_equal [@index_name], response["snapshot"]["indices"]
       assert_equal 1, response["snapshot"]["shards"]["total"]
     end
@@ -49,8 +53,10 @@ describe Elastomer::Client::Snapshot do
   it "gets snapshot info for one and all" do
     with_tmp_snapshot do |snapshot, repo|
       response = snapshot.get
+
       assert_equal snapshot.name, response["snapshots"][0]["snapshot"]
       response = repo.snapshots.get
+
       assert_equal snapshot.name, response["snapshots"][0]["snapshot"]
     end
   end
@@ -60,6 +66,7 @@ describe Elastomer::Client::Snapshot do
     with_tmp_repo do |repo|
       repo.snapshot(@name).create({indices: [@index_name]}, wait_for_completion: true)
       response = repo.snapshot(@name).status
+
       assert_equal 1, response["snapshots"][0]["shards_stats"]["total"]
     end
   end
@@ -69,9 +76,11 @@ describe Elastomer::Client::Snapshot do
     # check for an empty result instead
     with_tmp_repo do |repo|
       response = repo.snapshots.status
-      assert_equal [], response["snapshots"]
+
+      assert_empty response["snapshots"]
       response = $client.snapshot.status
-      assert_equal [], response["snapshots"]
+
+      assert_empty response["snapshots"]
     end
   end
 
@@ -83,7 +92,8 @@ describe Elastomer::Client::Snapshot do
   it "deletes snapshots" do
     with_tmp_snapshot do |snapshot|
       response = snapshot.delete
-      assert_equal true, response["acknowledged"]
+
+      assert response["acknowledged"]
     end
   end
 
@@ -95,6 +105,7 @@ describe Elastomer::Client::Snapshot do
       snapshot.create({indices: [@index_name]}, wait_for_completion: true)
       @index.delete
       response = snapshot.restore({}, wait_for_completion: true)
+
       assert_equal 1, response["snapshot"]["shards"]["total"]
     end
   end
@@ -119,6 +130,7 @@ describe Elastomer::Client::Snapshot do
           rename_pattern: @index_name,
           rename_replacement: @restored_index_name
         }, wait_for_completion: true)
+
         assert_equal [@restored_index_name], response["snapshot"]["indices"]
         assert_equal 1, response["snapshot"]["shards"]["total"]
       end

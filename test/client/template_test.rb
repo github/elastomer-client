@@ -16,11 +16,12 @@ describe Elastomer::Client::Cluster do
   it "lists templates in the cluster" do
     @template.create({template: "test-elastomer*"})
     templates = $client.cluster.templates
-    assert !templates.empty?, "expected to see a template"
+
+    refute_empty templates, "expected to see a template"
   end
 
   it "creates a template" do
-    assert !@template.exists?, "the template should not exist"
+    refute_predicate @template, :exists?, "the template should not exist"
 
     @template.create({
       template: "test-elastomer*",
@@ -30,9 +31,10 @@ describe Elastomer::Client::Cluster do
       }
     })
 
-    assert @template.exists?, " we now have a cluster-test template"
+    assert_predicate @template, :exists?, " we now have a cluster-test template"
 
     template = @template.get
+
     assert_equal [@name], template.keys
     assert_equal "test-elastomer*", template[@name]["template"]
     assert_equal "3", template[@name]["settings"]["index"]["number_of_shards"]

@@ -24,6 +24,7 @@ describe Elastomer::Notifications do
       assert_raises(Elastomer::Client::TimeoutError) { $client.info }
       event = @events.detect { |e| e.payload[:action] == "cluster.info" }
       exception = event.payload[:exception]
+
       assert_equal "Elastomer::Client::TimeoutError", exception[0]
       assert_match "timeout", exception[1]
     end
@@ -44,11 +45,13 @@ describe Elastomer::Notifications do
   it "instruments index actions" do
     @index.exists?; assert_action_event("index.exists")
     @index.create(default_index_settings)
+
     assert_action_event("index.create")
     wait_for_index(@index.name)
 
     @index.get_settings; assert_action_event("index.get_settings")
     @index.update_settings(number_of_replicas: 0)
+
     assert_action_event("index.get_settings")
     wait_for_index(@index.name)
 
@@ -60,6 +63,7 @@ describe Elastomer::Notifications do
   it "includes the response body in the payload" do
     @index.create(default_index_settings)
     event = @events.detect { |e| e.payload[:action] == "index.create" }
+
     assert event.payload[:response_body]
   end
 
@@ -68,6 +72,7 @@ describe Elastomer::Notifications do
     event = @events.detect { |e| e.payload[:action] == "index.create" }
 
     payload = event.payload
+
     assert payload[:response_body]
     assert payload[:request_body]
     assert_same payload[:body], payload[:request_body]

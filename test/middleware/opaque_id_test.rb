@@ -32,6 +32,7 @@ describe Elastomer::Middleware::OpaqueId do
 
   it 'generates an "X-Opaque-Id" header' do
     health = @client.cluster.health
+
     assert_equal({"cluster_name" => "elasticsearch", "status" => "green"}, health)
   end
 
@@ -45,7 +46,7 @@ describe Elastomer::Middleware::OpaqueId do
     uuid1 = opaque_id.generate_uuid
     uuid2 = opaque_id.generate_uuid
 
-    assert uuid1 != uuid2, "UUIDs should be unique"
+    refute_equal uuid1, uuid2, "UUIDs should be unique"
   end
 
   it "generates a UUID per thread" do
@@ -64,6 +65,7 @@ describe Elastomer::Middleware::OpaqueId do
     uuids.each { |uuid| assert_match(%r/\A[a-zA-Z0-9_-]{16}0{8}\z/, uuid) }
 
     bases = uuids.map { |uuid| uuid[0, 16] }
+
     assert_equal 3, bases.uniq.length, "each thread did not get a unique base ID"
   end
 end

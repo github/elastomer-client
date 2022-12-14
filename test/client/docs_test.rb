@@ -128,6 +128,7 @@ describe Elastomer::Client::Docs do
       }
 
       h = @docs.index(doc)
+
       assert_created h
       assert_equal "12", h["_id"]
 
@@ -138,6 +139,7 @@ describe Elastomer::Client::Docs do
         "_unknown_1" => "unknown attribute 1",
         "_unknown_2" => "unknown attribute 2"
       }
+
       assert_equal expected, indexed_doc["_source"]
     end
 
@@ -151,6 +153,7 @@ describe Elastomer::Client::Docs do
       }
 
       h = @docs.index(doc)
+
       assert_created h
       assert_equal "12", h["_id"]
 
@@ -164,6 +167,7 @@ describe Elastomer::Client::Docs do
         "title" => "The Adventures of Huckleberry Finn",
         "author" => "Mark Twain",
       }
+
       assert_equal expected, indexed_doc["_source"]
     end
 
@@ -195,11 +199,13 @@ describe Elastomer::Client::Docs do
 
   it "gets documents from the search index" do
     h = @docs.get id: "1", type: "doc1"
+
     refute_found h
 
     populate!
 
     h = @docs.get id: "1", type: "doc1"
+
     assert_found h
     assert_equal "mojombo", h["_source"]["author"]
   end
@@ -207,12 +213,14 @@ describe Elastomer::Client::Docs do
   it "checks if documents exist in the search index" do
     refute @docs.exists?(id: "1", type: "doc1")
     populate!
+
     assert @docs.exists?(id: "1", type: "doc1")
   end
 
   it "checks if documents exist in the search index with .exist?" do
     refute @docs.exist?(id: "1", type: "doc1")
     populate!
+
     assert @docs.exist?(id: "1", type: "doc1")
   end
 
@@ -224,13 +232,16 @@ describe Elastomer::Client::Docs do
       { _id: 1, _type: "doc2" }
     ]
     authors = h["docs"].map { |d| d["_source"]["author"] }
+
     assert_equal %w[mojombo pea53], authors
 
     h = @docs.multi_get({ids: [2, 1]}, type: "doc1")
     authors = h["docs"].map { |d| d["_source"]["author"] }
+
     assert_equal %w[defunkt mojombo], authors
 
     h = @index.docs("doc1").multi_get ids: [1, 2, 3, 4]
+
     assert_found h["docs"][0]
     assert_found h["docs"][1]
     refute_found h["docs"][2]
@@ -245,13 +256,16 @@ describe Elastomer::Client::Docs do
       { _id: 1, _type: "doc2" }
     ]
     authors = h["docs"].map { |d| d["_source"]["author"] }
+
     assert_equal %w[mojombo pea53], authors
 
     h = @docs.mget({ids: [2, 1]}, type: "doc1")
     authors = h["docs"].map { |d| d["_source"]["author"] }
+
     assert_equal %w[defunkt mojombo], authors
 
     h = @index.docs("doc1").mget ids: [1, 2, 3, 4]
+
     assert_found h["docs"][0]
     assert_found h["docs"][1]
     refute_found h["docs"][2]
@@ -264,11 +278,14 @@ describe Elastomer::Client::Docs do
 
     h = @docs.multi_get ids: [1, 2]
     authors = h["docs"].map { |d| d["_source"]["author"] }
+
     assert_equal %w[pea53 grantr], authors
 
     h = @docs.delete id: 1
+
     assert h["found"], "expected document to be found"
     h = @docs.multi_get ids: [1, 2]
+
     refute_found h["docs"][0]
     assert_found h["docs"][1]
 
@@ -290,6 +307,7 @@ describe Elastomer::Client::Docs do
 
     h = @docs.multi_get ids: [1, 2]
     authors = h["docs"].map { |d| d["_source"]["author"] }
+
     assert_equal %w[pea53 grantr], authors
 
     h = @docs.delete_by_query(q: "author:grantr")
@@ -315,6 +333,7 @@ describe Elastomer::Client::Docs do
 
     @index.refresh
     h = @docs.multi_get ids: [1, 2]
+
     assert_found h["docs"][0]
     refute_found h["docs"][1]
 
@@ -327,29 +346,35 @@ describe Elastomer::Client::Docs do
     )
     @index.refresh
     h = @docs.multi_get ids: [1, 2]
+
     refute_found h["docs"][0]
     refute_found h["docs"][1]
   end
 
   it "searches for documents" do
     h = @docs.search q: "*:*"
+
     assert_equal 0, h["hits"]["total"]
 
     populate!
 
     h = @docs.search q: "*:*"
+
     assert_equal 4, h["hits"]["total"]
 
     h = @docs.search q: "*:*", type: "doc1"
+
     assert_equal 2, h["hits"]["total"]
 
     h = @docs.search({
       query: {match_all: {}},
       post_filter: {term: {author: "defunkt"}}
     }, type: %w[doc1 doc2])
+
     assert_equal 1, h["hits"]["total"]
 
     hit = h["hits"]["hits"].first
+
     assert_equal "the author of resque", hit["_source"]["title"]
   end
 
@@ -371,17 +396,21 @@ describe Elastomer::Client::Docs do
 
   it "counts documents" do
     h = @docs.count q: "*:*"
+
     assert_equal 0, h["count"]
 
     populate!
 
     h = @docs.count q: "*:*"
+
     assert_equal 4, h["count"]
 
     h = @docs.count q: "*:*", type: "doc1"
+
     assert_equal 2, h["count"]
 
     h = @docs.count q: "*:*", type: "doc1,doc2"
+
     assert_equal 4, h["count"]
 
     h = @docs.count({
@@ -391,6 +420,7 @@ describe Elastomer::Client::Docs do
         }
       }
     }, type: %w[doc1 doc2])
+
     assert_equal 1, h["count"]
   end
 
@@ -404,17 +434,20 @@ describe Elastomer::Client::Docs do
         }
       }
     }, type: "doc1", id: 2)
-    assert_equal true, h["matched"]
+
+    assert h["matched"]
 
     h = @docs.explain(type: "doc2", id: 2, q: "pea53")
-    assert_equal false, h["matched"]
+
+    refute h["matched"]
   end
 
   it "validates queries" do
     populate!
 
     h = @docs.validate q: "*:*"
-    assert_equal true, h["valid"]
+
+    assert h["valid"]
 
     h = @docs.validate({
       query: {
@@ -446,6 +479,7 @@ describe Elastomer::Client::Docs do
     populate!
 
     h = @docs.get id: "1", type: "doc1"
+
     assert_found h
     assert_equal "mojombo", h["_source"]["author"]
 
@@ -455,6 +489,7 @@ describe Elastomer::Client::Docs do
       doc: {author: "TwP"}
     })
     h = @docs.get id: "1", type: "doc1"
+
     assert_found h
     assert_equal "TwP", h["_source"]["author"]
 
@@ -470,6 +505,7 @@ describe Elastomer::Client::Docs do
       })
 
       h = @docs.get id: "42", type: "doc1"
+
       assert_found h
       assert_equal "TwP", h["_source"]["author"]
       assert_equal "the ineffable beauty of search", h["_source"]["title"]
@@ -484,6 +520,7 @@ describe Elastomer::Client::Docs do
     assert_kind_of Integer, response["took"]
 
     response = @docs.get(id: 1, type: "doc1")
+
     assert_found response
     assert_equal "mojombo", response["_source"]["author"]
   end
@@ -557,13 +594,16 @@ describe Elastomer::Client::Docs do
 
     percolator1 = @index.percolator "1"
     response = percolator1.create query: { match: { author: "pea53" } }
+
     assert response["created"], "Couldn't create the percolator query"
     percolator2 = @index.percolator "2"
     response = percolator2.create query: { match: { author: "defunkt" } }
+
     assert response["created"], "Couldn't create the percolator query"
     @index.refresh
 
     response = @index.docs("doc1").percolate(doc: { author: "pea53" })
+
     assert_equal 1, response["matches"].length
     assert_equal "1", response["matches"][0]["_id"]
   end
@@ -573,13 +613,16 @@ describe Elastomer::Client::Docs do
 
     percolator1 = @index.percolator "1"
     response = percolator1.create query: { match: { author: "pea53" } }
+
     assert response["created"], "Couldn't create the percolator query"
     percolator2 = @index.percolator "2"
     response = percolator2.create query: { match: { author: "defunkt" } }
+
     assert response["created"], "Couldn't create the percolator query"
     @index.refresh
 
     response = @index.docs("doc2").percolate(nil, id: "1")
+
     assert_equal 1, response["matches"].length
     assert_equal "1", response["matches"][0]["_id"]
   end
@@ -589,13 +632,16 @@ describe Elastomer::Client::Docs do
 
     percolator1 = @index.percolator "1"
     response = percolator1.create query: { match: { author: "pea53" } }
+
     assert response["created"], "Couldn't create the percolator query"
     percolator2 = @index.percolator "2"
     response = percolator2.create query: { match: { author: "defunkt" } }
+
     assert response["created"], "Couldn't create the percolator query"
     @index.refresh
 
     count = @index.docs("doc1").percolate_count doc: { author: "pea53" }
+
     assert_equal 1, count
   end
 
@@ -604,13 +650,16 @@ describe Elastomer::Client::Docs do
 
     percolator1 = @index.percolator "1"
     response = percolator1.create query: { match: { author: "pea53" } }
+
     assert response["created"], "Couldn't create the percolator query"
     percolator2 = @index.percolator "2"
     response = percolator2.create query: { match: { author: "defunkt" } }
+
     assert response["created"], "Couldn't create the percolator query"
     @index.refresh
 
     count = @index.docs("doc2").percolate_count(nil, id: "1")
+
     assert_equal 1, count
   end
 
@@ -626,6 +675,7 @@ describe Elastomer::Client::Docs do
     end
 
     response1, response2, response3 = h["responses"]
+
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
     assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
     assert_equal 1, response3["total"]

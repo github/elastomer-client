@@ -35,8 +35,9 @@ describe Elastomer::Client::NativeDeleteByQuery do
         }
 
         response = @index.native_delete_by_query(query)
+
         refute_nil response["took"]
-        assert_equal(false, response["timed_out"])
+        refute(response["timed_out"])
         assert_equal(1, response["batches"])
         assert_equal(1, response["total"])
         assert_equal(1, response["deleted"])
@@ -44,6 +45,7 @@ describe Elastomer::Client::NativeDeleteByQuery do
 
         @index.refresh
         response = @docs.multi_get(ids: [0, 1])
+
         refute_found response.fetch("docs")[0]
         assert_found response.fetch("docs")[1]
       end
@@ -106,6 +108,7 @@ describe Elastomer::Client::NativeDeleteByQuery do
             { _id: 2, _routing: "dog" },
           ]
         })
+
         refute_found response["docs"][0]
         assert_found response["docs"][1]
         assert_found response["docs"][2]

@@ -53,9 +53,11 @@ describe Elastomer::Client::Bulk do
     @index.refresh
 
     h = @index.docs("tweet").get id: 1
+
     assert_equal "pea53", h["_source"]["author"]
 
     h = @index.docs("book").get id: 1
+
     assert_equal "John Scalzi", h["_source"]["author"]
 
 
@@ -74,9 +76,11 @@ describe Elastomer::Client::Bulk do
     @index.refresh
 
     h = @index.docs("book").get id: 1
-    assert !h["exists"], "was not successfully deleted"
+
+    refute h["exists"], "was not successfully deleted"
 
     h = @index.docs("book").get id: 2
+
     assert_equal "Tolkien", h["_source"]["author"]
   end
 
@@ -106,9 +110,11 @@ describe Elastomer::Client::Bulk do
     @index.refresh
 
     h = @index.docs("tweet").get id: 1
+
     assert_equal "pea53", h["_source"]["author"]
 
     h = @index.docs("book").get id: book_id
+
     assert_equal "John Scalzi", h["_source"]["author"]
 
 
@@ -137,9 +143,11 @@ describe Elastomer::Client::Bulk do
     @index.refresh
 
     h = @index.docs("book").get id: book_id
-    assert !h["exists"], "was not successfully deleted"
+
+    refute h["exists"], "was not successfully deleted"
 
     h = @index.docs("book").get id: book_id2
+
     assert_equal "Tolkien", h["_source"]["author"]
   end
 
@@ -157,9 +165,11 @@ describe Elastomer::Client::Bulk do
     @index.refresh
 
     h = @index.docs("tweet").get id: 1
+
     assert_equal "pea53", h["_source"]["author"]
 
     h = @index.docs("book").get id: 1
+
     assert_equal "John Scalzi", h["_source"]["author"]
 
     h = @index.bulk do |b|
@@ -173,9 +183,11 @@ describe Elastomer::Client::Bulk do
     @index.refresh
 
     h = @index.docs("book").get id: 1
-    assert !h["exists"], "was not successfully deleted"
+
+    refute h["exists"], "was not successfully deleted"
 
     h = @index.docs("book").get id: 2
+
     assert_equal "Tolkien", h["_source"]["author"]
   end
 
@@ -187,6 +199,7 @@ describe Elastomer::Client::Bulk do
         ary << b.index(document)
       }
       ary.compact!
+
       assert_equal 0, ary.length
 
       7.times { |num|
@@ -194,6 +207,7 @@ describe Elastomer::Client::Bulk do
         ary << b.index(document)
       }
       ary.compact!
+
       assert_equal 4, ary.length
 
       document = {_id: 10, _type: "tweet", author: "pea53", message: "tweet 10 is a 102 character request"}
@@ -218,6 +232,7 @@ describe Elastomer::Client::Bulk do
         ary << b.index(document)
       }
       ary.compact!
+
       assert_equal 0, ary.length
 
       7.times { |num|
@@ -225,6 +240,7 @@ describe Elastomer::Client::Bulk do
         ary << b.index(document)
       }
       ary.compact!
+
       assert_equal 2, ary.length
 
       document = {_id: 10, _type: "tweet", author: "pea53", message: "this is tweet number 10"}
@@ -252,6 +268,7 @@ describe Elastomer::Client::Bulk do
         ary << b.index(document)
       }
       ary.compact!
+
       assert_equal 0, ary.length
 
       document = {_id: 342, _type: "tweet", author: "pea53", message: "a"*290}
@@ -279,6 +296,7 @@ describe Elastomer::Client::Bulk do
     assert_kind_of Integer, response["took"]
 
     items = response["items"]
+
     assert_bulk_index(items[0])
 
     assert_equal "foo", items[0]["index"]["_id"]
@@ -296,6 +314,7 @@ describe Elastomer::Client::Bulk do
     assert_kind_of Integer, response["took"]
 
     items = response["items"]
+
     assert_bulk_index(items[0])
     assert_bulk_index(items[1])
 
@@ -314,6 +333,7 @@ describe Elastomer::Client::Bulk do
     assert_kind_of Integer, response["took"]
 
     items = response["items"]
+
     assert_bulk_index(items[0])
 
     refute_found @index.docs("tweet").get(id: 1)
@@ -331,6 +351,7 @@ describe Elastomer::Client::Bulk do
     assert_kind_of Integer, response["took"]
 
     items = response["items"]
+
     assert_bulk_index(items[0])
 
     assert_equal "2", items[0]["index"]["_id"]
@@ -345,6 +366,7 @@ describe Elastomer::Client::Bulk do
       [:index, { message: "tweet 3" }, { _id: 3, _type: "book", _index: @index.name }]
     ]
     responses = $client.bulk_stream_responses(ops, { action_count: 2 }).to_a
+
     assert_equal(2, responses.length)
     assert_bulk_index(responses[0]["items"][0])
     assert_bulk_index(responses[0]["items"][1])
@@ -359,6 +381,7 @@ describe Elastomer::Client::Bulk do
     ]
     items = []
     $client.bulk_stream_items(ops, { action_count: 2 }) { |item| items << item }
+
     assert_equal(3, items.length)
     assert_bulk_index(items[0])
     assert_bulk_index(items[1])

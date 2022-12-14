@@ -49,8 +49,8 @@ describe Elastomer::Client::RestApiSpec::ApiSpec do
   end
 
   it "validates request params" do
+    params = {q: "*:*", pretty: true, "nope": false}
     assert_raises(Elastomer::Client::IllegalArgument, "'nope' is not a valid parameter for the 'search' API") {
-      params = {q: "*:*", pretty: true, "nope": false}
       @api_spec.validate_params!(api: "search", params: params)
     }
   end

@@ -26,6 +26,7 @@ describe Elastomer::Client::AppDeleteByQuery do
 
       @index.refresh
       response = @index.app_delete_by_query(nil, q: "name:mittens")
+
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -43,6 +44,7 @@ describe Elastomer::Client::AppDeleteByQuery do
 
       @index.refresh
       response = @docs.multi_get ids: [0, 1]
+
       refute_found response["docs"][0]
       assert_found response["docs"][1]
     end
@@ -73,6 +75,7 @@ describe Elastomer::Client::AppDeleteByQuery do
 
       @index.refresh
       response = @docs.multi_get ids: [0, 1]
+
       refute_found response["docs"][0]
       refute_found response["docs"][1]
     end
@@ -98,6 +101,7 @@ describe Elastomer::Client::AppDeleteByQuery do
 
       @index.refresh
       response = @index.app_delete_by_query(nil, action_count: 1)
+
       assert_equal({
         "_all" => {
           "found" => 0,
@@ -134,6 +138,7 @@ describe Elastomer::Client::AppDeleteByQuery do
 
       @index.refresh
       response = @index.app_delete_by_query(nil, action_count: 1)
+
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -163,6 +168,7 @@ describe Elastomer::Client::AppDeleteByQuery do
 
       index.refresh
       response = index.app_delete_by_query(nil, q: "name:mittens")
+
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -185,6 +191,7 @@ describe Elastomer::Client::AppDeleteByQuery do
           { _id: 1, _routing: "cat" },
         ]
       })
+
       refute_found response["docs"][0]
       assert_found response["docs"][1]
 

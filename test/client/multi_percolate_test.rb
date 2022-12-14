@@ -60,6 +60,7 @@ describe Elastomer::Client::MultiPercolate do
     body = body.join "\n"
     h = $client.multi_percolate body
     response1, response2, response3 = h["responses"]
+
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
     assert_equal ["1", "3"], response2["matches"].map { |match| match["_id"] }.sort
     assert_equal 2, response3["total"]
@@ -80,6 +81,7 @@ describe Elastomer::Client::MultiPercolate do
     body = body.join "\n"
     h = $client.mpercolate body
     response1, response2, response3 = h["responses"]
+
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
     assert_equal ["1", "3"], response2["matches"].map { |match| match["_id"] }.sort
     assert_equal 2, response3["total"]
@@ -95,6 +97,7 @@ describe Elastomer::Client::MultiPercolate do
     end
 
     response1, response2, response3 = h["responses"]
+
     assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
     assert_equal ["1", "3"], response2["matches"].map { |match| match["_id"] }.sort
     assert_equal 2, response3["total"]

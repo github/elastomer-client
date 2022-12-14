@@ -7,17 +7,20 @@ describe Elastomer::Client do
 
   it "uses the adapter specified at creation" do
     c = Elastomer::Client.new(adapter: :test)
+
     assert_includes c.connection.builder.handlers, Faraday::Adapter::Test
   end
 
   it "use Faraday's default adapter if none is specified" do
     c = Elastomer::Client.new
     adapter = Faraday::Adapter.lookup_middleware(Faraday.default_adapter)
+
     assert_includes c.connection.builder.handlers, adapter
   end
 
   it "uses the same connection for all requests" do
     c = $client.connection
+
     assert_same c, $client.connection
   end
 
@@ -28,6 +31,7 @@ describe Elastomer::Client do
   it "raises an error on 4XX responses with an `error` field" do
     begin
       $client.get "/non-existent-index/_search?q=*:*"
+
       assert false, "exception was not raised when it should have been"
     rescue Elastomer::Client::Error => err
       assert_equal 404, err.status
@@ -53,6 +57,7 @@ describe Elastomer::Client do
 
     begin
       $client.post "/_bulk"
+
       assert false, "exception was not raised when it should have been"
     rescue Elastomer::Client::RejectedExecutionError => err
       assert_match %r/es_rejected_execution_exception/, err.message
@@ -69,14 +74,17 @@ describe Elastomer::Client do
 
   it "handles path expansions" do
     uri = $client.expand_path "/{foo}/{bar}", foo: "_cluster", bar: "health"
+
     assert_equal "/_cluster/health", uri
 
     uri = $client.expand_path "{/foo}{/baz}{/bar}", foo: "_cluster", bar: "state"
+
     assert_equal "/_cluster/state", uri
   end
 
   it "handles query parameters" do
     uri = $client.expand_path "/_cluster/health", level: "shards"
+
     assert_equal "/_cluster/health?level=shards", uri
   end
 
@@ -96,6 +104,7 @@ describe Elastomer::Client do
       password: "my_secret_password"
     }, token_auth: "my_secret_token")
     client = Elastomer::Client.new(**client_params)
+
     refute_match(/my_user/, client.inspect)
     refute_match(/my_secret_password/, client.inspect)
     refute_match(/my_secret_token/, client.inspect)
@@ -134,7 +143,7 @@ describe Elastomer::Client do
         client.ping
       end
 
-      refute basic_auth_spy.has_been_called?
+      refute_predicate basic_auth_spy, :has_been_called?
     end
 
     it "ignores basic authentication if username is missing" do
@@ -150,7 +159,7 @@ describe Elastomer::Client do
         client.ping
       end
 
-      refute basic_auth_spy.has_been_called?
+      refute_predicate basic_auth_spy, :has_been_called?
     end
 
     it "can use token authentication" do
@@ -182,7 +191,7 @@ describe Elastomer::Client do
         client.ping
       end
 
-      refute basic_auth_spy.has_been_called?
+      refute_predicate basic_auth_spy, :has_been_called?
       assert token_auth_spy.has_been_called_with?("my_secret_token")
     end
   end
@@ -198,14 +207,17 @@ describe Elastomer::Client do
 
     it "leaves String values unchanged" do
       body = $client.extract_body body: '{"query":{"match_all":{}}}'
+
       assert_equal '{"query":{"match_all":{}}}', body
 
       body = $client.extract_body body: "not a JSON string, but who cares!"
+
       assert_equal "not a JSON string, but who cares!", body
     end
 
     it "joins Array values" do
       body = $client.extract_body body: %w[foo bar baz]
+
       assert_equal "foo\nbar\nbaz\n", body
 
       body = $client.extract_body body: [
@@ -213,29 +225,35 @@ describe Elastomer::Client do
         "the second entry",
         nil
       ]
+
       assert_equal "the first entry\nthe second entry\n", body
     end
 
     it "converts values to JSON" do
       body = $client.extract_body body: true
+
       assert_equal "true", body
 
       body = $client.extract_body body: {query: {match_all: {}}}
+
       assert_equal '{"query":{"match_all":{}}}', body
     end
 
     it "returns frozen strings" do
       body = $client.extract_body body: '{"query":{"match_all":{}}}'
+
       assert_equal '{"query":{"match_all":{}}}', body
-      assert body.frozen?, "the body string should be frozen"
+      assert_predicate body, :frozen?, "the body string should be frozen"
 
       body = $client.extract_body body: %w[foo bar baz]
+
       assert_equal "foo\nbar\nbaz\n", body
-      assert body.frozen?, "Array body strings should be frozen"
+      assert_predicate body, :frozen?, "Array body strings should be frozen"
 
       body = $client.extract_body body: {query: {match_all: {}}}
+
       assert_equal '{"query":{"match_all":{}}}', body
-      assert body.frozen?, "JSON encoded body strings should be frozen"
+      assert_predicate body, :frozen?, "JSON encoded body strings should be frozen"
     end
   end
 
@@ -279,12 +297,13 @@ describe Elastomer::Client do
 
   describe "top level actions" do
     it "pings the cluster" do
-      assert_equal true, $client.ping
-      assert_equal true, $client.available?
+      assert $client.ping
+      assert_predicate $client, :available?
     end
 
     it "gets cluster info" do
       h = $client.info
+
       assert h.key?("name"), "expected cluster name to be returned"
       assert h.key?("version"), "expected cluster version information to be returned"
       assert h["version"].key?("number"), "expected cluster version number to be returned"
@@ -298,6 +317,7 @@ describe Elastomer::Client do
       request = stub_request(:get, "#{$client.url}/")
 
       client = Elastomer::Client.new(**$client_params.merge(es_version: "5.6.6"))
+
       assert_equal "5.6.6", client.version
 
       assert_not_requested request
@@ -305,6 +325,7 @@ describe Elastomer::Client do
 
     it "gets semantic version" do
       version_string = $client.version
+
       assert_equal Semantic::Version.new(version_string), $client.semantic_version
     end
   end

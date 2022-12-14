@@ -14,31 +14,37 @@ describe Elastomer::Middleware::ParseJson do
 
   it "doesn't change nil body" do
     response = process(nil)
+
     assert_nil response.body
   end
 
   it "nullifies empty body" do
     response = process("")
+
     assert_nil response.body
   end
 
   it "nullifies blank body" do
     response = process(" ")
+
     assert_nil response.body
   end
 
   it "parses json body with empty type" do
     response = process('{"a":1}')
+
     assert_equal({"a" => 1}, response.body)
   end
 
   it "parses json body of correct type" do
     response = process('{"a":1}', "application/json; charset=utf-8")
+
     assert_equal({"a" => 1}, response.body)
   end
 
   it "ignores json body if incorrect type" do
     response = process('{"a":1}', "application/xml; charset=utf-8")
+
     assert_equal('{"a":1}', response.body)
   end
 

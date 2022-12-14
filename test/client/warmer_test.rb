@@ -34,6 +34,7 @@ describe Elastomer::Client::Warmer do
 
   it "creates warmers" do
     h = @index.warmer("test1").create(query: { match_all: {}})
+
     assert_acknowledged h
   end
 
@@ -41,6 +42,7 @@ describe Elastomer::Client::Warmer do
     @index.warmer("test1").create(query: { match_all: {}})
 
     h = @index.warmer("test1").delete
+
     assert_acknowledged h
   end
 
@@ -49,14 +51,16 @@ describe Elastomer::Client::Warmer do
     @index.warmer("test1").create(body)
 
     h = @index.warmer("test1").get
+
     assert_equal body, h[@name]["warmers"]["test1"]["source"]
   end
 
   it "knows when warmers exist" do
-    assert_equal false, @index.warmer("test1").exists?
-    assert_equal false, @index.warmer("test1").exist?
+    refute_predicate @index.warmer("test1"), :exists?
+    refute_predicate @index.warmer("test1"), :exist?
 
     @index.warmer("test1").create(query: { match_all: {}})
-    assert_equal true, @index.warmer("test1").exists?
+
+    assert_predicate @index.warmer("test1"), :exists?
   end
 end

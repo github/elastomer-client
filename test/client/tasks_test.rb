@@ -17,9 +17,11 @@ describe Elastomer::Client::Tasks do
 
   it "list all in-flight tasks" do
     h = @tasks.get
+
     assert h["nodes"].keys.size > 0
 
     total_tasks = h["nodes"].map { |k, v| v["tasks"].keys.count }.sum
+
     assert total_tasks > 0
   end
 
@@ -31,6 +33,7 @@ describe Elastomer::Client::Tasks do
     h = @tasks.get group_by: "parents"
     parent_id = h["tasks"].select { |k, v| v.key?("children") }.keys.first
     childs_parent_ref = h.dig("tasks", parent_id, "children").first["parent_task_id"]
+
     assert_equal parent_id, childs_parent_ref
   end
 

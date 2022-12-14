@@ -82,6 +82,7 @@ describe Elastomer::Client::Scroller do
     scroll.each_document { |h| tweets << h["_id"].to_i }
 
     expected = (0...50).to_a.reverse
+
     assert_equal expected, tweets
   end
 
@@ -125,6 +126,7 @@ describe Elastomer::Client::Scroller do
         b.index %Q({"author":"pea53","message":"this is tweet number #{num}","sorter":#{50-num}}), _id: num, _type: "tweet"
       }
     end
+
     h["items"].each { |item| assert_bulk_index(item) }
 
     h = @index.bulk do |b|
@@ -132,6 +134,7 @@ describe Elastomer::Client::Scroller do
         b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num, _type: "book"
       }
     end
+
     h["items"].each { |item| assert_bulk_index(item) }
 
     @index.refresh

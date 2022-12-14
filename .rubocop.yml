@@ -17,6 +17,7 @@ inherit_gem:
   - config/default.yml # generic Ruby rules and cops
 
 require:
+- rubocop-minitest
 - rubocop-performance
 
 AllCops:

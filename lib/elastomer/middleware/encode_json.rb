@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   module Middleware
     # Request middleware that encodes the body as JSON.

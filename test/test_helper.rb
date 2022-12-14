@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rubygems" unless defined? Gem
 require "bundler"
 Bundler.require(:default, :development)

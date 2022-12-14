@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Usage:
 #
 #   script/generate-rest-api-spec <elasticsearch-version>

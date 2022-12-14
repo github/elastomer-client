@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   class Client
 
@@ -115,7 +117,7 @@ module Elastomer
       #
       # Returns the response body as a Hash when timeout expires or target tasks complete
       # COMPATIBILITY WARNING: the response body differs between ES versions for this API
-      def wait_for(timeout = "10s", params = {}) 
+      def wait_for(timeout = "10s", params = {})
         self.get params.merge(wait_for_completion: true, timeout: timeout)
       end
 

@@ -1,4 +1,6 @@
 # coding: utf-8
+# frozen_string_literal: true
+
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "elastomer/version"
@@ -35,4 +37,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "debug",              "~> 1.7.0"
   spec.add_development_dependency "spy",                "~> 1.0"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "rubocop-github"
+  spec.add_development_dependency "rubocop-minitest"
+  spec.add_development_dependency "rubocop-performance"
+  spec.add_development_dependency "rubocop-rake"
 end

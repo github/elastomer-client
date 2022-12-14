@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../test_helper"
 
 describe Elastomer::Client::Repository do
@@ -11,16 +13,17 @@ describe Elastomer::Client::Repository do
   end
 
   it "determines if a repo exists" do
-    assert_equal false, @repo.exists?
-    assert_equal false, @repo.exist?
+    refute_predicate @repo, :exists?
+    refute_predicate @repo, :exist?
     with_tmp_repo(@name) do
-      assert_equal true, @repo.exists?
+      assert_predicate @repo, :exists?
     end
   end
 
   it "creates repos" do
     response = create_repo(@name)
-    assert_equal true, response["acknowledged"]
+
+    assert response["acknowledged"]
     delete_repo(@name)
   end
 
@@ -33,6 +36,7 @@ describe Elastomer::Client::Repository do
   it "gets repos" do
     with_tmp_repo do |repo|
       response = repo.get
+
       refute_nil response[repo.name]
     end
   end
@@ -40,6 +44,7 @@ describe Elastomer::Client::Repository do
   it "gets all repos" do
     with_tmp_repo do |repo|
       response = $client.repository.get
+
       refute_nil response[repo.name]
     end
   end
@@ -47,20 +52,23 @@ describe Elastomer::Client::Repository do
   it "gets repo status" do
     with_tmp_repo do |repo|
       response = repo.status
-      assert_equal [], response["snapshots"]
+
+      assert_empty response["snapshots"]
     end
   end
 
   it "gets status of all repos" do
     response = $client.repository.status
-    assert_equal [], response["snapshots"]
+
+    assert_empty response["snapshots"]
   end
 
   it "updates repos" do
     with_tmp_repo do |repo|
       settings = repo.get[repo.name]["settings"]
-      response = repo.update(:type => "fs", :settings => settings.merge("compress" => true))
-      assert_equal true, response["acknowledged"]
+      response = repo.update(type: "fs", settings: settings.merge("compress" => true))
+
+      assert response["acknowledged"]
       assert_equal "true", repo.get[repo.name]["settings"]["compress"]
     end
   end
@@ -69,7 +77,7 @@ describe Elastomer::Client::Repository do
     with_tmp_repo do |repo|
       _(lambda {
         settings = repo.get[repo.name]["settings"]
-        $client.repository.update(:type => "fs", :settings => settings.merge("compress" => true))
+        $client.repository.update(type: "fs", settings: settings.merge("compress" => true))
       }).must_raise ArgumentError
     end
   end
@@ -77,8 +85,9 @@ describe Elastomer::Client::Repository do
   it "deletes repos" do
     with_tmp_repo do |repo|
       response = repo.delete
-      assert_equal true, response["acknowledged"]
-      assert_equal false, repo.exists?
+
+      assert response["acknowledged"]
+      refute_predicate repo, :exists?
     end
   end
 
@@ -91,15 +100,18 @@ describe Elastomer::Client::Repository do
   it "gets snapshots" do
     with_tmp_repo do |repo|
       response = repo.snapshots.get
-      assert_equal [], response["snapshots"]
+
+      assert_empty response["snapshots"]
 
       create_snapshot(repo, "test-snapshot")
       response = repo.snapshot.get
+
       assert_equal ["test-snapshot"], response["snapshots"].collect { |info| info["snapshot"] }
 
       create_snapshot(repo, "test-snapshot2")
       response  = repo.snapshots.get
       snapshot_names = response["snapshots"].collect { |info| info["snapshot"] }
+
       assert_includes snapshot_names, "test-snapshot"
       assert_includes snapshot_names, "test-snapshot2"
     end

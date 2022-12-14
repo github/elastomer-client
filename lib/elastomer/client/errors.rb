@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Elastomer
 
@@ -15,7 +16,7 @@ module Elastomer
       #
       # response - Faraday::Response object or a simple error message String
       #
-      def initialize( *args )
+      def initialize(*args)
         @status = nil
         @error = nil
 

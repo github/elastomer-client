@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "securerandom"
 
 module Elastomer
@@ -27,7 +29,7 @@ module Elastomer
       # env - Faraday environment Hash
       #
       # Returns the environment Hash
-      def call( env )
+      def call(env)
         uuid = generate_uuid.freeze
         env[:request_headers][X_OPAQUE_ID] = uuid
 
@@ -68,4 +70,4 @@ module Elastomer
 end  # Elastomer
 
 Faraday::Request.register_middleware \
-  :opaque_id => ::Elastomer::Middleware::OpaqueId
+  opaque_id: Elastomer::Middleware::OpaqueId

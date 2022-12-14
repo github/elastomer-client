@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rubygems" unless defined? Gem
 require "bundler"
 Bundler.require(:default, :development)
@@ -21,7 +23,7 @@ require "minitest/focus"
 
 # used in a couple test files, makes them available for all
 require "active_support/core_ext/enumerable"
-require 'active_support/core_ext/hash'
+require "active_support/core_ext/hash"
 
 # push the lib folder onto the load path
 $LOAD_PATH.unshift "lib"
@@ -93,11 +95,11 @@ require File.expand_path("../assertions", __FILE__)
 # Returns the cluster health response.
 # Raises Elastomer::Client::TimeoutError if requested status is not achieved
 # within 5 seconds.
-def wait_for_index(name, status="yellow")
+def wait_for_index(name, status = "yellow")
   $client.cluster.health(
-    :index           => name,
-    :wait_for_status => status,
-    :timeout         => "5s"
+    index: name,
+    wait_for_status: status,
+    timeout: "5s"
   )
 end
 
@@ -123,7 +125,7 @@ end
 
 def create_repo(name, settings = {})
   location = File.join(*[ENV["SNAPSHOT_DIR"], name].compact)
-  default_settings = {:type => "fs", :settings => {:location => location}}
+  default_settings = {type: "fs", settings: {location: location}}
   $client.repository(name).create(default_settings.merge(settings))
 end
 
@@ -153,7 +155,7 @@ def with_tmp_repo(name = SecureRandom.uuid, &block)
 end
 
 def create_snapshot(repo, name = SecureRandom.uuid)
-  repo.snapshot(name).create({}, :wait_for_completion => true)
+  repo.snapshot(name).create({}, wait_for_completion: true)
 end
 
 def with_tmp_snapshot(name = SecureRandom.uuid, &block)
@@ -180,9 +182,9 @@ def populate_background_index!(name)
       docs.bulk do |d|
         (1..500).each do |j|
           d.index \
-            :foo => "foo_#{i}_#{j}",
-            :bar => "bar_#{i}_#{j}",
-            :baz => "baz_#{i}_#{j}"
+            foo: "foo_#{i}_#{j}",
+            bar: "bar_#{i}_#{j}",
+            baz: "baz_#{i}_#{j}"
         end
       end
       index.refresh

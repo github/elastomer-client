@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   class Client
     # Execute delete_by_query using the native _delete_by_query API if supported

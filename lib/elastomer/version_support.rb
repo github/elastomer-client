@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   # VersionSupport holds methods that (a) encapsulate version differences; or
   # (b) give an intention-revealing name to a conditional check.

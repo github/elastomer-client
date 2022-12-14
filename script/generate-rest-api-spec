@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Usage:
 #
 #   script/generate-rest-api-spec <elasticsearch-version>
@@ -23,7 +25,7 @@ class RestApiSpecGenerator
   def initialize(version = "7.17")
     @version = version
 
-    sliced = @version.split(".").slice(0,2)
+    sliced = @version.split(".").slice(0, 2)
     @short_version = sliced.join(".")
     @class_version = sliced.join("_")
 
@@ -48,7 +50,7 @@ class RestApiSpecGenerator
 
   # Returns true if the elasticserach working directory exists.
   def working_dir_exists?
-    File.directory?(WORKING_DIR) && File.exists?(WORKING_DIR)
+    File.directory?(WORKING_DIR) && File.exist?(WORKING_DIR)
   end
 
   # Iterate over each of the REST API specs yield the name and the descriptor
@@ -68,9 +70,9 @@ class RestApiSpecGenerator
   # value pairs.
   def each_common
     filename = "#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json"
-    if File.exists? filename
+    if File.exist? filename
       hash = MultiJson.load(File.read(filename))
-      hash["params"].each {|k,v| yield(k,v)}
+      hash["params"].each { |k, v| yield(k, v) }
     end
   end
 
@@ -84,7 +86,7 @@ class RestApiSpecGenerator
 
   def generate_methods(data)
     if @version_support.es_version_7_plus?
-       data["url"]["paths"].map{|h| h["methods"]}.flatten.uniq
+      data["url"]["paths"].map { |h| h["methods"] }.flatten.uniq
     else
       Array(data["methods"]).to_s
     end
@@ -92,7 +94,7 @@ class RestApiSpecGenerator
 
   def generate_path(url)
     if @version_support.es_version_7_plus?
-      url["paths"].map{|h| h["path"]}.flatten.uniq.first
+      url["paths"].map { |h| h["path"] }.flatten.uniq.first
     else
       url["path"]
     end
@@ -100,7 +102,7 @@ class RestApiSpecGenerator
 
   def generate_paths(url)
     if @version_support.es_version_7_plus?
-      url["paths"].map{|h| h["path"]}.flatten.uniq
+      url["paths"].map { |h| h["path"] }.flatten.uniq
     else
       Array(url["paths"]).to_s
     end
@@ -108,7 +110,7 @@ class RestApiSpecGenerator
 
   def generate_parts(url)
     if @version_support.es_version_7_plus?
-      url["paths"].map{|h| h["parts"]}.compact.reduce({}, :merge)
+      url["paths"].map { |h| h["parts"] }.compact.reduce({}, :merge)
     else
       url["parts"]
     end

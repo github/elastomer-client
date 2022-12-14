@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Minitest::Assertions
   #COMPATIBILITY
   # ES 1.0 replaced the 'ok' attribute with a 'created' attribute
@@ -27,26 +29,22 @@ module Minitest::Assertions
     refute response["found"] || response["exists"], "document was unexpectedly found"
   end
 
-  #COMPATIBILITY
-  # ES 1.0 replaced the 'ok' attribute in the bulk response item with a
-  # 'status' attribute. Here we check for either one for compatibility
-  # with 0.90 and 1.0.
-  def assert_bulk_index(item, message="bulk index did not succeed")
-    ok     = item["index"]["ok"]
+  def assert_bulk_index(item, message = "bulk index did not succeed")
     status = item["index"]["status"]
-    assert ok == true || status == 201, message
+
+    assert_equal(201, status, message)
   end
 
-  def assert_bulk_create(item, message="bulk create did not succeed")
-    ok     = item["create"]["ok"]
+  def assert_bulk_create(item, message = "bulk create did not succeed")
     status = item["create"]["status"]
-    assert ok == true || status == 201, message
+
+    assert_equal(201, status, message)
   end
 
-  def assert_bulk_delete(item, message="bulk delete did not succeed")
-    ok     = item["delete"]["ok"]
+  def assert_bulk_delete(item, message = "bulk delete did not succeed")
     status = item["delete"]["status"]
-    assert ok == true || status == 200, message
+
+    assert_equal(200, status, message)
   end
 
   #COMPATIBILITY
@@ -54,23 +52,25 @@ module Minitest::Assertions
   # mapping["test-index"]["mappings"]["doco"]
   # ES 0.90 doesn't have the "mappings" element:
   # mapping["test-index"]["doco"]
-  def assert_mapping_exists(response, type, message="mapping expected to exist, but doesn't")
+  def assert_mapping_exists(response, type, message = "mapping expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")
         response["mappings"][type]
       else
         response[type]
       end
+
     refute_nil mapping, message
   end
 
-  def assert_property_exists(response, type, property, message="property expected to exist, but doesn't")
+  def assert_property_exists(response, type, property, message = "property expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")
         response["mappings"][type]
       else
         response[type]
       end
-    assert mapping["properties"].has_key?(property), message
+
+    assert mapping["properties"].has_key?(property), message # rubocop:disable Minitest/AssertWithExpectedArgument
   end
 end

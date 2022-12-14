@@ -12,72 +12,17 @@
 #
 # If you disable a check, document why.
 
+inherit_gem:
+  rubocop-github:
+  - config/default.yml # generic Ruby rules and cops
+
+require:
+- rubocop-minitest
+- rubocop-performance
+- rubocop-rake
+
 AllCops:
-  DisabledByDefault: true
-
-StringLiterals:
-  EnforcedStyle: double_quotes
-  Severity: error
-
-HashSyntax:
-  EnforcedStyle: hash_rockets
-  Severity: error
-
-AlignHash:
-  SupportedLastArgumentHashStyles: always_ignore
-
-AlignParameters:
-  Enabled: false # This is usually true, but we often want to roll back to
-                 # the start of a line.
-
-Attr:
-  Enabled: false # We have no styleguide guidance here, and it seems to be
-                 # in frequent use.
-
-ClassAndModuleChildren:
-  Enabled: false # module X<\n>module Y is just as good as module X::Y.
-
-Documentation:
+  NewCops: enable
   Exclude:
-    - !ruby/regexp /test\/*.rb/
-
-ClassLength:
-  Exclude:
-    - !ruby/regexp /test\/*.rb/
-
-PercentLiteralDelimiters:
-  PreferredDelimiters:
-    '%w': '{}'
-
-LineLength:
-  Max: 79
-  Severity: warning
-
-MultilineTernaryOperator:
-  Severity: error
-
-UnreachableCode:
-  Severity: error
-
-AndOr:
-  Severity: error
-
-EndAlignment:
-  Severity: error
-
-IndentationWidth:
-  Severity: error
-
-MethodLength:
-  CountComments: false  # count full line comments?
-  Max: 20
-  Severity: error
-
-Alias:
-  Enabled: false # We have no guidance on alias vs alias_method
-
-RedundantSelf:
-  Enabled: false # Sometimes a self.field is a bit more clear
-
-IfUnlessModifier:
-  Enabled: false
+    - 'lib/elastomer/client/rest_api_spec/api_spec_*.rb' # Exclude generated ApiSpec files
+    - 'vendor/**/*'

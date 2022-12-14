@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../test_helper"
 
 describe Elastomer::Client::NativeDeleteByQuery do
@@ -19,8 +21,8 @@ describe Elastomer::Client::NativeDeleteByQuery do
       end
 
       it "deletes by query" do
-        @docs.index({ :_id => 0, :name => "mittens" })
-        @docs.index({ :_id => 1, :name => "luna" })
+        @docs.index({ _id: 0, name: "mittens" })
+        @docs.index({ _id: 1, name: "luna" })
 
         @index.refresh
 
@@ -33,15 +35,17 @@ describe Elastomer::Client::NativeDeleteByQuery do
         }
 
         response = @index.native_delete_by_query(query)
+
         refute_nil response["took"]
-        assert_equal(false, response["timed_out"])
+        refute(response["timed_out"])
         assert_equal(1, response["batches"])
         assert_equal(1, response["total"])
         assert_equal(1, response["deleted"])
         assert_empty(response["failures"])
 
         @index.refresh
-        response = @docs.multi_get(:ids => [0, 1])
+        response = @docs.multi_get(ids: [0, 1])
+
         refute_found response.fetch("docs")[0]
         assert_found response.fetch("docs")[1]
       end
@@ -80,9 +84,9 @@ describe Elastomer::Client::NativeDeleteByQuery do
         wait_for_index(@index.name)
         docs = index.docs(type)
 
-        docs.index({ :_id => 0, :_routing => "cat", :name => "mittens" })
-        docs.index({ :_id => 1, :_routing => "cat", :name => "luna" })
-        docs.index({ :_id => 2, :_routing => "dog", :name => "mittens" })
+        docs.index({ _id: 0, _routing: "cat", name: "mittens" })
+        docs.index({ _id: 1, _routing: "cat", name: "luna" })
+        docs.index({ _id: 2, _routing: "dog", name: "mittens" })
 
         query = {
           query: {
@@ -98,12 +102,13 @@ describe Elastomer::Client::NativeDeleteByQuery do
         assert_equal(1, response["deleted"])
 
         response = docs.multi_get({
-          :docs => [
-            { :_id => 0, :_routing => "cat" },
-            { :_id => 1, :_routing => "cat" },
-            { :_id => 2, :_routing => "dog" },
+          docs: [
+            { _id: 0, _routing: "cat" },
+            { _id: 1, _routing: "cat" },
+            { _id: 2, _routing: "dog" },
           ]
         })
+
         refute_found response["docs"][0]
         assert_found response["docs"][1]
         assert_found response["docs"][2]

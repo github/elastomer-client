@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   class Client
 
@@ -11,7 +13,7 @@ module Elastomer
     # name - The name of the index as a String or an Array of names
     #
     # Returns an Index instance.
-    def index( name = nil )
+    def index(name = nil)
       Index.new self, name
     end
 
@@ -22,7 +24,7 @@ module Elastomer
       # client - Elastomer::Client used for HTTP requests to the server
       # name   - The name of the index as a String or an Array of names
       #
-      def initialize( client, name )
+      def initialize(client, name)
         @client = client
         @name   = @client.assert_param_presence(name, "index name") unless name.nil?
       end
@@ -39,7 +41,7 @@ module Elastomer
       # and https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-types-exists.html
       #
       # Returns true if the index (or type) exists
-      def exists?( params = {} )
+      def exists?(params = {})
         response = client.head "/{index}{/type}", update_params(params, action: "index.exists", rest_api: "indices.exists")
         response.success?
       end
@@ -53,7 +55,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
       #
       # Returns the response body as a Hash
-      def create( body, params = {} )
+      def create(body, params = {})
         response = client.put "/{index}", update_params(params, body: body, action: "index.create", rest_api: "indices.create")
         response.body
       end
@@ -65,7 +67,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html
       #
       # Returns the response body as a Hash
-      def delete( params = {} )
+      def delete(params = {})
         response = client.delete "/{index}", update_params(params, action: "index.delete", rest_api: "indices.delete")
         response.body
       end
@@ -77,7 +79,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html
       #
       # Returns the response body as a Hash
-      def open( params = {} )
+      def open(params = {})
         response = client.post "/{index}/_open", update_params(params, action: "index.open", rest_api: "indices.open")
         response.body
       end
@@ -89,7 +91,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html
       #
       # Returns the response body as a Hash
-      def close( params = {} )
+      def close(params = {})
         response = client.post "/{index}/_close", update_params(params, action: "index.close", rest_api: "indices.close")
         response.body
       end
@@ -101,7 +103,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-settings.html
       #
       # Returns the response body as a Hash
-      def get_settings( params = {} )
+      def get_settings(params = {})
         response = client.get "{/index}/_settings", update_params(params, action: "index.get_settings", rest_api: "indices.get_settings")
         response.body
       end
@@ -115,7 +117,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-update-settings.html
       #
       # Returns the response body as a Hash
-      def update_settings( body, params = {} )
+      def update_settings(body, params = {})
         response = client.put "{/index}/_settings", update_params(params, body: body, action: "index.update_settings", rest_api: "indices.put_settings")
         response.body
       end
@@ -129,7 +131,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-mapping.html
       #
       # Returns the response body as a Hash
-      def get_mapping( params = {} )
+      def get_mapping(params = {})
         response = client.get "/{index}/_mapping{/type}", update_params(params, action: "index.get_mapping", rest_api: "indices.get_mapping")
         response.body
       end
@@ -144,7 +146,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-mapping.html
       #
       # Returns the response body as a Hash
-      def update_mapping( type, body, params = {} )
+      def update_mapping(type, body, params = {})
         response = client.put "/{index}/_mapping/{type}", update_params(params, body: body, type: type, action: "index.update_mapping", rest_api: "indices.put_mapping")
         response.body
       end
@@ -157,7 +159,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
-      def get_aliases( params = {} )
+      def get_aliases(params = {})
         response = client.get "/{index}/_alias", update_params(action: "index.get_aliases", rest_api: "indices.get_alias")
         response.body
       end
@@ -178,7 +180,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
-      def get_alias( name, params = {} )
+      def get_alias(name, params = {})
         response = client.get "/{index}/_alias/{name}", update_params(params, name: name, action: "index.get_alias", rest_api: "indices.get_alias")
         response.body
       end
@@ -197,7 +199,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
-      def add_alias( name, params = {} )
+      def add_alias(name, params = {})
         response = client.put "/{index}/_alias/{name}", update_params(params, name: name, action: "index.add_alias", rest_api: "indices.put_alias")
         response.body
       end
@@ -215,7 +217,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
-      def delete_alias( name, params = {} )
+      def delete_alias(name, params = {})
         response = client.delete "/{index}/_alias/{name}", update_params(params, name: name, action: "index.delete_alias", rest_api: "indices.delete_alias")
         response.body
       end
@@ -229,7 +231,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-analyze.html
       #
       # Returns the response body as a Hash
-      def analyze( text, params = {} )
+      def analyze(text, params = {})
         body = text.is_a?(Hash) ? text : {text: text.to_s}
         response = client.get "{/index}/_analyze", update_params(params, body: body, action: "index.analyze", rest_api: "indices.analyze")
         response.body
@@ -244,7 +246,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
       #
       # Returns the response body as a Hash
-      def refresh( params = {} )
+      def refresh(params = {})
         response = client.post "{/index}/_refresh", update_params(params, action: "index.refresh", rest_api: "indices.refresh")
         response.body
       end
@@ -257,7 +259,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-flush.html
       #
       # Returns the response body as a Hash
-      def flush( params = {} )
+      def flush(params = {})
         response = client.post "{/index}/_flush", update_params(params, action: "index.flush", rest_api: "indices.flush")
         response.body
       end
@@ -271,7 +273,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html
       #
       # Returns the response body as a Hash
-      def forcemerge( params = {} )
+      def forcemerge(params = {})
         response = client.post "{/index}/_forcemerge", update_params(params, action: "index.forcemerge", rest_api: "indices.forcemerge")
         response.body
       end
@@ -286,7 +288,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-recovery.html
       #
       # Returns the response body as a Hash
-      def recovery( params = {} )
+      def recovery(params = {})
         response = client.get "{/index}/_recovery", update_params(params, action: "index.recovery", rest_api: "indices.recovery")
         response.body
       end
@@ -300,7 +302,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-clearcache.html
       #
       # Returns the response body as a Hash
-      def clear_cache( params = {} )
+      def clear_cache(params = {})
         response = client.post "{/index}/_cache/clear", update_params(params, action: "index.clear_cache", rest_api: "indices.clear_cache")
         response.body
       end
@@ -319,7 +321,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html
       #
       # Returns the response body as a Hash
-      def stats( params = {} )
+      def stats(params = {})
         response = client.get "{/index}/_stats{/stats}", update_params(params, action: "index.stats", rest_api: "indices.stats")
         response.body
       end
@@ -332,7 +334,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-segments.html
       #
       # Returns the response body as a Hash
-      def segments( params = {} )
+      def segments(params = {})
         response = client.get "{/index}/_segments", update_params(params, action: "index.segments", rest_api: "indices.segments")
         response.body
       end
@@ -345,7 +347,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html
       #
       # Returns a Docs instance.
-      def docs( type = nil )
+      def docs(type = nil)
         client.docs name, type
       end
 
@@ -384,7 +386,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
       #
       # Returns the response body as a Hash
-      def bulk( params = {}, &block )
+      def bulk(params = {}, &block)
         raise "a block is required" if block.nil?
 
         params = {index: self.name}.merge params
@@ -412,7 +414,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
       #
       # Returns a new Scroller instance
-      def scroll( query, opts = {} )
+      def scroll(query, opts = {})
         opts = {index: name}.merge opts
         client.scroll query, opts
       end
@@ -441,7 +443,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
       #
       # Returns a new Scroller instance
-      def scan( query, opts = {} )
+      def scan(query, opts = {})
         opts = {index: name}.merge opts
         client.scan query, opts
       end
@@ -472,7 +474,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html
       #
       # Returns the response body as a Hash
-      def multi_search( params = {}, &block )
+      def multi_search(params = {}, &block)
         raise "a block is required" if block.nil?
 
         params = {index: self.name}.merge params
@@ -579,7 +581,7 @@ module Elastomer
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update_params( params, overrides = nil )
+      def update_params(params, overrides = nil)
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h

@@ -10,7 +10,7 @@ module Elastomer
     # node_id - The node ID as a String or an Array of node IDs
     #
     # Returns a Nodes instance.
-    def nodes( node_id = nil )
+    def nodes(node_id = nil)
       Nodes.new self, node_id
     end
 
@@ -22,7 +22,7 @@ module Elastomer
       # client - Elastomer::Client used for HTTP requests to the server
       # node_id - The node ID as a String or an Array of node IDs
       #
-      def initialize( client, node_id )
+      def initialize(client, node_id)
         @client  = client
         @node_id = node_id
       end
@@ -48,7 +48,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-info.html
       #
       # Returns the response as a Hash
-      def info( params = {} )
+      def info(params = {})
         response = client.get "/_nodes{/node_id}{/info}", update_params(params, action: "nodes.info", rest_api: "nodes.info")
         response.body
       end
@@ -68,7 +68,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html
       #
       # Returns the response as a Hash
-      def stats( params = {} )
+      def stats(params = {})
         response = client.get "/_nodes{/node_id}/stats{/stats}", update_params(params, action: "nodes.stats", rest_api: "nodes.stats")
         response.body
       end
@@ -86,7 +86,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html
       #
       # Returns the response as a String
-      def hot_threads( params = {} )
+      def hot_threads(params = {})
         response = client.get "/_nodes{/node_id}/hot_threads", update_params(params, action: "nodes.hot_threads", rest_api: "nodes.hot_threads")
         response.body
       end
@@ -98,8 +98,8 @@ module Elastomer
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update_params( params, overrides = nil )
-        h = { :node_id => node_id }.update params
+      def update_params(params, overrides = nil)
+        h = { node_id: node_id }.update params
         h.update overrides unless overrides.nil?
         h
       end

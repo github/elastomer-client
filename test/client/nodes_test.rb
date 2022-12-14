@@ -17,12 +17,12 @@ describe Elastomer::Client::Nodes do
   end
 
   it "filters node info" do
-    h = $client.nodes.info(:info => "os")
+    h = $client.nodes.info(info: "os")
     node = h["nodes"].values.first
     assert node.key?("os"), "expected os info to be present"
     assert !node.key?("jvm"), "expected jvm info to be absent"
 
-    h = $client.nodes.info(:info => %w[jvm process])
+    h = $client.nodes.info(info: %w[jvm process])
     node = h["nodes"].values.first
     assert node.key?("jvm"), "expected jvm info to be present"
     assert node.key?("process"), "expected process info to be present"
@@ -30,14 +30,14 @@ describe Elastomer::Client::Nodes do
   end
 
   it "filters node stats" do
-    h = $client.nodes.stats(:stats => "http")
+    h = $client.nodes.stats(stats: "http")
     node = h["nodes"].values.first
     assert node.key?("http"), "expected http stats to be present"
     assert !node.key?("indices"), "expected indices stats to be absent"
   end
 
   it "gets the hot threads for the node(s)" do
-    str = $client.nodes.hot_threads :read_timeout => 2
+    str = $client.nodes.hot_threads read_timeout: 2
     assert_instance_of String, str
     assert !str.nil?, "expected response to not be nil"
     assert !str.empty?, "expected response to not be empty"

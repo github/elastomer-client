@@ -8,22 +8,22 @@ describe Elastomer::Client::Scroller do
 
     unless @index.exists?
       @index.create \
-        :settings => { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
-        :mappings => {
-          :tweet => {
-            :_source => { :enabled => true }, :_all => { :enabled => false },
-            :properties => {
-              :message => $client.version_support.text(analyzer: "standard"),
-              :author  => $client.version_support.keyword,
-              :sorter  => { :type => "integer" }
+        settings: { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
+        mappings: {
+          tweet: {
+            _source: { enabled: true }, _all: { enabled: false },
+            properties: {
+              message: $client.version_support.text(analyzer: "standard"),
+              author: $client.version_support.keyword,
+              sorter: { type: "integer" }
             }
           },
-          :book => {
-            :_source => { :enabled => true }, :_all => { :enabled => false },
-            :properties => {
-              :title  => $client.version_support.text(analyzer: "standard"),
-              :author => $client.version_support.keyword,
-              :sorter  => { :type => "integer" }
+          book: {
+            _source: { enabled: true }, _all: { enabled: false },
+            properties: {
+              title: $client.version_support.text(analyzer: "standard"),
+              author: $client.version_support.keyword,
+              sorter: { type: "integer" }
             }
           }
         }
@@ -38,7 +38,7 @@ describe Elastomer::Client::Scroller do
   end
 
   it "scans over all documents in an index" do
-    scan = @index.scan '{"query":{"match_all":{}}}', :size => 10
+    scan = @index.scan '{"query":{"match_all":{}}}', size: 10
 
     counts = {"tweet" => 0, "book" => 0}
     scan.each_document { |h| counts[h["_type"]] += 1 }
@@ -48,7 +48,7 @@ describe Elastomer::Client::Scroller do
   end
 
   it "restricts the scan to a single document type" do
-    scan = @index.scan '{"query":{"match_all":{}}}', :type => "book"
+    scan = @index.scan '{"query":{"match_all":{}}}', type: "book"
 
     counts = {"tweet" => 0, "book" => 0}
     scan.each_document { |h| counts[h["_type"]] += 1 }
@@ -58,9 +58,9 @@ describe Elastomer::Client::Scroller do
   end
 
   it "limits results by query" do
-    scan = @index.scan :query => { :bool => { :should => [
-      {:match => {:author => "pea53"}},
-      {:match => {:title => "17"}}
+    scan = @index.scan query: { bool: { should: [
+      {match: {author: "pea53"}},
+      {match: {title: "17"}}
     ]}}
 
     counts = {"tweet" => 0, "book" => 0}
@@ -72,9 +72,9 @@ describe Elastomer::Client::Scroller do
 
   it "scrolls and sorts over all documents" do
     scroll = @index.scroll({
-      :query => {:match_all => {}},
-      :sort => {:sorter => {:order => :asc}}
-    }, :type => "tweet")
+      query: {match_all: {}},
+      sort: {sorter: {order: :asc}}
+    }, type: "tweet")
 
     tweets = []
     scroll.each_document { |h| tweets << h["_id"].to_i }
@@ -84,7 +84,7 @@ describe Elastomer::Client::Scroller do
   end
 
   it "propagates URL query strings" do
-    scan = @index.scan(nil, { :q => "author:pea53 || title:17" })
+    scan = @index.scan(nil, { q: "author:pea53 || title:17" })
 
     counts = {"tweet" => 0, "book" => 0}
     scan.each_document { |h| counts[h["_type"]] += 1 }
@@ -114,23 +114,23 @@ describe Elastomer::Client::Scroller do
   end
 
   it "raises an exception on existing sort in query" do
-    assert_raises(ArgumentError) { @index.scan :sort => [:_doc] , :query => {} }
+    assert_raises(ArgumentError) { @index.scan sort: [:_doc] , query: {} }
   end
 
   def populate!
     h = @index.bulk do |b|
       50.times { |num|
-        b.index %Q({"author":"pea53","message":"this is tweet number #{num}","sorter":#{50-num}}), :_id => num, :_type => "tweet"
+        b.index %Q({"author":"pea53","message":"this is tweet number #{num}","sorter":#{50-num}}), _id: num, _type: "tweet"
       }
     end
-    h["items"].each {|item| assert_bulk_index(item) }
+    h["items"].each { |item| assert_bulk_index(item) }
 
     h = @index.bulk do |b|
       25.times { |num|
-        b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), :_id => num, :_type => "book"
+        b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num, _type: "book"
       }
     end
-    h["items"].each {|item| assert_bulk_index(item) }
+    h["items"].each { |item| assert_bulk_index(item) }
 
     @index.refresh
   end

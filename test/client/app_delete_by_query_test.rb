@@ -19,11 +19,11 @@ describe Elastomer::Client::AppDeleteByQuery do
     end
 
     it "deletes by query" do
-      @docs.index({ :_id => 0, :name => "mittens" })
-      @docs.index({ :_id => 1, :name => "luna" })
+      @docs.index({ _id: 0, name: "mittens" })
+      @docs.index({ _id: 1, name: "luna" })
 
       @index.refresh
-      response = @index.app_delete_by_query(nil, :q => "name:mittens")
+      response = @index.app_delete_by_query(nil, q: "name:mittens")
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -40,19 +40,19 @@ describe Elastomer::Client::AppDeleteByQuery do
       }, response["_indices"])
 
       @index.refresh
-      response = @docs.multi_get :ids => [0, 1]
+      response = @docs.multi_get ids: [0, 1]
       refute_found response["docs"][0]
       assert_found response["docs"][1]
     end
 
     it "respects action_count" do
-      @docs.index({ :_id => 0, :name => "mittens" })
-      @docs.index({ :_id => 1, :name => "luna" })
+      @docs.index({ _id: 0, name: "mittens" })
+      @docs.index({ _id: 1, name: "luna" })
       @index.refresh
 
-      response = @index.app_delete_by_query(nil, :action_count => 1)
+      response = @index.app_delete_by_query(nil, action_count: 1)
 
-      assert_requested(:post, /_bulk/, :times => 2)
+      assert_requested(:post, /_bulk/, times: 2)
 
       assert_equal({
         "_all" => {
@@ -70,18 +70,18 @@ describe Elastomer::Client::AppDeleteByQuery do
       }, response["_indices"])
 
       @index.refresh
-      response = @docs.multi_get :ids => [0, 1]
+      response = @docs.multi_get ids: [0, 1]
       refute_found response["docs"][0]
       refute_found response["docs"][1]
     end
 
     it "counts missing documents" do
-      @docs.index({ :_id => 0 })
+      @docs.index({ _id: 0 })
 
       stub_request(:post, /_bulk/).
         to_return(lambda do |request|
           {
-            :body => MultiJson.dump({
+            body: MultiJson.dump({
               "took" => 0,
               "errors" => false,
               "items" => [{
@@ -95,7 +95,7 @@ describe Elastomer::Client::AppDeleteByQuery do
         end)
 
       @index.refresh
-      response = @index.app_delete_by_query(nil, :action_count => 1)
+      response = @index.app_delete_by_query(nil, action_count: 1)
       assert_equal({
         "_all" => {
           "found" => 0,
@@ -113,12 +113,12 @@ describe Elastomer::Client::AppDeleteByQuery do
     end
 
     it "counts failed operations" do
-      @docs.index({ :_id => 0 })
+      @docs.index({ _id: 0 })
 
       stub_request(:post, /_bulk/).
         to_return(lambda do |request|
           {
-            :body => MultiJson.dump({
+            body: MultiJson.dump({
               "took" => 0,
               "errors" => false,
               "items" => [{
@@ -131,7 +131,7 @@ describe Elastomer::Client::AppDeleteByQuery do
         end)
 
       @index.refresh
-      response = @index.app_delete_by_query(nil, :action_count => 1)
+      response = @index.app_delete_by_query(nil, action_count: 1)
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -152,15 +152,15 @@ describe Elastomer::Client::AppDeleteByQuery do
       index = $client.index "elastomer-delete-by-query-routing-test"
       index.delete if index.exists?
       type = "docs"
-      index.create({ :mappings => { type => { :_routing => { :required => true } } } })
+      index.create({ mappings: { type => { _routing: { required: true } } } })
       wait_for_index(@index.name)
       docs = index.docs(type)
 
-      docs.index({ :_id => 0, :_routing => "cat", :name => "mittens" })
-      docs.index({ :_id => 1, :_routing => "cat", :name => "luna" })
+      docs.index({ _id: 0, _routing: "cat", name: "mittens" })
+      docs.index({ _id: 1, _routing: "cat", name: "luna" })
 
       index.refresh
-      response = index.app_delete_by_query(nil, :q => "name:mittens")
+      response = index.app_delete_by_query(nil, q: "name:mittens")
       assert_equal({
         "_all" => {
           "found" => 1,
@@ -178,9 +178,9 @@ describe Elastomer::Client::AppDeleteByQuery do
 
       index.refresh
       response = docs.multi_get({
-        :docs => [
-          { :_id => 0, :_routing => "cat" },
-          { :_id => 1, :_routing => "cat" },
+        docs: [
+          { _id: 0, _routing: "cat" },
+          { _id: 1, _routing: "cat" },
         ]
       })
       refute_found response["docs"][0]

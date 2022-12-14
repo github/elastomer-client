@@ -4,7 +4,7 @@ require "elastomer/notifications"
 describe Elastomer::Client do
 
   it "uses the adapter specified at creation" do
-    c = Elastomer::Client.new(:adapter => :test)
+    c = Elastomer::Client.new(adapter: :test)
     assert_includes c.connection.builder.handlers, Faraday::Adapter::Test
   end
 
@@ -66,25 +66,25 @@ describe Elastomer::Client do
   end
 
   it "handles path expansions" do
-    uri = $client.expand_path "/{foo}/{bar}", :foo => "_cluster", :bar => "health"
+    uri = $client.expand_path "/{foo}/{bar}", foo: "_cluster", bar: "health"
     assert_equal "/_cluster/health", uri
 
-    uri = $client.expand_path "{/foo}{/baz}{/bar}", :foo => "_cluster", :bar => "state"
+    uri = $client.expand_path "{/foo}{/baz}{/bar}", foo: "_cluster", bar: "state"
     assert_equal "/_cluster/state", uri
   end
 
   it "handles query parameters" do
-    uri = $client.expand_path "/_cluster/health", :level => "shards"
+    uri = $client.expand_path "/_cluster/health", level: "shards"
     assert_equal "/_cluster/health?level=shards", uri
   end
 
   it "validates path expansions" do
     assert_raises(ArgumentError) {
-      $client.expand_path "/{foo}/{bar}", :foo => "_cluster", :bar => nil
+      $client.expand_path "/{foo}/{bar}", foo: "_cluster", bar: nil
     }
 
     assert_raises(ArgumentError) {
-      $client.expand_path "/{foo}/{bar}", :foo => "_cluster", :bar => ""
+      $client.expand_path "/{foo}/{bar}", foo: "_cluster", bar: ""
     }
   end
 
@@ -187,26 +187,26 @@ describe Elastomer::Client do
 
   describe "when extracting and converting :body params" do
     it "deletes the :body from the params (or it gets the hose)" do
-      params = { :body => nil, :q => "what what?" }
+      params = { body: nil, q: "what what?" }
       body = $client.extract_body params
 
       assert_nil body
-      assert_equal({:q => "what what?"}, params)
+      assert_equal({q: "what what?"}, params)
     end
 
     it "leaves String values unchanged" do
-      body = $client.extract_body :body => '{"query":{"match_all":{}}}'
+      body = $client.extract_body body: '{"query":{"match_all":{}}}'
       assert_equal '{"query":{"match_all":{}}}', body
 
-      body = $client.extract_body :body => "not a JSON string, but who cares!"
+      body = $client.extract_body body: "not a JSON string, but who cares!"
       assert_equal "not a JSON string, but who cares!", body
     end
 
     it "joins Array values" do
-      body = $client.extract_body :body => %w[foo bar baz]
+      body = $client.extract_body body: %w[foo bar baz]
       assert_equal "foo\nbar\nbaz\n", body
 
-      body = $client.extract_body :body => [
+      body = $client.extract_body body: [
         "the first entry",
         "the second entry",
         nil
@@ -215,23 +215,23 @@ describe Elastomer::Client do
     end
 
     it "converts values to JSON" do
-      body = $client.extract_body :body => true
+      body = $client.extract_body body: true
       assert_equal "true", body
 
-      body = $client.extract_body :body => {:query => {:match_all => {}}}
+      body = $client.extract_body body: {query: {match_all: {}}}
       assert_equal '{"query":{"match_all":{}}}', body
     end
 
     it "returns frozen strings" do
-      body = $client.extract_body :body => '{"query":{"match_all":{}}}'
+      body = $client.extract_body body: '{"query":{"match_all":{}}}'
       assert_equal '{"query":{"match_all":{}}}', body
       assert body.frozen?, "the body string should be frozen"
 
-      body = $client.extract_body :body => %w[foo bar baz]
+      body = $client.extract_body body: %w[foo bar baz]
       assert_equal "foo\nbar\nbaz\n", body
       assert body.frozen?, "Array body strings should be frozen"
 
-      body = $client.extract_body :body => {:query => {:match_all => {}}}
+      body = $client.extract_body body: {query: {match_all: {}}}
       assert_equal '{"query":{"match_all":{}}}', body
       assert body.frozen?, "JSON encoded body strings should be frozen"
     end

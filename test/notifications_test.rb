@@ -75,10 +75,10 @@ describe Elastomer::Notifications do
     assert @events.detect { |e| e.payload[:action] == action }, "expected #{action} event"
   end
 
-  def stub_client(method, url, status=200, body='{"acknowledged":true}')
+  def stub_client(method, url, status = 200, body = '{"acknowledged":true}')
     stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-      stub.send(method, url) { |env| [status, {}, body]}
+      stub.send(method, url) { |env| [status, {}, body] }
     end
-    Elastomer::Client.new($client_params.merge(:opaque_id => false, :adapter => [:test, stubs]))
+    Elastomer::Client.new($client_params.merge(opaque_id: false, adapter: [:test, stubs]))
   end
 end

@@ -27,4 +27,4 @@ module Elastomer
 end
 
 Faraday::Request.register_middleware \
-  :limit_size => ::Elastomer::Middleware::LimitSize
+  limit_size: Elastomer::Middleware::LimitSize

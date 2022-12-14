@@ -42,4 +42,4 @@ module Elastomer
   end
 end
 
-Faraday::Request.register_middleware(elastomer_compress: ::Elastomer::Middleware::Compress)
+Faraday::Request.register_middleware(elastomer_compress: Elastomer::Middleware::Compress)

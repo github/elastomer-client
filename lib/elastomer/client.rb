@@ -176,7 +176,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    def head( path, params = {} )
+    def head(path, params = {})
       request :head, path, params
     end
 
@@ -187,7 +187,7 @@ module Elastomer
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
-    def get( path, params = {} )
+    def get(path, params = {})
       request :get, path, params
     end
 
@@ -198,7 +198,7 @@ module Elastomer
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
-    def put( path, params = {} )
+    def put(path, params = {})
       request :put, path, params
     end
 
@@ -209,7 +209,7 @@ module Elastomer
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
-    def post( path, params = {} )
+    def post(path, params = {})
       request :post, path, params
     end
 
@@ -220,7 +220,7 @@ module Elastomer
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
-    def delete( path, params = {} )
+    def delete(path, params = {})
       request :delete, path, params
     end
 
@@ -237,8 +237,7 @@ module Elastomer
     #
     # Returns a Faraday::Response
     # Raises an Elastomer::Client::Error on 4XX and 5XX responses
-    # rubocop:disable Metrics/MethodLength
-    def request( method, path, params )
+    def request(method, path, params)
       read_timeout = params.delete(:read_timeout)
       request_max_retries = params.delete(:max_retries) || max_retries
       body = extract_body(params)
@@ -323,7 +322,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns the request body as a String or `nil` if no :body is present
-    def extract_body( params )
+    def extract_body(params)
       body = params.delete :body
       return if body.nil?
 
@@ -360,7 +359,7 @@ module Elastomer
     #   #=> '/foo/no%20bar'
     #
     # Returns an Addressable::Uri
-    def expand_path( path, params )
+    def expand_path(path, params)
       template = Addressable::Template.new path
 
       expansions = {}
@@ -379,7 +378,7 @@ module Elastomer
 
       if rest_api
         query_values = if strict_params?
-          api_spec.validate_params!(api: rest_api, params: query_values)
+                         api_spec.validate_params!(api: rest_api, params: query_values)
         else
           api_spec.select_params(api: rest_api, from: query_values)
         end
@@ -399,7 +398,7 @@ module Elastomer
     # block  - The block that will be instrumented
     #
     # Returns the response from the block
-    def instrument( path, body, params )
+    def instrument(path, body, params)
       yield
     end
 
@@ -416,7 +415,7 @@ module Elastomer
     # Returns the response.
     # Raises an Elastomer::Client::Error on 500 responses or responses
     # containing and 'error' field.
-    def handle_errors( response )
+    def handle_errors(response)
       raise ServerError, response if response.status >= 500
 
       if response.body.is_a?(Hash) && (error = response.body["error"])
@@ -453,7 +452,7 @@ module Elastomer
     #
     # Returns the validated param as a String.
     # Raises an ArgumentError if the param is not valid.
-    def assert_param_presence( param, name = "input value" )
+    def assert_param_presence(param, name = "input value")
       case param
       when String, Symbol, Numeric
         param = param.to_s.strip

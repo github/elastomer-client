@@ -55,4 +55,4 @@ module Elastomer
 end
 
 Faraday::Request.register_middleware \
-  :encode_json => ::Elastomer::Middleware::EncodeJson
+  encode_json: Elastomer::Middleware::EncodeJson

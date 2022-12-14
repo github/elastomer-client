@@ -19,7 +19,7 @@ module Elastomer
     #   end
     #
     # Returns a new Scroller instance
-    def scroll( query, opts = {} )
+    def scroll(query, opts = {})
       Scroller.new(self, query, opts)
     end
 
@@ -42,7 +42,7 @@ module Elastomer
     #   end
     #
     # Returns a new Scroller instance
-    def scan( query, opts = {} )
+    def scan(query, opts = {})
       Scroller.new(self, add_sort_by_doc(query), opts)
     end
 
@@ -70,7 +70,7 @@ module Elastomer
     #   # repeat until there are no more hits
     #
     # Returns the response body as a Hash.
-    def start_scroll( opts = {} )
+    def start_scroll(opts = {})
       opts = opts.merge action: "search.start_scroll", rest_api: "search"
       response = get "{/index}{/type}/_search", opts
       response.body
@@ -95,7 +95,7 @@ module Elastomer
     #   # repeat until the results are empty
     #
     # Returns the response body as a Hash.
-    def continue_scroll( scroll_id, scroll = "5m" )
+    def continue_scroll(scroll_id, scroll = "5m")
       response = get "/_search/scroll", body: {scroll_id: scroll_id}, scroll: scroll, action: "search.scroll", rest_api: "scroll"
       response.body
     rescue RequestError => err
@@ -112,7 +112,7 @@ module Elastomer
     # scroll_id - One or more scroll IDs
     #
     # Returns the response body as a Hash.
-    def clear_scroll( scroll_ids )
+    def clear_scroll(scroll_ids)
       response = delete "/_search/scroll", body: {scroll_id: Array(scroll_ids)}, action: "search.clear_scroll", rest_api: "clear_scroll"
       response.body
     end
@@ -129,7 +129,7 @@ module Elastomer
       end
 
       if query.has_key? :sort
-         raise ArgumentError, "Query cannot contain a sort (found sort '#{query[:sort]}' in query: #{query})"
+        raise ArgumentError, "Query cannot contain a sort (found sort '#{query[:sort]}' in query: #{query})"
       end
 
       query.merge(sort: [:_doc])
@@ -167,7 +167,7 @@ module Elastomer
       #     doc['_source']
       #   }
       #
-      def initialize( client, query, opts = {} )
+      def initialize(client, query, opts = {})
         @client = client
 
         @opts = DEFAULT_OPTS.merge({ body: query }).merge(opts)
@@ -230,7 +230,7 @@ module Elastomer
       #   end
       #
       # Returns this Scroller instance.
-      def each_document( &block )
+      def each_document(&block)
         each { |hits| hits["hits"].each(&block) }
       end
 

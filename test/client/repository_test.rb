@@ -59,7 +59,7 @@ describe Elastomer::Client::Repository do
   it "updates repos" do
     with_tmp_repo do |repo|
       settings = repo.get[repo.name]["settings"]
-      response = repo.update(:type => "fs", :settings => settings.merge("compress" => true))
+      response = repo.update(type: "fs", settings: settings.merge("compress" => true))
       assert_equal true, response["acknowledged"]
       assert_equal "true", repo.get[repo.name]["settings"]["compress"]
     end
@@ -69,7 +69,7 @@ describe Elastomer::Client::Repository do
     with_tmp_repo do |repo|
       _(lambda {
         settings = repo.get[repo.name]["settings"]
-        $client.repository.update(:type => "fs", :settings => settings.merge("compress" => true))
+        $client.repository.update(type: "fs", settings: settings.merge("compress" => true))
       }).must_raise ArgumentError
     end
   end

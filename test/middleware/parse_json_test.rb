@@ -1,11 +1,11 @@
 require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Middleware::ParseJson do
-  let(:middleware) { Elastomer::Middleware::ParseJson.new(lambda {|env| Faraday::Response.new(env)})}
+  let(:middleware) { Elastomer::Middleware::ParseJson.new(lambda { |env| Faraday::Response.new(env) }) }
   let(:headers) { Hash.new }
 
   def process(body, content_type = nil)
-    env = { :body => body, :response_headers => Faraday::Utils::Headers.new(headers) }
+    env = { body: body, response_headers: Faraday::Utils::Headers.new(headers) }
     env[:response_headers]["content-type"] = content_type if content_type
     middleware.call(env)
   end

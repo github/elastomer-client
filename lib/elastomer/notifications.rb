@@ -54,14 +54,14 @@ module Elastomer
     # block  - The block that will be instrumented
     #
     # Returns the response from the block
-    def instrument( path, body, params )
+    def instrument(path, body, params)
       payload = {
-        :index        => params[:index],
-        :type         => params[:type],
-        :action       => params[:action],
-        :context      => params[:context],
-        :request_body => body,
-        :body         => body   # for backwards compatibility
+        index: params[:index],
+        type: params[:type],
+        action: params[:action],
+        context: params[:context],
+        request_body: body,
+        body: body   # for backwards compatibility
       }
 
       ::Elastomer::Notifications.service.instrument(NAME, payload) do

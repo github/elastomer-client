@@ -8,11 +8,11 @@ describe Elastomer::Client::Error do
   end
 
   it "is instantiated from an HTTP response" do
-    response = Faraday::Response.new(:body => "UTF8Error invalid middle-byte")
+    response = Faraday::Response.new(body: "UTF8Error invalid middle-byte")
     err = Elastomer::Client::Error.new(response)
     assert_equal "UTF8Error invalid middle-byte", err.message
 
-    response = Faraday::Response.new(:body => {"error" => "IndexMissingException"})
+    response = Faraday::Response.new(body: {"error" => "IndexMissingException"})
     err = Elastomer::Client::Error.new(response)
     assert_equal "IndexMissingException", err.message
     assert_equal "IndexMissingException", err.error
@@ -34,7 +34,7 @@ describe Elastomer::Client::Error do
       },
      "status" => 404
     }
-    response = Faraday::Response.new(:body => body)
+    response = Faraday::Response.new(body: body)
     err = Elastomer::Client::Error.new(response)
     assert_equal body["error"].to_s, err.message
     assert_equal body["error"], err.error

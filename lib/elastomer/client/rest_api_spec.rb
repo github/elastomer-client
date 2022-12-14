@@ -34,7 +34,7 @@ module Elastomer
       # Internal: Convert a dotted version String into an underscore format
       # suitable for use in Ruby class names.
       def self.to_class_version(version)
-        version.to_s.split(".").slice(0,2).join("_")
+        version.to_s.split(".").slice(0, 2).join("_")
       end
     end
   end

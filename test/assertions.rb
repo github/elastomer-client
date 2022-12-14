@@ -31,19 +31,19 @@ module Minitest::Assertions
   # ES 1.0 replaced the 'ok' attribute in the bulk response item with a
   # 'status' attribute. Here we check for either one for compatibility
   # with 0.90 and 1.0.
-  def assert_bulk_index(item, message="bulk index did not succeed")
+  def assert_bulk_index(item, message = "bulk index did not succeed")
     ok     = item["index"]["ok"]
     status = item["index"]["status"]
     assert ok == true || status == 201, message
   end
 
-  def assert_bulk_create(item, message="bulk create did not succeed")
+  def assert_bulk_create(item, message = "bulk create did not succeed")
     ok     = item["create"]["ok"]
     status = item["create"]["status"]
     assert ok == true || status == 201, message
   end
 
-  def assert_bulk_delete(item, message="bulk delete did not succeed")
+  def assert_bulk_delete(item, message = "bulk delete did not succeed")
     ok     = item["delete"]["ok"]
     status = item["delete"]["status"]
     assert ok == true || status == 200, message
@@ -54,7 +54,7 @@ module Minitest::Assertions
   # mapping["test-index"]["mappings"]["doco"]
   # ES 0.90 doesn't have the "mappings" element:
   # mapping["test-index"]["doco"]
-  def assert_mapping_exists(response, type, message="mapping expected to exist, but doesn't")
+  def assert_mapping_exists(response, type, message = "mapping expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")
         response["mappings"][type]
@@ -64,7 +64,7 @@ module Minitest::Assertions
     refute_nil mapping, message
   end
 
-  def assert_property_exists(response, type, property, message="property expected to exist, but doesn't")
+  def assert_property_exists(response, type, property, message = "property expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")
         response["mappings"][type]

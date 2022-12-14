@@ -77,7 +77,7 @@ module Elastomer::Client::RestApiSpec
     # Returns a new Hash containing the valid common request params
     def select_common_params(from:)
       return from if @common_params.empty?
-      from.select {|k,v| valid_common_param?(k)}
+      from.select { |k, v| valid_common_param?(k) }
     end
 
     # Returns `true` if the param is a common request parameter.

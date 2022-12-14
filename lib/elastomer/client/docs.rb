@@ -11,7 +11,7 @@ module Elastomer
     # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html
     #
     # Returns a Docs instance.
-    def docs( name = nil, type = nil )
+    def docs(name = nil, type = nil)
       Docs.new self, name, type
     end
 
@@ -23,7 +23,7 @@ module Elastomer
       # name   - The name of the index as a String
       # type   - The document type as a String
       #
-      def initialize( client, name, type = nil )
+      def initialize(client, name, type = nil)
         @client = client
         @name   = @client.assert_param_presence(name, "index name") unless name.nil?
         @type   = @client.assert_param_presence(type, "document type") unless type.nil?
@@ -75,7 +75,7 @@ module Elastomer
       #
       # Raises Elastomer::Client::IllegalArgument if an unsupported indexing
       # directive is used.
-      def index( document, params = {} )
+      def index(document, params = {})
         overrides = from_document document
         params = update_params(params, overrides)
         params.merge!(action: "docs.index", rest_api: "index")
@@ -101,7 +101,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
       #
       # Returns the response body as a Hash
-      def delete( params = {} )
+      def delete(params = {})
         response = client.delete "/{index}/{type}/{id}", update_params(params, action: "docs.delete", rest_api: "delete")
         response.body
       end
@@ -115,7 +115,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
       #
       # Returns the response body as a Hash
-      def get( params = {} )
+      def get(params = {})
         response = client.get "/{index}/{type}/{id}", update_params(params, action: "docs.get", rest_api: "get")
         response.body
       end
@@ -129,7 +129,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#docs-get
       #
       # Returns true if the document exists
-      def exists?( params = {} )
+      def exists?(params = {})
         response = client.head "/{index}/{type}/{id}", update_params(params, action: "docs.exists", rest_api: "exists")
         response.success?
       end
@@ -144,7 +144,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#_source
       #
       # Returns the response body as a Hash
-      def source( params = {} )
+      def source(params = {})
         response = client.get "/{index}/{type}/{id}/_source", update_params(params, action: "docs.source", rest_api: "get_source")
         response.body
       end
@@ -157,7 +157,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-get.html
       #
       # Returns the response body as a Hash
-      def multi_get( body, params = {} )
+      def multi_get(body, params = {})
         overrides = from_document body
         overrides.merge!(action: "docs.multi_get", rest_api: "mget")
 
@@ -174,7 +174,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html
       #
       # Returns the response body as a Hash
-      def update( script, params = {} )
+      def update(script, params = {})
         overrides = from_document script
         overrides.merge!(action: "docs.update", rest_api: "update")
 
@@ -204,7 +204,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html
       #
       # Returns the response body as a hash
-      def search( query, params = nil )
+      def search(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
         response = client.get "/{index}{/type}/_search", update_params(params, body: query, action: "docs.search", rest_api: "search")
@@ -224,7 +224,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-shards.html
       #
       # Returns the response body as a hash
-      def search_shards( params = {} )
+      def search_shards(params = {})
         response = client.get "/{index}{/type}/_search_shards", update_params(params, action: "docs.search_shards", rest_api: "search_shards")
         response.body
       end
@@ -249,7 +249,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html
       #
       # Returns the response body as a Hash
-      def count( query, params = nil )
+      def count(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
         response = client.get "/{index}{/type}/_count", update_params(params, body: query, action: "docs.count", rest_api: "count")
@@ -339,7 +339,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-termvectors.html
       #
       # Returns the response body as a hash
-      def termvector( params = {} )
+      def termvector(params = {})
         response = client.get "/{index}/{type}/{id}/_termvectors", update_params(params, action: "docs.termvector", rest_api: "termvectors")
         response.body
       end
@@ -357,15 +357,13 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-termvectors.html
       #
       # Returns the response body as a hash
-      def multi_termvectors( body, params = {} )
+      def multi_termvectors(body, params = {})
         response = client.get "{/index}{/type}/_mtermvectors", update_params(params, body: body, action: "docs.multi_termvectors", rest_api: "mtermvectors")
         response.body
       end
       alias_method :multi_term_vectors, :multi_termvectors
 
-=begin
-Percolate
-=end
+# Percolate
 
       # Compute a score explanation for a query and a specific document. This
       # can give useful feedback about why a document matched or didn't match
@@ -384,7 +382,7 @@ Percolate
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-explain.html
       #
       # Returns the response body as a hash
-      def explain( query, params = nil )
+      def explain(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
         response = client.get "/{index}/{type}/{id}/_explain", update_params(params, body: query, action: "docs.explain", rest_api: "explain")
@@ -409,7 +407,7 @@ Percolate
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-validate.html
       #
       # Returns the response body as a hash
-      def validate( query, params = nil )
+      def validate(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
         response = client.get "/{index}{/type}/_validate/query", update_params(params, body: query, action: "docs.validate", rest_api: "indices.validate_query")
@@ -437,7 +435,7 @@ Percolate
       #   end
       #
       # Returns the response body as a Hash
-      def bulk( params = {}, &block )
+      def bulk(params = {}, &block)
         raise "a block is required" if block.nil?
 
         params = {index: self.name, type: self.type}.merge params
@@ -465,7 +463,7 @@ Percolate
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
       #
       # Returns a new Scroller instance
-      def scroll( query, opts = {} )
+      def scroll(query, opts = {})
         opts = {index: name, type: type}.merge opts
         client.scroll query, opts
       end
@@ -492,7 +490,7 @@ Percolate
       #   end
       #
       # Returns a new Scroller instance
-      def scan( query, opts = {} )
+      def scan(query, opts = {})
         opts = {index: name, type: type}.merge opts
         client.scan query, opts
       end
@@ -521,7 +519,7 @@ Percolate
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html
       #
       # Returns the response body as a Hash
-      def multi_search( params = {}, &block )
+      def multi_search(params = {}, &block)
         raise "a block is required" if block.nil?
 
         params = {index: self.name, type: self.type}.merge params
@@ -556,7 +554,7 @@ Percolate
       SPECIAL_KEYS= %i[
         index type id version version_type op_type routing parent timestamp ttl
         consistency replication refresh wait_for_active_shards
-      ].inject({}) { |h,k| h[k] = "_#{k}"; h }.freeze
+      ].inject({}) { |h, k| h[k] = "_#{k}"; h }.freeze
 
       # Internal: Given a `document` generate an options hash that will
       # override parameters based on the content of the document. The document
@@ -571,7 +569,7 @@ Percolate
       #
       # Raises Elastomer::Client::IllegalArgument if an unsupported indexing
       # directive is used.
-      def from_document( document )
+      def from_document(document)
         opts = {body: document}
 
         if document.is_a? Hash
@@ -591,10 +589,10 @@ Percolate
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update_params( params, overrides = nil )
+      def update_params(params, overrides = nil)
         h = defaults.update params
         h.update overrides unless overrides.nil?
-        h[:routing] = h[:routing].join(",") if Array === h[:routing]
+        h[:routing] = h[:routing].join(",") if h[:routing].is_a?(Array)
         h
       end
 
@@ -610,7 +608,7 @@ Percolate
       # params - params hash OR nil if no query
       #
       # Returns an array of the query (possibly nil) and params Hash.
-      def extract_params( query, params = nil )
+      def extract_params(query, params = nil)
         if params.nil?
           if query.key? :query
             params = {}

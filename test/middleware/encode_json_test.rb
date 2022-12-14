@@ -1,10 +1,10 @@
 require File.expand_path("../../test_helper", __FILE__)
 
 describe Elastomer::Middleware::EncodeJson do
-  let(:middleware) { Elastomer::Middleware::EncodeJson.new(lambda {|env| env})}
+  let(:middleware) { Elastomer::Middleware::EncodeJson.new(lambda { |env| env }) }
 
   def process(body, content_type: nil, method: :post)
-    env = { :body => body, :request_headers => Faraday::Utils::Headers.new, method: method }
+    env = { body: body, request_headers: Faraday::Utils::Headers.new, method: method }
     env[:request_headers]["content-type"] = content_type if content_type
     middleware.call(env)
   end
@@ -36,7 +36,7 @@ describe Elastomer::Middleware::EncodeJson do
   end
 
   it "handles object body" do
-    result = process({:a => 1})
+    result = process({a: 1})
     assert_equal '{"a":1}', result[:body]
     assert_equal "application/json", result[:request_headers]["content-type"]
   end
@@ -48,14 +48,14 @@ describe Elastomer::Middleware::EncodeJson do
   end
 
   it "handles object body with json type" do
-    result = process({:a => 1}, content_type: "application/json; charset=utf-8")
+    result = process({a: 1}, content_type: "application/json; charset=utf-8")
     assert_equal '{"a":1}', result[:body]
     assert_equal "application/json; charset=utf-8", result[:request_headers]["content-type"]
   end
 
   it "handles object body with incompatible type" do
-    result = process({:a => 1}, content_type: "application/xml; charset=utf-8")
-    assert_equal({:a => 1}, result[:body])
+    result = process({a: 1}, content_type: "application/xml; charset=utf-8")
+    assert_equal({a: 1}, result[:body])
     assert_equal "application/xml; charset=utf-8", result[:request_headers]["content-type"]
   end
 end

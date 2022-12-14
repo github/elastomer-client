@@ -17,7 +17,7 @@ describe Elastomer::Client::Percolator do
       # COMPATIBILITY
       base_mappings =
         if requires_percolator_mapping?
-          { :mappings => { :percolator => { :properties => { :query => { :type => "percolator" } } } } }
+          { mappings: { percolator: { properties: { query: { type: "percolator" } } } } }
         else
           nil
         end
@@ -28,20 +28,20 @@ describe Elastomer::Client::Percolator do
 
     it "creates a query" do
       percolator = @index.percolator "1"
-      response = percolator.create :query => { :match_all => { } }
+      response = percolator.create query: { match_all: { } }
       assert response["created"], "Couldn't create the percolator query"
     end
 
     it "gets a query" do
       percolator = @index.percolator "1"
-      percolator.create :query => { :match_all => { } }
+      percolator.create query: { match_all: { } }
       response = percolator.get
       assert response["found"], "Couldn't find the percolator query"
     end
 
     it "deletes a query" do
       percolator = @index.percolator "1"
-      percolator.create :query => { :match_all => { } }
+      percolator.create query: { match_all: { } }
       response = percolator.delete
       assert response["found"], "Couldn't find the percolator query"
     end
@@ -49,7 +49,7 @@ describe Elastomer::Client::Percolator do
     it "checks for the existence of a query" do
       percolator = @index.percolator "1"
       refute percolator.exists?, "Percolator query exists"
-      percolator.create :query => { :match_all => { } }
+      percolator.create query: { match_all: { } }
       assert percolator.exists?, "Percolator query does not exist"
     end
 

@@ -6,10 +6,10 @@ describe Elastomer::Client::RestApiSpec::ApiSpec do
   end
 
   it "selects valid path parts" do
-    parts  = {index: "test", "type" => "doc", foo: "bar"}
+    parts  = {:index => "test", "type" => "doc", :foo => "bar"}
     result = @api_spec.select_parts(api: "search", from: parts)
 
-    assert_equal({index: "test", "type" => "doc"}, result)
+    assert_equal({:index => "test", "type" => "doc"}, result)
   end
 
   it "identifies valid path parts" do
@@ -19,10 +19,10 @@ describe Elastomer::Client::RestApiSpec::ApiSpec do
   end
 
   it "selects valid request params" do
-    params = {explain: true, "preference" => "local", nope: "invalid"}
+    params = {:explain => true, "preference" => "local", :nope => "invalid"}
     result = @api_spec.select_params(api: "search", from: params)
 
-    assert_equal({explain: true, "preference" => "local"}, result)
+    assert_equal({:explain => true, "preference" => "local"}, result)
   end
 
   it "identifies valid request params" do
@@ -33,10 +33,10 @@ describe Elastomer::Client::RestApiSpec::ApiSpec do
   end
 
   it "selects common request params" do
-    params = {pretty: true, "human" => true, nope: "invalid"}
+    params = {:pretty => true, "human" => true, :nope => "invalid"}
     result = @api_spec.select_common_params(from: params)
 
-    assert_equal({pretty: true, "human" => true}, result)
+    assert_equal({:pretty => true, "human" => true}, result)
   end
 
   it "identifies common request params" do

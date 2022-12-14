@@ -12,7 +12,7 @@ describe Elastomer::Client::Cluster do
   end
 
   it "lists templates in the cluster" do
-    @template.create({:template => "test-elastomer*"})
+    @template.create({template: "test-elastomer*"})
     templates = $client.cluster.templates
     assert !templates.empty?, "expected to see a template"
   end
@@ -21,10 +21,10 @@ describe Elastomer::Client::Cluster do
     assert !@template.exists?, "the template should not exist"
 
     @template.create({
-      :template => "test-elastomer*",
-      :settings => { :number_of_shards => 3 },
-      :mappings => {
-        :doco => { :_source => { :enabled => false }}
+      template: "test-elastomer*",
+      settings: { number_of_shards: 3 },
+      mappings: {
+        doco: { _source: { enabled: false }}
       }
     })
 

@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "debug",              "~> 1.7.0"
   spec.add_development_dependency "spy",                "~> 1.0"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rubocop"
 end

@@ -1,1 +1,0 @@
-puts "fail rubocop"

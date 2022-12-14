@@ -12,10 +12,14 @@
 #
 # If you disable a check, document why.
 
+inherit_gem:
+  rubocop-github:
+  - config/default.yml # generic Ruby rules and cops
+
+require:
+- rubocop-performance
+
 AllCops:
   NewCops: enable
   Exclude:
     - 'lib/elastomer/client/rest_api_spec/api_spec_*.rb' # Exclude generated ApiSpec files
-
-Style/GuardClause:
-  Enabled: false # Errors happening with a few files

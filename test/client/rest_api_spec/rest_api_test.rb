@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../../test_helper"
 
 describe Elastomer::Client::RestApiSpec::RestApi do
@@ -26,9 +28,9 @@ describe Elastomer::Client::RestApiSpec::RestApi do
 
   it "selects valid path parts" do
     hash = {
-      index: "test",
+      :index => "test",
       "metric" => "os",
-      nope: "not selected"
+      :nope => "not selected"
     }
     selected = @rest_api.select_parts(from: hash)
 
@@ -45,10 +47,10 @@ describe Elastomer::Client::RestApiSpec::RestApi do
 
   it "selects valid request params" do
     hash = {
-      local: true,
+      :local => true,
       "flat_settings" => true,
-      expand_wildcards: "all",
-      nope: "not selected"
+      :expand_wildcards => "all",
+      :nope => "not selected"
     }
     selected = @rest_api.select_params(from: hash)
 

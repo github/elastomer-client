@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 
 module Elastomer::Client::RestApiSpec
 
   # This is the superclass for the version specific API Spec classes that will
   # be generated using the `script/generate-rest-api-spec` script. Each version
   # of Elasticsarch we support will have it's own ApiSpec class that will
-  # validate the API request aprams for that particular version.
+  # validate the API request params for that particular version.
   class ApiSpec
 
     attr_reader :rest_apis
@@ -77,7 +78,7 @@ module Elastomer::Client::RestApiSpec
     # Returns a new Hash containing the valid common request params
     def select_common_params(from:)
       return from if @common_params.empty?
-      from.select {|k,v| valid_common_param?(k)}
+      from.select { |k, v| valid_common_param?(k) }
     end
 
     # Returns `true` if the param is a common request parameter.

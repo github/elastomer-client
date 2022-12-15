@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Usage:
 #
 #   script/generate-rest-api-spec <elasticsearch-version>
@@ -13,18 +15,21 @@ require "bundler/setup"
 
 $LOAD_PATH.unshift "lib"
 require "elastomer/client"
+require "elastomer/version_support"
 
 class RestApiSpecGenerator
   WORKING_DIR = "vendor/elasticsearch"
 
   attr_reader :version, :short_version, :class_version
 
-  def initialize(version = "5.6")
+  def initialize(version = "7.17")
     @version = version
 
-    sliced = @version.split(".").slice(0,2)
+    sliced = @version.split(".").slice(0, 2)
     @short_version = sliced.join(".")
     @class_version = sliced.join("_")
+
+    @version_support = Elastomer::VersionSupport.new(version)
   end
 
   # Setup the working directory and generate the Ruby API spec for the
@@ -32,7 +37,7 @@ class RestApiSpecGenerator
   def run
     setup
     File.open(ruby_spec_filename, "w") do |fd|
-      fd.puts ERB.new(DATA.read, 0, "-").result(binding)
+      fd.puts ERB.new(DATA.read, trim_mode: "-").result(binding)
     end
   ensure
     reset
@@ -45,13 +50,13 @@ class RestApiSpecGenerator
 
   # Returns true if the elasticserach working directory exists.
   def working_dir_exists?
-    File.directory?(WORKING_DIR) && File.exists?(WORKING_DIR)
+    File.directory?(WORKING_DIR) && File.exist?(WORKING_DIR)
   end
 
   # Iterate over each of the REST API specs yield the name and the descriptor
   # hash for that particular API spec.
   def each_api
-    Dir.glob("#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/*.json").each do |filename|
+    Dir.glob("#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/*.json").sort.each do |filename|
       next if filename =~ /\/_common\.json\Z/
 
       hash = MultiJson.load(File.read(filename))
@@ -65,11 +70,60 @@ class RestApiSpecGenerator
   # value pairs.
   def each_common
     filename = "#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json"
-    if File.exists? filename
+    if File.exist? filename
       hash = MultiJson.load(File.read(filename))
-      hash["params"].each {|k,v| yield(k,v)}
+      hash["params"].each { |k, v| yield(k, v) }
     end
   end
+
+  def generate_documentation(data)
+    if @version_support.es_version_7_plus?
+      data["documentation"]["url"].to_s
+    else
+      data["documentation"].to_s
+    end
+  end
+
+  def generate_methods(data)
+    if @version_support.es_version_7_plus?
+      data["url"]["paths"].map { |h| h["methods"] }.flatten.uniq
+    else
+      Array(data["methods"]).to_s
+    end
+  end
+
+  def generate_path(url)
+    if @version_support.es_version_7_plus?
+      url["paths"].map { |h| h["path"] }.flatten.uniq.first
+    else
+      url["path"]
+    end
+  end
+
+  def generate_paths(url)
+    if @version_support.es_version_7_plus?
+      url["paths"].map { |h| h["path"] }.flatten.uniq
+    else
+      Array(url["paths"]).to_s
+    end
+  end
+
+  def generate_parts(url)
+    if @version_support.es_version_7_plus?
+      url["paths"].map { |h| h["parts"] }.compact.reduce({}, :merge)
+    else
+      url["parts"]
+    end
+  end
+
+  def generate_params(data)
+    if @version_support.es_version_7_plus?
+      data["params"]
+    else
+      data["url"]["params"]
+    end
+  end
+
 
   # Perform a sparse checkout of the elasticsearch git repository and then check
   # out the branch corresponding to the ES version passed to this script.
@@ -82,23 +136,23 @@ class RestApiSpecGenerator
         git remote add -f origin https://github.com/elastic/elasticsearch.git &&
         git config core.sparsecheckout true &&
         echo /rest-api-spec/src/main/resources/rest-api-spec/api/ >> .git/info/sparse-checkout &&
-        git pull origin master
+        git pull origin main
       SH
     end
 
     system <<-SH
       cd #{WORKING_DIR} &&
-      git pull origin master &&
+      git pull origin main &&
       git checkout -q origin/#{short_version}
     SH
   end
 
-  # Reset the elasticsearch working directory back to the master branch of the
+  # Reset the elasticsearch working directory back to the main branch of the
   # git repository.
   def reset
     system <<-SH
       cd #{WORKING_DIR} &&
-      git checkout master
+      git checkout main
     SH
   end
 end
@@ -114,23 +168,24 @@ module Elastomer::Client::RestApiSpec
   class ApiSpecV<%= class_version %> < ApiSpec
     def initialize
       @rest_apis = {
-<% each_api do |name,data| -%>
+      <%- each_api do |name,data| -%>
+        <%- url = data["url"] -%>
         "<%= name %>" => RestApi.new(
-          documentation: "<%= data["documentation"].to_s %>",
-          methods: <%= Array(data["methods"]).to_s %>,
+          documentation: "<%= generate_documentation(data) %>",
+          methods: <%= generate_methods(data) %>,
           body: <%= data["body"] ? data["body"].to_s : "nil" %>,
-<% url = data["url"] -%>
           url: {
-            path: "<%= url["path"] %>",
-            paths: <%= Array(url["paths"]).to_s %>,
-<% if (parts = url["parts"]) && !parts.empty? -%>
+            path: "<%= generate_path(url) %>",
+            paths: <%= generate_paths(url) %>,
+<% if (parts = generate_parts(url)) && !parts.empty? -%>
             parts: {
 <% parts.each do |k,v| -%>
               "<%= k %>" => <%= v.to_s %>,
 <% end -%>
             },
 <% end -%>
-<% if (params = url["params"]) && !params.empty? -%>
+<% params = generate_params(data) -%>
+<% if !params.nil? && !params.empty? -%>
             params: {
 <% params.each do |k,v| -%>
               "<%= k %>" => <%= v.to_s %>,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rubygems" unless defined? Gem
 require "bundler"
 Bundler.require(:default, :development)
@@ -21,7 +23,7 @@ require "minitest/focus"
 
 # used in a couple test files, makes them available for all
 require "active_support/core_ext/enumerable"
-require 'active_support/core_ext/hash'
+require "active_support/core_ext/hash"
 
 # push the lib folder onto the load path
 $LOAD_PATH.unshift "lib"
@@ -46,7 +48,7 @@ puts "Elasticsearch version is #{$client.version}"
 # COMPATIBILITY
 # Returns true if the Elasticsearch cluster defaults to supporting compression.
 def supports_compressed_bodies_by_default?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # Now that we have the version, re-create the client with compression if supported.
@@ -93,11 +95,11 @@ require File.expand_path("../assertions", __FILE__)
 # Returns the cluster health response.
 # Raises Elastomer::Client::TimeoutError if requested status is not achieved
 # within 5 seconds.
-def wait_for_index(name, status="yellow")
+def wait_for_index(name, status = "yellow")
   $client.cluster.health(
-    :index           => name,
-    :wait_for_status => status,
-    :timeout         => "5s"
+    index: name,
+    wait_for_status: status,
+    timeout: "5s"
   )
 end
 
@@ -123,7 +125,7 @@ end
 
 def create_repo(name, settings = {})
   location = File.join(*[ENV["SNAPSHOT_DIR"], name].compact)
-  default_settings = {:type => "fs", :settings => {:location => location}}
+  default_settings = {type: "fs", settings: {location: location}}
   $client.repository(name).create(default_settings.merge(settings))
 end
 
@@ -153,7 +155,7 @@ def with_tmp_repo(name = SecureRandom.uuid, &block)
 end
 
 def create_snapshot(repo, name = SecureRandom.uuid)
-  repo.snapshot(name).create({}, :wait_for_completion => true)
+  repo.snapshot(name).create({}, wait_for_completion: true)
 end
 
 def with_tmp_snapshot(name = SecureRandom.uuid, &block)
@@ -180,9 +182,9 @@ def populate_background_index!(name)
       docs.bulk do |d|
         (1..500).each do |j|
           d.index \
-            :foo => "foo_#{i}_#{j}",
-            :bar => "bar_#{i}_#{j}",
-            :baz => "baz_#{i}_#{j}"
+            foo: "foo_#{i}_#{j}",
+            bar: "bar_#{i}_#{j}",
+            baz: "baz_#{i}_#{j}"
         end
       end
       index.refresh
@@ -226,29 +228,29 @@ end
 
 # COMPATIBILITY
 # ES 2.x returns an empty result when an alias does not exist for a full or partial match
-# ES 5.6 returns an error when an alias does not exist for a full or partial match
+# ES 5.6+ returns an error when an alias does not exist for a full or partial match
 def fetching_non_existent_alias_returns_error?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
-# ES 5.6 includes a _nodes key in the /_cluster/stats response. Strangely
+# ES 5.6+ includes a _nodes key in the /_cluster/stats response. Strangely
 # enough, this is not documented in the example response:
 # https://www.elastic.co/guide/en/elasticsearch/reference/5.6/cluster-stats.html
 def cluster_stats_includes_underscore_nodes?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
 # ES 2.0 deprecated the `filtered` query type. ES 5.0 removed it entirely.
 def filtered_query_removed?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # ES 5.6 percolator queries/document submissions require that an appropriate
 # percolator type and field within that type are defined on the index mappings
 def requires_percolator_mapping?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
@@ -259,9 +261,9 @@ def supports_suggest_output?
 end
 
 # COMPATIBILITY
-# ES 5 returns information about the number of cleared scroll IDs
+# ES 5+ returns information about the number of cleared scroll IDs
 def returns_cleared_scroll_id_info?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # COMPATIBILITY
@@ -277,7 +279,7 @@ end
 # COMPATIBILITY
 # Returns true if the Elasticsearch cluster will validate request parameters.
 def parameter_validation?
-  $client.version_support.es_version_5_x?
+  $client.version_support.es_version_5_plus?
 end
 
 # ES 5 supports native _delete_by_query, but the output and semantics are

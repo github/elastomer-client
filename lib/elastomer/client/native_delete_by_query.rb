@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   class Client
     # Delete documents based on a query using the Elasticsearch _delete_by_query API.

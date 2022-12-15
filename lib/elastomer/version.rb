@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   VERSION = "3.2.3"
 

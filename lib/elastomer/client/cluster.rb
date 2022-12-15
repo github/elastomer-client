@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   class Client
 
@@ -13,7 +15,7 @@ module Elastomer
       #
       # client - Elastomer::Client used for HTTP requests to the server
       #
-      def initialize( client )
+      def initialize(client)
         @client = client
       end
 
@@ -33,7 +35,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
       #
       # Returns the response as a Hash
-      def health( params = {} )
+      def health(params = {})
         response = client.get "/_cluster/health{/index}", params.merge(action: "cluster.health", rest_api: "cluster.health")
         response.body
       end
@@ -51,7 +53,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-state.html
       #
       # Returns the response as a Hash
-      def state( params = {} )
+      def state(params = {})
         response = client.get "/_cluster/state{/metrics}{/indices}", params.merge(action: "cluster.state", rest_api: "cluster.state")
         response.body
       end
@@ -66,7 +68,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html
       #
       # Returns the response as a Hash
-      def stats( params = {} )
+      def stats(params = {})
         response = client.get "/_cluster/stats", params.merge(action: "cluster.stats", rest_api: "cluster.stats")
         response.body
       end
@@ -79,7 +81,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-pending.html
       #
       # Returns the response as a Hash
-      def pending_tasks( params = {} )
+      def pending_tasks(params = {})
         response = client.get "/_cluster/pending_tasks", params.merge(action: "cluster.pending_tasks", rest_api: "cluster.pending_tasks")
         response.body
       end
@@ -100,7 +102,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-update-settings.html
       #
       # Returns the response as a Hash
-      def get_settings( params = {} )
+      def get_settings(params = {})
         response = client.get "/_cluster/settings", params.merge(action: "cluster.get_settings", rest_api: "cluster.get_settings")
         response.body
       end
@@ -116,7 +118,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-update-settings.html
       #
       # Returns the response as a Hash
-      def update_settings( body, params = {} )
+      def update_settings(body, params = {})
         response = client.put "/_cluster/settings", params.merge(body: body, action: "cluster.update_settings", rest_api: "cluster.put_settings")
         response.body
       end
@@ -146,7 +148,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-reroute.html
       #
       # Returns the response as a Hash
-      def reroute( commands, params = {} )
+      def reroute(commands, params = {})
         if commands.is_a?(Hash) && commands.key?(:commands)
           body = commands
         elsif commands.is_a?(Hash)
@@ -178,7 +180,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
-      def get_aliases( params = {} )
+      def get_aliases(params = {})
         response = client.get "{/index}/_alias{/name}", params.merge(action: "cluster.get_aliases", rest_api: "indices.get_alias")
         response.body
       end
@@ -204,7 +206,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
       #
       # Returns the response body as a Hash
-      def update_aliases( actions, params = {} )
+      def update_aliases(actions, params = {})
         if actions.is_a?(Hash) && actions.key?(:actions)
           body = actions
         elsif actions.is_a?(Hash)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../test_helper"
 
 describe Elastomer::Client::Tasks do
@@ -15,20 +17,23 @@ describe Elastomer::Client::Tasks do
 
   it "list all in-flight tasks" do
     h = @tasks.get
+
     assert h["nodes"].keys.size > 0
 
     total_tasks = h["nodes"].map { |k, v| v["tasks"].keys.count }.sum
+
     assert total_tasks > 0
   end
 
   it "groups by parent->child relationships when get-all tasks API is grouped by 'parents'" do
-    unless $client.version_support.es_version_5_x?
+    unless $client.version_support.es_version_5_plus?
       skip "Tasks API is not supported in ES version #{$client.version}"
     end
 
-    h = @tasks.get :group_by => "parents"
+    h = @tasks.get group_by: "parents"
     parent_id = h["tasks"].select { |k, v| v.key?("children") }.keys.first
     childs_parent_ref = h.dig("tasks", parent_id, "children").first["parent_task_id"]
+
     assert_equal parent_id, childs_parent_ref
   end
 
@@ -47,7 +52,7 @@ describe Elastomer::Client::Tasks do
 
   it "raises exception when get_by_id is called w/invalid node ID is supplied" do
     assert_raises(ArgumentError) do
-        @tasks.get_by_id nil, 42
+      @tasks.get_by_id nil, 42
     end
   end
 

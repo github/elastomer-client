@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   class Client
 
@@ -28,7 +30,7 @@ module Elastomer
     #   end
     #
     # Returns the response body as a Hash
-    def bulk( body = nil, params = nil )
+    def bulk(body = nil, params = nil)
       if block_given?
         params, body = (body || {}), nil
         yield bulk_obj = Bulk.new(self, params)
@@ -168,7 +170,7 @@ module Elastomer
       # params - Parameters Hash to pass to the Client#bulk method
       #   :request_size - the maximum request size in bytes
       #   :action_count - the maximum number of actions
-      def initialize( client, params = {} )
+      def initialize(client, params = {})
         @client  = client
         @params  = params
 
@@ -190,7 +192,7 @@ module Elastomer
       # buffered until the request size is met or exceeded. When this happens a
       # bulk request is issued, queued actions are cleared, and the response
       # from Elasticsearch is returned.
-      def request_size=( value )
+      def request_size=(value)
         if value.nil?
           @request_size = nil
         else
@@ -232,9 +234,9 @@ module Elastomer
       #   index("foo" => "bar", "_id" => 1, "_type" => "foo")
       #
       # Returns the response from the bulk call if one was made or nil.
-      def index( document, params = {} )
+      def index(document, params = {})
         params = prepare_params(document, params)
-        add_to_actions({:index => params}, document)
+        add_to_actions({index: params}, document)
       end
 
       # Add a create action to the list of bulk actions to be performed when
@@ -251,9 +253,9 @@ module Elastomer
       #   create("foo" => "bar", "_id" => 1)
       #
       # Returns the response from the bulk call if one was made or nil.
-      def create( document, params )
+      def create(document, params)
         params = prepare_params(document, params)
-        add_to_actions({:create => params}, document)
+        add_to_actions({create: params}, document)
       end
 
       # Add an update action to the list of bulk actions to be performed when
@@ -270,9 +272,9 @@ module Elastomer
       #   update("foo" => "bar", "_id" => 1)
       #
       # Returns the response from the bulk call if one was made or nil.
-      def update( document, params )
+      def update(document, params)
         params = prepare_params(document, params)
-        add_to_actions({:update => params}, document)
+        add_to_actions({update: params}, document)
       end
 
       # Add a delete action to the list of bulk actions to be performed when
@@ -284,9 +286,9 @@ module Elastomer
       #   delete(:_id => 1, :_type => 'foo')
       #
       # Returns the response from the bulk call if one was made or nil.
-      def delete( params )
+      def delete(params)
         params = prepare_params(nil, params)
-        add_to_actions({:delete => params})
+        add_to_actions({delete: params})
       end
 
       # Immediately execute a bulk API call with the currently accumulated
@@ -328,7 +330,7 @@ module Elastomer
       # document - The document Hash
       #
       # Returns extracted key/value pairs as a Hash.
-      def from_document( document )
+      def from_document(document)
         opts = {}
 
         SPECIAL_KEYS_HASH.values.each do |field|
@@ -375,7 +377,7 @@ module Elastomer
       # Returns the response from the bulk call if one was made or nil.
       # Raises RequestSizeError if the given action is larger than the
       #        configured requst size or the client.max_request_size
-      def add_to_actions( action, document = nil )
+      def add_to_actions(action, document = nil)
         action = MultiJson.dump(action)
         size = action.bytesize
 
@@ -407,7 +409,7 @@ module Elastomer
       # dispatch the bulk request.
       #
       # Returns `true` of `false`
-      def ready_to_send?( size )
+      def ready_to_send?(size)
         total_request_size = @current_request_size + size
         total_action_count = @current_action_count + 1
 
@@ -417,7 +419,7 @@ module Elastomer
 
       # Internal: Raises a RequestSizeError if the given size is larger than
       # the configured client.max_request_size
-      def check_action_size!( size )
+      def check_action_size!(size)
         return unless size > client.max_request_size
         raise RequestSizeError, "Bulk action of size `#{size}` exceeds the maximum requst size: #{client.max_request_size}"
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "forwardable"
 
 module Elastomer::Client::RestApiSpec
@@ -40,7 +42,7 @@ module Elastomer::Client::RestApiSpec
       end
 
       def select_parts(from:)
-        from.select {|k,v| valid_part?(k)}
+        from.select { |k, v| valid_part?(k) }
       end
 
       def valid_part?(part)
@@ -48,7 +50,7 @@ module Elastomer::Client::RestApiSpec
       end
 
       def select_params(from:)
-        from.select {|k,v| valid_param?(k)}
+        from.select { |k, v| valid_param?(k) }
       end
 
       def valid_param?(param)

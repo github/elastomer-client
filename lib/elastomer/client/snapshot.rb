@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastomer
   class Client
 
@@ -112,7 +114,7 @@ module Elastomer
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update_params( params, overrides = nil )
+      def update_params(params, overrides = nil)
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h

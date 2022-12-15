@@ -13,10 +13,10 @@ describe Elastomer::Client::Bulk do
       @index.create \
         settings: { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
         mappings: mappings_wrapper("book", {
-          :_source => { :enabled => true },
-          :properties => {
-            :title  => $client.version_support.text(analyzer: "standard"),
-            :author => $client.version_support.keyword
+          _source: { enabled: true },
+          properties: {
+            title: $client.version_support.text(analyzer: "standard"),
+            author: $client.version_support.keyword
           }
         })
 

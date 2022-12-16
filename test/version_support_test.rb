@@ -1,7 +1,7 @@
 # typed: true
 # frozen_string_literal: true
 
-require_relative './test_helper'
+require_relative "./test_helper"
 
 describe Elastomer::VersionSupport do
   describe "supported versions" do

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rubygems" unless defined? Gem
@@ -62,7 +63,8 @@ Minitest.after_run do
 end
 
 # add custom assertions
-require File.expand_path("../assertions", __FILE__)
+require_relative "./assertions"
+include AssertionTestHelpers
 
 # require 'elastomer/notifications'
 # require 'pp'
@@ -188,7 +190,7 @@ end
 # that are long-running enough to be queried again for verification in test cases
 def query_long_running_tasks
   Kernel.sleep(0.01)
-  target_tasks = []
+  target_tasks = T.let([], T.untyped)
   100.times.each do
     target_tasks = @tasks.get["nodes"]
       .map { |k, v| v["tasks"] }

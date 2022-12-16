@@ -1,6 +1,9 @@
+# typed: true
 # frozen_string_literal: true
 
-module Minitest::Assertions
+module AssertionTestHelpers
+  include Minitest::Assertions
+
   #COMPATIBILITY
   # ES 1.0 replaced the 'ok' attribute with a 'created' attribute
   # in index responses. Check for either one so we are compatible

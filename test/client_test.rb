@@ -1,6 +1,7 @@
+# typed: false
 # frozen_string_literal: true
 
-require File.expand_path("../test_helper", __FILE__)
+require_relative "./test_helper"
 require "elastomer/notifications"
 
 describe Elastomer::Client do

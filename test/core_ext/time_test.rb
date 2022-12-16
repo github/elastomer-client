@@ -1,6 +1,7 @@
+# typed: true
 # frozen_string_literal: true
 
-require File.expand_path("../../test_helper", __FILE__)
+require_relative "../test_helper"
 require "elastomer/core_ext/time"
 
 describe "JSON conversions for Time" do

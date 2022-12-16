@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 require_relative "../test_helper"
@@ -63,7 +64,7 @@ describe Elastomer::Client::Tasks do
       test_thread = populate_background_index!(@index.name)
 
       # ensure we can wait on completion of a task
-      success = false
+      success = T.let(false, T::Boolean)
       query_long_running_tasks.each do |ts|
         t = ts.values.first
         begin
@@ -71,7 +72,7 @@ describe Elastomer::Client::Tasks do
           success = !resp.key?("node_failures")
         rescue Elastomer::Client::ServerError => e
           # this means the timeout expired before the task finished, but it's a good thing!
-          success = /Timed out waiting for completion/ =~ e.message
+          success = (/Timed out waiting for completion/ =~ e.message) != nil
         end
         break if success
       end
@@ -90,7 +91,7 @@ describe Elastomer::Client::Tasks do
       test_thread = populate_background_index!(@index.name)
 
       # look up and verify found task
-      found_by_id = false
+      found_by_id = T.let(false, T.nilable(T::Boolean))
       query_long_running_tasks.each do |ts|
         t = ts.values.first
         resp = @tasks.get_by_id t["node"], t["id"]

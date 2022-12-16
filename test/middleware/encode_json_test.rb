@@ -1,9 +1,12 @@
+# typed: true
 # frozen_string_literal: true
 
-require File.expand_path("../../test_helper", __FILE__)
+require_relative "../test_helper"
 
 describe Elastomer::Middleware::EncodeJson do
-  let(:middleware) { Elastomer::Middleware::EncodeJson.new(lambda { |env| env }) }
+  def middleware
+    Elastomer::Middleware::EncodeJson.new(lambda {|env| env})
+  end
 
   def process(body, content_type: nil, method: :post)
     env = { body: body, request_headers: Faraday::Utils::Headers.new, method: method }

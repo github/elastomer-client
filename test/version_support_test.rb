@@ -1,6 +1,7 @@
+# typed: true
 # frozen_string_literal: true
 
-require_relative "./test_helper"
+require_relative './test_helper'
 
 describe Elastomer::VersionSupport do
   describe "supported versions" do
@@ -41,8 +42,10 @@ describe Elastomer::VersionSupport do
   end
 
   describe "ES 2.x" do
-    let(:version_support) { Elastomer::VersionSupport.new("2.3.5") }
-
+    def version_support
+       Elastomer::VersionSupport.new("2.3.5")
+    end
+    
     describe "#keyword" do
       it "returns non_analyzed string" do
         expected = {
@@ -74,7 +77,9 @@ describe Elastomer::VersionSupport do
   end
 
   describe "ES 5.x" do
-    let(:version_support) { Elastomer::VersionSupport.new("5.6.0") }
+    def version_support
+       Elastomer::VersionSupport.new("5.6.0")
+    end
 
     describe "#keyword" do
       it "returns keyword" do

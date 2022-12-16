@@ -295,8 +295,8 @@ def mappings_wrapper(type, body)
     body
   else
     {
-      :_default_ => {
-        :dynamic => "strict"
+      _default_: {
+        dynamic: "strict"
       },
       type => body
     }
@@ -304,8 +304,8 @@ def mappings_wrapper(type, body)
 end
 
 # COMPATIBILITY
-# ES 7 drops mapping types, so maybe return type as a String
-def maybe_type(type, body)
+# ES 7 drops mapping types, so append type to the document only if ES version < 7
+def document_wrapper(type, body)
   if $client.version_support.es_version_7_plus?
     body
   else

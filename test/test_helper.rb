@@ -295,8 +295,8 @@ def mappings_wrapper(type, body)
     body
   else
     {
-      _default_: {
-        dynamic: "strict"
+      :_default_ => {
+        :dynamic => "strict"
       },
       type => body
     }

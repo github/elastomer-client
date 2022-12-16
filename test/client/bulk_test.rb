@@ -189,10 +189,11 @@ describe Elastomer::Client::Bulk do
     book_title = $client.version_support.es_version_7_plus? ? "A"*52 : "A"*34
     ary << @index.bulk(request_size: 300) do |b|
       2.times { |num|
-      document = document_wrapper("book", {_id: num, author: "Author 1", title: book_title})
-      ary << b.index(document)
+        document = document_wrapper("book", {_id: num, author: "Author 1", title: book_title})
+        ary << b.index(document)
       }
       ary.compact!
+
       assert_equal 0, ary.length
 
       7.times { |num|
@@ -214,7 +215,7 @@ describe Elastomer::Client::Bulk do
     @index.refresh
     h = @index.docs.search q: "*:*", size: 0
 
-    if $client.version_support.es_version_7_plus? then
+    if $client.version_support.es_version_7_plus?
       assert_equal 10, h["hits"]["total"]["value"]
     else
       assert_equal 10, h["hits"]["total"]
@@ -251,7 +252,7 @@ describe Elastomer::Client::Bulk do
     @index.refresh
     h = @index.docs.search q: "*:*", size: 0
 
-    if $client.version_support.es_version_7_plus? then
+    if $client.version_support.es_version_7_plus?
       assert_equal 10, h["hits"]["total"]["value"]
     else
       assert_equal 10, h["hits"]["total"]
@@ -284,7 +285,7 @@ describe Elastomer::Client::Bulk do
     index.refresh
     h = index.docs.search q: "*:*", size: 0
 
-    if $client.version_support.es_version_7_plus? then
+    if $client.version_support.es_version_7_plus?
       assert_equal 2, h["hits"]["total"]["value"]
     else
       assert_equal 2, h["hits"]["total"]

@@ -345,7 +345,7 @@ describe Elastomer::Client::Bulk do
     assert_bulk_index(responses[1]["items"][0])
   end
 
-  it "streamss bulk items" do
+  it "streams bulk items" do
     ops = [
       [:index, document_wrapper("book", { title: "Book 1" }), { _id: 1, _index: @index.name }],
       [:index, document_wrapper("book", { title: "Book 2" }), { _id: 2, _index: @index.name }],

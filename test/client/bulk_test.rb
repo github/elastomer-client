@@ -79,7 +79,7 @@ describe Elastomer::Client::Bulk do
   it "supports a nice block syntax" do
     h = @index.bulk do |b|
       b.index document_wrapper("book", {_id: 1, author: "Author 1", title: "Book 1"})
-      b.index  document_wrapper("book", {_id: nil, author: "Author 2", title: "Book 2"})
+      b.index document_wrapper("book", {_id: nil, author: "Author 2", title: "Book 2"})
     end
     items = h["items"]
 
@@ -110,8 +110,8 @@ describe Elastomer::Client::Bulk do
     assert_equal "Author 2", h["_source"]["author"]
 
     h = @index.bulk do |b|
-      b.index   document_wrapper("book", {_id: "", author: "Author 3", title: "Book 3"})
-      b.delete  document_wrapper("book", {_id: book_id})
+      b.index  document_wrapper("book", {_id: "", author: "Author 3", title: "Book 3"})
+      b.delete document_wrapper("book", {_id: book_id})
     end
     items = h["items"]
 

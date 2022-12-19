@@ -314,7 +314,7 @@ describe Elastomer::Client::Bulk do
     assert_equal "Book 2", @index.docs("book").get(id: "bar")["_source"]["title"]
   end
 
-  it "doesn't override parameters from the document" do
+  it "doesn't override parameters with properties from the document" do
     document = document_wrapper("book", { _id: 1, author: "Author 1", title: "Book 1" })
     params = { id: 2 }
 

@@ -348,6 +348,7 @@ module Elastomer
       #
       # Returns a Docs instance.
       def docs(type = nil)
+        type = "_doc" if client.version_support.es_version_7_plus?
         client.docs name, type
       end
 

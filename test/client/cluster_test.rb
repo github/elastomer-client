@@ -62,24 +62,24 @@ describe Elastomer::Client::Cluster do
   end
 
   it "updates the cluster settings" do
-    @cluster.update_settings transient: { "indices.ttl.interval" => "30m" }
+    @cluster.update_settings transient: { "indices.recovery.max_bytes_per_sec" => "30mb" }
     h = @cluster.settings
 
-    value = h["transient"]["indices"]["ttl"]["interval"]
+    value = h["transient"]["indices"]["recovery"]["max_bytes_per_sec"]
 
-    assert_equal "30m", value
+    assert_equal "30mb", value
 
-    @cluster.update_settings transient: { "indices.ttl.interval" => "60m" }
+    @cluster.update_settings transient: { "indices.recovery.max_bytes_per_sec" => "60mb" }
     h = @cluster.settings
 
-    value = h["transient"]["indices"]["ttl"]["interval"]
+    value = h["transient"]["indices"]["recovery"]["max_bytes_per_sec"]
 
-    assert_equal "60m", value
+    assert_equal "60mb", value
   end
 
   it "returns cluster stats" do
     h = @cluster.stats
-    expected = %w[cluster_name indices nodes status timestamp]
+    expected = $client.version_support.es_version_7_plus? ? %w[cluster_name cluster_uuid indices nodes status timestamp] : %w[cluster_name indices nodes status timestamp]
     expected.unshift("_nodes") if cluster_stats_includes_underscore_nodes?
 
     assert_equal expected, h.keys.sort

@@ -294,12 +294,13 @@ def mappings_wrapper(type, body)
   if $client.version_support.es_version_7_plus?
     body
   else
-    {
-      :_default_ => {
-        :dynamic => "strict"
-      },
-      type => body
+    mapping = {
+      _default_: {
+        dynamic: "strict"
+      }
     }
+    mapping[type] = body
+    mapping
   end
 end
 

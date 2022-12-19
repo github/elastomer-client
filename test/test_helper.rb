@@ -290,7 +290,7 @@ end
 
 # COMPATIBILITY
 # ES 7 drops mapping types, so don't wrap with a mapping type for ES 7+
-def mappings_wrapper(type, body)
+def mappings_wrapper(type, body, disable_all = false)
   if $client.version_support.es_version_7_plus?
     body
   else
@@ -300,6 +300,7 @@ def mappings_wrapper(type, body)
       }
     }
     mapping[type] = body
+    if disable_all then mapping[type]["_all"] = { "enabled": false } end
     mapping
   end
 end

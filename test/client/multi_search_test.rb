@@ -11,23 +11,13 @@ describe Elastomer::Client::MultiSearch do
     unless @index.exists?
       @index.create \
         settings: { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
-        mappings: {
-          doc1: {
-            _source: { enabled: true }, _all: { enabled: false },
-            properties: {
-              title: $client.version_support.text(analyzer: "standard"),
-              author: $client.version_support.keyword
-            }
-          },
-          doc2: {
-            _source: { enabled: true }, _all: { enabled: false },
-            properties: {
-              title: $client.version_support.text(analyzer: "standard"),
-              author: $client.version_support.keyword
-            }
+        mappings: mappings_wrapper("book", {
+          _source: { enabled: true },
+          properties: {
+            title: $client.version_support.text(analyzer: "standard"),
+            author: $client.version_support.keyword
           }
-        }
-
+        }, !$client.version_support.es_version_7_plus?)
       wait_for_index(@name)
     end
 
@@ -42,30 +32,39 @@ describe Elastomer::Client::MultiSearch do
     populate!
 
     body = [
-      '{"index" : "elastomer-msearch-test", "size" : 0}',
+      '{"index" : "elastomer-msearch-test"}',
       '{"query" : {"match_all" : {}}}',
-      '{"index" : "elastomer-msearch-test", "type": "doc2"}',
-      '{"query" : {"match": {"author" : "grantr"}}}',
+      '{"index" : "elastomer-msearch-test"}',
+      '{"query" : {"match": {"author" : "Author 2"}}}',
       nil
     ]
     body = body.join "\n"
     h = $client.multi_search body
     response1, response2 = h["responses"]
 
-    assert_equal 4, response1["hits"]["total"]
-    assert_equal 1, response2["hits"]["total"]
+    if $client.version_support.es_version_7_plus?
+      assert_equal 2, response1["hits"]["total"]["value"]
+      assert_equal 1, response2["hits"]["total"]["value"]
+    else
+      assert_equal 2, response1["hits"]["total"]
+      assert_equal 1, response2["hits"]["total"]
+    end
     assert_equal "2", response2["hits"]["hits"][0]["_id"]
 
     body = [
       "{}",
-      '{"query" : {"match": {"author" : "grantr"}}}',
+      '{"query" : {"match": {"author" : "Author 2"}}}',
       nil
     ]
     body = body.join "\n"
     h = $client.multi_search body, index: @name
     response1 = h["responses"].first
 
-    assert_equal 1, response1["hits"]["total"]
+    if $client.version_support.es_version_7_plus?
+      assert_equal 1, response1["hits"]["total"]["value"]
+    else
+      assert_equal 1, response1["hits"]["total"]
+    end
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
   end
 
@@ -73,30 +72,39 @@ describe Elastomer::Client::MultiSearch do
     populate!
 
     body = [
-      '{"index" : "elastomer-msearch-test", "size" : 0}',
+      '{"index" : "elastomer-msearch-test"}',
       '{"query" : {"match_all" : {}}}',
-      '{"index" : "elastomer-msearch-test", "type": "doc2"}',
-      '{"query" : {"match": {"author" : "grantr"}}}',
+      '{"index" : "elastomer-msearch-test"}',
+      '{"query" : {"match": {"author" : "Author 2"}}}',
       nil
     ]
     body = body.join "\n"
     h = $client.msearch body
     response1, response2 = h["responses"]
 
-    assert_equal 4, response1["hits"]["total"]
-    assert_equal 1, response2["hits"]["total"]
+    if $client.version_support.es_version_7_plus?
+      assert_equal 2, response1["hits"]["total"]["value"]
+      assert_equal 1, response2["hits"]["total"]["value"]
+    else
+      assert_equal 2, response1["hits"]["total"]
+      assert_equal 1, response2["hits"]["total"]
+    end
     assert_equal "2", response2["hits"]["hits"][0]["_id"]
 
     body = [
       "{}",
-      '{"query" : {"match": {"author" : "grantr"}}}',
+      '{"query" : {"match": {"author" : "Author 2"}}}',
       nil
     ]
     body = body.join "\n"
     h = $client.msearch body, index: @name
     response1 = h["responses"].first
 
-    assert_equal 1, response1["hits"]["total"]
+    if $client.version_support.es_version_7_plus?
+      assert_equal 1, response1["hits"]["total"]["value"]
+    else
+      assert_equal 1, response1["hits"]["total"]
+    end
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
   end
 
@@ -104,60 +112,66 @@ describe Elastomer::Client::MultiSearch do
     populate!
 
     h = $client.multi_search do |m|
-      m.search({query: { match_all: {}}}, index: @name, size: 0)
-      m.search({query: { match: { "title" => "author" }}}, index: @name, type: "doc2")
+      m.search({query: { match_all: {}}}, index: @name)
+      m.search({query: { match: { "title" => "author" }}}, index: @name)
     end
 
     response1, response2 = h["responses"]
 
-    assert_equal 4, response1["hits"]["total"]
-    assert_equal 2, response2["hits"]["total"]
+    if $client.version_support.es_version_7_plus?
+      assert_equal 2, response1["hits"]["total"]["value"]
+      assert_equal 2, response2["hits"]["total"]["value"]
+    else
+      assert_equal 2, response1["hits"]["total"]
+      assert_equal 2, response2["hits"]["total"]
+    end
 
     h = @index.multi_search do |m|
-      m.search({query: { match_all: {}}}, size: 0)
-      m.search({query: { match: { "title" => "author" }}}, type: "doc2")
+      m.search({query: { match_all: {}}})
+      m.search({query: { match: { "title" => "author" }}})
     end
 
     response1, response2 = h["responses"]
 
-    assert_equal 4, response1["hits"]["total"]
-    assert_equal 2, response2["hits"]["total"]
+    if $client.version_support.es_version_7_plus?
+      assert_equal 2, response1["hits"]["total"]["value"]
+      assert_equal 2, response2["hits"]["total"]["value"]
+    else
+      assert_equal 2, response1["hits"]["total"]
+      assert_equal 2, response2["hits"]["total"]
+    end
 
-    h = @index.docs("doc1").multi_search do |m|
-      m.search({query: { match_all: {}}}, size: 0)
-      m.search({query: { match: { "title" => "logging" }}}, type: "doc2")
+    type = $client.version_support.es_version_7_plus? ? "" : "book"
+    h = @index.docs(type).multi_search do |m|
+      m.search({query: { match_all: {}}})
+      m.search({query: { match: { "title" => "2" }}})
     end
 
     response1, response2 = h["responses"]
 
-    assert_equal 2, response1["hits"]["total"]
-    assert_equal 1, response2["hits"]["total"]
+    if $client.version_support.es_version_7_plus?
+      assert_equal 2, response1["hits"]["total"]["value"]
+      assert_equal 1, response2["hits"]["total"]["value"]
+    else
+      assert_equal 2, response1["hits"]["total"]
+      assert_equal 1, response2["hits"]["total"]
+    end
   end
 
   def populate!
     @docs.index \
-      _id: 1,
-      _type: "doc1",
-      title: "the author of gravatar",
-      author: "mojombo"
+      document_wrapper("book", {
+        _id: 1,
+        title: "Book 1 by author 1",
+        author: "Author 1"
+      })
 
     @docs.index \
-      _id: 2,
-      _type: "doc1",
-      title: "the author of resque",
-      author: "defunkt"
-
-    @docs.index \
-      _id: 1,
-      _type: "doc2",
-      title: "the author of logging",
-      author: "pea53"
-
-    @docs.index \
-      _id: 2,
-      _type: "doc2",
-      title: "the author of rubber-band",
-      author: "grantr"
+      document_wrapper("book", {
+        _id: 2,
+        title: "Book 2 by author 2",
+        author: "Author 2"
+      })
 
     @index.refresh
   end

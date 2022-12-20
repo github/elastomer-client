@@ -49,6 +49,7 @@ describe Elastomer::Client::MultiSearch do
       assert_equal 2, response1["hits"]["total"]
       assert_equal 1, response2["hits"]["total"]
     end
+
     assert_equal "2", response2["hits"]["hits"][0]["_id"]
 
     body = [
@@ -65,6 +66,7 @@ describe Elastomer::Client::MultiSearch do
     else
       assert_equal 1, response1["hits"]["total"]
     end
+
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
   end
 
@@ -89,6 +91,7 @@ describe Elastomer::Client::MultiSearch do
       assert_equal 2, response1["hits"]["total"]
       assert_equal 1, response2["hits"]["total"]
     end
+
     assert_equal "2", response2["hits"]["hits"][0]["_id"]
 
     body = [
@@ -105,6 +108,7 @@ describe Elastomer::Client::MultiSearch do
     else
       assert_equal 1, response1["hits"]["total"]
     end
+
     assert_equal "2", response1["hits"]["hits"][0]["_id"]
   end
 

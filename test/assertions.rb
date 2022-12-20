@@ -6,7 +6,7 @@ module Minitest::Assertions
   # in index responses. Check for either one so we are compatible
   # with 0.90 and 1.0.
   def assert_created(response)
-    assert response["created"] || response["ok"], "document was not created"
+    assert ($client.version_support.es_version_7_plus? ? response["result"] == "created" : response["created"]) || response["ok"], "document was not created"
   end
 
   #COMPATIBILITY

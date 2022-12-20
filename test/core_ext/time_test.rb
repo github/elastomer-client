@@ -11,15 +11,13 @@ describe "JSON conversions for Time" do
     unless @index.exists?
       @index.create \
         settings: { "index.number_of_shards" => 1, "index.number_of_replicas" => 0 },
-        mappings: {
-          doc1: {
-            _source: { enabled: true }, _all: { enabled: false },
-            properties: {
-              title: $client.version_support.keyword,
-              created_at: { type: "date" }
-            }
+        mappings: mappings_wrapper("book", {
+          _source: { enabled: true },
+          properties: {
+            title: $client.version_support.keyword,
+            created_at: { type: "date" }
           }
-        }
+        }, !$client.version_support.es_version_7_plus?)
 
       wait_for_index(@name)
     end
@@ -39,11 +37,11 @@ describe "JSON conversions for Time" do
 
   it "indexes time fields" do
     time = Time.utc(2013, 5, 3, 10, 1, 31)
-    h = @docs.index({title: "test document", created_at: time}, type: "doc1")
+    h = @docs.index(document_wrapper("book", {title: "Book 1", created_at: time}))
 
     assert_created(h)
 
-    doc = @docs.get(type: "doc1", id: h["_id"])
+    doc = $client.version_support.es_version_7_plus? ? @docs.get(id: h["_id"]) : @docs.get(type: "book", id: h["_id"])
 
     assert_equal "2013-05-03T10:01:31.000Z", doc["_source"]["created_at"]
   end

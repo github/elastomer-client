@@ -55,7 +55,11 @@ module Minitest::Assertions
   def assert_mapping_exists(response, type, message = "mapping expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")
-        response["mappings"][type]
+        if $client.version_support.es_version_7_plus?
+          response["mappings"]
+        else
+          response["mappings"][type]
+        end
       else
         response[type]
       end
@@ -66,7 +70,11 @@ module Minitest::Assertions
   def assert_property_exists(response, type, property, message = "property expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")
-        response["mappings"][type]
+        if $client.version_support.es_version_7_plus?
+          response["mappings"]
+        else
+          response["mappings"][type]
+        end
       else
         response[type]
       end

@@ -54,39 +54,33 @@ describe Elastomer::Client::Index do
     it "adds mappings for document types" do
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },
-        mappings: {
-          doco: {
-            _source: { enabled: false },
-            _all: { enabled: false },
-            properties: {
-              title: $client.version_support.text(analyzer: "standard"),
-              author: $client.version_support.keyword
-            }
+        mappings: mappings_wrapper("book", {
+          _source: { enabled: false },
+          properties: {
+            title: $client.version_support.text(analyzer: "standard"),
+            author: $client.version_support.keyword
           }
-        }
+        }, true)
       )
 
       assert_predicate @index, :exists?, "the index should now exist"
-      assert_mapping_exists @index.get_mapping[@name], "doco"
+      assert_mapping_exists @index.get_mapping[@name], "book"
     end
 
     it "adds mappings for document types with .mapping" do
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },
-        mappings: {
-          doco: {
-            _source: { enabled: false },
-            _all: { enabled: false },
-            properties: {
-              title: $client.version_support.text(analyzer: "standard"),
-              author: $client.version_support.keyword
-            }
+        mappings: mappings_wrapper("book", {
+          _source: { enabled: false },
+          properties: {
+            title: $client.version_support.text(analyzer: "standard"),
+            author: $client.version_support.keyword
           }
-        }
+        }, true)
       )
 
       assert_predicate @index, :exists?, "the index should now exist"
-      assert_mapping_exists @index.mapping[@name], "doco"
+      assert_mapping_exists @index.mapping[@name], "book"
     end
   end
 
@@ -111,56 +105,68 @@ describe Elastomer::Client::Index do
 
   it "updates document mappings" do
     @index.create(
-      mappings: {
-        doco: {
-          _source: { enabled: false },
-          _all: { enabled: false },
-          properties: {title: $client.version_support.text(analyzer: "standard")}
-        }
-      }
+      mappings: mappings_wrapper("book", {
+        _source: { enabled: false },
+          properties: { title: $client.version_support.text(analyzer: "standard") }
+      }, true)
     )
 
-    assert_property_exists @index.mapping[@name], "doco", "title"
+    assert_property_exists @index.mapping[@name], "book", "title"
 
-    @index.update_mapping "doco", { doco: { properties: {
-      author: $client.version_support.keyword
-    }}}
+    if $client.version_support.es_version_7_plus?
+      @index.update_mapping "_doc", { properties: {
+        author: $client.version_support.keyword
+      }}, { include_type_name: true }
+    else
+      @index.update_mapping "book", { book: { properties: {
+        author: $client.version_support.keyword
+      }}}
+    end
 
-    assert_property_exists @index.mapping[@name], "doco", "author"
-    assert_property_exists @index.mapping[@name], "doco", "title"
+    assert_property_exists @index.mapping[@name], "book", "author"
+    assert_property_exists @index.mapping[@name], "book", "title"
 
-    @index.update_mapping "mux_mool", { mux_mool: { properties: {
-      song: $client.version_support.keyword
-    }}}
+    # ES7 removes mapping types so test adding a new mapping type only for versions < 7
+    if !$client.version_support.es_version_7_plus?
+      @index.update_mapping "mux_mool", { mux_mool: { properties: {
+        song: $client.version_support.keyword
+      }}}
 
-    assert_property_exists @index.mapping[@name], "mux_mool", "song"
+      assert_property_exists @index.mapping[@name], "mux_mool", "song"
+    end
   end
 
   it "updates document mappings with .put_mapping" do
     @index.create(
-      mappings: {
-        doco: {
-          _source: { enabled: false },
-          _all: { enabled: false },
-          properties: {title: $client.version_support.text(analyzer: "standard")}
-        }
-      }
+      mappings: mappings_wrapper("book", {
+        _source: { enabled: false },
+          properties: { title: $client.version_support.text(analyzer: "standard") }
+      }, true)
     )
 
-    assert_property_exists @index.mapping[@name], "doco", "title"
+    assert_property_exists @index.mapping[@name], "book", "title"
 
-    @index.put_mapping "doco", { doco: { properties: {
-      author: $client.version_support.keyword
-    }}}
+    if $client.version_support.es_version_7_plus?
+      @index.put_mapping "_doc", { properties: {
+        author: $client.version_support.keyword
+      }}, { include_type_name: true }
+    else
+      @index.put_mapping "book", { book: { properties: {
+        author: $client.version_support.keyword
+      }}}
+    end
+    
+    assert_property_exists @index.mapping[@name], "book", "author"
+    assert_property_exists @index.mapping[@name], "book", "title"
 
-    assert_property_exists @index.mapping[@name], "doco", "author"
-    assert_property_exists @index.mapping[@name], "doco", "title"
+    # ES7 removes mapping types so test adding a new mapping type only for versions < 7
+    if !$client.version_support.es_version_7_plus?
+      @index.put_mapping "mux_mool", { mux_mool: { properties: {
+        song: $client.version_support.keyword
+      }}}
 
-    @index.put_mapping "mux_mool", { mux_mool: { properties: {
-      song: $client.version_support.keyword
-    }}}
-
-    assert_property_exists @index.mapping[@name], "mux_mool", "song"
+      assert_property_exists @index.mapping[@name], "mux_mool", "song"
+    end
   end
 
   it "lists all aliases to the index" do
@@ -184,12 +190,17 @@ describe Elastomer::Client::Index do
       assert_equal("alias [not-there] missing", exception.message)
       assert_equal(404, exception.status)
 
-      exception = assert_raises(Elastomer::Client::RequestError) do
-        @index.get_alias("not*")
-      end
+      # In ES 7, when you use wildcards, an error is not raised if no match is found
+      if $client.version_support.es_version_7_plus?
+        assert_empty(@index.get_alias("not*"))
+      else
+        exception = assert_raises(Elastomer::Client::RequestError) do
+          @index.get_alias("not*")
+        end
 
-      assert_equal("alias [not*] missing", exception.message)
-      assert_equal(404, exception.status)
+        assert_equal("alias [not*] missing", exception.message)
+        assert_equal(404, exception.status)
+      end
     else
       assert_empty(@index.get_alias("not-there"))
       assert_empty(@index.get_alias("not*"))
@@ -265,17 +276,14 @@ describe Elastomer::Client::Index do
 
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },
-        mappings: {
-          doco: {
-            _source: { enabled: false },
-            _all: { enabled: false },
-            properties: {
-              title: $client.version_support.text(analyzer: "standard"),
-              author: $client.version_support.keyword,
-              suggest: suggest
-            }
+        mappings: mappings_wrapper("book", {
+          _source: { enabled: false },
+          properties: {
+            title: $client.version_support.text(analyzer: "standard"),
+            author: $client.version_support.keyword,
+            suggest: suggest
           }
-        }
+        }, true)
       )
       wait_for_index(@name)
     end
@@ -343,14 +351,13 @@ describe Elastomer::Client::Index do
     end
 
     it "gets segments" do
-      @index.docs("foo").index("foo" => "bar")
       response = @index.segments
 
       assert_includes response["indices"], "elastomer-index-test"
     end
 
     it "deletes by query" do
-      @index.docs("foo").index("foo" => "bar")
+      @index.docs.index(document_wrapper("book", { _id: 1, title: "Book 1" }))
       @index.refresh
       r = @index.delete_by_query(q: "*")
 
@@ -381,79 +388,87 @@ describe Elastomer::Client::Index do
       assert_equal id, percolator.id
     end
 
-    it "performs multi percolate queries" do
-      # COMPATIBILITY
-      if requires_percolator_mapping?
-        @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
+    it "performs multi percolate queriess" do
+      # The _percolate endpoint is removed from ES 7, and replaced with percolate queries via _search and _msearch
+      if !$client.version_support.es_version_7_plus?
+        # COMPATIBILITY
+        if requires_percolator_mapping?
+          @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
+        end
+
+        @index.docs.index \
+          document_wrapper("book", {
+            _id: 1,
+            title: "Book 1 by author 1",
+            author: "Author 1"
+          })
+
+        @index.docs.index \
+          document_wrapper("book", {
+            _id: 2,
+            title: "Book 2 by author 2",
+            author: "Author 2"
+          })
+
+        @index.percolator("1").create query: { match_all: { } }
+        @index.percolator("2").create query: { match: { author: "Author 1" } }
+        @index.refresh
+
+        h = @index.multi_percolate(type: "book") do |m|
+          m.percolate author: "Author 1"
+          m.percolate author: "Author 2"
+          m.count({ author: "Author 2" }, {})
+        end
+
+        response1, response2, response3 = h["responses"]
+
+        assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+        assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
+        assert_equal 1, response3["total"]
       end
-
-      @index.docs.index \
-        _id: 1,
-        _type: "doco",
-        title: "the author of logging",
-        author: "pea53"
-
-      @index.docs.index \
-        _id: 2,
-        _type: "doco",
-        title: "the author of rubber-band",
-        author: "grantr"
-
-      @index.percolator("1").create query: { match_all: { } }
-      @index.percolator("2").create query: { match: { author: "pea53" } }
-      @index.refresh
-
-      h = @index.multi_percolate(type: "doco") do |m|
-        m.percolate author: "pea53"
-        m.percolate author: "grantr"
-        m.count({ author: "grantr" }, {})
-      end
-
-      response1, response2, response3 = h["responses"]
-
-      assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-      assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
-      assert_equal 1, response3["total"]
     end
 
     it "performs suggestion queries" do
-      @index.docs.index \
-        _id: 1,
-        _type: "doco",
-        title: "the magnificent",
-        author: "greg",
-        suggest: {input: "greg", weight: 2}
+      # The _suggest endpoint is removed from ES 7, suggest functionality is now via _search
+      if !$client.version_support.es_version_7_plus?
+        @index.docs.index \
+          document_wrapper("book", {
+            _id: 1,
+            title: "the magnificent",
+            author: "greg",
+            suggest: {input: "greg", weight: 2}
+          })
 
-      @index.docs.index \
-        _id: 2,
-        _type: "doco",
-        title: "the author of rubber-band",
-        author: "grant",
-        suggest: {input: "grant", weight: 1}
+        @index.docs.index \
+          document_wrapper("book", {
+            _id: 2,
+            title: "the author of rubber-band",
+            author: "grant",
+            suggest: {input: "grant", weight: 1}
+          })
+        @index.refresh
+        response = @index.suggest({name: {text: "gr", completion: {field: :suggest}}})
 
-      @index.refresh
-      response = @index.suggest({name: {text: "gr", completion: {field: :suggest}}})
+        assert response.key?("name")
+        hash = response["name"].first
 
-      assert response.key?("name")
-      hash = response["name"].first
+        assert_equal "gr", hash["text"]
 
-      assert_equal "gr", hash["text"]
+        options = hash["options"]
 
-      options = hash["options"]
-
-      assert_equal 2, options.length
-      assert_equal "greg", options.first["text"]
-      assert_equal "grant", options.last["text"]
+        assert_equal 2, options.length
+        assert_equal "greg", options.first["text"]
+        assert_equal "grant", options.last["text"]
+      end
     end
 
     it "handles output parameter of field" do
-      document = {
+      document = document_wrapper("book", {
         _id:     1,
-        _type:   "doco",
         title:   "the magnificent",
         author:  "greg",
         suggest: {input: %w[Greg greg], output: "Greg", weight: 2}
-      }
+      })
 
       if supports_suggest_output?
         # It is not an error to index `output`...

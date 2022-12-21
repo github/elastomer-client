@@ -155,7 +155,7 @@ describe Elastomer::Client::Index do
         author: $client.version_support.keyword
       }}}
     end
-    
+
     assert_property_exists @index.mapping[@name], "book", "author"
     assert_property_exists @index.mapping[@name], "book", "title"
 

@@ -162,6 +162,38 @@ describe Elastomer::Client::MultiSearch do
     end
   end
 
+  it "performs suggestion queries using the search endpoint" do
+    populate!
+
+    h = @index.multi_search do |m|
+      m.search({
+        query: {
+          match: {
+            title: "by author"
+          }
+        },
+        suggest: {
+          suggestion1: {
+            text: "by author",
+            term: {
+              field: "author"
+            }
+          }
+        }
+      })
+    end
+
+    response = h["responses"][0]
+
+    if $client.version_support.es_version_7_plus?
+      assert_equal 2, response["hits"]["total"]["value"]
+    else
+      assert_equal 2, response["hits"]["total"]
+    end
+
+    refute_nil response["suggest"], "expected suggester text to be returned"
+  end
+
   def populate!
     @docs.index \
       document_wrapper("book", {

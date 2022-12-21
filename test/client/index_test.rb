@@ -388,7 +388,7 @@ describe Elastomer::Client::Index do
       assert_equal id, percolator.id
     end
 
-    it "performs multi percolate queriess" do
+    it "performs multi percolate queries" do
       # The _percolate endpoint is removed from ES 7, and replaced with percolate queries via _search and _msearch
       if !$client.version_support.es_version_7_plus?
         # COMPATIBILITY

@@ -225,8 +225,11 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-shards.html
       #
       # Returns the response body as a hash
-      def search_shards(params = {})
-        response = client.get "/{index}{/type}/_search_shards", update_params(params, action: "docs.search_shards", rest_api: "search_shards")
+      def search_shards(params = {}, remove_type_param = false)
+        updated_params = update_params(params, action: "docs.search_shards", rest_api: "search_shards")
+        if remove_type_param then updated_params.delete(:type) end
+
+        response = client.get "/{index}{/type}/_search_shards", updated_params
         response.body
       end
 

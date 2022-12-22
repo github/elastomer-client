@@ -702,7 +702,7 @@ describe Elastomer::Client::Docs do
     if $client.version_support.es_version_7_plus?
       skip "Multi percolate not supported in ES version #{$client.version}"
     end
-  
+
     @index.percolator("1").create query: { match_all: { } }
     @index.percolator("2").create query: { match: { author: "Author1" } }
     @index.refresh

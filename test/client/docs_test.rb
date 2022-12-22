@@ -204,7 +204,7 @@ describe Elastomer::Client::Docs do
     assert_equal "Author1", h["_source"]["author"]
   end
 
-  it "checks if documents exist in the search indexx" do
+  it "checks if documents exist in the search index" do
     refute $client.version_support.es_version_7_plus? ? @docs.exists?(id: "1") : @docs.exists?(id: "1", type: "book")
     populate!
 

@@ -26,9 +26,9 @@ describe Elastomer::Client::Cluster do
     @template.create({
       template: "test-elastomer*",
       settings: { number_of_shards: 3 },
-      mappings: {
-        doco: { _source: { enabled: false }}
-      }
+      mappings: mappings_wrapper("book", {
+        _source: { enabled: false }
+      })
     })
 
     assert_predicate @template, :exists?, " we now have a cluster-test template"
@@ -36,7 +36,13 @@ describe Elastomer::Client::Cluster do
     template = @template.get
 
     assert_equal [@name], template.keys
-    assert_equal "test-elastomer*", template[@name]["template"]
+
+    if $client.version_support.es_version_7_plus? 
+      assert_equal "test-elastomer*", template[@name]["index_patterns"][0]
+    else
+      assert_equal "test-elastomer*", template[@name]["template"]
+    end
+
     assert_equal "3", template[@name]["settings"]["index"]["number_of_shards"]
   end
 end

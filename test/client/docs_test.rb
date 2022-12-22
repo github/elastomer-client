@@ -609,105 +609,115 @@ describe Elastomer::Client::Docs do
   end
 
   it "percolates a given document" do
-    if !$client.version_support.es_version_7_plus?
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create query: { match: { author: "Author1" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create query: { match: { author: "Author2" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      @index.refresh
-
-      response = @index.docs("book").percolate(doc: { author: "Author1" })
-
-      assert_equal 1, response["matches"].length
-      assert_equal "1", response["matches"][0]["_id"]
+    if $client.version_support.es_version_7_plus?
+      skip "Percolate not supported in ES version #{$client.version}"
     end
+
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create query: { match: { author: "Author1" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create query: { match: { author: "Author2" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
+
+    response = @index.docs("book").percolate(doc: { author: "Author1" })
+
+    assert_equal 1, response["matches"].length
+    assert_equal "1", response["matches"][0]["_id"]
   end
 
   it "percolates an existing document" do
-    if !$client.version_support.es_version_7_plus?
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create query: { match: { author: "Author1" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create query: { match: { author: "Author2" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      @index.refresh
-
-      response = @index.docs("book").percolate(nil, id: "1")
-
-      assert_equal 1, response["matches"].length
-      assert_equal "1", response["matches"][0]["_id"]
+    if $client.version_support.es_version_7_plus?
+      skip "Percolate not supported in ES version #{$client.version}"
     end
+
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create query: { match: { author: "Author1" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create query: { match: { author: "Author2" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
+
+    response = @index.docs("book").percolate(nil, id: "1")
+
+    assert_equal 1, response["matches"].length
+    assert_equal "1", response["matches"][0]["_id"]
   end
 
   it "counts the matches for percolating a given document" do
-    if !$client.version_support.es_version_7_plus?
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create query: { match: { author: "Author1" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create query: { match: { author: "Author2" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      @index.refresh
-
-      count = @index.docs("book").percolate_count doc: { author: "Author1" }
-
-      assert_equal 1, count
+    if $client.version_support.es_version_7_plus?
+      skip "Percolate not supported in ES version #{$client.version}"
     end
+
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create query: { match: { author: "Author1" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create query: { match: { author: "Author2" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
+
+    count = @index.docs("book").percolate_count doc: { author: "Author1" }
+
+    assert_equal 1, count
   end
 
   it "counts the matches for percolating an existing document" do
-    if !$client.version_support.es_version_7_plus?
-      populate!
-
-      percolator1 = @index.percolator "1"
-      response = percolator1.create query: { match: { author: "Author1" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      percolator2 = @index.percolator "2"
-      response = percolator2.create query: { match: { author: "Author2" } }
-
-      assert response["created"], "Couldn't create the percolator query"
-      @index.refresh
-
-      count = @index.docs("book").percolate_count(nil, id: "1")
-
-      assert_equal 1, count
+    if $client.version_support.es_version_7_plus?
+      skip "Percolate not supported in ES version #{$client.version}"
     end
+
+    populate!
+
+    percolator1 = @index.percolator "1"
+    response = percolator1.create query: { match: { author: "Author1" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    percolator2 = @index.percolator "2"
+    response = percolator2.create query: { match: { author: "Author2" } }
+
+    assert response["created"], "Couldn't create the percolator query"
+    @index.refresh
+
+    count = @index.docs("book").percolate_count(nil, id: "1")
+
+    assert_equal 1, count
   end
 
   it "performs multi percolate queries" do
-    if !$client.version_support.es_version_7_plus?
-      @index.percolator("1").create query: { match_all: { } }
-      @index.percolator("2").create query: { match: { author: "Author1" } }
-      @index.refresh
-
-      h = @index.docs("book").multi_percolate do |m|
-        m.percolate author: "Author1"
-        m.percolate author: "Author2"
-        m.count({}, { author: "Author2" })
-      end
-
-      response1, response2, response3 = h["responses"]
-
-      assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
-      assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
-      assert_equal 1, response3["total"]
+    if $client.version_support.es_version_7_plus?
+      skip "Multi percolate not supported in ES version #{$client.version}"
     end
+  
+    @index.percolator("1").create query: { match_all: { } }
+    @index.percolator("2").create query: { match: { author: "Author1" } }
+    @index.refresh
+
+    h = @index.docs("book").multi_percolate do |m|
+      m.percolate author: "Author1"
+      m.percolate author: "Author2"
+      m.count({}, { author: "Author2" })
+    end
+
+    response1, response2, response3 = h["responses"]
+
+    assert_equal ["1", "2"], response1["matches"].map { |match| match["_id"] }.sort
+    assert_equal ["1"], response2["matches"].map { |match| match["_id"] }.sort
+    assert_equal 1, response3["total"]
   end
 
   # Create/index multiple documents.

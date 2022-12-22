@@ -64,4 +64,4 @@ describe Elastomer::Client::Percolator do
       assert_raises(ArgumentError) { @index.percolator nil }
     end
   end
-end
+end unless $client.version_support.es_version_7_plus?

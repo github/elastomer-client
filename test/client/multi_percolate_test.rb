@@ -138,4 +138,4 @@ describe Elastomer::Client::MultiPercolate do
     @index.refresh
   end
   # rubocop:enable Metrics/MethodLength
-end
+end unless $client.version_support.es_version_7_plus?

@@ -5,6 +5,10 @@ require_relative "../test_helper"
 describe Elastomer::Client::MultiPercolate do
 
   before do
+    if $client.version_support.es_version_7_plus?
+      skip "Multi percolate not supported in ES version #{$client.version}"
+    end
+
     @name  = "elastomer-mpercolate-test"
     @index = $client.index(@name)
 
@@ -138,4 +142,4 @@ describe Elastomer::Client::MultiPercolate do
     @index.refresh
   end
   # rubocop:enable Metrics/MethodLength
-end unless $client.version_support.es_version_7_plus?
+end

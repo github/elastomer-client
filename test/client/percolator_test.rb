@@ -5,6 +5,10 @@ require_relative "../test_helper"
 describe Elastomer::Client::Percolator do
 
   before do
+    if $client.version_support.es_version_7_plus?
+      skip "Percolate not supported in ES version #{$client.version}"
+    end
+
     @index = $client.index "elastomer-percolator-test"
     @index.delete if @index.exists?
     @docs = @index.docs("docs")
@@ -64,4 +68,4 @@ describe Elastomer::Client::Percolator do
       assert_raises(ArgumentError) { @index.percolator nil }
     end
   end
-end unless $client.version_support.es_version_7_plus?
+end

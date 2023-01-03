@@ -37,7 +37,7 @@ describe Elastomer::Client::Cluster do
 
     assert_equal [@name], template.keys
 
-    if $client.version_support.es_version_7_plus? 
+    if $client.version_support.es_version_7_plus?
       assert_equal "test-elastomer*", template[@name]["index_patterns"][0]
     else
       assert_equal "test-elastomer*", template[@name]["template"]

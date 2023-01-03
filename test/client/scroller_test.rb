@@ -100,11 +100,11 @@ describe Elastomer::Client::Scroller do
   def populate!
     h = @index.bulk do |b|
       25.times { |num|
-      if $client.version_support.es_version_7_plus?
-        b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num
-      else
-        b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num, _type: "book"
-      end
+        if $client.version_support.es_version_7_plus?
+          b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num
+        else
+          b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num, _type: "book"
+        end
       }
     end
 

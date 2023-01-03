@@ -5,6 +5,10 @@ require_relative "../test_helper"
 describe Elastomer::Client::AppDeleteByQuery do
 
   before do
+    if $client.version_support.es_version_7_plus?
+      skip "app_delete_by_query is not supported in ES version #{$client.version}"
+    end
+
     @index = $client.index "elastomer-delete-by-query-test"
     @index.delete if @index.exists?
     @docs = @index.docs("docs")

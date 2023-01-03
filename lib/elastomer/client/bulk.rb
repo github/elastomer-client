@@ -160,7 +160,7 @@ module Elastomer
     # immediately.
     #
     class Bulk
-      DEFAULT_REQUEST_SIZE = 10 * 2**20  # 10 MB
+      DEFAULT_REQUEST_SIZE = 2**20 * 10  # 10 MB
 
       # Create a new bulk client for handling some of the details of
       # accumulating documents to index and then formatting them properly for

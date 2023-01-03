@@ -14,6 +14,9 @@ describe Elastomer::Client::Snapshot do
     @index_name = "elastomer-snapshot-test-index"
     @index = $client.index(@index_name)
     @name = "elastomer-test"
+    if $client.version_support.es_version_7_plus?
+      $client.cluster.update_settings persistent: { "ingest.geoip.downloader.enabled" => "false" }
+    end
   end
 
   after do
@@ -41,9 +44,9 @@ describe Elastomer::Client::Snapshot do
   end
 
   it "creates snapshots with options" do
-    @index.create(number_of_shards: 1, number_of_replicas: 0)
+    @index.create(settings: { number_of_shards: 1, number_of_replicas: 0 })
     with_tmp_repo do |repo|
-      response = repo.snapshot(@name).create({indices: [@index_name]}, wait_for_completion: true)
+      response = repo.snapshot(@name).create({ indices: [@index_name] }, wait_for_completion: true)
 
       assert_equal [@index_name], response["snapshot"]["indices"]
       assert_equal 1, response["snapshot"]["shards"]["total"]
@@ -62,7 +65,7 @@ describe Elastomer::Client::Snapshot do
   end
 
   it "gets snapshot status for one and all" do
-    @index.create(number_of_shards: 1, number_of_replicas: 0)
+    @index.create(settings: { number_of_shards: 1, number_of_replicas: 0 })
     with_tmp_repo do |repo|
       repo.snapshot(@name).create({indices: [@index_name]}, wait_for_completion: true)
       response = repo.snapshot(@name).status
@@ -98,11 +101,11 @@ describe Elastomer::Client::Snapshot do
   end
 
   it "restores snapshots" do
-    @index.create(number_of_shards: 1, number_of_replicas: 0)
+    @index.create(settings: { number_of_shards: 1, number_of_replicas: 0 })
     wait_for_index(@index_name)
     with_tmp_repo do |repo|
       snapshot = repo.snapshot(@name)
-      snapshot.create({indices: [@index_name]}, wait_for_completion: true)
+      snapshot.create({ indices: [@index_name] }, wait_for_completion: true)
       @index.delete
       response = snapshot.restore({}, wait_for_completion: true)
 
@@ -121,7 +124,7 @@ describe Elastomer::Client::Snapshot do
     end
 
     it "restores snapshots with options" do
-      @index.create(number_of_shards: 1, number_of_replicas: 0)
+      @index.create(settings: { number_of_shards: 1, number_of_replicas: 0 })
       wait_for_index(@index_name)
       with_tmp_repo do |repo|
         snapshot = repo.snapshot(@name)

@@ -79,6 +79,6 @@ module Minitest::Assertions
         response[type]
       end
 
-    assert mapping["properties"].has_key?(property), message # rubocop:disable Minitest/AssertWithExpectedArgument
+    assert mapping["properties"].has_key?(property), message
   end
 end

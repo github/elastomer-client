@@ -36,7 +36,6 @@ jobs:
       - uses: actions/checkout@v3
       - run: 'wget ${{ matrix.ES_DOWNLOAD_URL }}'
       - run: 'tar -xzf elasticsearch-*.tar.gz'
-      - run: "sed -i '/UseParNewGC/d' ./elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch.in.sh"
       - run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d'
       - run: gem install bundler
       - run: bundle install

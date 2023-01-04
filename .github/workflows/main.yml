@@ -39,12 +39,8 @@ jobs:
         with:
           path: ./elasticsearch-${{ matrix.ES_VERSION }}
           key: ${{ env.cache-name }}-${{ matrix.ES_VERSION }}
-          restore-keys: |
-            ${{ env.cache-name }}-${{ matrix.ES_VERSION }}
-
-      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+      - if: ${{ steps.cache-elasticsearch.outputs.cache-hit != 'true' }}
         name: Download Elasticsearch
-        continue-on-error: true
         run: |
           wget ${{ matrix.ES_DOWNLOAD_URL }}
           tar -xzf elasticsearch-*.tar.gz

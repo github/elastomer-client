@@ -31,8 +31,22 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - uses: actions/checkout@v3
-      - run: 'wget ${{ matrix.ES_DOWNLOAD_URL }}'
-      - run: 'tar -xzf elasticsearch-*.tar.gz'
+      - name: Cache Elasticsearch
+        id: cache-elasticsearch
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elasticsearch
+        with:
+          path: ./elasticsearch-${{ matrix.ES_VERSION }}
+          key: ${{ env.cache-name }}-${{ matrix.ES_VERSION }}
+          restore-keys: |
+            ${{ env.cache-name }}-${{ matrix.ES_VERSION }}
+
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: Download Elasticsearch
+        continue-on-error: true
+        run: 'wget ${{ matrix.ES_DOWNLOAD_URL }}'
+        run: 'tar -xzf elasticsearch-*.tar.gz'
       - run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d'
       - run: gem install bundler
       - run: bundle install

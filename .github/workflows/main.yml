@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         ruby-version: ['2.7', '3.0', '3.1']
-        ES_VERSION: ['2.4.6', '5.6.15']
+        ES_VERSION: ['2.4.6', '5.6.15', '7.17.8']
         include:
           - ES_VERSION: '2.4.6'
             ES_DOWNLOAD_URL: >-
@@ -20,6 +20,9 @@ jobs:
           - ES_VERSION: '5.6.15'
             ES_DOWNLOAD_URL: >-
               https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.15.tar.gz
+          - ES_VERSION: '7.17.8'
+            ES_DOWNLOAD_URL: >-
+              https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.17.8-linux-x86_64.tar.gz
     steps:
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'

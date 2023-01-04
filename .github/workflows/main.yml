@@ -46,8 +46,8 @@ jobs:
         name: Download Elasticsearch
         continue-on-error: true
         run: |
-          'wget ${{ matrix.ES_DOWNLOAD_URL }}'
-          'tar -xzf elasticsearch-*.tar.gz'
+          wget ${{ matrix.ES_DOWNLOAD_URL }}
+          tar -xzf elasticsearch-*.tar.gz
       - run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d'
       - run: gem install bundler
       - run: bundle install

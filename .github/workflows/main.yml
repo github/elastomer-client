@@ -45,8 +45,9 @@ jobs:
       - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         name: Download Elasticsearch
         continue-on-error: true
-        run: 'wget ${{ matrix.ES_DOWNLOAD_URL }}'
-        run: 'tar -xzf elasticsearch-*.tar.gz'
+        run: |
+          'wget ${{ matrix.ES_DOWNLOAD_URL }}'
+          'tar -xzf elasticsearch-*.tar.gz'
       - run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d'
       - run: gem install bundler
       - run: bundle install

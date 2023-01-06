@@ -720,6 +720,25 @@ describe Elastomer::Client::Docs do
     assert_equal 1, response3["total"]
   end
 
+  it "accepts a type param and does not throw an error for ES7" do 
+    if !$client.version_support.es_version_7_plus?
+      skip "This test is only needed for ES 7 onwards"
+    end
+  
+    h = @docs.index \
+      _id: 1,
+      _type: "book",
+      title: "Book 1 by author 1",
+      author: "Author 1"
+
+    assert_created h
+    assert_equal "1", h["_id"]
+
+    response1 = @docs.get(id: 1, type: "book")
+
+    assert_equal "1", response1["_id"]
+  end
+
   # Create/index multiple documents.
   #
   # docs - An instance of Elastomer::Client::Docs or Elastomer::Client::Bulk. If

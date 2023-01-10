@@ -391,6 +391,7 @@ module Elastomer
         response = nil
         begin
           response = call if ready_to_send?(size)
+        # rubocop:disable Lint/UselessRescue
         rescue StandardError => err
           raise err
         ensure

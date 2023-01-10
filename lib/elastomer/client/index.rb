@@ -147,7 +147,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       def update_mapping(type, body, params = {})
-        response = client.put "/{index}/_mapping/{type}", update_params(params, body: body, type: type, action: "index.update_mapping", rest_api: "indices.put_mapping")
+        response = client.put "/{index}/_mapping{/type}", update_params(params, body: body, type: type, action: "index.update_mapping", rest_api: "indices.put_mapping")
         response.body
       end
       alias_method :put_mapping, :update_mapping
@@ -585,6 +585,7 @@ module Elastomer
       def update_params(params, overrides = nil)
         h = defaults.update params
         h.update overrides unless overrides.nil?
+        h.delete(:type) if client.version_support.es_version_7_plus?
         h
       end
 

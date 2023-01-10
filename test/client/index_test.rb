@@ -255,11 +255,11 @@ describe Elastomer::Client::Index do
     assert_equal %w[just few words analyze], tokens
   end
 
-  it "accepts a type param and does not throw an error for ES7" do 
+  it "accepts a type param and does not throw an error for ES7" do
     if !$client.version_support.es_version_7_plus?
       skip "This test is only needed for ES 7 onwards"
     end
-  
+
     @index.create(
       mappings: mappings_wrapper("book", {
         _source: { enabled: false },

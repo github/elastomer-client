@@ -116,7 +116,7 @@ describe Elastomer::Client::Index do
     if $client.version_support.es_version_7_plus?
       @index.update_mapping "_doc", { properties: {
         author: $client.version_support.keyword
-      }}, { include_type_name: true }
+      }}
     else
       @index.update_mapping "book", { book: { properties: {
         author: $client.version_support.keyword
@@ -149,7 +149,7 @@ describe Elastomer::Client::Index do
     if $client.version_support.es_version_7_plus?
       @index.put_mapping "_doc", { properties: {
         author: $client.version_support.keyword
-      }}, { include_type_name: true }
+      }}
     else
       @index.put_mapping "book", { book: { properties: {
         author: $client.version_support.keyword
@@ -253,6 +253,28 @@ describe Elastomer::Client::Index do
     tokens = tokens["tokens"].map { |h| h["token"] }
 
     assert_equal %w[just few words analyze], tokens
+  end
+
+  it "accepts a type param and does not throw an error for ES7" do 
+    if !$client.version_support.es_version_7_plus?
+      skip "This test is only needed for ES 7 onwards"
+    end
+  
+    @index.create(
+      mappings: mappings_wrapper("book", {
+        _source: { enabled: false },
+          properties: { title: $client.version_support.text(analyzer: "standard") }
+      }, true)
+    )
+
+    assert_property_exists @index.mapping(type: "book")[@name], "book", "title"
+
+    @index.update_mapping "book", { properties: {
+      author: $client.version_support.keyword
+    }}
+
+    assert_property_exists @index.mapping(type: "book")[@name], "book", "author"
+    assert_property_exists @index.mapping(type: "book")[@name], "book", "title"
   end
 
   describe "when an index does not exist" do

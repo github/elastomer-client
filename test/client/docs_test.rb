@@ -729,7 +729,7 @@ describe Elastomer::Client::Docs do
       _id: 1,
       _type: "book",
       title: "Book 1 by author 1",
-      author: "Author 1"
+      author: "Author1"
 
     assert_created h
     assert_equal "1", h["_id"]
@@ -737,6 +737,41 @@ describe Elastomer::Client::Docs do
     response1 = @docs.get(id: 1, type: "book")
 
     assert_equal "1", response1["_id"]
+
+    @docs.update(document_wrapper("book", {
+      _id: "1",
+      doc: { author: "Author1.1" }
+    }))
+    response2 = @docs.get(id: "1", type: "book")
+
+    assert_equal "Author1.1", response2["_source"]["author"]
+
+    h = @docs.index \
+    _id: 2,
+    _type: "book",
+    title: "Book 2 by author 2",
+    author: "Author2"
+
+    assert_created h
+    assert_equal "2", h["_id"]
+
+    h = @docs.multi_get({ids: [2, 1]}, type: "book")
+    authors = h["docs"].map { |d| d["_source"]["author"] }
+
+    assert_equal %w[Author2 Author1.1], authors
+
+    h = @docs.delete id: 3, type: "book"
+
+    refute @docs.exists?(id: "3", type: "book")
+
+    @index.refresh
+    h = @docs.count q: "*:*", type: "book"
+
+    assert_equal 2, h["count"]
+
+    h = @docs.search q: "*:*", type: "book"
+
+    assert_equal 2, h["hits"]["total"]["value"]
   end
 
   # Create/index multiple documents.

@@ -760,6 +760,15 @@ describe Elastomer::Client::Docs do
 
     assert_equal %w[Author2 Author1.1], authors
 
+    h = @docs.index \
+    _id: 3,
+    _type: "book",
+    title: "Book 3 by author 3",
+    author: "Author3"
+
+    assert_created h
+    assert_equal "3", h["_id"]
+
     h = @docs.delete id: 3, type: "book"
 
     refute @docs.exists?(id: "3", type: "book")

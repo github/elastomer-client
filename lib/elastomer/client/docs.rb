@@ -597,7 +597,7 @@ module Elastomer
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h[:routing] = h[:routing].join(",") if h[:routing].is_a?(Array)
-        if client.version_support.es_version_7_plus? then h[:type] = "_doc" end
+        h[:type] = "_doc" if client.version_support.es_version_7_plus?
         h
       end
 

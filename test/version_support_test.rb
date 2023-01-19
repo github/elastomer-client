@@ -28,7 +28,6 @@ describe Elastomer::VersionSupport do
         assert_predicate Elastomer::VersionSupport.new(version), :es_version_7_plus?
         assert_predicate Elastomer::VersionSupport.new(version), :es_version_8_plus?
       end
-      
     end
   end
 

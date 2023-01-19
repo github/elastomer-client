@@ -35,7 +35,7 @@ describe Elastomer::VersionSupport do
   describe "unsupported versions" do
     it "blow up" do
       too_low = ["0.90", "1.0.1", "2.0.0", "2.2.0"]
-      too_high = [ "9.0.0"]
+      too_high = ["9.0.0"]
 
       (too_low + too_high).each do |version|
         exception = assert_raises(ArgumentError, "expected #{version} to not be supported") do

@@ -109,6 +109,11 @@ module Elastomer
     def es_version_7_plus?
       version >= "7.0.0"
     end
+    
+    # Returns true if Elasticsearch version is 8.x or higher.
+    def es_version_8_plus?
+      version >= "8.0.0"
+    end
 
     # Wraps version check and param gen where ES version >= 5.x requires
     # percolator type + field defined in mappings

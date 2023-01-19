@@ -1,6 +1,33 @@
 version: "3"
 
 services:
+  elasticsearch8.6:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
+    container_name: es8.6
+    profiles: ["es8", "all"]
+    environment:
+      - cluster.name=elastomer8.6
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.watcher.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 1g
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - esrepos8:/usr/share/elasticsearch/repos
+      - ./elasticsearch7plus.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 127.0.0.1:${ES_8_PORT:-9208}:9200
+  
   elasticsearch7.17:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.7
     container_name: es7.17
@@ -25,7 +52,7 @@ services:
       - IPC_LOCK
     volumes:
       - esrepos7:/usr/share/elasticsearch/repos
-      - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch7plus.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - 127.0.0.1:${ES_7_PORT:-9207}:9200
   
@@ -83,6 +110,12 @@ services:
       - 127.0.0.1:${ES_2_PORT:-9202}:9200
 
 volumes:
+  esrepos8:
+    driver: local
+    driver_opts:
+      device: tmpfs
+      type: tmpfs
+      o: size=100m,uid=102,gid=102
   esrepos7:
     driver: local
     driver_opts:

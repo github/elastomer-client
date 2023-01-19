@@ -11,7 +11,7 @@ module Elastomer
     #
     # Raises ArgumentError if version is unsupported.
     def initialize(version)
-      if version < "2.3" || version >= "8.0"
+      if version < "2.3" || version >= "8.7"
         raise ArgumentError, "Elasticsearch version #{version} is not supported by elastomer-client"
       end
 

@@ -10,3 +10,4 @@ path:
 transport.port: 9300
 http.port: 9200
 http.max_content_length: 50mb
+ingest.geoip.downloader.enabled: false

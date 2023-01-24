@@ -162,7 +162,7 @@ module Elastomer
         overrides = from_document body
         overrides.merge!(action: "docs.multi_get", rest_api: "mget")
 
-        response = client.get "{/index}{/type}/_mget", update_params(params, overrides)
+        response = client.get "{/index}{/type}/_mget", update_params(params, overrides, client.version_support.es_version_8_plus?)
         response.body
       end
       alias_method :mget, :multi_get
@@ -179,7 +179,11 @@ module Elastomer
         overrides = from_document script
         overrides.merge!(action: "docs.update", rest_api: "update")
 
-        response = client.post "/{index}/{type}/{id}/_update", update_params(params, overrides)
+        if client.version_support.es_version_8_plus?
+          response = client.post "/{index}/_update/{id}", update_params(params, overrides, true)
+        else
+          response = client.post "/{index}/{type}/{id}/_update", update_params(params, overrides)
+        end
         response.body
       end
 
@@ -208,7 +212,7 @@ module Elastomer
       def search(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_search", update_params(params, body: query, action: "docs.search", rest_api: "search")
+        response = client.get "/{index}{/type}/_search", update_params(params, {body: query, action: "docs.search", rest_api: "search"}, client.version_support.es_version_8_plus?)
         response.body
       end
 
@@ -256,7 +260,11 @@ module Elastomer
       def count(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_count", update_params(params, body: query, action: "docs.count", rest_api: "count")
+        if client.version_support.es_version_8_plus?
+          response = client.get "/{index}/_count", update_params(params, {body: query, action: "docs.count", rest_api: "count"}, true)
+        else
+          response = client.get "/{index}{/type}/_count", update_params(params, body: query, action: "docs.count", rest_api: "count")
+        end
         response.body
       end
 
@@ -344,7 +352,11 @@ module Elastomer
       #
       # Returns the response body as a hash
       def termvector(params = {})
-        response = client.get "/{index}/{type}/{id}/_termvectors", update_params(params, action: "docs.termvector", rest_api: "termvectors")
+        if client.version_support.es_version_8_plus?
+          response = client.get "/{index}/_termvectors/{id}", update_params(params, {action: "docs.termvector", rest_api: "termvectors"}, true)
+        else
+          response = client.get "/{index}/{type}/{id}/_termvectors", update_params(params, action: "docs.termvector", rest_api: "termvectors")
+        end
         response.body
       end
       alias_method :termvectors, :termvector
@@ -362,7 +374,7 @@ module Elastomer
       #
       # Returns the response body as a hash
       def multi_termvectors(body, params = {})
-        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, body: body, action: "docs.multi_termvectors", rest_api: "mtermvectors")
+        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, {body: body, action: "docs.multi_termvectors", rest_api: "mtermvectors"}, client.version_support.es_version_8_plus?)
         response.body
       end
       alias_method :multi_term_vectors, :multi_termvectors
@@ -389,7 +401,11 @@ module Elastomer
       def explain(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}/{type}/{id}/_explain", update_params(params, body: query, action: "docs.explain", rest_api: "explain")
+        if client.version_support.es_version_8_plus?
+          response = client.get "/{index}/_explain/{id}", update_params(params, {body: query, action: "docs.explain", rest_api: "explain"}, true)
+        else
+          response = client.get "/{index}/{type}/{id}/_explain", update_params(params, body: query, action: "docs.explain", rest_api: "explain")
+        end
         response.body
       end
 
@@ -414,7 +430,7 @@ module Elastomer
       def validate(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_validate/query", update_params(params, body: query, action: "docs.validate", rest_api: "indices.validate_query")
+        response = client.get "/{index}{/type}/_validate/query", update_params(params, {body: query, action: "docs.validate", rest_api: "indices.validate_query"}, client.version_support.es_version_8_plus?)
         response.body
       end
 
@@ -593,11 +609,12 @@ module Elastomer
       # overrides - Optional parameter overrides as a Hash
       #
       # Returns a new params Hash.
-      def update_params(params, overrides = nil)
+      def update_params(params, overrides = nil, delete_type = false)
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h[:routing] = h[:routing].join(",") if h[:routing].is_a?(Array)
-        h[:type] = "_doc" if client.version_support.es_version_7_plus?
+        h[:type] = "_doc" if client.version_support.es_version_7_plus? && !delete_type
+        h.delete(:type) if delete_type
         h
       end
 

@@ -721,8 +721,8 @@ describe Elastomer::Client::Docs do
   end
 
   it "accepts a type param and does not throw an error for ES7" do
-    if !$client.version_support.es_version_7_plus?
-      skip "This test is only needed for ES 7 onwards"
+    if !$client.version_support.es_version_7_plus? || $client.version_support.es_version_8_plus?
+      skip "This test is only needed for ES 7"
     end
 
     h = @docs.index \

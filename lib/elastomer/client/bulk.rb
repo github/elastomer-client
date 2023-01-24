@@ -39,8 +39,10 @@ module Elastomer
       else
         raise "bulk request body cannot be nil" if body.nil?
         params ||= {}
+        updated_params = params.merge(body: body, action: "bulk", rest_api: "bulk")
+        updated_params.delete(:type) if $client.version_support.es_version_8_plus?
 
-        response = self.post "{/index}{/type}/_bulk", params.merge(body: body, action: "bulk", rest_api: "bulk")
+        response = self.post "{/index}{/type}/_bulk", updated_params
         response.body
       end
     end

@@ -543,6 +543,7 @@ module Elastomer
         raise "a block is required" if block.nil?
 
         params = {index: self.name, type: self.type}.merge params
+        params.delete(:type) if client.version_support.es_version_8_plus?
         client.multi_search params, &block
       end
 

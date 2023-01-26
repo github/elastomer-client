@@ -74,6 +74,7 @@ module Elastomer
     # Returns the response body as a Hash.
     def start_scroll(opts = {})
       opts = opts.merge action: "search.start_scroll", rest_api: "search"
+      opts.delete(:type) if version_support.es_version_8_plus?
       response = get "{/index}{/type}/_search", opts
       response.body
     end

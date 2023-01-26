@@ -40,24 +40,19 @@ handled by the Docs class (discussed next).
 require 'elastomer/client'
 client = Elastomer::Client.new
 
-index = client.index('twitter')
+index = client.index('books')
 index.create(
   :settings => { 'index.number_of_shards' => 3 },
   :mappings => {
-    :tweet => {
-      :_source => { :enabled => true },
-      :_all    => { :enabled => false },
-      :properties => {
-        :author => { :type => 'string', :index => 'not_analyzed' },
-        :tweet  => { :type => 'string', :analyze => 'standard' }
-      }
+    :_source => { :enabled => true },
+    :properties => {
+      :author => { :type => 'keyword' },
+      :title  => { :type => 'text' }
     }
   }
 )
 
 index.exists?
-
-index.exists? :type => 'tweet'
 
 index.delete
 ```
@@ -72,16 +67,15 @@ document type.
 require 'elastomer/client'
 client = Elastomer::Client.new
 
-docs = client.docs('twitter')
+docs = client.docs('books')
 
 docs.index({
   :_id    => 1,
-  :_type  => 'tweet',
-  :author => '@pea53',
-  :tweet  => 'announcing Elastomer, the stupid simple Elasticsearch client'
+  :author => 'Mark Twain',
+  :title  => 'The Adventures of Huckleberry Finn'
 })
 
-docs.search({:query => {:match_all => {}}}, :size => 0)
+docs.search({:query => {:match_all => {}}})
 ```
 
 #### Performance
@@ -103,14 +97,21 @@ Get started by cloning and running a few scripts:
     - `script/bootstrap`
 2. Run ES in Docker (see below)
 3. Run tests
+    - for ES 8: `ES_PORT=9208 rake test`
     - for ES 7: `ES_PORT=9207 rake test`
     - for ES 5: `ES_PORT=9205 rake test`
 
 
-Run ES 5 and ES 7:
+Run ES 5, ES 7, and ES 8:
 ```
 cd docker
 docker compose --profile all up
+```
+
+Run only ES 8:
+```
+cd docker
+docker compose --profile es8 up
 ```
 
 Run only ES 7:

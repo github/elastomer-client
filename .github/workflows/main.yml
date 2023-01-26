@@ -42,7 +42,12 @@ jobs:
         run: |
           wget ${{ matrix.ES_DOWNLOAD_URL }}
           tar -xzf elasticsearch-*.tar.gz
-      - run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d -Expack.security.enabled=false'
+      - if: ${{ matrix.ES_VERSION == '5.6.15' }}
+        name: Run Elasticsearch
+        run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d'
+      - if: ${{ matrix.ES_VERSION != '5.6.15' }}
+        name: Run Elasticsearch
+        run: './elasticsearch-${{ matrix.ES_VERSION }}/bin/elasticsearch -d -Expack.security.enabled=false'
       - run: gem install bundler
       - run: bundle install
       - run: script/poll-for-es

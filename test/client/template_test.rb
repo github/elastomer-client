@@ -14,7 +14,11 @@ describe Elastomer::Client::Cluster do
   end
 
   it "lists templates in the cluster" do
-    @template.create({template: "test-elastomer*"})
+    if $client.version_support.es_version_7_plus?
+      @template.create({index_patterns: ["test-elastomer*"]})
+    else
+      @template.create({template: "test-elastomer*"})
+    end
     templates = $client.cluster.templates
 
     refute_empty templates, "expected to see a template"
@@ -23,13 +27,20 @@ describe Elastomer::Client::Cluster do
   it "creates a template" do
     refute_predicate @template, :exists?, "the template should not exist"
 
-    @template.create({
-      template: "test-elastomer*",
+    if $client.version_support.es_version_7_plus?
+      template_config = {index_patterns: ["test-elastomer*"]}
+    else
+      template_config = {template: "test-elastomer*"}
+    end
+
+    template_config.merge!({
       settings: { number_of_shards: 3 },
       mappings: mappings_wrapper("book", {
         _source: { enabled: false }
       })
     })
+
+    @template.create(template_config)
 
     assert_predicate @template, :exists?, " we now have a cluster-test template"
 

@@ -507,28 +507,6 @@ module Elastomer
         client.multi_percolate(params, &block)
       end
 
-      # Provides access to warmer API commands. Index warmers run search
-      # requests to warm up the index before it is available for
-      # searching. Warmers are useful for searches that require heavy
-      # data loading, such as faceting or sorting.
-      #
-      # The warmer api allows creating, deleting, and retrieving
-      # registered warmers.
-      #
-      # warmer_name - The name of the warmer to operate on.
-      #
-      # Examples
-      #   index.warmer('warmer1').create(query: {match_all: {}})
-      #   index.warmer('warmer1').get
-      #   index.warmer('warmer1').delete
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-warmers.html
-      #
-      # Returns a new Warmer instance
-      def warmer(warmer_name)
-        Warmer.new(client, name, warmer_name)
-      end
-
       # Delete documents by query following either the native or
       # application-level delete by query method.
       #

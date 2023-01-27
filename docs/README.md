@@ -30,7 +30,6 @@ document. All the other components are built atop the client.
 * [Documents](docs.md)
 * [Cluster](cluster.md)
 * [Templates](templates.md)
-* [Warmers](warmers.md)
 
 **Bulk Components**
 

@@ -15,7 +15,7 @@ describe Elastomer::Client::Docs do
           _source: { enabled: true },
           properties: {
             title: { type: "text", analyzer: "standard", term_vector: "with_positions_offsets" },
-            author: $client.version_support.keyword
+            author: { type: "keyword" }
           }
         }, true)
 

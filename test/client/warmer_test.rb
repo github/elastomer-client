@@ -19,7 +19,7 @@ describe Elastomer::Client::Warmer do
             _source: { enabled: true }, _all: { enabled: false },
             properties: {
               message: { type: "text", analyzer: "standard" },
-              author: $client.version_support.keyword
+              author: { type: "keyword" }
             }
           }
         }

@@ -16,7 +16,7 @@ describe Elastomer::Client::Bulk do
           _source: { enabled: true },
           properties: {
             title: { type: "text", analyzer: "standard" },
-            author: $client.version_support.keyword
+            author: { type: "keyword" }
           }
         })
 

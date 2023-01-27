@@ -58,7 +58,7 @@ describe Elastomer::Client::Index do
           _source: { enabled: false },
           properties: {
             title: { type: "text", analyzer: "standard" },
-            author: $client.version_support.keyword
+            author: { type: "keyword" }
           }
         }, true)
       )
@@ -74,7 +74,7 @@ describe Elastomer::Client::Index do
           _source: { enabled: false },
           properties: {
             title: { type: "text", analyzer: "standard" },
-            author: $client.version_support.keyword
+            author: { type: "keyword" }
           }
         }, true)
       )
@@ -115,11 +115,11 @@ describe Elastomer::Client::Index do
 
     if $client.version_support.es_version_7_plus?
       @index.update_mapping "_doc", { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}
     else
       @index.update_mapping "book", { book: { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}}
     end
 
@@ -129,7 +129,7 @@ describe Elastomer::Client::Index do
     # ES7 removes mapping types so test adding a new mapping type only for versions < 7
     if !$client.version_support.es_version_7_plus?
       @index.update_mapping "mux_mool", { mux_mool: { properties: {
-        song: $client.version_support.keyword
+        song: { type: "keyword" }
       }}}
 
       assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -148,11 +148,11 @@ describe Elastomer::Client::Index do
 
     if $client.version_support.es_version_7_plus?
       @index.put_mapping "_doc", { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}
     else
       @index.put_mapping "book", { book: { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}}
     end
 
@@ -162,7 +162,7 @@ describe Elastomer::Client::Index do
     # ES7 removes mapping types so test adding a new mapping type only for versions < 7
     if !$client.version_support.es_version_7_plus?
       @index.put_mapping "mux_mool", { mux_mool: { properties: {
-        song: $client.version_support.keyword
+        song: { type: "keyword" }
       }}}
 
       assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -270,7 +270,7 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping(type: "book")[@name], "book", "title"
 
     @index.update_mapping "book", { properties: {
-      author: $client.version_support.keyword
+      author: { type: "keyword" }
     }}
 
     assert_property_exists @index.mapping(type: "book")[@name], "book", "author"
@@ -302,7 +302,7 @@ describe Elastomer::Client::Index do
           _source: { enabled: false },
           properties: {
             title: { type: "text", analyzer: "standard" },
-            author: $client.version_support.keyword,
+            author: { type: "keyword" },
             suggest: suggest
           }
         }, true)

@@ -15,7 +15,7 @@ describe Elastomer::Client::MultiSearch do
           _source: { enabled: true },
           properties: {
             title: { type: "text", analyzer: "standard" },
-            author: $client.version_support.keyword
+            author: { type: "keyword" }
           }
         }, !$client.version_support.es_version_7_plus?)
       wait_for_index(@name)

@@ -16,7 +16,7 @@ describe Elastomer::Client::Scroller do
           _source: { enabled: true },
           properties: {
             title: { type: "text", analyzer: "standard" },
-            author: $client.version_support.keyword,
+            author: { type: "keyword" },
             sorter: { type: "integer" }
           }
         }, true)

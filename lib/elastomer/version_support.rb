@@ -42,20 +42,6 @@ module Elastomer
       es_version_5_plus?
     end
 
-    # COMPATIBILITY: Return a "keyword"-type mapping for a field.
-    #
-    # On ES 2.x, this will be a string field with not_analyzed=true. On ES 5+,
-    # it will be a keyword field.
-    def keyword(**args)
-      reject_args!(args, :type, :index)
-
-      if es_version_2_x?
-        {type: "string", index: "not_analyzed"}.merge(args)
-      else
-        {type: "keyword"}.merge(args)
-      end
-    end
-
     # COMPATIBILITY: return a simple boolean value or legacy {"enabled": true/false}.
     #
     # https://www.elastic.co/guide/en/elasticsearch/reference/5.5/breaking_50_mapping_changes.html#_literal_norms_literal

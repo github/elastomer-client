@@ -93,20 +93,6 @@ module Elastomer
     end
 
     # COMPATIBILITY
-    # ES 2.x reports query parsing exceptions as query_parse_exception whereas
-    # ES 5.x reports them as query_shard_exception or parsing_exception
-    # depending on when the error occurs.
-    #
-    # Returns an Array of Strings to match.
-    def query_parse_exception
-      if es_version_2_x?
-        ["query_parsing_exception"]
-      else
-        ["query_shard_exception", "parsing_exception"]
-      end
-    end
-
-    # COMPATIBILITY
     #
     # ES5 doesn't accept/ignore ambiguous or unexpected req params any more
     alias :strict_request_params? :es_version_5_plus?

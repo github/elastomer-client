@@ -18,7 +18,7 @@ describe Elastomer::Client::Warmer do
           tweet: {
             _source: { enabled: true }, _all: { enabled: false },
             properties: {
-              message: $client.version_support.text(analyzer: "standard"),
+              message: { type: "text", analyzer: "standard" },
               author: $client.version_support.keyword
             }
           }

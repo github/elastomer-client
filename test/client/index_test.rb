@@ -57,7 +57,7 @@ describe Elastomer::Client::Index do
         mappings: mappings_wrapper("book", {
           _source: { enabled: false },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
+            title: { type: "text", analyzer: "standard" },
             author: $client.version_support.keyword
           }
         }, true)
@@ -73,7 +73,7 @@ describe Elastomer::Client::Index do
         mappings: mappings_wrapper("book", {
           _source: { enabled: false },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
+            title: { type: "text", analyzer: "standard" },
             author: $client.version_support.keyword
           }
         }, true)
@@ -107,7 +107,7 @@ describe Elastomer::Client::Index do
     @index.create(
       mappings: mappings_wrapper("book", {
         _source: { enabled: false },
-          properties: { title: $client.version_support.text(analyzer: "standard") }
+          properties: { title: { type: "text", analyzer: "standard" } }
       }, true)
     )
 
@@ -140,7 +140,7 @@ describe Elastomer::Client::Index do
     @index.create(
       mappings: mappings_wrapper("book", {
         _source: { enabled: false },
-          properties: { title: $client.version_support.text(analyzer: "standard") }
+          properties: { title: { type: "text", analyzer: "standard" } }
       }, true)
     )
 
@@ -263,7 +263,7 @@ describe Elastomer::Client::Index do
     @index.create(
       mappings: mappings_wrapper("book", {
         _source: { enabled: false },
-          properties: { title: $client.version_support.text(analyzer: "standard") }
+          properties: { title: { type: "text", analyzer: "standard" } }
       }, true)
     )
 
@@ -301,7 +301,7 @@ describe Elastomer::Client::Index do
         mappings: mappings_wrapper("book", {
           _source: { enabled: false },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
+            title: { type: "text", analyzer: "standard" },
             author: $client.version_support.keyword,
             suggest: suggest
           }

@@ -89,7 +89,7 @@ describe Elastomer::Client::NativeDeleteByQuery do
           settings: settings,
           mappings: mappings_wrapper(type, {
             properties: {
-              name: $client.version_support.text(analyzer: "standard"),
+              name: { type: "text", analyzer: "standard" },
             },
             _routing: { required: true }
           })

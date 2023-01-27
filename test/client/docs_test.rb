@@ -14,7 +14,7 @@ describe Elastomer::Client::Docs do
         mappings: mappings_wrapper("book", {
           _source: { enabled: true },
           properties: {
-            title: $client.version_support.text(analyzer: "standard", term_vector: "with_positions_offsets"),
+            title: { type: "text", analyzer: "standard", term_vector: "with_positions_offsets" },
             author: $client.version_support.keyword
           }
         }, true)

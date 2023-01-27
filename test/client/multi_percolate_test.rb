@@ -19,14 +19,14 @@ describe Elastomer::Client::MultiPercolate do
           doc1: {
             _source: { enabled: true }, _all: { enabled: false },
             properties: {
-              title: $client.version_support.text(analyzer: "standard"),
+              title: { type: "text", analyzer: "standard" },
               author: $client.version_support.keyword
             }
           },
           doc2: {
             _source: { enabled: true }, _all: { enabled: false },
             properties: {
-              title: $client.version_support.text(analyzer: "standard"),
+              title: { type: "text", analyzer: "standard" },
               author: $client.version_support.keyword
             }
           }

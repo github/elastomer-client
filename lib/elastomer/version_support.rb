@@ -42,19 +42,6 @@ module Elastomer
       es_version_5_plus?
     end
 
-    # COMPATIBILITY: Return a "text"-type mapping for a field.
-    #
-    # On ES 2.x, this will be a string field. On ES 5+, it will be a text field.
-    def text(**args)
-      reject_args!(args, :type, :index)
-
-      if es_version_2_x?
-        {type: "string"}.merge(args)
-      else
-        {type: "text"}.merge(args)
-      end
-    end
-
     # COMPATIBILITY: Return a "keyword"-type mapping for a field.
     #
     # On ES 2.x, this will be a string field with not_analyzed=true. On ES 5+,

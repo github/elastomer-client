@@ -62,17 +62,6 @@ describe Elastomer::VersionSupport do
       end
     end
 
-    describe "#text" do
-      it "returns analyzed string" do
-        expected = {
-          type: "string",
-          term_vector: "with_positions_offsets"
-        }
-
-        assert_equal(expected, version_support.text(term_vector: "with_positions_offsets"))
-      end
-    end
-
     describe "native_delete_by_query?" do
       it "returns false" do
         refute_predicate version_support, :native_delete_by_query?, "ES 2.X does not have native delete_by_query support"
@@ -91,17 +80,6 @@ describe Elastomer::VersionSupport do
         }
 
         assert_equal(expected, version_support.keyword(store: true))
-      end
-    end
-
-    describe "#text" do
-      it "returns text" do
-        expected = {
-          type: "text",
-          term_vector: "with_positions_offsets"
-        }
-
-        assert_equal(expected, version_support.text(term_vector: "with_positions_offsets"))
       end
     end
 

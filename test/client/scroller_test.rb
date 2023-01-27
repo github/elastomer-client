@@ -15,7 +15,7 @@ describe Elastomer::Client::Scroller do
         mappings: mappings_wrapper("book", {
           _source: { enabled: true },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
+            title: { type: "text", analyzer: "standard" },
             author: $client.version_support.keyword,
             sorter: { type: "integer" }
           }

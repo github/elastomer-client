@@ -47,24 +47,8 @@ describe Elastomer::VersionSupport do
     end
   end
 
-  describe "ES 2.x" do
-    let(:version_support) { Elastomer::VersionSupport.new("2.3.5") }
-
-    describe "native_delete_by_query?" do
-      it "returns false" do
-        refute_predicate version_support, :native_delete_by_query?, "ES 2.X does not have native delete_by_query support"
-      end
-    end
-  end
-
   describe "ES 5.x" do
     let(:version_support) { Elastomer::VersionSupport.new("5.6.0") }
-
-    describe "native_delete_by_query?" do
-      it "returns true" do
-        assert_predicate version_support, :native_delete_by_query?, "ES 5.X has native delete_by_query support"
-      end
-    end
 
     describe "#op_type_param" do
       it "converts the supplied params key _op_type to op_type, if present" do

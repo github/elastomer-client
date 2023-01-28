@@ -383,24 +383,7 @@ describe Elastomer::Client::Index do
       @index.refresh
       r = @index.delete_by_query(q: "*")
 
-      if supports_native_delete_by_query?
-        assert_equal(1, r["deleted"])
-      else
-        assert_equal({
-          "_all" => {
-            "found" => 1,
-            "deleted" => 1,
-            "missing" => 0,
-            "failed" => 0,
-          },
-          @name => {
-            "found" => 1,
-            "deleted" => 1,
-            "missing" => 0,
-            "failed" => 0,
-          }
-        }, r["_indices"])
-      end
+      assert_equal(1, r["deleted"])
     end
 
     it "creates a Percolator" do

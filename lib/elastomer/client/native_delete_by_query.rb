@@ -23,10 +23,6 @@ module Elastomer
       attr_reader :client, :query, :parameters
 
       def initialize(client, query, parameters)
-        unless client.version_support.native_delete_by_query?
-          raise IncompatibleVersionException, "Elasticsearch '#{client.version}' does not support _delete_by_query"
-        end
-
         @client = client
         @query = query
         @parameters = parameters

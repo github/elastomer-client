@@ -98,10 +98,6 @@ module Elastomer
     alias :strict_request_params? :es_version_5_plus?
 
     # COMPATIBILITY
-    # ES 5.X supports `delete_by_query` natively again.
-    alias :native_delete_by_query? :es_version_5_plus?
-
-    # COMPATIBILITY
     # Internal: VersionSupport maintains dynamically-created lists of acceptable and unacceptable
     # request params by ES version. This just shims that list since those params have leading
     # underscores by default. If we end up with >1 such param, let's make a real thing to handle this.

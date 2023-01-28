@@ -18,12 +18,6 @@ module Elastomer
       @version = version
     end
 
-    # COMPATIBILITY: The Tasks API is evolving quickly; features, and request/response
-    # structure can differ across ES versions
-    def tasks_new_response_format?
-      es_version_5_plus?
-    end
-
     # COMPATIBILITY: Return a boolean indicating if this version supports the
     # `tasks.get` API - https://www.elastic.co/guide/en/elasticsearch/reference/5.x/tasks.html
     def supports_tasks_get?

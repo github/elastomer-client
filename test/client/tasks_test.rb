@@ -95,13 +95,7 @@ describe Elastomer::Client::Tasks do
         t = ts.values.first
         resp = @tasks.get_by_id t["node"], t["id"]
 
-        # ES 5.x and 2.x responses are structured differently
-        if $client.version_support.tasks_new_response_format?
-          found_by_id = resp["task"]["node"] == t["node"] && resp["task"]["id"] == t["id"]
-        else
-          nid, tid = resp["nodes"][t["node"]]["tasks"].keys.first.split(":")
-          found_by_id = nid == t["node"] && tid.to_i == t["id"]
-        end
+        found_by_id = resp["task"]["node"] == t["node"] && resp["task"]["id"] == t["id"]
 
         break if found_by_id
       end

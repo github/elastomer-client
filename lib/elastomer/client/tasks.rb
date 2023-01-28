@@ -94,11 +94,7 @@ module Elastomer
         parent_task_id = "#{parent_node_id}:#{parent_task_id}"
         params = params.merge(action: "tasks.parent", rest_api: "tasks.list")
 
-        if client.version_support.supports_parent_task_id?
-          params[:parent_task_id] = parent_task_id
-        else
-          params[:parent_task] = parent_task_id
-        end
+        params[:parent_task_id] = parent_task_id
 
         response = client.get "/_tasks", params
         response.body

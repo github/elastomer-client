@@ -24,12 +24,6 @@ module Elastomer
       es_version_5_plus?
     end
 
-    # COMPATIBILITY: Return a boolean indicating if this version supports the
-    # `parent_task_id` param in the tasks API - https://www.elastic.co/guide/en/elasticsearch/reference/5.x/tasks.html
-    def supports_parent_task_id?
-      es_version_5_plus?
-    end
-
     # COMPATIBILITY: return a simple boolean value or legacy {"enabled": true/false}.
     #
     # https://www.elastic.co/guide/en/elasticsearch/reference/5.5/breaking_50_mapping_changes.html#_literal_norms_literal

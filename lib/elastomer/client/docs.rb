@@ -268,29 +268,9 @@ module Elastomer
         response.body
       end
 
-      # Delete documents by query following either the native or
-      # application-level delete by query method.
-      #
-      # NOTE: The parameters and response format varies by version. To have more
-      # control over this, use app_delete_by_query or native_delete_by_query
-      # directly.
+      # Delete documents by query
       def delete_by_query(query, params = nil)
-        send(@client.version_support.delete_by_query_method, query, params)
-      end
-
-      # DEPRECATED: Delete documents from one or more indices and one or more types based
-      # on a query. This method supports both the "request body" query and the
-      # "URI request" query. When using the request body semantics, the query
-      # hash must contain the :query key. Otherwise we assume a URI request is
-      # being made.
-      #
-      # See Client#app_delete_by_query for more information.
-      #
-      # Returns a Hash of statistics about the delete operations
-      def app_delete_by_query(query, params = nil)
-        query, params = extract_params(query) if params.nil?
-
-        @client.app_delete_by_query(query, update_params(params))
+        send(:native_delete_by_query, query, params)
       end
 
       # Delete documents from one or more indices and one or more types based

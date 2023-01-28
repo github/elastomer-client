@@ -18,12 +18,6 @@ module Elastomer
       @version = version
     end
 
-    # COMPATIBILITY: Return a boolean indicating if this version supports the
-    # `tasks.get` API - https://www.elastic.co/guide/en/elasticsearch/reference/5.x/tasks.html
-    def supports_tasks_get?
-      es_version_5_plus?
-    end
-
     # COMPATIBILITY: handle _op_type -> op_type request param conversion for put-if-absent bnehavior
     # Returns the (possibly mutated) params hash supplied by the caller.
     #

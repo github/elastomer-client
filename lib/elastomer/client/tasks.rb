@@ -65,10 +65,8 @@ module Elastomer
         raise ArgumentError, "invalid node ID provided: #{node_id.inspect}" if node_id.to_s.empty?
         raise ArgumentError, "invalid task ID provided: #{task_id.inspect}" unless task_id.is_a?(Integer)
 
-        rest_api = client.version_support.supports_tasks_get? ? "tasks.get" : "tasks.list"
-
         # in this API, the task ID is included in the path, not as a request parameter.
-        response = client.get "/_tasks/{task_id}", params.merge(task_id: "#{node_id}:#{task_id}", action: "tasks.get", rest_api: rest_api)
+        response = client.get "/_tasks/{task_id}", params.merge(task_id: "#{node_id}:#{task_id}", action: "tasks.get", rest_api: "tasks.get")
         response.body
       end
 

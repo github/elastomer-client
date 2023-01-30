@@ -167,7 +167,6 @@ describe Elastomer::Client::Docs do
       assert_equal expected, indexed_doc["_source"]
     end
 
-    # COMPATIBILITY: Fail fast on known indexing directives that aren't for this version of ES
     it "raises an exception when a known indexing directive from an unsupported version is used" do
       # Symbol keys
       doc = document_wrapper("book", {

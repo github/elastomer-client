@@ -90,17 +90,7 @@ describe Elastomer::Client::Index do
     @index.update_settings "index.number_of_replicas" => 1
     settings = @index.settings[@name]["settings"]
 
-    # COMPATIBILITY
-    # ES 1.0 changed the default return format of index settings to always
-    # expand nested properties, e.g.
-    # {"index.number_of_replicas": "1"} changed to
-    # {"index": {"number_of_replicas":"1"}}
-
-    # To support both versions, we check for either return format.
-    value = settings["index.number_of_replicas"] ||
-            settings["index"]["number_of_replicas"]
-
-    assert_equal "1", value
+    assert_equal "1", settings["index"]["number_of_replicas"]
   end
 
   it "updates document mappings" do

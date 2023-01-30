@@ -213,14 +213,6 @@ end
 # into Elastomer::VersionSupport.
 
 # COMPATIBILITY
-# ES 5.x returns `index` bulk request as `index` responses whether or not the
-# document was created or updated. ES 2.x returns a `create` response if it was
-# created.
-def bulk_index_returns_create_for_new_documents?
-  $client.version_support.es_version_2_x?
-end
-
-# COMPATIBILITY
 # ES 5.x drops support for index-time payloads
 def index_time_payloads?
   $client.version_support.es_version_2_x?

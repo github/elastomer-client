@@ -213,12 +213,6 @@ end
 # into Elastomer::VersionSupport.
 
 # COMPATIBILITY
-# ES 5.x drops support for index-time payloads
-def index_time_payloads?
-  $client.version_support.es_version_2_x?
-end
-
-# COMPATIBILITY
 # ES 2.x returns an empty result when an alias does not exist for a full or partial match
 # ES 5.6+ returns an error when an alias does not exist for a full or partial match
 def fetching_non_existent_alias_returns_error?

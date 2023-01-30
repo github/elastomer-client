@@ -292,10 +292,6 @@ describe Elastomer::Client::Index do
         search_analyzer: "simple",
       }
 
-      # COMPATIBILITY
-      # ES 5.x drops support for index-time payloads
-      suggest[:payloads] = false if index_time_payloads?
-
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },
         mappings: mappings_wrapper("book", {

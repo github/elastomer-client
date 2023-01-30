@@ -18,30 +18,9 @@ module Elastomer
       @version = version
     end
 
-    # COMPATIBILITY: handle _op_type -> op_type request param conversion for put-if-absent bnehavior
-    # Returns the (possibly mutated) params hash supplied by the caller.
-    #
-    # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#operation-type
-    def op_type(params = {})
-      if es_version_5_plus? && (params.key?(:_op_type) || params.key?("_op_type"))
-        params[:op_type] = params.delete(:_op_type)
-      end
-      params
-    end
-
     # Elasticsearch changes some request formats in a non-backward-compatible
     # way. Some tests need to know what version is running to structure requests
     # as expected.
-
-    # Returns true if Elasticsearch version is 2.x.
-    def es_version_2_x?
-      version >= "2.0.0" && version <  "3.0.0"
-    end
-
-    # Returns true if Elasticsearch version is 5.x or higher.
-    def es_version_5_plus?
-      version >= "5.0.0"
-    end
 
     # Returns true if Elasticsearch version is 7.x or higher.
     def es_version_7_plus?
@@ -51,26 +30,6 @@ module Elastomer
     # Returns true if Elasticsearch version is 8.x or higher.
     def es_version_8_plus?
       version >= "8.0.0"
-    end
-
-    # Wraps version check and param gen where ES version >= 5.x requires
-    # percolator type + field defined in mappings
-    def percolator_type
-      if es_version_5_plus?
-        "percolator"
-      else
-        ".percolator"
-      end
-    end
-
-    # COMPATIBILITY
-    # Internal: VersionSupport maintains dynamically-created lists of acceptable and unacceptable
-    # request params by ES version. This just shims that list since those params have leading
-    # underscores by default. If we end up with >1 such param, let's make a real thing to handle this.
-    def fix_op_type!(params = {})
-      if es_version_5_plus? && params.key?(:op_type)
-        params[:op_type] = "op_type"
-      end
     end
 
     private

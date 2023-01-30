@@ -57,8 +57,8 @@ describe Elastomer::Client::Index do
         mappings: mappings_wrapper("book", {
           _source: { enabled: false },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
-            author: $client.version_support.keyword
+            title: { type: "text", analyzer: "standard" },
+            author: { type: "keyword" }
           }
         }, true)
       )
@@ -73,8 +73,8 @@ describe Elastomer::Client::Index do
         mappings: mappings_wrapper("book", {
           _source: { enabled: false },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
-            author: $client.version_support.keyword
+            title: { type: "text", analyzer: "standard" },
+            author: { type: "keyword" }
           }
         }, true)
       )
@@ -90,24 +90,14 @@ describe Elastomer::Client::Index do
     @index.update_settings "index.number_of_replicas" => 1
     settings = @index.settings[@name]["settings"]
 
-    # COMPATIBILITY
-    # ES 1.0 changed the default return format of index settings to always
-    # expand nested properties, e.g.
-    # {"index.number_of_replicas": "1"} changed to
-    # {"index": {"number_of_replicas":"1"}}
-
-    # To support both versions, we check for either return format.
-    value = settings["index.number_of_replicas"] ||
-            settings["index"]["number_of_replicas"]
-
-    assert_equal "1", value
+    assert_equal "1", settings["index"]["number_of_replicas"]
   end
 
   it "updates document mappings" do
     @index.create(
       mappings: mappings_wrapper("book", {
         _source: { enabled: false },
-          properties: { title: $client.version_support.text(analyzer: "standard") }
+          properties: { title: { type: "text", analyzer: "standard" } }
       }, true)
     )
 
@@ -115,11 +105,11 @@ describe Elastomer::Client::Index do
 
     if $client.version_support.es_version_7_plus?
       @index.update_mapping "_doc", { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}
     else
       @index.update_mapping "book", { book: { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}}
     end
 
@@ -129,7 +119,7 @@ describe Elastomer::Client::Index do
     # ES7 removes mapping types so test adding a new mapping type only for versions < 7
     if !$client.version_support.es_version_7_plus?
       @index.update_mapping "mux_mool", { mux_mool: { properties: {
-        song: $client.version_support.keyword
+        song: { type: "keyword" }
       }}}
 
       assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -140,7 +130,7 @@ describe Elastomer::Client::Index do
     @index.create(
       mappings: mappings_wrapper("book", {
         _source: { enabled: false },
-          properties: { title: $client.version_support.text(analyzer: "standard") }
+          properties: { title: { type: "text", analyzer: "standard" } }
       }, true)
     )
 
@@ -148,11 +138,11 @@ describe Elastomer::Client::Index do
 
     if $client.version_support.es_version_7_plus?
       @index.put_mapping "_doc", { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}
     else
       @index.put_mapping "book", { book: { properties: {
-        author: $client.version_support.keyword
+        author: { type: "keyword" }
       }}}
     end
 
@@ -162,7 +152,7 @@ describe Elastomer::Client::Index do
     # ES7 removes mapping types so test adding a new mapping type only for versions < 7
     if !$client.version_support.es_version_7_plus?
       @index.put_mapping "mux_mool", { mux_mool: { properties: {
-        song: $client.version_support.keyword
+        song: { type: "keyword" }
       }}}
 
       assert_property_exists @index.mapping[@name], "mux_mool", "song"
@@ -182,28 +172,23 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
     assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_alias("*"))
 
-    if fetching_non_existent_alias_returns_error?
-      exception = assert_raises(Elastomer::Client::RequestError) do
-        @index.get_alias("not-there")
-      end
+    exception = assert_raises(Elastomer::Client::RequestError) do
+      @index.get_alias("not-there")
+    end
 
-      assert_equal("alias [not-there] missing", exception.message)
-      assert_equal(404, exception.status)
+    assert_equal("alias [not-there] missing", exception.message)
+    assert_equal(404, exception.status)
 
-      # In ES 7, when you use wildcards, an error is not raised if no match is found
-      if $client.version_support.es_version_7_plus?
-        assert_empty(@index.get_alias("not*"))
-      else
-        exception = assert_raises(Elastomer::Client::RequestError) do
-          @index.get_alias("not*")
-        end
-
-        assert_equal("alias [not*] missing", exception.message)
-        assert_equal(404, exception.status)
-      end
-    else
-      assert_empty(@index.get_alias("not-there"))
+    # In ES 7, when you use wildcards, an error is not raised if no match is found
+    if $client.version_support.es_version_7_plus?
       assert_empty(@index.get_alias("not*"))
+    else
+      exception = assert_raises(Elastomer::Client::RequestError) do
+        @index.get_alias("not*")
+      end
+
+      assert_equal("alias [not*] missing", exception.message)
+      assert_equal(404, exception.status)
     end
   end
 
@@ -263,14 +248,14 @@ describe Elastomer::Client::Index do
     @index.create(
       mappings: mappings_wrapper("book", {
         _source: { enabled: false },
-          properties: { title: $client.version_support.text(analyzer: "standard") }
+          properties: { title: { type: "text", analyzer: "standard" } }
       }, true)
     )
 
     assert_property_exists @index.mapping(type: "book")[@name], "book", "title"
 
     @index.update_mapping "book", { properties: {
-      author: $client.version_support.keyword
+      author: { type: "keyword" }
     }}
 
     assert_property_exists @index.mapping(type: "book")[@name], "book", "author"
@@ -292,17 +277,13 @@ describe Elastomer::Client::Index do
         search_analyzer: "simple",
       }
 
-      # COMPATIBILITY
-      # ES 5.x drops support for index-time payloads
-      suggest[:payloads] = false if index_time_payloads?
-
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },
         mappings: mappings_wrapper("book", {
           _source: { enabled: false },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
-            author: $client.version_support.keyword,
+            title: { type: "text", analyzer: "standard" },
+            author: { type: "keyword" },
             suggest: suggest
           }
         }, true)
@@ -383,24 +364,7 @@ describe Elastomer::Client::Index do
       @index.refresh
       r = @index.delete_by_query(q: "*")
 
-      if supports_native_delete_by_query?
-        assert_equal(1, r["deleted"])
-      else
-        assert_equal({
-          "_all" => {
-            "found" => 1,
-            "deleted" => 1,
-            "missing" => 0,
-            "failed" => 0,
-          },
-          @name => {
-            "found" => 1,
-            "deleted" => 1,
-            "missing" => 0,
-            "failed" => 0,
-          }
-        }, r["_indices"])
-      end
+      assert_equal(1, r["deleted"])
     end
 
     it "creates a Percolator" do
@@ -413,10 +377,7 @@ describe Elastomer::Client::Index do
     it "performs multi percolate queries" do
       # The _percolate endpoint is removed from ES 7, and replaced with percolate queries via _search and _msearch
       if !$client.version_support.es_version_7_plus?
-        # COMPATIBILITY
-        if requires_percolator_mapping?
-          @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
-        end
+        @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
 
         @index.docs.index \
           document_wrapper("book", {
@@ -492,24 +453,13 @@ describe Elastomer::Client::Index do
         suggest: {input: %w[Greg greg], output: "Greg", weight: 2}
       })
 
-      if supports_suggest_output?
-        # It is not an error to index `output`...
+      # Indexing the document fails when `output` is provided
+      exception = assert_raises(Elastomer::Client::RequestError) do
         @index.docs.index(document)
-
-        # ...and `output` is used in the search response
-        @index.refresh
-        response = @index.suggest({name: {text: "gr", completion: {field: :suggest}}})
-
-        assert_equal "Greg", response.fetch("name").first.fetch("options").first.fetch("text")
-      else
-        # Indexing the document fails when `output` is provided
-        exception = assert_raises(Elastomer::Client::RequestError) do
-          @index.docs.index(document)
-        end
-
-        assert_equal(400, exception.status)
-        assert_match(/\[output\]/, exception.message)
       end
+
+      assert_equal(400, exception.status)
+      assert_match(/\[output\]/, exception.message)
     end
   end
 end

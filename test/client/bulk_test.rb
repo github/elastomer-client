@@ -15,8 +15,8 @@ describe Elastomer::Client::Bulk do
         mappings: mappings_wrapper("book", {
           _source: { enabled: true },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
-            author: $client.version_support.keyword
+            title: { type: "text", analyzer: "standard" },
+            author: { type: "keyword" }
           }
         })
 
@@ -87,15 +87,9 @@ describe Elastomer::Client::Bulk do
 
     assert_equal 2, h["items"].length
 
-    if bulk_index_returns_create_for_new_documents?
-      assert_bulk_index h["items"].first
-      assert_bulk_create h["items"].last
-      book_id = items.last["create"]["_id"]
-    else
-      assert_bulk_index h["items"].first
-      assert_bulk_index h["items"].last
-      book_id = items.last["index"]["_id"]
-    end
+    assert_bulk_index h["items"].first
+    assert_bulk_index h["items"].last
+    book_id = items.last["index"]["_id"]
 
     assert_match %r/^\S{20,22}$/, book_id
 
@@ -117,17 +111,10 @@ describe Elastomer::Client::Bulk do
 
     assert_equal 2, h["items"].length
 
-    if bulk_index_returns_create_for_new_documents?
-      assert_bulk_create h["items"].first, "expected to create a book"
-      assert_bulk_delete h["items"].last, "expected to delete a book"
+    assert_bulk_index h["items"].first, "expected to create a book"
+    assert_bulk_delete h["items"].last, "expected to delete a book"
 
-      book_id2 = items.first["create"]["_id"]
-    else
-      assert_bulk_index h["items"].first, "expected to create a book"
-      assert_bulk_delete h["items"].last, "expected to delete a book"
-
-      book_id2 = items.first["index"]["_id"]
-    end
+    book_id2 = items.first["index"]["_id"]
 
     assert_match %r/^\S{20,22}$/, book_id2
 

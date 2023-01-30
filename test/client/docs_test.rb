@@ -14,13 +14,13 @@ describe Elastomer::Client::Docs do
         mappings: mappings_wrapper("book", {
           _source: { enabled: true },
           properties: {
-            title: $client.version_support.text(analyzer: "standard", term_vector: "with_positions_offsets"),
-            author: $client.version_support.keyword
+            title: { type: "text", analyzer: "standard", term_vector: "with_positions_offsets" },
+            author: { type: "keyword" }
           }
         }, true)
 
       # COMPATIBILITY
-      if !$client.version_support.es_version_7_plus? && requires_percolator_mapping?
+      if !$client.version_support.es_version_7_plus?
         @index.update_mapping("percolator", { properties: { query: { type: "percolator"}}})
       end
 
@@ -167,13 +167,12 @@ describe Elastomer::Client::Docs do
       assert_equal expected, indexed_doc["_source"]
     end
 
-    # COMPATIBILITY: Fail fast on known indexing directives that aren't for this version of ES
     it "raises an exception when a known indexing directive from an unsupported version is used" do
       # Symbol keys
       doc = document_wrapper("book", {
         _id: "12",
         title: "Book1"
-      }).merge(incompatible_indexing_directive)
+      }).merge({_consistency: "all"})
 
       assert_raises(Elastomer::Client::IllegalArgument) do
         @docs.index(doc)
@@ -183,7 +182,7 @@ describe Elastomer::Client::Docs do
       doc = document_wrapper("book", {
         "_id" => "12",
         "title" => "Book1"
-      }).merge(incompatible_indexing_directive.stringify_keys)
+      }).merge({"_consistency": "all"})
 
       assert_raises(Elastomer::Client::IllegalArgument) do
         @docs.index(doc)
@@ -311,24 +310,7 @@ describe Elastomer::Client::Docs do
 
     h = @docs.delete_by_query(q: "author:Author2")
 
-    if supports_native_delete_by_query?
-      assert_equal(1, h["deleted"])
-    else
-      assert_equal(h["_indices"], {
-        "_all" => {
-          "found" => 1,
-          "deleted" => 1,
-          "missing" => 0,
-          "failed" => 0,
-        },
-        @name => {
-          "found" => 1,
-          "deleted" => 1,
-          "missing" => 0,
-          "failed" => 0,
-        },
-      })
-    end
+    assert_equal(1, h["deleted"])
 
     @index.refresh
     h = @docs.multi_get ids: [1, 2]
@@ -479,11 +461,7 @@ describe Elastomer::Client::Docs do
       }
     })
 
-    if filtered_query_removed?
-      refute h["valid"]
-    else
-      assert h["valid"]
-    end
+    refute h["valid"]
 
     h = @docs.validate({
       query: {

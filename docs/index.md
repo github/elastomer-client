@@ -3,7 +3,7 @@
 The index component provides access to the
 [indices API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
 used for index management, settings, mappings, and aliases. Index
-[warmers](warmers.md) and [templates](templates.md) are handled via their own
+[templates](templates.md) are handled via their own
 components. Methods for adding documents to the index and searching those
 documents are found in the [documents](documents.md) component. The index
 component deals solely with management of the indices themselves.

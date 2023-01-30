@@ -36,7 +36,8 @@ $client_params = {
   read_timeout: 10,
   open_timeout: 1,
   opaque_id: false,
-  strict_params: true
+  strict_params: true,
+  compress_body: true
 }
 $client = Elastomer::Client.new(**$client_params)
 
@@ -44,17 +45,6 @@ $client = Elastomer::Client.new(**$client_params)
 raise "No server available at #{$client.url}" unless $client.available?
 
 puts "Elasticsearch version is #{$client.version}"
-
-# COMPATIBILITY
-# Returns true if the Elasticsearch cluster defaults to supporting compression.
-def supports_compressed_bodies_by_default?
-  $client.version_support.es_version_5_plus?
-end
-
-# Now that we have the version, re-create the client with compression if supported.
-if supports_compressed_bodies_by_default?
-  $client = Elastomer::Client.new(**$client_params.merge(compress_body: true))
-end
 
 # remove any lingering test indices from the cluster
 MiniTest.after_run do
@@ -211,82 +201,6 @@ end
 # The methods below are to support intention-revealing names about version
 # differences in the tests. If necessary for general operation they can be moved
 # into Elastomer::VersionSupport.
-
-# COMPATIBILITY
-# ES 5.x returns `index` bulk request as `index` responses whether or not the
-# document was created or updated. ES 2.x returns a `create` response if it was
-# created.
-def bulk_index_returns_create_for_new_documents?
-  $client.version_support.es_version_2_x?
-end
-
-# COMPATIBILITY
-# ES 5.x drops support for index-time payloads
-def index_time_payloads?
-  $client.version_support.es_version_2_x?
-end
-
-# COMPATIBILITY
-# ES 2.x returns an empty result when an alias does not exist for a full or partial match
-# ES 5.6+ returns an error when an alias does not exist for a full or partial match
-def fetching_non_existent_alias_returns_error?
-  $client.version_support.es_version_5_plus?
-end
-
-# COMPATIBILITY
-# ES 5.6+ includes a _nodes key in the /_cluster/stats response. Strangely
-# enough, this is not documented in the example response:
-# https://www.elastic.co/guide/en/elasticsearch/reference/5.6/cluster-stats.html
-def cluster_stats_includes_underscore_nodes?
-  $client.version_support.es_version_5_plus?
-end
-
-# COMPATIBILITY
-# ES 2.0 deprecated the `filtered` query type. ES 5.0 removed it entirely.
-def filtered_query_removed?
-  $client.version_support.es_version_5_plus?
-end
-
-# ES 5.6 percolator queries/document submissions require that an appropriate
-# percolator type and field within that type are defined on the index mappings
-def requires_percolator_mapping?
-  $client.version_support.es_version_5_plus?
-end
-
-# COMPATIBILITY
-# ES 5 removes the `output` option for fields.
-# See: https://www.elastic.co/guide/en/elasticsearch/reference/5.6/breaking_50_suggester.html#_simpler_completion_indexing
-def supports_suggest_output?
-  $client.version_support.es_version_2_x?
-end
-
-# COMPATIBILITY
-# ES 5+ returns information about the number of cleared scroll IDs
-def returns_cleared_scroll_id_info?
-  $client.version_support.es_version_5_plus?
-end
-
-# COMPATIBILITY
-# Return a Hash with an unsupported indexing directive key/value to test fail-fast.
-def incompatible_indexing_directive
-  if $client.version_support.es_version_2_x?
-    {_wait_for_active_shards: 10}
-  else
-    {_consistency: "all"}
-  end
-end
-
-# COMPATIBILITY
-# Returns true if the Elasticsearch cluster will validate request parameters.
-def parameter_validation?
-  $client.version_support.es_version_5_plus?
-end
-
-# ES 5 supports native _delete_by_query, but the output and semantics are
-# different than the plugin which we modeled our delete by query on.
-def supports_native_delete_by_query?
-  $client.version_support.native_delete_by_query?
-end
 
 # COMPATIBILITY
 # ES 7 drops mapping types, so don't wrap with a mapping type for ES 7+

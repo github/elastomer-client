@@ -19,24 +19,21 @@ describe Elastomer::Client::MultiPercolate do
           doc1: {
             _source: { enabled: true }, _all: { enabled: false },
             properties: {
-              title: $client.version_support.text(analyzer: "standard"),
-              author: $client.version_support.keyword
+              title: { type: "text", analyzer: "standard" },
+              author: { type: "keyword" }
             }
           },
           doc2: {
             _source: { enabled: true }, _all: { enabled: false },
             properties: {
-              title: $client.version_support.text(analyzer: "standard"),
-              author: $client.version_support.keyword
+              title: { type: "text", analyzer: "standard" },
+              author: { type: "keyword" }
             }
           }
         }
       }
 
-      # COMPATIBILITY
-      if requires_percolator_mapping?
-        base_mappings_settings[:mappings][:percolator] = { properties: { query: { type: "percolator" } } }
-      end
+      base_mappings_settings[:mappings][:percolator] = { properties: { query: { type: "percolator" } } }
 
       @index.create base_mappings_settings
       wait_for_index(@name)

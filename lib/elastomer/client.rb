@@ -430,7 +430,7 @@ module Elastomer
         when "document_already_exists_exception"; raise DocumentAlreadyExistsError, response
         # Elasticsearch 5.x.x root_cause type for document already existing
         when "version_conflict_engine_exception"; raise DocumentAlreadyExistsError, response
-        when *version_support.query_parse_exception; raise QueryParsingError, response
+        when "query_shard_exception", "parsing_exception"; raise QueryParsingError, response
         end
 
         raise RequestError, response

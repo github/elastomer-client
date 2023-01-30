@@ -14,7 +14,7 @@ describe "JSON conversions for Time" do
         mappings: mappings_wrapper("book", {
           _source: { enabled: true },
           properties: {
-            title: $client.version_support.keyword,
+            title: { type: "keyword" },
             created_at: { type: "date" }
           }
         }, !$client.version_support.es_version_7_plus?)

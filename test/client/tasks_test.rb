@@ -26,10 +26,6 @@ describe Elastomer::Client::Tasks do
   end
 
   it "groups by parent->child relationships when get-all tasks API is grouped by 'parents'" do
-    unless $client.version_support.es_version_5_plus?
-      skip "Tasks API is not supported in ES version #{$client.version}"
-    end
-
     h = @tasks.get group_by: "parents"
     parent_id = h["tasks"].select { |k, v| v.key?("children") }.keys.first
     childs_parent_ref = h.dig("tasks", parent_id, "children").first["parent_task_id"]
@@ -95,13 +91,7 @@ describe Elastomer::Client::Tasks do
         t = ts.values.first
         resp = @tasks.get_by_id t["node"], t["id"]
 
-        # ES 5.x and 2.x responses are structured differently
-        if $client.version_support.tasks_new_response_format?
-          found_by_id = resp["task"]["node"] == t["node"] && resp["task"]["id"] == t["id"]
-        else
-          nid, tid = resp["nodes"][t["node"]]["tasks"].keys.first.split(":")
-          found_by_id = nid == t["node"] && tid.to_i == t["id"]
-        end
+        found_by_id = resp["task"]["node"] == t["node"] && resp["task"]["id"] == t["id"]
 
         break if found_by_id
       end

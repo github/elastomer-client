@@ -14,8 +14,8 @@ describe Elastomer::Client::MultiSearch do
         mappings: mappings_wrapper("book", {
           _source: { enabled: true },
           properties: {
-            title: $client.version_support.text(analyzer: "standard"),
-            author: $client.version_support.keyword
+            title: { type: "text", analyzer: "standard" },
+            author: { type: "keyword" }
           }
         }, !$client.version_support.es_version_7_plus?)
       wait_for_index(@name)

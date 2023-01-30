@@ -1,28 +1,18 @@
 # frozen_string_literal: true
 
 module Minitest::Assertions
-  #COMPATIBILITY
-  # ES 1.0 replaced the 'ok' attribute with a 'created' attribute
-  # in index responses. Check for either one so we are compatible
-  # with 0.90 and 1.0.
+  # COMPATIBILITY
+  # ES 7+ response uses "result" instead of "created"
   def assert_created(response)
-    assert ($client.version_support.es_version_7_plus? ? response["result"] == "created" : response["created"]) || response["ok"], "document was not created"
+    assert $client.version_support.es_version_7_plus? ? response["result"] == "created" : response["created"], "document was not created"
   end
 
-  #COMPATIBILITY
-  # ES 1.0 replaced the 'ok' attribute with an 'acknowledged' attribute
-  # in many responses. Check for either one so we are compatible
-  # with 0.90 and 1.0.
   def assert_acknowledged(response)
-    assert response["acknowledged"] || response["ok"], "document was not acknowledged"
+    assert response["acknowledged"], "document was not acknowledged"
   end
 
-  #COMPATIBILITY
-  # ES 1.0 replaced the 'exists' attribute with a 'found' attribute in the
-  # get document response. Check for either one so we are compatible
-  # with 0.90 and 1.0.
   def assert_found(response)
-    assert response["found"] || response["exists"], "document was not found"
+    assert response["found"], "document was not found"
   end
 
   def refute_found(response)
@@ -47,26 +37,21 @@ module Minitest::Assertions
     assert_equal(200, status, message)
   end
 
-  #COMPATIBILITY
-  # ES 1.0 nests mappings in a "mappings" element under the index name, e.g.
-  # mapping["test-index"]["mappings"]["doco"]
-  # ES 0.90 doesn't have the "mappings" element:
-  # mapping["test-index"]["doco"]
+  # COMPATIBILITY
+  # ES 7+ no longer supports types
   def assert_mapping_exists(response, type, message = "mapping expected to exist, but doesn't")
     mapping =
-      if response.has_key?("mappings")
-        if $client.version_support.es_version_7_plus?
-          response["mappings"]
-        else
-          response["mappings"][type]
-        end
+      if $client.version_support.es_version_7_plus?
+        response["mappings"]
       else
-        response[type]
+        response["mappings"][type]
       end
 
     refute_nil mapping, message
   end
 
+  # COMPATIBILITY
+  # ES 7+ no longer supports types
   def assert_property_exists(response, type, property, message = "property expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")

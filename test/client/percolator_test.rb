@@ -20,13 +20,7 @@ describe Elastomer::Client::Percolator do
 
   describe "when an index exists" do
     before do
-      # COMPATIBILITY
-      base_mappings =
-        if requires_percolator_mapping?
-          { mappings: { percolator: { properties: { query: { type: "percolator" } } } } }
-        else
-          nil
-        end
+      base_mappings = { mappings: { percolator: { properties: { query: { type: "percolator" } } } } }
 
       @index.create(base_mappings)
       wait_for_index(@index.name)

@@ -11,7 +11,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.watcher.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx2048m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
@@ -19,7 +19,7 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    mem_limit: 1g
+    mem_limit: 2g
     cap_add:
       - IPC_LOCK
     volumes:
@@ -47,7 +47,7 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    mem_limit: 1g
+    mem_limit: 2g
     cap_add:
       - IPC_LOCK
     volumes:

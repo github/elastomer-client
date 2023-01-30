@@ -471,24 +471,13 @@ describe Elastomer::Client::Index do
         suggest: {input: %w[Greg greg], output: "Greg", weight: 2}
       })
 
-      if supports_suggest_output?
-        # It is not an error to index `output`...
+      # Indexing the document fails when `output` is provided
+      exception = assert_raises(Elastomer::Client::RequestError) do
         @index.docs.index(document)
-
-        # ...and `output` is used in the search response
-        @index.refresh
-        response = @index.suggest({name: {text: "gr", completion: {field: :suggest}}})
-
-        assert_equal "Greg", response.fetch("name").first.fetch("options").first.fetch("text")
-      else
-        # Indexing the document fails when `output` is provided
-        exception = assert_raises(Elastomer::Client::RequestError) do
-          @index.docs.index(document)
-        end
-
-        assert_equal(400, exception.status)
-        assert_match(/\[output\]/, exception.message)
       end
+
+      assert_equal(400, exception.status)
+      assert_match(/\[output\]/, exception.message)
     end
   end
 end

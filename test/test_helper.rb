@@ -240,13 +240,6 @@ def requires_percolator_mapping?
 end
 
 # COMPATIBILITY
-# ES 5 removes the `output` option for fields.
-# See: https://www.elastic.co/guide/en/elasticsearch/reference/5.6/breaking_50_suggester.html#_simpler_completion_indexing
-def supports_suggest_output?
-  $client.version_support.es_version_2_x?
-end
-
-# COMPATIBILITY
 # ES 5+ returns information about the number of cleared scroll IDs
 def returns_cleared_scroll_id_info?
   $client.version_support.es_version_5_plus?

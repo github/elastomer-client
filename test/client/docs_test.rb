@@ -20,7 +20,7 @@ describe Elastomer::Client::Docs do
         }, true)
 
       # COMPATIBILITY
-      if !$client.version_support.es_version_7_plus? && requires_percolator_mapping?
+      if !$client.version_support.es_version_7_plus?
         @index.update_mapping("percolator", { properties: { query: { type: "percolator"}}})
       end
 
@@ -462,11 +462,7 @@ describe Elastomer::Client::Docs do
       }
     })
 
-    if filtered_query_removed?
-      refute h["valid"]
-    else
-      assert h["valid"]
-    end
+    refute h["valid"]
 
     h = @docs.validate({
       query: {

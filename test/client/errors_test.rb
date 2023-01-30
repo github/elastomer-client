@@ -83,25 +83,13 @@ describe Elastomer::Client::Error do
     refute Elastomer::Client::RejectedExecutionError.fatal, "Rejected execution errors are not fatal"
   end
 
-  if parameter_validation?
-    it "wraps illegal argument exceptions" do
-      begin
-        $client.get("/_cluster/health?consistency=all")
+  it "wraps illegal argument exceptions" do
+    begin
+      $client.get("/_cluster/health?consistency=all")
 
-        assert false, "IllegalArgument exception was not raised"
-      rescue Elastomer::Client::IllegalArgument => err
-        assert_match(/request \[\/_cluster\/health\] contains unrecognized parameter: \[consistency\]/, err.message)
-      end
-    end
-  else
-    it "does not raise illegal argument exceptions" do
-      begin
-        $client.get("/_cluster/health?consistency=all")
-
-        assert true, "Exception was not raised"
-      rescue Elastomer::Client::Error => err
-        assert false, "Exception #{err} was raised"
-      end
+      assert false, "IllegalArgument exception was not raised"
+    rescue Elastomer::Client::IllegalArgument => err
+      assert_match(/request \[\/_cluster\/health\] contains unrecognized parameter: \[consistency\]/, err.message)
     end
   end
 end

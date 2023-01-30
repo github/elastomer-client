@@ -85,12 +85,8 @@ describe Elastomer::Client::Scroller do
 
     response = $client.clear_scroll(h["_scroll_id"])
 
-    if returns_cleared_scroll_id_info?
-      assert response["succeeded"]
-      assert_equal 1, response["num_freed"]
-    else
-      assert_empty response
-    end
+    assert response["succeeded"]
+    assert_equal 1, response["num_freed"]
   end
 
   it "raises an exception on existing sort in query" do

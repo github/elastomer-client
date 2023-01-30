@@ -26,10 +26,6 @@ describe Elastomer::Client::Tasks do
   end
 
   it "groups by parent->child relationships when get-all tasks API is grouped by 'parents'" do
-    unless $client.version_support.es_version_5_plus?
-      skip "Tasks API is not supported in ES version #{$client.version}"
-    end
-
     h = @tasks.get group_by: "parents"
     parent_id = h["tasks"].select { |k, v| v.key?("children") }.keys.first
     childs_parent_ref = h.dig("tasks", parent_id, "children").first["parent_task_id"]

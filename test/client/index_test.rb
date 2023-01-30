@@ -182,28 +182,23 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
     assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_alias("*"))
 
-    if fetching_non_existent_alias_returns_error?
-      exception = assert_raises(Elastomer::Client::RequestError) do
-        @index.get_alias("not-there")
-      end
+    exception = assert_raises(Elastomer::Client::RequestError) do
+      @index.get_alias("not-there")
+    end
 
-      assert_equal("alias [not-there] missing", exception.message)
-      assert_equal(404, exception.status)
+    assert_equal("alias [not-there] missing", exception.message)
+    assert_equal(404, exception.status)
 
-      # In ES 7, when you use wildcards, an error is not raised if no match is found
-      if $client.version_support.es_version_7_plus?
-        assert_empty(@index.get_alias("not*"))
-      else
-        exception = assert_raises(Elastomer::Client::RequestError) do
-          @index.get_alias("not*")
-        end
-
-        assert_equal("alias [not*] missing", exception.message)
-        assert_equal(404, exception.status)
-      end
-    else
-      assert_empty(@index.get_alias("not-there"))
+    # In ES 7, when you use wildcards, an error is not raised if no match is found
+    if $client.version_support.es_version_7_plus?
       assert_empty(@index.get_alias("not*"))
+    else
+      exception = assert_raises(Elastomer::Client::RequestError) do
+        @index.get_alias("not*")
+      end
+
+      assert_equal("alias [not*] missing", exception.message)
+      assert_equal(404, exception.status)
     end
   end
 
@@ -392,10 +387,7 @@ describe Elastomer::Client::Index do
     it "performs multi percolate queries" do
       # The _percolate endpoint is removed from ES 7, and replaced with percolate queries via _search and _msearch
       if !$client.version_support.es_version_7_plus?
-        # COMPATIBILITY
-        if requires_percolator_mapping?
-          @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
-        end
+        @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
 
         @index.docs.index \
           document_wrapper("book", {

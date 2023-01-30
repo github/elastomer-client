@@ -246,16 +246,6 @@ def returns_cleared_scroll_id_info?
 end
 
 # COMPATIBILITY
-# Return a Hash with an unsupported indexing directive key/value to test fail-fast.
-def incompatible_indexing_directive
-  if $client.version_support.es_version_2_x?
-    {_wait_for_active_shards: 10}
-  else
-    {_consistency: "all"}
-  end
-end
-
-# COMPATIBILITY
 # Returns true if the Elasticsearch cluster will validate request parameters.
 def parameter_validation?
   $client.version_support.es_version_5_plus?

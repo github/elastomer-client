@@ -173,7 +173,7 @@ describe Elastomer::Client::Docs do
       doc = document_wrapper("book", {
         _id: "12",
         title: "Book1"
-      }).merge(incompatible_indexing_directive)
+      }).merge({_consistency: "all"})
 
       assert_raises(Elastomer::Client::IllegalArgument) do
         @docs.index(doc)
@@ -183,7 +183,7 @@ describe Elastomer::Client::Docs do
       doc = document_wrapper("book", {
         "_id" => "12",
         "title" => "Book1"
-      }).merge(incompatible_indexing_directive.stringify_keys)
+      }).merge({"_consistency": "all"})
 
       assert_raises(Elastomer::Client::IllegalArgument) do
         @docs.index(doc)

@@ -94,7 +94,7 @@ locations enables you to reconcile documents between the two.
 The `:_id` field is only one of several special fields that control document
 indexing in Elasticsearch. The full list of supported fields are enumerated in
 the `index`
-[method documentation](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client/docs.rb#L45-56).
+[method documentation](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/docs.rb#L45-56).
 
 As a parting note, you can also provide the index name and document type as part
 of the document itself. These fields will be extracted from the document before

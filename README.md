@@ -129,7 +129,7 @@ docker compose --profile es5 up
 
 ## Releasing
 
-1. Create a new branch from `master`
+1. Create a new branch from `main`
 2. Bump the version number in `lib/elastomer/version.rb`
 3. Update `CHANGELOG.md` with info about the new version
 4. Execute `bin/rake build`. This will place a new gem file in the `pkg/` folder.

@@ -1,3 +1,9 @@
+## 4.0.0 (2023-02-10)
+- Add ES 7 and ES 8 compatibility for existing functionality
+- Remove ES 2 support
+- Add support for newer Ruby versions (3.0, 3.1, 3.2)
+- Remove support for older Ruby versions (< 3.0)
+
 ## 3.2.3 (2020-02-26)
 - Fix warnings in Ruby 2.7 whan passing a Hash to a method that is expecting keyword arguments
 

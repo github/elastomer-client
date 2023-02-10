@@ -4,8 +4,8 @@ The cluster component deals with commands for managing cluster state and
 monitoring cluster health. All the commands found under the
 [cluster API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html)
 section of the Elasticsearch documentation are implemented by the
-[`cluster.rb`](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client/cluster.rb)
-module and the [`nodes.rb`](https://github.com/github/elastomer-client/blob/master/lib/elastomer/client/nodes.rb)
+[`cluster.rb`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/cluster.rb)
+module and the [`nodes.rb`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/nodes.rb)
 module.
 
 ## Cluster

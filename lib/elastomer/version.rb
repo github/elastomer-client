@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Elastomer
-  VERSION = "3.2.3"
+  VERSION = "4.0.0"
 
   def self.version
     VERSION

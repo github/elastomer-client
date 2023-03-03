@@ -312,7 +312,7 @@ module Elastomer
       end
 
       SPECIAL_KEYS = %w[id type index version version_type routing parent timestamp ttl consistency refresh retry_on_conflict]
-      SPECIAL_KEYS_HASH = SPECIAL_KEYS.inject({}) { |h, k| h[k] = "_#{k}"; h }
+      UNPREFIXED_SPECIAL_KEYS = %w[parent retry_on_conflict routing version version_type]
 
       # Internal: convert special key parameters to their wire representation
       # and apply any override document parameters.
@@ -335,10 +335,16 @@ module Elastomer
       def from_document(document)
         opts = {}
 
-        SPECIAL_KEYS_HASH.values.each do |field|
-          key = field.to_sym
-          opts[key] = document.delete field if document.key? field
-          opts[key] = document.delete key   if document.key? key
+        SPECIAL_KEYS.each do |key|
+          prefixed_key = "_#{key}"
+
+          if document.key?(prefixed_key)
+            opts[prefixed_key.to_sym] = document.delete(prefixed_key)
+          end
+
+          if document.key?(prefixed_key.to_sym)
+            opts[prefixed_key.to_sym] = document.delete(prefixed_key.to_sym)
+          end
         end
 
         opts
@@ -357,9 +363,21 @@ module Elastomer
       def convert_special_keys(params)
         new_params = params.dup
 
-        SPECIAL_KEYS_HASH.each do |k1, k2|
-          new_params[k2] = new_params.delete k1 if new_params.key? k1
-          new_params[k2.to_sym] = new_params.delete k1.to_sym if new_params.key? k1.to_sym
+        SPECIAL_KEYS.each do |original_key|
+          omit_prefix = (
+            client.version_support.es_version_7_plus? &&
+            UNPREFIXED_SPECIAL_KEYS.include?(original_key)
+          )
+
+          converted_key = (omit_prefix ? "" : "_") + original_key
+
+          if new_params.key?(original_key)
+            new_params[converted_key] = new_params.delete(original_key)
+          end
+
+          if new_params.key?(original_key.to_sym)
+            new_params[converted_key.to_sym] = new_params.delete(original_key.to_sym)
+          end
         end
 
         new_params

@@ -1,3 +1,9 @@
+## 4.0.2 (2023-03-03)
+- Fix ES 7+ handling of params like `routing` that were prefixed with an underscore in earlier versions
+
+## 4.0.1 (2023-02-10)
+- Fix a bug in the bulk API interface that prevents a version check from working correctly
+
 ## 4.0.0 (2023-02-10)
 - Add ES 7 and ES 8 compatibility for existing functionality
 - Remove ES 2 support

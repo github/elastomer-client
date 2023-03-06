@@ -159,13 +159,7 @@ ES_PORT=9205 rake test
 1. Run `gem install pkg/elastomer-client-{VERSION}.gem` to install the new gem locally
 1. Start an `irb` session, `require "elastomer/client"` and make sure things work as you expect
 1. Once everything is working as you expect, push both your commit and your tag, and open a pull request
-1. Request review from a [maintainer](#maintainers) and wait for the pull request to be approved. Once it is approved, you can merge it to `main` yourself. After that, pull down a fresh copy of `main` and then...
+1. Request review from a maintainer and wait for the pull request to be approved. Once it is approved, you can merge it to `main` yourself. After that, pull down a fresh copy of `main` and then...
 1. [Optional] If you intend to release a new version to Rubygems, run `rake release`
 1. [Optional] If necessary, manually push the new version to rubygems.org
 1. 🕺 💃 🎉
-
-## Maintainers
-
-- @ndonewar
-- @kag728
-- @richa-d

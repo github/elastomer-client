@@ -387,7 +387,9 @@ module Elastomer
       end
 
       uri = template.expand(expansions)
-      uri.query_values = query_values unless query_values.empty?
+      query_values.transform_keys!(&:to_s)
+      uri.query_values = (uri.query_values || {}).merge(query_values) unless query_values.empty?
+
       uri.to_s
     end
 

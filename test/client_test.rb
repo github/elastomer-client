@@ -88,6 +88,18 @@ describe Elastomer::Client do
     assert_equal "/_cluster/health?level=shards", uri
   end
 
+  it "handles query parameters in path and arguments" do
+    uri = $client.expand_path "/index/_update_by_query?conflicts=proceed", routing: "1"
+
+    assert_equal "/index/_update_by_query?conflicts=proceed&routing=1", uri
+  end
+
+  it "overrides query parameters in path and with arguments" do
+    uri = $client.expand_path "/index/_update_by_query?conflicts=proceed&routing=2", routing: "1"
+
+    assert_equal "/index/_update_by_query?conflicts=proceed&routing=1", uri
+  end
+
   it "validates path expansions" do
     assert_raises(ArgumentError) {
       $client.expand_path "/{foo}/{bar}", foo: "_cluster", bar: nil

@@ -526,6 +526,16 @@ module Elastomer
         docs.native_delete_by_query(query, params)
       end
 
+      # Update documents by query using Elasticsearch's _update_by_query API.
+      #
+      # See Client#update_by_query for more information.
+      #
+      # Returns a Hash of statistics about the update operations as returned by
+      # _update_by_query.
+      def update_by_query(query, params = nil)
+        docs.update_by_query(query, params)
+      end
+
       # Constructs a Percolator with the given id on this index.
       #
       # Examples

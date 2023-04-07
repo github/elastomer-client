@@ -280,7 +280,7 @@ describe Elastomer::Client::Index do
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },
         mappings: mappings_wrapper("book", {
-          _source: { enabled: false },
+          _source: { enabled: true },
           properties: {
             title: { type: "text", analyzer: "standard" },
             author: { type: "keyword" },
@@ -365,6 +365,33 @@ describe Elastomer::Client::Index do
       r = @index.delete_by_query(q: "*")
 
       assert_equal(1, r["deleted"])
+    end
+
+    focus
+    it "updates by query" do
+      @index.docs.index(document_wrapper("book", { _id: 1, title: "Book 1" }))
+      @index.refresh
+      r = @index.update_by_query(
+        query: { match_all: {}},
+        script: { source: "ctx._source.title = 'Book 2'" }
+      )
+
+      @index.refresh
+      updated = @index.docs.get(id: 1, type: "book")
+
+      assert_equal(1, r["updated"])
+      assert_equal("Book 2", updated["_source"]["title"])
+
+      r = @index.update_by_query({
+        query: { match_all: {}},
+        script: { source: "ctx._source.title = 'Book 3'" }
+      }, conflicts: "proceed")
+
+      @index.refresh
+      updated = @index.docs.get(id: 1, type: "book")
+
+      assert_equal(1, r["updated"])
+      assert_equal("Book 3", updated["_source"]["title"])
     end
 
     it "creates a Percolator" do

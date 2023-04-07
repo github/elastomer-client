@@ -332,6 +332,41 @@ describe Elastomer::Client::Docs do
     refute_found h["docs"][1]
   end
 
+  it "updates documents by query" do
+    populate!
+
+    r = @docs.update_by_query(query: {
+      bool: {
+        filter: {term: {author: "Author1"}}
+      }
+    }, script: {
+      source: "ctx._source.author = 'Author1 Updated'"
+    })
+
+    assert_equal 1, r["updated"]
+
+    r = @docs.update_by_query({
+      query: {
+        bool: {
+          filter: {term: {author: "Author2"}}
+        }
+      },
+      script: {
+        source: "ctx._source.author = 'Author2 Updated'"
+      }
+    }, conflicts: "proceed")
+
+    assert_equal 1, r["updated"]
+
+    @index.refresh
+
+    h = @docs.multi_get ids: [1, 2]
+
+    assert_equal "Author1 Updated", h["docs"][0]["_source"]["author"]
+    assert_equal "Author2 Updated", h["docs"][1]["_source"]["author"]
+
+  end
+
   it "searches for documents" do
     h = @docs.search q: "*:*"
 

@@ -1,3 +1,7 @@
+## 4.0.3 (2023-04-07)
+- Fix query values specified in path get removed when query values are specified with params (#261)
+- Add support for `update_by_query` (#263)
+
 ## 4.0.2 (2023-03-03)
 - Fix ES 7+ handling of params like `routing` that were prefixed with an underscore in earlier versions
 

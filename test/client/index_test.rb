@@ -367,7 +367,6 @@ describe Elastomer::Client::Index do
       assert_equal(1, r["deleted"])
     end
 
-    focus
     it "updates by query" do
       @index.docs.index(document_wrapper("book", { _id: 1, title: "Book 1" }))
       @index.refresh

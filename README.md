@@ -8,15 +8,15 @@ The client provides a one-to-one mapping to the Elasticsearch [API
 endpoints](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html).
 The API is decomposed into logical sections and accessed according to what you
 are trying to accomplish. Each logical section is represented as a [client
-class](lib/elastomer/client) and a top-level accessor is provided for each.
+class](lib/elastomer_client/client) and a top-level accessor is provided for each.
 
 #### Cluster
 
 API endpoints dealing with cluster level information and settings are found in
-the [Cluster](lib/elastomer/client/cluster.rb) class.
+the [Cluster](lib/elastomer_client/client/cluster.rb) class.
 
 ```ruby
-require 'elastomer/client'
+require 'elastomer_client/client'
 client = ElastomerClient::Client.new
 
 # the current health summary
@@ -31,13 +31,13 @@ client.cluster.templates
 
 #### Index
 
-The methods in the [Index](lib/elastomer/client/index.rb) class deal with the
+The methods in the [Index](lib/elastomer_client/client/index.rb) class deal with the
 management of indexes in the cluster. This includes setting up type mappings
 and adjusting settings. The actual indexing and search of documents are
 handled by the Docs class (discussed next).
 
 ```ruby
-require 'elastomer/client'
+require 'elastomer_client/client'
 client = ElastomerClient::Client.new
 
 index = client.index('books')
@@ -59,12 +59,12 @@ index.delete
 
 #### Docs
 
-The [Docs](lib/elastomer/client/docs.rb) class handles the indexing and
+The [Docs](lib/elastomer_client/client/docs.rb) class handles the indexing and
 searching of documents. Each instance is scoped to an index and optionally a
 document type.
 
 ```ruby
-require 'elastomer/client'
+require 'elastomer_client/client'
 client = ElastomerClient::Client.new
 
 docs = client.docs('books')
@@ -130,11 +130,11 @@ docker compose --profile es5 up
 ## Releasing
 
 1. Create a new branch from `main`
-2. Bump the version number in `lib/elastomer/version.rb`
+2. Bump the version number in `lib/elastomer_client/version.rb`
 3. Update `CHANGELOG.md` with info about the new version
 4. Execute `bin/rake build`. This will place a new gem file in the `pkg/` folder.
 5. Run `gem install pkg/elastomer-client-{VERSION}.gem` to install the new gem locally
-6. Start an `irb` session, `require "elastomer/client"` and make sure things work as you expect
+6. Start an `irb` session, `require "elastomer_client/client"` and make sure things work as you expect
 7. Once everything is working as you expect, commit the version bump and open a PR
 8. Once you get approval and merge it to master, pull down a fresh copy of master and then...
 9. Run `rake release`

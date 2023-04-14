@@ -14,7 +14,7 @@ However, you can omit the index name and pass it along with each API method
 called.
 
 ```ruby
-require 'elastomer/client'
+require 'elastomer_client/client'
 client = ElastomerClient::Client.new :port => 9200
 
 # you can provide an index name

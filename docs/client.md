@@ -1,7 +1,7 @@
 # ElastomerClient Client Component
 
 All methods in the ElastomerClient gem eventually make an HTTP request to
-Elasticsearch. The [`ElastomerClient::Client`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client.rb)
+Elasticsearch. The [`ElastomerClient::Client`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client.rb)
 class is responsible for connecting to an Elasticsearch instance, making HTTP
 requests, processing the response, and handling errors. Let's look at the
 details of how `ElastomerClient::Client` handles HTTP communication.
@@ -64,7 +64,7 @@ Elasticsearch provides an `X-Opaque-Id` request header. Any value set in this
 request header will be returned in the corresponding response header. This
 allows the client to correlate the response from Elasticsearch with the request
 that was submitted. We have written an
-[OpaqueId](https://github.com/github/elastomer-client/blob/main/lib/elastomer/middleware/opaque_id.rb)
+[OpaqueId](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/middleware/opaque_id.rb)
 middleware that will abort any request if the `X-Opaque-Id` headers disagree
 between the request and the response. You can use this feature by setting
 the `:opaque_id` flag.
@@ -144,7 +144,7 @@ With the [`Addressable::Template`](https://github.com/sporkmonger/addressable#ur
 a typical search URL takes the form `{/index}{/type}/_search`. The `:index` and
 `:type` values are taken from the parameters Hash and combined with the template
 to generate the URL. The internal
-[`expand_path`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client.rb#L245)
+[`expand_path`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client.rb#L245)
 method handles the URL generation.
 
 Here are a few examples to better illustrate the concept.
@@ -209,7 +209,7 @@ ElastomerClient code makes no attempt to retry an operation in the face of an
 error. However, it does classify errors into *fatal* and *retryable* exceptions.
 
 Each class that inherits from
-[`ElastomerClient::Client::Error`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/errors.rb)
+[`ElastomerClient::Client::Error`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client/errors.rb)
 has a `fatal?` method (and the inverse `retry?` method). If an exception is
 fatal, then the request is fundamentally flawed and should not be retried.
 Passing a malformed search query or trying to search an index that does not

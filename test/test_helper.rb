@@ -27,7 +27,7 @@ require "active_support/core_ext/hash"
 
 # push the lib folder onto the load path
 $LOAD_PATH.unshift "lib"
-require "elastomer/client"
+require "elastomer_client/client"
 
 # we are going to use the same client instance everywhere!
 # the client should always be stateless
@@ -62,7 +62,7 @@ end
 # add custom assertions
 require File.expand_path("../assertions", __FILE__)
 
-# require 'elastomer/notifications'
+# require 'elastomer_client/notifications'
 # require 'pp'
 
 # ActiveSupport::Notifications.subscribe('request.client.elastomer') do |name, start_time, end_time, transaction_id, payload|

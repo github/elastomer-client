@@ -3,14 +3,14 @@
 require "active_support"
 require "active_support/notifications"
 require "securerandom"
-require "elastomer/client"
+require "elastomer_client/client"
 
 module ElastomerClient
 
   # So you want to get notifications from your Elasticsearch client? Well,
   # you've come to the right place!
   #
-  #   require 'elastomer/notifications'
+  #   require 'elastomer_client/notifications'
   #
   # Requiring this module will add ActiveSupport notifications to all
   # Elasticsearch requests. To subscribe to those requests ...

@@ -24,5 +24,5 @@ require:
 AllCops:
   NewCops: enable
   Exclude:
-    - 'lib/elastomer/client/rest_api_spec/api_spec_*.rb' # Exclude generated ApiSpec files
+    - 'lib/elastomer_client/client/rest_api_spec/api_spec_*.rb' # Exclude generated ApiSpec files
     - 'vendor/**/*'

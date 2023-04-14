@@ -7,8 +7,8 @@ require "multi_json"
 require "semantic"
 require "zlib"
 
-require "elastomer/version"
-require "elastomer/version_support"
+require "elastomer_client/version"
+require "elastomer_client/version_support"
 
 module ElastomerClient
 
@@ -25,7 +25,7 @@ module ElastomerClient
     # request will be retried up to this many times with a 75ms delay between
     # the retry attempts. Only non-fatal exceptions will retried automatically.
     #
-    # see lib/elastomer/client/errors.rb#L92-L94
+    # see lib/elastomer_client/client/errors.rb#L92-L94
     #
     # Method params:
     #   :host - the host as a String
@@ -394,7 +394,7 @@ module ElastomerClient
     end
 
     # Internal: A noop method that simply yields to the block. This method
-    # will be replaced when the 'elastomer/notifications' module is included.
+    # will be replaced when the 'elastomer_client/notifications' module is included.
     #
     # path   - The full request path as a String
     # body   - The request body as a String or `nil`

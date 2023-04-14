@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::UpdateByQuery do
+describe ElastomerClient::Client::UpdateByQuery do
   before do
     @index = $client.index "elastomer-update-by-query-test"
     @index.delete if @index.exists?
@@ -70,13 +70,13 @@ describe Elastomer::Client::UpdateByQuery do
         }
       }
 
-      assert_raises(Elastomer::Client::RequestError) do
+      assert_raises(ElastomerClient::Client::RequestError) do
         @index.update_by_query(query)
       end
     end
 
     it "fails when an unknown parameter is provided" do
-      assert_raises(Elastomer::Client::IllegalArgument) do
+      assert_raises(ElastomerClient::Client::IllegalArgument) do
         @index.update_by_query({}, foo: "bar")
       end
     end

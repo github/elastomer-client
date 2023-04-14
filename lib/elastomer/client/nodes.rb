@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Provides access to node-level API commands. The default node is set to
@@ -20,7 +20,7 @@ module Elastomer
       # Create a new nodes client for making API requests that pertain to
       # the health and management individual nodes.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # node_id - The node ID as a String or an Array of node IDs
       #
       def initialize(client, node_id)

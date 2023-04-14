@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   module Middleware
     # Request middleware that encodes the body as JSON.
     #
@@ -57,4 +57,4 @@ module Elastomer
 end
 
 Faraday::Request.register_middleware \
-  encode_json: Elastomer::Middleware::EncodeJson
+  encode_json: ElastomerClient::Middleware::EncodeJson

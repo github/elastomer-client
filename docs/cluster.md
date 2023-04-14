@@ -1,4 +1,4 @@
-# Elastomer Cluster Component
+# ElastomerClient Cluster Component
 
 The cluster component deals with commands for managing cluster state and
 monitoring cluster health. All the commands found under the
@@ -23,7 +23,7 @@ returns a very simple cluster health status report.
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new :port => 9200
+client = ElastomerClient::Client.new :port => 9200
 
 # the current health summary
 client.cluster.health
@@ -126,7 +126,7 @@ module in elastomer-client.
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new :port => 9200
+client = ElastomerClient::Client.new :port => 9200
 
 # gather OS, JVM, and process information from the local node
 client.nodes("_local").info(:info => %w[os jvm process])

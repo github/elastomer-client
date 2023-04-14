@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Execute an array of searches in bulk. Results are returned in an
@@ -63,7 +63,7 @@ module Elastomer
       # Create a new MultiSearch instance for accumulating searches and
       # submitting them all as a single request.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # params - Parameters Hash to pass to the Client#multi_search method
       def initialize(client, params = {})
         @client  = client

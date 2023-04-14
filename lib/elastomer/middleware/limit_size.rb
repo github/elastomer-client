@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   module Middleware
 
     # Request middleware that raises an exception if the request body exceeds a
@@ -17,7 +17,7 @@ module Elastomer
       def call(env)
         if body = env[:body]
           if body.is_a?(String) && body.bytesize > max_request_size
-            raise ::Elastomer::Client::RequestSizeError,
+            raise ::ElastomerClient::Client::RequestSizeError,
               "Request of size `#{body.bytesize}` exceeds the maximum requst size: #{max_request_size}"
           end
         end
@@ -29,4 +29,4 @@ module Elastomer
 end
 
 Faraday::Request.register_middleware \
-  limit_size: Elastomer::Middleware::LimitSize
+  limit_size: ElastomerClient::Middleware::LimitSize

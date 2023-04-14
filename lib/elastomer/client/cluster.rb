@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Returns a Cluster instance.
@@ -13,7 +13,7 @@ module Elastomer
       # Create a new cluster client for making API requests that pertain to
       # the cluster health and management.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       #
       def initialize(client)
         @client = client

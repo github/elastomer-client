@@ -5,7 +5,7 @@ require "active_support/notifications"
 require "securerandom"
 require "elastomer/client"
 
-module Elastomer
+module ElastomerClient
 
   # So you want to get notifications from your Elasticsearch client? Well,
   # you've come to the right place!
@@ -30,11 +30,11 @@ module Elastomer
   # * :status - response status code
   #
   # If you want to use your own notifications service then you will need to
-  # let Elastomer know by setting the `service` here in the Notifications
+  # let ElastomerClient know by setting the `service` here in the Notifications
   # module. The service should adhere to the ActiveSupport::Notifications
   # specification.
   #
-  #   Elastomer::Notifications.service = your_own_service
+  #   ElastomerClient::Notifications.service = your_own_service
   #
   module Notifications
 
@@ -66,7 +66,7 @@ module Elastomer
         body: body   # for backwards compatibility
       }
 
-      ::Elastomer::Notifications.service.instrument(NAME, payload) do
+      ::ElastomerClient::Notifications.service.instrument(NAME, payload) do
         response = yield
         payload[:url]           = response.env[:url]
         payload[:method]        = response.env[:method]
@@ -84,6 +84,6 @@ module Elastomer
   # inject our instrument method into the Client class
   class Client
     remove_method :instrument
-    include ::Elastomer::Notifications
+    include ::ElastomerClient::Notifications
   end
 end

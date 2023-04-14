@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   module Middleware
 
     # Parse response bodies as JSON.
@@ -38,4 +38,4 @@ module Elastomer
 end
 
 Faraday::Response.register_middleware \
-  parse_json: Elastomer::Middleware::ParseJson
+  parse_json: ElastomerClient::Middleware::ParseJson

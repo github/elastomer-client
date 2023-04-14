@@ -29,7 +29,7 @@ class RestApiSpecGenerator
     @short_version = sliced.join(".")
     @class_version = sliced.join("_")
 
-    @version_support = Elastomer::VersionSupport.new(version)
+    @version_support = ElastomerClient::VersionSupport.new(version)
   end
 
   # Setup the working directory and generate the Ruby API spec for the
@@ -164,7 +164,7 @@ __END__
 # Date: <%= Time.now.strftime("%Y-%m-%d") %>
 # ES version: <%= version %>
 
-module Elastomer::Client::RestApiSpec
+module ElastomerClient::Client::RestApiSpec
   class ApiSpecV<%= class_version %> < ApiSpec
     def initialize
       @rest_apis = {

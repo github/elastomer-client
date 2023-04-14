@@ -1,4 +1,4 @@
-# Elastomer Client [![CI build Workflow](https://github.com/github/elastomer-client/actions/workflows/main.yml/badge.svg)](https://github.com/github/elastomer-client/actions/workflows/main.yml)
+# ElastomerClient [![CI build Workflow](https://github.com/github/elastomer-client/actions/workflows/main.yml/badge.svg)](https://github.com/github/elastomer-client/actions/workflows/main.yml)
 
 Making a stupid simple Elasticsearch client so your project can be smarter!
 
@@ -17,7 +17,7 @@ the [Cluster](lib/elastomer/client/cluster.rb) class.
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new
+client = ElastomerClient::Client.new
 
 # the current health summary
 client.cluster.health
@@ -38,7 +38,7 @@ handled by the Docs class (discussed next).
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new
+client = ElastomerClient::Client.new
 
 index = client.index('books')
 index.create(
@@ -65,7 +65,7 @@ document type.
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new
+client = ElastomerClient::Client.new
 
 docs = client.docs('books')
 
@@ -80,13 +80,13 @@ docs.search({:query => {:match_all => {}}})
 
 #### Performance
 
-By default Elastomer uses Net::HTTP (via Faraday) to communicate with
+By default ElastomerClient uses Net::HTTP (via Faraday) to communicate with
 Elasticsearch. You may find that Excon performs better for your use. To enable
-Excon, add it to your bundle and then change your Elastomer initialization
+Excon, add it to your bundle and then change your ElastomerClient initialization
 thusly:
 
 ```ruby
-Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
+ElastomerClient::Client.new(url: YOUR_ES_URL, adapter: :excon)
 ```
 
 ## Development

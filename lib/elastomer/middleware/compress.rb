@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "stringio"
 
-module Elastomer
+module ElastomerClient
   module Middleware
     # Request middleware that compresses request bodies with GZip for supported
     # versions of Elasticsearch.
@@ -42,4 +42,4 @@ module Elastomer
   end
 end
 
-Faraday::Request.register_middleware(elastomer_compress: Elastomer::Middleware::Compress)
+Faraday::Request.register_middleware(elastomer_compress: ElastomerClient::Middleware::Compress)

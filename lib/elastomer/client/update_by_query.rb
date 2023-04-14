@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
     # Update documents based on a query using the Elasticsearch _update_by_query API.
     #

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Provides access to index-level API commands. An index name is required for
@@ -21,7 +21,7 @@ module Elastomer
       # Create a new index client for making API requests that pertain to
       # the health and management of individual indexes.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # name   - The name of the index as a String or an Array of names
       #
       def initialize(client, name)
@@ -520,7 +520,7 @@ module Elastomer
       # Returns a Hash of statistics about the delete operations as returned by
       # _delete_by_query.
       #
-      # Raises Elastomer::Client::IncompatibleVersionException if this version
+      # Raises ElastomerClient::Client::IncompatibleVersionException if this version
       # of Elasticsearch does not support _delete_by_query.
       def native_delete_by_query(query, params = nil)
         docs.native_delete_by_query(query, params)

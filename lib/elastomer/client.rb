@@ -10,7 +10,7 @@ require "zlib"
 require "elastomer/version"
 require "elastomer/version_support"
 
-module Elastomer
+module ElastomerClient
 
   class Client
     IVAR_BLACK_LIST = [:@basic_auth, :@token_auth]
@@ -188,7 +188,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
+    # Raises an ElastomerClient::Client::Error on 4XX and 5XX responses
     def get(path, params = {})
       request :get, path, params
     end
@@ -199,7 +199,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
+    # Raises an ElastomerClient::Client::Error on 4XX and 5XX responses
     def put(path, params = {})
       request :put, path, params
     end
@@ -210,7 +210,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
+    # Raises an ElastomerClient::Client::Error on 4XX and 5XX responses
     def post(path, params = {})
       request :post, path, params
     end
@@ -221,7 +221,7 @@ module Elastomer
     # params - Parameters Hash
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
+    # Raises an ElastomerClient::Client::Error on 4XX and 5XX responses
     def delete(path, params = {})
       request :delete, path, params
     end
@@ -238,7 +238,7 @@ module Elastomer
     #   :max_retires  - Optional retry number for the request
     #
     # Returns a Faraday::Response
-    # Raises an Elastomer::Client::Error on 4XX and 5XX responses
+    # Raises an ElastomerClient::Client::Error on 4XX and 5XX responses
     def request(method, path, params)
       read_timeout = params.delete(:read_timeout)
       request_max_retries = params.delete(:max_retries) || max_retries
@@ -277,7 +277,7 @@ module Elastomer
 
           handle_errors response
 
-        # wrap Faraday errors with appropriate Elastomer::Client error classes
+        # wrap Faraday errors with appropriate ElastomerClient::Client error classes
         rescue Faraday::Error::ClientError => boom
           error = wrap_faraday_error(boom, method, path)
           if error.retry? && RETRYABLE_METHODS.include?(method) && (retries += 1) <= request_max_retries
@@ -294,7 +294,7 @@ module Elastomer
     end
     # rubocop:enable Metrics/MethodLength
 
-    # Internal: Returns a new Elastomer::Client error that wraps the given
+    # Internal: Returns a new ElastomerClient::Client error that wraps the given
     # Faraday error. A generic Error is returned if we cannot wrap the given
     # Faraday error.
     #
@@ -304,7 +304,7 @@ module Elastomer
     #
     def wrap_faraday_error(error, method, path)
       error_name  = error.class.name.split("::").last
-      error_class = Elastomer::Client.const_get(error_name) rescue Elastomer::Client::Error
+      error_class = ElastomerClient::Client.const_get(error_name) rescue ElastomerClient::Client::Error
       error_class.new(error, method.upcase, path)
     end
 
@@ -417,7 +417,7 @@ module Elastomer
     # response - The Faraday::Response object.
     #
     # Returns the response.
-    # Raises an Elastomer::Client::Error on 500 responses or responses
+    # Raises an ElastomerClient::Client::Error on 500 responses or responses
     # containing and 'error' field.
     def handle_errors(response)
       raise ServerError, response if response.status >= 500
@@ -504,7 +504,7 @@ module Elastomer
       object.respond_to?(:empty?) ? !object.empty? : !!object
     end
   end  # Client
-end  # Elastomer
+end  # ElastomerClient
 
 # require all files in the `client` sub-directory
 Dir.glob(File.expand_path("../client/*.rb", __FILE__)).each { |fn| require fn }

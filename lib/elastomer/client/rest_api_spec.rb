@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Provides access to the versioned REST API specs for Elasticsearch.

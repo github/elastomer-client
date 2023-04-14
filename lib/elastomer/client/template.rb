@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Returns a Template instance.
@@ -14,7 +14,7 @@ module Elastomer
       # Create a new template client for making API requests that pertain to
       # template management.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # name   - The name of the template as a String
       #
       def initialize(client, name)

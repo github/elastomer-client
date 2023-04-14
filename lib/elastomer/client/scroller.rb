@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Create a new Scroller instance for scrolling all results from a `query`.
@@ -152,7 +152,7 @@ module Elastomer
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
       # and https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-search-type.html#scan
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # query  - The query to scroll as a Hash or a JSON encoded String
       # opts   - Options Hash
       #   :index       - the name of the index to search
@@ -244,7 +244,7 @@ module Elastomer
       def clear!
         return if scroll_id.nil?
         client.clear_scroll(scroll_id)
-      rescue ::Elastomer::Client::IllegalArgument
+      rescue ::ElastomerClient::Client::IllegalArgument
         nil
       end
 
@@ -270,4 +270,4 @@ module Elastomer
 
     end  # Scroller
   end  # Client
-end  # Elastomer
+end  # ElastomerClient

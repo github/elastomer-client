@@ -3,7 +3,7 @@
 require File.expand_path("../test_helper", __FILE__)
 require "elastomer/notifications"
 
-describe Elastomer::Notifications do
+describe ElastomerClient::Notifications do
   before do
     @name = "elastomer-notifications-test"
     @index = $client.index @name
@@ -21,11 +21,11 @@ describe Elastomer::Notifications do
 
   it "instruments timeouts" do
     $client.stub :connection, lambda { raise Faraday::Error::TimeoutError } do
-      assert_raises(Elastomer::Client::TimeoutError) { $client.info }
+      assert_raises(ElastomerClient::Client::TimeoutError) { $client.info }
       event = @events.detect { |e| e.payload[:action] == "cluster.info" }
       exception = event.payload[:exception]
 
-      assert_equal "Elastomer::Client::TimeoutError", exception[0]
+      assert_equal "ElastomerClient::Client::TimeoutError", exception[0]
       assert_match "timeout", exception[1]
     end
   end
@@ -86,6 +86,6 @@ describe Elastomer::Notifications do
     stubs = Faraday::Adapter::Test::Stubs.new do |stub|
       stub.send(method, url) { |env| [status, {}, body] }
     end
-    Elastomer::Client.new($client_params.merge(opaque_id: false, adapter: [:test, stubs]))
+    ElastomerClient::Client.new($client_params.merge(opaque_id: false, adapter: [:test, stubs]))
   end
 end

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
 
-  # Parent class for all Elastomer errors.
+  # Parent class for all ElastomerClient errors.
   Error = Class.new StandardError
 
   class Client
 
     # General error response from client requests.
-    class Error < ::Elastomer::Error
+    class Error < ::ElastomerClient::Error
 
       # Construct a new Error from the given response object or a message
       # String. If a response object is given, the error message will be
@@ -97,15 +97,15 @@ module Elastomer
     ConnectionFailed.fatal       = false
     RejectedExecutionError.fatal = false
 
-    # Define an Elastomer::Client exception class on the fly for
+    # Define an ElastomerClient::Client exception class on the fly for
     # Faraday exception classes that we don't specifically wrap.
     Faraday::Error.constants.each do |error_name|
-      next if ::Elastomer::Client.const_get(error_name) rescue nil
+      next if ::ElastomerClient::Client.const_get(error_name) rescue nil
 
       error_class = Faraday::Error.const_get(error_name)
       next unless error_class < Faraday::Error::ClientError
 
-      ::Elastomer::Client.const_set(error_name, Class.new(Error))
+      ::ElastomerClient::Client.const_set(error_name, Class.new(Error))
     end
 
     # Exception for operations that are unsupported with the version of

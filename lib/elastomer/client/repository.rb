@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Returns a Repository instance.
@@ -12,7 +12,7 @@ module Elastomer
       # Create a new index client for making API requests that pertain to
       # the health and management individual indexes.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # name   - The name of the index as a String or an Array of names
       def initialize(client, name = nil)
         @client = client
@@ -30,7 +30,7 @@ module Elastomer
       def exists?(params = {})
         response = client.get "/_snapshot{/repository}", update_params(params, action: "repository.exists", rest_api: "snapshot.get_repository")
         response.success?
-      rescue Elastomer::Client::Error => err
+      rescue ElastomerClient::Client::Error => err
         if err.error && err.error.dig("root_cause", 0, "type") == "repository_missing_exception"
           false
         else

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Provides access to snapshot API commands.
@@ -17,7 +17,7 @@ module Elastomer
       # Create a new snapshot object for making API requests that pertain to
       # creating, restoring, deleting, and retrieving snapshots.
       #
-      # client     - Elastomer::Client used for HTTP requests to the server
+      # client     - ElastomerClient::Client used for HTTP requests to the server
       # repository - The name of the repository as a String. Cannot be nil if
       #              snapshot name is not nil.
       # name       - The name of the snapshot as a String
@@ -39,7 +39,7 @@ module Elastomer
       def exists?(params = {})
         response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, action: "snapshot.exists", rest_api: "snapshot.get")
         response.success?
-      rescue Elastomer::Client::Error => err
+      rescue ElastomerClient::Client::Error => err
         if err.error && err.error.dig("root_cause", 0, "type") == "snapshot_missing_exception"
           false
         else

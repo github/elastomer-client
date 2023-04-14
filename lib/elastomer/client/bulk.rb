@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # The `bulk` method can be used in two ways. Without a block the method
@@ -168,7 +168,7 @@ module Elastomer
       # accumulating documents to index and then formatting them properly for
       # the bulk API command.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # params - Parameters Hash to pass to the Client#bulk method
       #   :request_size - the maximum request size in bytes
       #   :action_count - the maximum number of actions

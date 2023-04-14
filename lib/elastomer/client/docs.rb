@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Provides access to document-level API commands. Indexing documents and
@@ -20,7 +20,7 @@ module Elastomer
       # Create a new document client for making API requests that pertain to
       # the indexing and searching of documents in a search index.
       #
-      # client - Elastomer::Client used for HTTP requests to the server
+      # client - ElastomerClient::Client used for HTTP requests to the server
       # name   - The name of the index as a String
       # type   - The document type as a String
       #
@@ -74,7 +74,7 @@ module Elastomer
       #
       # Returns the response body as a Hash
       #
-      # Raises Elastomer::Client::IllegalArgument if an unsupported indexing
+      # Raises ElastomerClient::Client::IllegalArgument if an unsupported indexing
       # directive is used.
       def index(document, params = {})
         overrides = from_document document
@@ -281,7 +281,7 @@ module Elastomer
       # Returns a Hash of statistics about the delete operations as returned by
       # _delete_by_query.
       #
-      # Raises Elastomer::Client::IncompatibleVersionException if this version
+      # Raises ElastomerClient::Client::IncompatibleVersionException if this version
       # of Elasticsearch does not support _delete_by_query.
       def native_delete_by_query(query, params = {})
         query, params = extract_params(query) if params.nil?
@@ -580,7 +580,7 @@ module Elastomer
       #
       # Returns an options Hash extracted from the document.
       #
-      # Raises Elastomer::Client::IllegalArgument if an unsupported indexing
+      # Raises ElastomerClient::Client::IllegalArgument if an unsupported indexing
       # directive is used.
       def from_document(document)
         opts = {body: document}

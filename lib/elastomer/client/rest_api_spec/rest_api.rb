@@ -2,7 +2,7 @@
 
 require "forwardable"
 
-module Elastomer::Client::RestApiSpec
+module ElastomerClient::Client::RestApiSpec
   class RestApi
     extend Forwardable
 

@@ -1,4 +1,4 @@
-# Elastomer Documents Component
+# ElastomerClient Documents Component
 
 The documents components handles all API calls related to
 [indexing documents](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
@@ -12,7 +12,7 @@ documents components are equivalent.
 
 ```ruby
 require 'elastomer/client'
-client = Elastomer::Client.new :port => 9200
+client = ElastomerClient::Client.new :port => 9200
 
 docs1 = client.index("blog").docs("post")
 docs2 = client.docs("blog", "post")
@@ -163,7 +163,7 @@ client.docs.search \
 The `search` method returns the query response from Elasticsearch as a ruby
 Hash. All the keys are represented as Strings. The [hashie](https://github.com/intridea/hashie)
 project has some useful transforms and wrappers for working with these result
-sets, but that is left to the user to implement if they so desire. Elastomer
+sets, but that is left to the user to implement if they so desire. ElastomerClient
 client returns only ruby Hashes.
 
 Searches can be executed against multiple indices and multiple types. Again,

@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Nodes do
+describe ElastomerClient::Client::Nodes do
 
   it "gets info for the node(s)" do
     h = $client.nodes.info

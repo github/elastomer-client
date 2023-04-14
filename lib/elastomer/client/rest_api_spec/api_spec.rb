@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer::Client::RestApiSpec
+module ElastomerClient::Client::RestApiSpec
 
   # This is the superclass for the version specific API Spec classes that will
   # be generated using the `script/generate-rest-api-spec` script. Each version
@@ -101,7 +101,7 @@ module Elastomer::Client::RestApiSpec
 
       params.keys.each do |key|
         unless rest_api.valid_param?(key) || valid_common_param?(key)
-          raise ::Elastomer::Client::IllegalArgument, "'#{key}' is not a valid parameter for the '#{api}' API"
+          raise ::ElastomerClient::Client::IllegalArgument, "'#{key}' is not a valid parameter for the '#{api}' API"
         end
       end
       params

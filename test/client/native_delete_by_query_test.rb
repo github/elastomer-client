@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::NativeDeleteByQuery do
+describe ElastomerClient::Client::NativeDeleteByQuery do
   before do
     @index = $client.index "elastomer-delete-by-query-test"
     @index.delete if @index.exists?
@@ -67,13 +67,13 @@ describe Elastomer::Client::NativeDeleteByQuery do
         }
       }
 
-      assert_raises(Elastomer::Client::RequestError) do
+      assert_raises(ElastomerClient::Client::RequestError) do
         @index.native_delete_by_query(query)
       end
     end
 
     it "fails when an unknown parameter is provided" do
-      assert_raises(Elastomer::Client::IllegalArgument) do
+      assert_raises(ElastomerClient::Client::IllegalArgument) do
         @index.native_delete_by_query({}, foo: "bar")
       end
     end

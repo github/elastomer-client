@@ -2,7 +2,7 @@
 
 require "securerandom"
 
-module Elastomer
+module ElastomerClient
   module Middleware
 
     # This Faraday middleware implements the "X-Opaque-Id" request / response
@@ -14,7 +14,7 @@ module Elastomer
     # The SecureRandom lib is used to generate a UUID string for each request.
     # This value is used as the content for the "X-Opaque-Id" header. If the
     # value is different between the request and the response, then an
-    # `Elastomer::Client::OpaqueIdError` is raised. In this case no response
+    # `ElastomerClient::Client::OpaqueIdError` is raised. In this case no response
     # will be returned.
     #
     # See [Elasticsearch "X-Opaque-Id"
@@ -36,7 +36,7 @@ module Elastomer
         @app.call(env).on_complete do |renv|
           response_uuid = renv[:response_headers][X_OPAQUE_ID]
           if uuid != response_uuid
-            raise ::Elastomer::Client::OpaqueIdError,
+            raise ::ElastomerClient::Client::OpaqueIdError,
                   "Conflicting 'X-Opaque-Id' headers: request #{uuid.inspect}, response #{response_uuid.inspect}"
           end
         end
@@ -67,7 +67,7 @@ module Elastomer
   # 'X-Opaque-Id' request header and the one received in the response header.
   Client::OpaqueIdError = Class.new Client::Error
 
-end  # Elastomer
+end  # ElastomerClient
 
 Faraday::Request.register_middleware \
-  opaque_id: Elastomer::Middleware::OpaqueId
+  opaque_id: ElastomerClient::Middleware::OpaqueId

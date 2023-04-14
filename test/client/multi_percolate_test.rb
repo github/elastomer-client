@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::MultiPercolate do
+describe ElastomerClient::Client::MultiPercolate do
 
   before do
     if $client.version_support.es_version_7_plus?

@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::MultiSearch do
+describe ElastomerClient::Client::MultiSearch do
 
   before do
     @name  = "elastomer-msearch-test"

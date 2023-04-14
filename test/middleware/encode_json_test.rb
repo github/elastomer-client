@@ -2,8 +2,8 @@
 
 require File.expand_path("../../test_helper", __FILE__)
 
-describe Elastomer::Middleware::EncodeJson do
-  let(:middleware) { Elastomer::Middleware::EncodeJson.new(lambda { |env| env }) }
+describe ElastomerClient::Middleware::EncodeJson do
+  let(:middleware) { ElastomerClient::Middleware::EncodeJson.new(lambda { |env| env }) }
 
   def process(body, content_type: nil, method: :post)
     env = { body: body, request_headers: Faraday::Utils::Headers.new, method: method }

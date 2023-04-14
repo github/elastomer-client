@@ -2,8 +2,8 @@
 
 require File.expand_path("../../test_helper", __FILE__)
 
-describe Elastomer::Middleware::ParseJson do
-  let(:middleware) { Elastomer::Middleware::ParseJson.new(lambda { |env| Faraday::Response.new(env) }) }
+describe ElastomerClient::Middleware::ParseJson do
+  let(:middleware) { ElastomerClient::Middleware::ParseJson.new(lambda { |env| Faraday::Response.new(env) }) }
   let(:headers) { Hash.new }
 
   def process(body, content_type = nil)

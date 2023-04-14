@@ -2,7 +2,7 @@
 # Date: 2023-01-18
 # ES version: 8.6
 
-module Elastomer::Client::RestApiSpec
+module ElastomerClient::Client::RestApiSpec
   class ApiSpecV8_6 < ApiSpec
     def initialize
       @rest_apis = {

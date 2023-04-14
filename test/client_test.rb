@@ -3,16 +3,16 @@
 require File.expand_path("../test_helper", __FILE__)
 require "elastomer/notifications"
 
-describe Elastomer::Client do
+describe ElastomerClient::Client do
 
   it "uses the adapter specified at creation" do
-    c = Elastomer::Client.new(adapter: :test)
+    c = ElastomerClient::Client.new(adapter: :test)
 
     assert_includes c.connection.builder.handlers, Faraday::Adapter::Test
   end
 
   it "use Faraday's default adapter if none is specified" do
-    c = Elastomer::Client.new
+    c = ElastomerClient::Client.new
     adapter = Faraday::Adapter.lookup_middleware(Faraday.default_adapter)
 
     assert_includes c.connection.builder.handlers, adapter
@@ -33,7 +33,7 @@ describe Elastomer::Client do
       $client.get "/non-existent-index/_search?q=*:*"
 
       assert false, "exception was not raised when it should have been"
-    rescue Elastomer::Client::Error => err
+    rescue ElastomerClient::Client::Error => err
       assert_equal 404, err.status
       assert_match %r/index_not_found_exception/, err.message
     end
@@ -59,7 +59,7 @@ describe Elastomer::Client do
       $client.post "/_bulk"
 
       assert false, "exception was not raised when it should have been"
-    rescue Elastomer::Client::RejectedExecutionError => err
+    rescue ElastomerClient::Client::RejectedExecutionError => err
       assert_match %r/es_rejected_execution_exception/, err.message
     end
   end
@@ -68,7 +68,7 @@ describe Elastomer::Client do
     error = Faraday::TimeoutError.new("it took too long")
     wrapped = $client.wrap_faraday_error(error, :get, "/_cat/indices")
 
-    assert_instance_of Elastomer::Client::TimeoutError, wrapped
+    assert_instance_of ElastomerClient::Client::TimeoutError, wrapped
     assert_equal "it took too long :: GET /_cat/indices", wrapped.message
   end
 
@@ -115,7 +115,7 @@ describe Elastomer::Client do
       username: "my_user",
       password: "my_secret_password"
     }, token_auth: "my_secret_token")
-    client = Elastomer::Client.new(**client_params)
+    client = ElastomerClient::Client.new(**client_params)
 
     refute_match(/my_user/, client.inspect)
     refute_match(/my_secret_password/, client.inspect)
@@ -130,7 +130,7 @@ describe Elastomer::Client do
         username: "my_user",
         password: "my_secret_password"
       })
-      client = Elastomer::Client.new(**client_params)
+      client = ElastomerClient::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -146,7 +146,7 @@ describe Elastomer::Client do
       client_params = $client_params.merge(basic_auth: {
         username: "my_user"
       })
-      client = Elastomer::Client.new(**client_params)
+      client = ElastomerClient::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -162,7 +162,7 @@ describe Elastomer::Client do
       client_params = $client_params.merge(basic_auth: {
         password: "my_secret_password"
       })
-      client = Elastomer::Client.new(**client_params)
+      client = ElastomerClient::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -176,7 +176,7 @@ describe Elastomer::Client do
 
     it "can use token authentication" do
       client_params = $client_params.merge(token_auth: "my_secret_token")
-      client = Elastomer::Client.new(**client_params)
+      client = ElastomerClient::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       token_auth_spy = Spy.on(connection, :token_auth).and_return(nil)
@@ -193,7 +193,7 @@ describe Elastomer::Client do
         username: "my_user",
         password: "my_secret_password"
       }, token_auth: "my_secret_token")
-      client = Elastomer::Client.new(**client_params)
+      client = ElastomerClient::Client.new(**client_params)
 
       connection = Faraday::Connection.new
       basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
@@ -328,7 +328,7 @@ describe Elastomer::Client do
     it "does not make an HTTP request for version if it is provided at create time" do
       request = stub_request(:get, "#{$client.url}/")
 
-      client = Elastomer::Client.new(**$client_params.merge(es_version: "5.6.6"))
+      client = ElastomerClient::Client.new(**$client_params.merge(es_version: "5.6.6"))
 
       assert_equal "5.6.6", client.version
 
@@ -384,7 +384,7 @@ describe Elastomer::Client do
           body: "green open test-index 1 0 0 0 159b 159b"
         })
 
-      assert_raises(Elastomer::Client::ConnectionFailed) {
+      assert_raises(ElastomerClient::Client::ConnectionFailed) {
         $client.get("/_cat/indices")
       }
     end
@@ -406,7 +406,7 @@ describe Elastomer::Client do
         to_timeout.then.
         to_return({body: %q/{"acknowledged": true}/})
 
-      assert_raises(Elastomer::Client::ConnectionFailed) {
+      assert_raises(ElastomerClient::Client::ConnectionFailed) {
         $client.index("test-index").create({}, max_retries: 1)
       }
     end
@@ -416,7 +416,7 @@ describe Elastomer::Client do
         to_timeout.then.
         to_return({body: %q/{"acknowledged": true}/})
 
-      assert_raises(Elastomer::Client::ConnectionFailed) {
+      assert_raises(ElastomerClient::Client::ConnectionFailed) {
         $client.index("test-index").flush(max_retries: 1)
       }
     end
@@ -426,7 +426,7 @@ describe Elastomer::Client do
         to_timeout.then.
         to_return({body: %q/{"acknowledged": true}/})
 
-      assert_raises(Elastomer::Client::ConnectionFailed) {
+      assert_raises(ElastomerClient::Client::ConnectionFailed) {
         $client.index("test-index").delete(max_retries: 1)
       }
     end

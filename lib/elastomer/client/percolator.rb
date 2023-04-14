@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     class Percolator
 
       # Create a new Percolator for managing a query.
       #
-      # client     - Elastomer::Client used for HTTP requests to the server
+      # client     - ElastomerClient::Client used for HTTP requests to the server
       # index_name - The index name
       # id         - The _id for the query
       def initialize(client, index_name, id)
@@ -76,4 +76,4 @@ module Elastomer
 
     end  # Percolator
   end  # Client
-end  # Elastomer
+end  # ElastomerClient

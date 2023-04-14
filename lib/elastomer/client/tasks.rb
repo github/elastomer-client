@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Elastomer
+module ElastomerClient
   class Client
 
     # Returns a Tasks instance for querying the cluster bound to this client for
@@ -17,7 +17,7 @@ module Elastomer
       # Create a new Tasks for introspecting on internal cluster activity.
       # More context: https://www.elastic.co/guide/en/elasticsearch/reference/5.6/tasks.html
       #
-      # client     - Elastomer::Client used for HTTP requests to the server
+      # client     - ElastomerClient::Client used for HTTP requests to the server
       #
       # Raises IncompatibleVersionException if caller attempts to access Tasks API on ES version < 5.0.0
       def initialize(client)

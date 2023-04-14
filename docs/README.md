@@ -1,6 +1,6 @@
-# Elastomer Client in Depth
+# ElastomerClient in Depth
 
-We first started building the Elastomer Client gem when an
+We first started building the ElastomerClient gem when an
 [official client](https://github.com/elasticsearch/elasticsearch-ruby)
 was not yet available from Elasticsearch. We were looking for a client that
 provided a one-to-one mapping of the Elasticsearch APIs and avoided higher level
@@ -16,10 +16,10 @@ To that end we have tried to be as faithful as possible to the Elasticsearch API
 with our implementation. There are a few places where it made sense to wrap the
 Elasticsearch API inside Ruby idioms. One notable location is the
 [scan-scroll](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
-search type; the Elastomer Client provides a Ruby iterator to work with these
+search type; the ElastomerClient provides a Ruby iterator to work with these
 types of queries.
 
-Below are links to documents describing the various components of the Elastomer
+Below are links to documents describing the various components of the ElastomerClient
 Client library. Start with the core components - specifically the **Client**
 document. All the other components are built atop the client.
 

@@ -2,9 +2,9 @@
 
 require_relative "../../test_helper"
 
-describe Elastomer::Client::RestApiSpec::ApiSpec do
+describe ElastomerClient::Client::RestApiSpec::ApiSpec do
   before do
-    @api_spec = Elastomer::Client::RestApiSpec.api_spec("5.6.4")
+    @api_spec = ElastomerClient::Client::RestApiSpec.api_spec("5.6.4")
   end
 
   it "selects valid path parts" do
@@ -50,7 +50,7 @@ describe Elastomer::Client::RestApiSpec::ApiSpec do
 
   it "validates request params" do
     params = {q: "*:*", pretty: true, "nope": false}
-    assert_raises(Elastomer::Client::IllegalArgument, "'nope' is not a valid parameter for the 'search' API") {
+    assert_raises(ElastomerClient::Client::IllegalArgument, "'nope' is not a valid parameter for the 'search' API") {
       @api_spec.validate_params!(api: "search", params: params)
     }
   end

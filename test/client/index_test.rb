@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Index do
+describe ElastomerClient::Client::Index do
 
   before do
     @name  = "elastomer-index-test"
@@ -172,7 +172,7 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
     assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_alias("*"))
 
-    exception = assert_raises(Elastomer::Client::RequestError) do
+    exception = assert_raises(ElastomerClient::Client::RequestError) do
       @index.get_alias("not-there")
     end
 
@@ -183,7 +183,7 @@ describe Elastomer::Client::Index do
     if $client.version_support.es_version_7_plus?
       assert_empty(@index.get_alias("not*"))
     else
-      exception = assert_raises(Elastomer::Client::RequestError) do
+      exception = assert_raises(ElastomerClient::Client::RequestError) do
         @index.get_alias("not*")
       end
 
@@ -265,7 +265,7 @@ describe Elastomer::Client::Index do
   describe "when an index does not exist" do
     it "raises an IndexNotFoundError on delete" do
       index = $client.index("index-that-does-not-exist")
-      assert_raises(Elastomer::Client::IndexNotFoundError) { index.delete }
+      assert_raises(ElastomerClient::Client::IndexNotFoundError) { index.delete }
     end
   end
 
@@ -480,7 +480,7 @@ describe Elastomer::Client::Index do
       })
 
       # Indexing the document fails when `output` is provided
-      exception = assert_raises(Elastomer::Client::RequestError) do
+      exception = assert_raises(ElastomerClient::Client::RequestError) do
         @index.docs.index(document)
       end
 

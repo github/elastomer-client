@@ -27,7 +27,7 @@ require "active_support/core_ext/hash"
 
 # push the lib folder onto the load path
 $LOAD_PATH.unshift "lib"
-require "elastomer/client"
+require "elastomer_client/client"
 
 # we are going to use the same client instance everywhere!
 # the client should always be stateless
@@ -39,7 +39,7 @@ $client_params = {
   strict_params: true,
   compress_body: true
 }
-$client = Elastomer::Client.new(**$client_params)
+$client = ElastomerClient::Client.new(**$client_params)
 
 # ensure we have an Elasticsearch server to test with
 raise "No server available at #{$client.url}" unless $client.available?
@@ -62,7 +62,7 @@ end
 # add custom assertions
 require File.expand_path("../assertions", __FILE__)
 
-# require 'elastomer/notifications'
+# require 'elastomer_client/notifications'
 # require 'pp'
 
 # ActiveSupport::Notifications.subscribe('request.client.elastomer') do |name, start_time, end_time, transaction_id, payload|
@@ -83,7 +83,7 @@ require File.expand_path("../assertions", __FILE__)
 #            setting of 1 replica.
 #
 # Returns the cluster health response.
-# Raises Elastomer::Client::TimeoutError if requested status is not achieved
+# Raises ElastomerClient::Client::TimeoutError if requested status is not achieved
 # within 5 seconds.
 def wait_for_index(name, status = "yellow")
   $client.cluster.health(
@@ -102,7 +102,7 @@ def run_snapshot_tests?
     begin
       create_repo("elastomer-client-snapshot-test")
       $run_snapshot_tests = true
-    rescue Elastomer::Client::Error
+    rescue ElastomerClient::Client::Error
       puts "Could not create a snapshot repo. Snapshot tests will be disabled."
       puts "To enable snapshot tests, add a path.repo setting to your elasticsearch.yml file."
       $run_snapshot_tests = false
@@ -200,7 +200,7 @@ end
 
 # The methods below are to support intention-revealing names about version
 # differences in the tests. If necessary for general operation they can be moved
-# into Elastomer::VersionSupport.
+# into ElastomerClient::VersionSupport.
 
 # COMPATIBILITY
 # ES 7 drops mapping types, so don't wrap with a mapping type for ES 7+

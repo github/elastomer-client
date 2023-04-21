@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Scroller do
+describe ElastomerClient::Client::Scroller do
 
   before do
     @name  = "elastomer-scroller-test"

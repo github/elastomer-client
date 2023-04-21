@@ -1,4 +1,4 @@
-# Elastomer Index Component
+# ElastomerClient Index Component
 
 The index component provides access to the
 [indices API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
@@ -14,8 +14,8 @@ However, you can omit the index name and pass it along with each API method
 called.
 
 ```ruby
-require 'elastomer/client'
-client = Elastomer::Client.new :port => 9200
+require 'elastomer_client/client'
+client = ElastomerClient::Client.new :port => 9200
 
 # you can provide an index name
 index = client.index "blog"

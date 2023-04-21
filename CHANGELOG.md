@@ -1,3 +1,6 @@
+## 5.0.0 (2023-04-17)
+- Rename Elastomer to ElastomerClient (and elastomer to elastomer_client)
+
 ## 4.0.3 (2023-04-07)
 - Fix query values specified in path get removed when query values are specified with params (#261)
 - Add support for `update_by_query` (#263)

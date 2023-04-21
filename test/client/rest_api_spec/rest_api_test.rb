@@ -2,9 +2,9 @@
 
 require_relative "../../test_helper"
 
-describe Elastomer::Client::RestApiSpec::RestApi do
+describe ElastomerClient::Client::RestApiSpec::RestApi do
   before do
-    @rest_api = Elastomer::Client::RestApiSpec::RestApi.new \
+    @rest_api = ElastomerClient::Client::RestApiSpec::RestApi.new \
         documentation: "https://www.elastic.co/guide/en/elasticsearch/reference/5.x/cluster-state.html",
         methods: ["GET"],
         body: nil,

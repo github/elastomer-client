@@ -2,7 +2,7 @@
 
 require File.expand_path("../../test_helper", __FILE__)
 
-describe Elastomer::Middleware::OpaqueId do
+describe ElastomerClient::Middleware::OpaqueId do
 
   before do
     stubs = Faraday::Adapter::Test::Stubs.new do |stub|
@@ -26,7 +26,7 @@ describe Elastomer::Middleware::OpaqueId do
         opaque_id: true,
         adapter: [:test, stubs]
 
-    @client = Elastomer::Client.new(**opts)
+    @client = ElastomerClient::Client.new(**opts)
     @client.instance_variable_set(:@version, "5.6.4")
   end
 
@@ -37,11 +37,11 @@ describe Elastomer::Middleware::OpaqueId do
   end
 
   it "raises an exception on conflicting headers" do
-    assert_raises(Elastomer::Client::OpaqueIdError) { @client.cluster.state }
+    assert_raises(ElastomerClient::Client::OpaqueIdError) { @client.cluster.state }
   end
 
   it "generates a UUID per call" do
-    opaque_id = Elastomer::Middleware::OpaqueId.new
+    opaque_id = ElastomerClient::Middleware::OpaqueId.new
 
     uuid1 = opaque_id.generate_uuid
     uuid2 = opaque_id.generate_uuid
@@ -50,7 +50,7 @@ describe Elastomer::Middleware::OpaqueId do
   end
 
   it "generates a UUID per thread" do
-    opaque_id = Elastomer::Middleware::OpaqueId.new
+    opaque_id = ElastomerClient::Middleware::OpaqueId.new
     uuids = []
     threads = []
 

@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Snapshot do
+describe ElastomerClient::Client::Snapshot do
   before do
     @index = nil
     @restored_index = nil

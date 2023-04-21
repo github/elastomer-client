@@ -3,7 +3,7 @@
 require_relative "../test_helper"
 require "json"
 
-describe Elastomer::Client::Bulk do
+describe ElastomerClient::Client::Bulk do
 
   before do
     @name  = "elastomer-bulk-test"
@@ -247,7 +247,7 @@ describe Elastomer::Client::Bulk do
   end
 
   it "rejects documents that excceed the maximum request size" do
-    client = Elastomer::Client.new(**$client_params.merge(max_request_size: 300))
+    client = ElastomerClient::Client.new(**$client_params.merge(max_request_size: 300))
     index  = client.index(@name)
 
     ary = []
@@ -262,7 +262,7 @@ describe Elastomer::Client::Bulk do
       assert_equal 0, ary.length
 
       document = document_wrapper("book", {_id: 342, author: "Author 1", message: "A"*290})
-      assert_raises(Elastomer::Client::RequestSizeError) { b.index(document) }
+      assert_raises(ElastomerClient::Client::RequestSizeError) { b.index(document) }
     end
     ary.compact!
 

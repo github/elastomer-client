@@ -2,7 +2,7 @@
 
 require_relative "./test_helper"
 
-describe Elastomer::VersionSupport do
+describe ElastomerClient::VersionSupport do
   describe "supported versions" do
     it "allows 5.0.0 to 8.6.0" do
       five_series = ["5.0.0", "5.0.9", "5.2.0", "5.6.9", "5.6.100"]
@@ -10,16 +10,16 @@ describe Elastomer::VersionSupport do
       eight_series = ["8.0.0", "8.6.0"]
 
       five_series.each do |version|
-        assert Elastomer::VersionSupport.new(version)
+        assert ElastomerClient::VersionSupport.new(version)
       end
 
       seven_series.each do |version|
-        assert_predicate Elastomer::VersionSupport.new(version), :es_version_7_plus?
+        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_7_plus?
       end
 
       eight_series.each do |version|
-        assert_predicate Elastomer::VersionSupport.new(version), :es_version_7_plus?
-        assert_predicate Elastomer::VersionSupport.new(version), :es_version_8_plus?
+        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_7_plus?
+        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_8_plus?
       end
     end
   end
@@ -31,7 +31,7 @@ describe Elastomer::VersionSupport do
 
       (too_low + too_high).each do |version|
         exception = assert_raises(ArgumentError, "expected #{version} to not be supported") do
-          Elastomer::VersionSupport.new(version)
+          ElastomerClient::VersionSupport.new(version)
         end
 
         assert_match version, exception.message

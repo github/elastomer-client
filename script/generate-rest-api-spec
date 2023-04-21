@@ -14,8 +14,8 @@ require "rubygems"
 require "bundler/setup"
 
 $LOAD_PATH.unshift "lib"
-require "elastomer/client"
-require "elastomer/version_support"
+require "elastomer_client/client"
+require "elastomer_client/version_support"
 
 class RestApiSpecGenerator
   WORKING_DIR = "vendor/elasticsearch"
@@ -29,7 +29,7 @@ class RestApiSpecGenerator
     @short_version = sliced.join(".")
     @class_version = sliced.join("_")
 
-    @version_support = Elastomer::VersionSupport.new(version)
+    @version_support = ElastomerClient::VersionSupport.new(version)
   end
 
   # Setup the working directory and generate the Ruby API spec for the
@@ -45,7 +45,7 @@ class RestApiSpecGenerator
 
   # The name of the Ruby API spec file for this particular Elasticsearch version.
   def ruby_spec_filename
-    "lib/elastomer/client/rest_api_spec/api_spec_v#{class_version}.rb"
+    "lib/elastomer_client/client/rest_api_spec/api_spec_v#{class_version}.rb"
   end
 
   # Returns true if the elasticserach working directory exists.
@@ -164,7 +164,7 @@ __END__
 # Date: <%= Time.now.strftime("%Y-%m-%d") %>
 # ES version: <%= version %>
 
-module Elastomer::Client::RestApiSpec
+module ElastomerClient::Client::RestApiSpec
   class ApiSpecV<%= class_version %> < ApiSpec
     def initialize
       @rest_apis = {

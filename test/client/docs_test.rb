@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Docs do
+describe ElastomerClient::Client::Docs do
 
   before do
     @name  = "elastomer-docs-test"
@@ -45,7 +45,7 @@ describe Elastomer::Client::Docs do
 
     assert_created h
 
-    assert_raises(Elastomer::Client::DocumentAlreadyExistsError) do
+    assert_raises(ElastomerClient::Client::DocumentAlreadyExistsError) do
       @docs.index document.dup
     end
   end
@@ -174,7 +174,7 @@ describe Elastomer::Client::Docs do
         title: "Book1"
       }).merge({_consistency: "all"})
 
-      assert_raises(Elastomer::Client::IllegalArgument) do
+      assert_raises(ElastomerClient::Client::IllegalArgument) do
         @docs.index(doc)
       end
 
@@ -184,7 +184,7 @@ describe Elastomer::Client::Docs do
         "title" => "Book1"
       }).merge({"_consistency": "all"})
 
-      assert_raises(Elastomer::Client::IllegalArgument) do
+      assert_raises(ElastomerClient::Client::IllegalArgument) do
         @docs.index(doc)
       end
     end
@@ -420,10 +420,10 @@ describe Elastomer::Client::Docs do
 
   it "generates QueryParsingError exceptions on bad input when searching" do
     query = {query: {query_string: {query: "OR should fail"}}}
-    assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query) }
+    assert_raises(ElastomerClient::Client::QueryParsingError) { @docs.search(query) }
 
     query = {query: {foo_is_not_valid: {}}}
-    assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query) }
+    assert_raises(ElastomerClient::Client::QueryParsingError) { @docs.search(query) }
   end
 
   it "counts documents" do
@@ -798,7 +798,7 @@ describe Elastomer::Client::Docs do
 
   # Create/index multiple documents.
   #
-  # docs - An instance of Elastomer::Client::Docs or Elastomer::Client::Bulk. If
+  # docs - An instance of ElastomerClient::Client::Docs or ElastomerClient::Client::Bulk. If
   #        nil uses the @docs instance variable.
   def populate!(docs = @docs)
     docs.index \

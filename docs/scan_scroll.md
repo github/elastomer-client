@@ -1,3 +1,3 @@
-# Elastomer Scan/Scroll Component
+# ElastomerClient Scan/Scroll Component
 
 ![constructocat](https://octodex.github.com/images/constructocat2.jpg)

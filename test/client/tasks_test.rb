@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Tasks do
+describe ElastomerClient::Client::Tasks do
   before do
     @tasks = $client.tasks
 
@@ -65,7 +65,7 @@ describe Elastomer::Client::Tasks do
         begin
           resp = @tasks.wait_by_id t["node"], t["id"], "3s"
           success = !resp.key?("node_failures")
-        rescue Elastomer::Client::ServerError => e
+        rescue ElastomerClient::Client::ServerError => e
           # this means the timeout expired before the task finished, but it's a good thing!
           success = /Timed out waiting for completion/ =~ e.message
         end

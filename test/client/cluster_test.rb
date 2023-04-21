@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Cluster do
+describe ElastomerClient::Client::Cluster do
 
   before do
     @name = "elastomer-cluster-test"

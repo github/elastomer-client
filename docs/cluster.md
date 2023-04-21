@@ -1,17 +1,17 @@
-# Elastomer Cluster Component
+# ElastomerClient Cluster Component
 
 The cluster component deals with commands for managing cluster state and
 monitoring cluster health. All the commands found under the
 [cluster API](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html)
 section of the Elasticsearch documentation are implemented by the
-[`cluster.rb`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/cluster.rb)
-module and the [`nodes.rb`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/nodes.rb)
+[`cluster.rb`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client/cluster.rb)
+module and the [`nodes.rb`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client/nodes.rb)
 module.
 
 ## Cluster
 
 API endpoints dealing with cluster level information and settings are found in
-the [`Cluster`](lib/elastomer/client/cluster.rb) class. Each of these methods
+the [`Cluster`](lib/elastomer_client/client/cluster.rb) class. Each of these methods
 corresponds to an API endpoint described in the Elasticsearch documentation
 (linked to above). The params listed in the documentation can be passed to these
 methods, so we do not take too much trouble to enumerate them all.
@@ -22,8 +22,8 @@ The cluster [health API](https://www.elastic.co/guide/en/elasticsearch/reference
 returns a very simple cluster health status report.
 
 ```ruby
-require 'elastomer/client'
-client = Elastomer::Client.new :port => 9200
+require 'elastomer_client/client'
+client = ElastomerClient::Client.new :port => 9200
 
 # the current health summary
 client.cluster.health
@@ -125,8 +125,8 @@ individual (or multiple) nodes in the cluster. We expose these via the `nodes`
 module in elastomer-client.
 
 ```ruby
-require 'elastomer/client'
-client = Elastomer::Client.new :port => 9200
+require 'elastomer_client/client'
+client = ElastomerClient::Client.new :port => 9200
 
 # gather OS, JVM, and process information from the local node
 client.nodes("_local").info(:info => %w[os jvm process])

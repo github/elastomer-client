@@ -549,7 +549,6 @@ describe ElastomerClient::Client::Docs do
   end
 
   it "supports bulk operations with the same parameters as docs" do
-    debugger
     response = @docs.bulk do |b|
       puts b
       populate!(b)

@@ -1,3 +1,6 @@
+## 5.0.1 (2023-04-26)
+- Fix bug in bulk API preventing string `_id` from being removed if empty
+- Remove `_type` from document body during bulk requests for versions ES 7+
 ## 5.0.0 (2023-04-17)
 - Rename Elastomer to ElastomerClient (and elastomer to elastomer_client)
 

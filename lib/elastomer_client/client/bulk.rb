@@ -322,6 +322,13 @@ module ElastomerClient
           params = from_document(document).merge(params)
         end
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
+        params.delete("_id") if params["_id"].nil? || params["_id"].to_s.empty?
+
+        if client.version_support.es_version_7_plus?
+          params.delete(:_type)
+          params.delete("_type")
+        end
+
         params
       end
 

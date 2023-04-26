@@ -35,8 +35,9 @@ describe ElastomerClient::Client::Docs do
   end
 
   it "raises error when writing same document twice" do
-    document = document_wrapper("book", {
+    document = ({
       _id: "documentid",
+      _type: "book",
       _op_type: "create",
       title: "Book by Author1",
       author: "Author1"
@@ -51,21 +52,23 @@ describe ElastomerClient::Client::Docs do
   end
 
   it "autogenerates IDs for documents" do
-    h = @docs.index \
-      document_wrapper("book", {
+    h = @docs.index(
+      {
         _id: nil,
         title: "Book1 by author 1",
-        author: "Author1"
+        author: "Author1",
+        _type: "book"
       })
 
     assert_created h
     assert_match %r/^\S{20,22}$/, h["_id"]
 
-    h = @docs.index \
-      document_wrapper("book", {
+    h = @docs.index(
+      {
         _id: nil,
         title: "Book2 by author 2",
-        author: "Author2"
+        author: "Author2",
+        _type: "book"
       })
 
     assert_created h
@@ -73,9 +76,10 @@ describe ElastomerClient::Client::Docs do
   end
 
   it "uses the provided document ID" do
-    h = @docs.index \
-      document_wrapper("book", {
+    h = @docs.index (
+      {
         _id: 42,
+        _type: "book",
         title: "Book1 by author 1",
         author: "Author1"
       })
@@ -85,16 +89,10 @@ describe ElastomerClient::Client::Docs do
   end
 
   it "accepts JSON encoded document strings" do
-    if $client.version_support.es_version_7_plus?
-      h = @docs.index \
-        '{"author":"Author1", "title":"Book1 by author 1"}',
-        id: 42
-    else
-      h = @docs.index \
-        '{"author":"Author1", "title":"Book1 by author 1"}',
-        id: 42,
-        type: "book"
-    end
+    h = @docs.index \
+      '{"author":"Author1", "title":"Book1 by author 1"}',
+      id: 42,
+      type: "book"
 
     assert_created h
     assert_equal "42", h["_id"]
@@ -116,8 +114,9 @@ describe ElastomerClient::Client::Docs do
     end
 
     it "indexes fields that are not recognized as indexing directives" do
-      doc = document_wrapper("book", {
+      doc = ({
         _id: "12",
+        _type: "book",
         title: "Book1",
         author: "Author1",
         _unknown_1: "unknown attribute 1",
@@ -141,12 +140,13 @@ describe ElastomerClient::Client::Docs do
     end
 
     it "extracts indexing directives from the document" do
-      doc = document_wrapper("book", {
+      doc = {
         _id: "12",
+        _type: "book",
         _routing: "author",
         title: "Book1",
         author: "Author1"
-      })
+      }
 
       h = @docs.index(doc)
 
@@ -169,20 +169,24 @@ describe ElastomerClient::Client::Docs do
 
     it "raises an exception when a known indexing directive from an unsupported version is used" do
       # Symbol keys
-      doc = document_wrapper("book", {
+      doc = ({
         _id: "12",
-        title: "Book1"
-      }).merge({_consistency: "all"})
+        _type: "book",
+        title: "Book1",
+       _consistency: "all"
+      })
 
       assert_raises(ElastomerClient::Client::IllegalArgument) do
         @docs.index(doc)
       end
 
       # String keys
-      doc = document_wrapper("book", {
+      doc = ({
         "_id" => "12",
-        "title" => "Book1"
-      }).merge({"_consistency": "all"})
+        "_type" => "book",
+        "title" => "Book1",
+        "_consistency" => "all"
+      })
 
       assert_raises(ElastomerClient::Client::IllegalArgument) do
         @docs.index(doc)
@@ -801,16 +805,16 @@ describe ElastomerClient::Client::Docs do
   # docs - An instance of ElastomerClient::Client::Docs or ElastomerClient::Client::Bulk. If
   #        nil uses the @docs instance variable.
   def populate!(docs = @docs)
-    docs.index \
-      document_wrapper("book", {
+    docs.index ({
         _id: 1,
+        _type: "book",
         title: "Book1 by author 1",
         author: "Author1"
       })
 
-    docs.index \
-      document_wrapper("book", {
+    docs.index ({
         _id: 2,
+        _type: "book",
         title: "Book2 by author 2",
         author: "Author2"
       })

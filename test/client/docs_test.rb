@@ -413,8 +413,6 @@ describe ElastomerClient::Client::Docs do
   end
 
   it "supports the shards search API" do
-    # We add the type param to all requests (type is _doc for ES 7)
-    # But the shards endpoint has to be used without the type param to return the shard data for ES 7
     h = @docs.search_shards(params={})
 
     assert h.key?("nodes"), "response contains \"nodes\" information"

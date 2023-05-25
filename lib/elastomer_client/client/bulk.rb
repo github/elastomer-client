@@ -327,6 +327,8 @@ module ElastomerClient
         if client.version_support.es_version_7_plus?
           params.delete(:_type)
           params.delete("_type")
+          params.delete(:_routing)
+          params.delete("_routing")
         end
 
         params

@@ -327,8 +327,6 @@ module ElastomerClient
         if client.version_support.es_version_7_plus?
           params.delete(:_type)
           params.delete("_type")
-          params.delete(:_routing)
-          params.delete("_routing")
         end
 
         params
@@ -345,7 +343,12 @@ module ElastomerClient
         opts = {}
 
         SPECIAL_KEYS.each do |key|
-          prefixed_key = "_#{key}"
+          omit_prefix = (
+            client.version_support.es_version_7_plus? &&
+            UNPREFIXED_SPECIAL_KEYS.include?(key)
+          )
+
+          prefixed_key = (omit_prefix ? "" : "_") + key
 
           if document.key?(prefixed_key)
             opts[prefixed_key.to_sym] = document.delete(prefixed_key)

@@ -348,14 +348,15 @@ module ElastomerClient
             UNPREFIXED_SPECIAL_KEYS.include?(key)
           )
 
-          prefixed_key = (omit_prefix ? "" : "_") + key
+          prefixed_key = "_" + key
+          converted_key = (omit_prefix ? "" : "_") + key
 
           if document.key?(prefixed_key)
-            opts[prefixed_key.to_sym] = document.delete(prefixed_key)
+            opts[converted_key.to_sym] = document.delete(prefixed_key)
           end
 
           if document.key?(prefixed_key.to_sym)
-            opts[prefixed_key.to_sym] = document.delete(prefixed_key.to_sym)
+            opts[converted_key.to_sym] = document.delete(prefixed_key.to_sym)
           end
         end
 

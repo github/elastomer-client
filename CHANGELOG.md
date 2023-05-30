@@ -1,3 +1,6 @@
+## 5.0.3 (2023-05-31)
+- Allow deprecated underscored parameters to work for Bulk API for versions ES 7+. 
+- Allow non-underscored parameters to work for Bulk API for version ES 5. 
 ## 5.0.2 (2023-05-31)
 - Add ES 8.7 REST API spec
 - Remove deprecated `type` parameter from `search_shards` API 

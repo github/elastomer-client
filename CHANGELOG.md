@@ -1,3 +1,6 @@
+## 5.0.2 (2023-05-31)
+- Add ES 8.7 REST API spec
+- Remove deprecated `type` parameter from `search_shards` API 
 ## 5.0.1 (2023-04-26)
 - Fix bug in bulk API preventing string `_id` from being removed if empty
 - Remove `_type` from document body during bulk requests for versions ES 7+

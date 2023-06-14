@@ -356,6 +356,34 @@ describe ElastomerClient::Client::Bulk do
     assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
   end
 
+  it "supports the routing parameter within documents with underscore" do
+    document = { _id: 1,  _type: "book", _routing: "custom", title: "Book 1" }
+
+    response = @index.bulk do |b|
+      b.index document
+    end
+
+    items = response["items"]
+
+    assert_kind_of Integer, response["took"]
+    assert_bulk_index(items[0])
+    assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
+  end
+
+  it "supports the routing parameter within documents without underscore" do
+    document = { _id: 1,  _type: "book", routing: "custom", title: "Book 1" }
+
+    response = @index.bulk do |b|
+      b.index document
+    end
+
+    items = response["items"]
+
+    assert_kind_of Integer, response["took"]
+    assert_bulk_index(items[0])
+    assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
+  end
+
   it "streams bulk responses" do
     ops = [
       [:index, document_wrapper("book", { title: "Book 1" }), { _id: 1, _index: @index.name }],

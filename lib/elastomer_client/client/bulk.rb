@@ -335,6 +335,8 @@ module ElastomerClient
       # Internal: Extract special keys for bulk indexing from the given
       # `document`. The keys and their values are returned as a Hash from this
       # method. If a value is `nil` then it will be ignored.
+      # This will cover all cases to properly convert parameters for ES5-ES8,
+      # whether or not the prefix should be underscored or not.
       #
       # document - The document Hash
       #
@@ -343,14 +345,28 @@ module ElastomerClient
         opts = {}
 
         SPECIAL_KEYS.each do |key|
-          prefixed_key = "_#{key}"
+          omit_prefix = (
+            client.version_support.es_version_7_plus? &&
+            UNPREFIXED_SPECIAL_KEYS.include?(key)
+          )
+
+          prefixed_key = "_" + key
+          converted_key = (omit_prefix ? "" : "_") + key
 
           if document.key?(prefixed_key)
-            opts[prefixed_key.to_sym] = document.delete(prefixed_key)
+            opts[converted_key.to_sym] = document.delete(prefixed_key)
           end
 
           if document.key?(prefixed_key.to_sym)
-            opts[prefixed_key.to_sym] = document.delete(prefixed_key.to_sym)
+            opts[converted_key.to_sym] = document.delete(prefixed_key.to_sym)
+          end
+
+          if document.key?(key)
+            opts[converted_key.to_sym] = document.delete(key)
+          end
+
+          if document.key?(key.to_sym)
+            opts[converted_key.to_sym] = document.delete(key.to_sym)
           end
         end
 

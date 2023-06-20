@@ -1,3 +1,5 @@
+## 5.0.4 (2023-06-20)
+- Remove support for `timestamp` and `ttl` index parameters
 ## 5.0.3 (2023-06-14)
 - Allow deprecated underscored parameters to work for Bulk API for versions ES 7+. 
 - Allow non-underscored parameters to work for Bulk API for version ES 5. 

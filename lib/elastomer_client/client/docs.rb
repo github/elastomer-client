@@ -55,8 +55,6 @@ module ElastomerClient
       #
       # Elasticsearch 2.X only:
       #
-      #   :_timestamp (deprecated)
-      #   :_ttl (deprecated)
       #   :_consistency
       #
       # Elasticsearch 5.x only:
@@ -564,7 +562,7 @@ module ElastomerClient
       end
 
       SPECIAL_KEYS= %i[
-        index type id version version_type op_type routing parent timestamp ttl
+        index type id version version_type op_type routing parent
         consistency replication refresh wait_for_active_shards
       ].inject({}) { |h, k| h[k] = "_#{k}"; h }.freeze
 

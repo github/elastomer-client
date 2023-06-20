@@ -311,7 +311,7 @@ module ElastomerClient
         @actions.clear
       end
 
-      SPECIAL_KEYS = %w[id type index version version_type routing parent timestamp ttl consistency refresh retry_on_conflict]
+      SPECIAL_KEYS = %w[id type index version version_type routing parent consistency refresh retry_on_conflict]
       UNPREFIXED_SPECIAL_KEYS = %w[parent retry_on_conflict routing version version_type]
 
       # Internal: convert special key parameters to their wire representation

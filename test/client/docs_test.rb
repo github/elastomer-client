@@ -281,7 +281,7 @@ describe ElastomerClient::Client::Docs do
     h = @docs.delete id: 1
 
     if $client.version_support.es_version_7_plus?
-      assert h["result"], "deleted"
+      assert_equal "deleted", h["result"], "expected document to be found"
     else
       assert h["found"], "expected document to be found"
     end
@@ -300,7 +300,11 @@ describe ElastomerClient::Client::Docs do
     @docs = @index.docs("book")
     h = @docs.delete id: 42
 
-    refute h["found"], "expected document to not be found"
+    if $client.version_support.es_version_7_plus?
+      refute_equal "deleted", h["result"], "expected document to not be found"
+    else
+      refute h["found"], "expected document to not be found"
+    end
   end
 
   it "deletes documents by query" do

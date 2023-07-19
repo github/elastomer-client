@@ -107,7 +107,7 @@ module ElastomerClient
     #   #   "failure" => 0
     #   # }
     #
-    #   # sample response item:
+    #   # sample response item for ES5:
     #   # {
     #   #   "delete": {
     #   #     "_index": "foo",
@@ -116,6 +116,17 @@ module ElastomerClient
     #   #     "_version": 3,
     #   #     "status": 200,
     #   #     "found": true
+    #   #   }
+    #   # }
+    #
+    #   # sample response item for ES8:
+    #   # {
+    #   #   "delete": {
+    #   #     "_index": "foo",
+    #   #     "_id": "42",
+    #   #     "_version": 3,
+    #   #     "status": 200,
+    #   #     "result": "deleted"
     #   #   }
     #   # }
     #

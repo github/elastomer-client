@@ -1,3 +1,8 @@
+## 5.0.5 (2023-08-08)
+- Replace usage of "found" field by "result" in tests for the delete API (#275)
+- Reduce the noise of the client during an inspect call by hiding connection info (#276)
+- Rename MiniTest to Minitest (#277)
+- 
 ## 5.0.4 (2023-06-20)
 - Remove support for `timestamp` and `ttl` index parameters
 ## 5.0.3 (2023-06-14)

@@ -1,14 +1,23 @@
+## 5.0.5 (2023-08-08)
+- Replace usage of "found" field by "result" in tests for the delete API (#275)
+- Reduce the noise of the client during an inspect call by hiding connection info (#276)
+- Rename MiniTest to Minitest (#277)
+
 ## 5.0.4 (2023-06-20)
 - Remove support for `timestamp` and `ttl` index parameters
+
 ## 5.0.3 (2023-06-14)
 - Allow deprecated underscored parameters to work for Bulk API for versions ES 7+. 
 - Allow non-underscored parameters to work for Bulk API for version ES 5. 
+
 ## 5.0.2 (2023-05-31)
 - Add ES 8.7 REST API spec
 - Remove deprecated `type` parameter from `search_shards` API 
+
 ## 5.0.1 (2023-04-26)
 - Fix bug in bulk API preventing string `_id` from being removed if empty
 - Remove `_type` from document body during bulk requests for versions ES 7+
+
 ## 5.0.0 (2023-04-17)
 - Rename Elastomer to ElastomerClient (and elastomer to elastomer_client)
 

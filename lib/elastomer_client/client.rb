@@ -14,7 +14,7 @@ module ElastomerClient
 
   class Client
     IVAR_BLACK_LIST = [:@basic_auth, :@token_auth]
-    IVAR_NOISY_LIST = [:@api_spec, :@cluster]
+    IVAR_NOISY_LIST = [:@api_spec, :@cluster, :@connection]
 
     MAX_REQUEST_SIZE = 2**20 * 250  # 250 MB
 

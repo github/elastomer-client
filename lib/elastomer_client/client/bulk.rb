@@ -366,17 +366,11 @@ module ElastomerClient
 
           if document.key?(prefixed_key)
             opts[converted_key.to_sym] = document.delete(prefixed_key)
-          end
-
-          if document.key?(prefixed_key.to_sym)
+          elsif document.key?(prefixed_key.to_sym)
             opts[converted_key.to_sym] = document.delete(prefixed_key.to_sym)
-          end
-
-          if document.key?(key)
+          elsif document.key?(key)
             opts[converted_key.to_sym] = document.delete(key)
-          end
-
-          if document.key?(key.to_sym)
+          elsif document.key?(key.to_sym)
             opts[converted_key.to_sym] = document.delete(key.to_sym)
           end
         end

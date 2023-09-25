@@ -77,7 +77,7 @@ class RestApiSpecGenerator
   end
 
   def generate_documentation(data)
-    if @version_support.es_version_7_plus?
+    if @version_support.es_version_8_plus?
       data["documentation"]["url"].to_s
     else
       data["documentation"].to_s
@@ -85,7 +85,7 @@ class RestApiSpecGenerator
   end
 
   def generate_methods(data)
-    if @version_support.es_version_7_plus?
+    if @version_support.es_version_8_plus?
       data["url"]["paths"].map { |h| h["methods"] }.flatten.uniq
     else
       Array(data["methods"]).to_s
@@ -93,7 +93,7 @@ class RestApiSpecGenerator
   end
 
   def generate_path(url)
-    if @version_support.es_version_7_plus?
+    if @version_support.es_version_8_plus?
       url["paths"].map { |h| h["path"] }.flatten.uniq.first
     else
       url["path"]
@@ -101,7 +101,7 @@ class RestApiSpecGenerator
   end
 
   def generate_paths(url)
-    if @version_support.es_version_7_plus?
+    if @version_support.es_version_8_plus?
       url["paths"].map { |h| h["path"] }.flatten.uniq
     else
       Array(url["paths"]).to_s
@@ -109,7 +109,7 @@ class RestApiSpecGenerator
   end
 
   def generate_parts(url)
-    if @version_support.es_version_7_plus?
+    if @version_support.es_version_8_plus?
       url["paths"].map { |h| h["parts"] }.compact.reduce({}, :merge)
     else
       url["parts"]
@@ -117,7 +117,7 @@ class RestApiSpecGenerator
   end
 
   def generate_params(data)
-    if @version_support.es_version_7_plus?
+    if @version_support.es_version_8_plus?
       data["params"]
     else
       data["url"]["params"]

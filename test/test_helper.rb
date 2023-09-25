@@ -205,7 +205,7 @@ end
 # COMPATIBILITY
 # ES 7 drops mapping types, so don't wrap with a mapping type for ES 7+
 def mappings_wrapper(type, body, disable_all = false)
-  if $client.version_support.es_version_7_plus?
+  if $client.version_support.es_version_8_plus?
     body
   else
     mapping = {
@@ -222,7 +222,7 @@ end
 # COMPATIBILITY
 # ES 7 drops mapping types, so append type to the document only if ES version < 7
 def document_wrapper(type, body)
-  if $client.version_support.es_version_7_plus?
+  if $client.version_support.es_version_8_plus?
     body
   else
     body.merge({_type: type})

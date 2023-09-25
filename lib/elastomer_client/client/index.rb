@@ -348,7 +348,7 @@ module ElastomerClient
       #
       # Returns a Docs instance.
       def docs(type = nil)
-        type = "_doc" if client.version_support.es_version_7_plus?
+        type = "_doc" if client.version_support.es_version_8_plus?
         client.docs name, type
       end
 
@@ -557,7 +557,7 @@ module ElastomerClient
       def update_params(params, overrides = nil)
         h = defaults.update params
         h.update overrides unless overrides.nil?
-        h.delete(:type) if client.version_support.es_version_7_plus?
+        h.delete(:type) if client.version_support.es_version_8_plus?
         h
       end
 

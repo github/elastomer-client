@@ -173,7 +173,7 @@ describe ElastomerClient::Client::Bulk do
     ary = []
     # since es7 does not include the mapping type in the document, it has less characters per request
     # add characters to the document to get 100 characters per request
-    book_title = $client.version_support.es_version_7_plus? ? "A"*52 : "A"*34
+    book_title = $client.version_support.es_version_8_plus? ? "A"*52 : "A"*34
     ary << @index.bulk(request_size: 300) do |b|
       2.times { |num|
         document = { author: "Author 1", title: book_title}
@@ -202,7 +202,7 @@ describe ElastomerClient::Client::Bulk do
     @index.refresh
     h = @index.docs.search q: "*:*", size: 0
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 10, h["hits"]["total"]["value"]
     else
       assert_equal 10, h["hits"]["total"]
@@ -239,7 +239,7 @@ describe ElastomerClient::Client::Bulk do
     @index.refresh
     h = @index.docs.search q: "*:*", size: 0
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 10, h["hits"]["total"]["value"]
     else
       assert_equal 10, h["hits"]["total"]
@@ -251,7 +251,7 @@ describe ElastomerClient::Client::Bulk do
     index  = client.index(@name)
 
     ary = []
-    book_title = $client.version_support.es_version_7_plus? ? "A"*52 : "A"*34
+    book_title = $client.version_support.es_version_8_plus? ? "A"*52 : "A"*34
     ary << index.bulk(request_size: 300) do |b|
       2.times { |num|
         document = {author: "Author 1", title: book_title}
@@ -272,7 +272,7 @@ describe ElastomerClient::Client::Bulk do
     index.refresh
     h = index.docs.search q: "*:*", size: 0
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, h["hits"]["total"]["value"]
     else
       assert_equal 2, h["hits"]["total"]
@@ -342,7 +342,7 @@ describe ElastomerClient::Client::Bulk do
     document = { title: "Book 1" }
 
     params = { _id: 1, _type: "book" }
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       params[:routing] = "custom"
     else
       params[:_routing] = "custom"

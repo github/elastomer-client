@@ -356,6 +356,8 @@ module ElastomerClient
         opts = {}
 
         SPECIAL_KEYS.each do |key|
+          next if key == "type" && client.version_support.es_version_7_plus?
+
           omit_prefix = (
             client.version_support.es_version_7_plus? &&
             UNPREFIXED_SPECIAL_KEYS.include?(key)

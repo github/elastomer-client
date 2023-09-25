@@ -5,7 +5,7 @@ module ElastomerClient
 
     attr_reader :version
 
-    # version - an Elasticsearch version string e.g., 5.6.6 or 7.17.8
+    # version - an Elasticsearch version string e.g., 5.6.6 or 8.7.0
     #
     # Raises ArgumentError if version is unsupported.
     def initialize(version)
@@ -14,11 +14,6 @@ module ElastomerClient
       end
 
       @version = version
-    end
-
-    # Returns true if Elasticsearch version is 7.x or higher.
-    def es_version_7_plus?
-      version >= "7.0.0"
     end
 
     # Returns true if Elasticsearch version is 8.x or higher.

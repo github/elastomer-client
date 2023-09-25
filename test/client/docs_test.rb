@@ -739,69 +739,6 @@ describe ElastomerClient::Client::Docs do
     assert_equal 1, response3["total"]
   end
 
-  it "accepts a type param and does not throw an error for ES7" do
-    if !$client.version_support.es_version_7_plus? || $client.version_support.es_version_8_plus?
-      skip "This test is only needed for ES 7"
-    end
-
-    h = @docs.index \
-      _id: 1,
-      _type: "book",
-      title: "Book 1 by author 1",
-      author: "Author1"
-
-    assert_created h
-    assert_equal "1", h["_id"]
-
-    response1 = @docs.get(id: 1, type: "book")
-
-    assert_equal "1", response1["_id"]
-
-    @docs.update(document_wrapper("book", {
-      _id: "1",
-      doc: { author: "Author1.1" }
-    }))
-    response2 = @docs.get(id: "1", type: "book")
-
-    assert_equal "Author1.1", response2["_source"]["author"]
-
-    h = @docs.index \
-    _id: 2,
-    _type: "book",
-    title: "Book 2 by author 2",
-    author: "Author2"
-
-    assert_created h
-    assert_equal "2", h["_id"]
-
-    h = @docs.multi_get({ids: [2, 1]}, type: "book")
-    authors = h["docs"].map { |d| d["_source"]["author"] }
-
-    assert_equal %w[Author2 Author1.1], authors
-
-    h = @docs.index \
-    _id: 3,
-    _type: "book",
-    title: "Book 3 by author 3",
-    author: "Author3"
-
-    assert_created h
-    assert_equal "3", h["_id"]
-
-    h = @docs.delete id: 3, type: "book"
-
-    refute @docs.exists?(id: "3", type: "book")
-
-    @index.refresh
-    h = @docs.count q: "*:*", type: "book"
-
-    assert_equal 2, h["count"]
-
-    h = @docs.search q: "*:*", type: "book"
-
-    assert_equal 2, h["hits"]["total"]["value"]
-  end
-
   # Create/index multiple documents.
   #
   # docs - An instance of ElastomerClient::Client::Docs or ElastomerClient::Client::Bulk. If

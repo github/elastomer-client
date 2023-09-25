@@ -171,7 +171,7 @@ describe ElastomerClient::Client::Bulk do
 
   it "executes a bulk API call when a request size is reached" do
     ary = []
-    # since es7 does not include the mapping type in the document, it has less characters per request
+    # since ES8 does not include the mapping type in the document, it has less characters per request
     # add characters to the document to get 100 characters per request
     book_title = $client.version_support.es_version_8_plus? ? "A"*52 : "A"*34
     ary << @index.bulk(request_size: 300) do |b|

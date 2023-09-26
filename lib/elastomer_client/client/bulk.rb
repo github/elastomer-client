@@ -356,6 +356,8 @@ module ElastomerClient
         opts = {}
 
         SPECIAL_KEYS.each do |key|
+          next if key == "type" && client.version_support.es_version_8_plus?
+
           omit_prefix = (
             client.version_support.es_version_7_plus? &&
             UNPREFIXED_SPECIAL_KEYS.include?(key)
@@ -397,20 +399,29 @@ module ElastomerClient
       def convert_special_keys(params)
         new_params = params.dup
 
-        SPECIAL_KEYS.each do |original_key|
+        SPECIAL_KEYS.each do |key|
           omit_prefix = (
             client.version_support.es_version_7_plus? &&
-            UNPREFIXED_SPECIAL_KEYS.include?(original_key)
+            UNPREFIXED_SPECIAL_KEYS.include?(key)
           )
 
-          converted_key = (omit_prefix ? "" : "_") + original_key
+          prefixed_key = "_" + key
+          converted_key = (omit_prefix ? "" : "_") + key
 
-          if new_params.key?(original_key)
-            new_params[converted_key] = new_params.delete(original_key)
+          if new_params.key?(prefixed_key)
+            new_params[converted_key] = new_params.delete(prefixed_key)
           end
 
-          if new_params.key?(original_key.to_sym)
-            new_params[converted_key.to_sym] = new_params.delete(original_key.to_sym)
+          if new_params.key?(prefixed_key.to_sym)
+            new_params[converted_key.to_sym] = new_params.delete(prefixed_key.to_sym)
+          end
+
+          if new_params.key?(key)
+            new_params[converted_key] = new_params.delete(key)
+          end
+
+          if new_params.key?(key.to_sym)
+            new_params[converted_key.to_sym] = new_params.delete(key.to_sym)
           end
         end
 

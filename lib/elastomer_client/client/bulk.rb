@@ -356,8 +356,6 @@ module ElastomerClient
         opts = {}
 
         SPECIAL_KEYS.each do |key|
-          next if key == "type" && client.version_support.es_version_8_plus?
-
           omit_prefix = (
             client.version_support.es_version_7_plus? &&
             UNPREFIXED_SPECIAL_KEYS.include?(key)
@@ -373,6 +371,8 @@ module ElastomerClient
           if document.key?(prefixed_key.to_sym)
             opts[converted_key.to_sym] = document.delete(prefixed_key.to_sym)
           end
+
+          next if key == "type" && client.version_support.es_version_8_plus?
 
           if document.key?(key)
             opts[converted_key.to_sym] = document.delete(key)

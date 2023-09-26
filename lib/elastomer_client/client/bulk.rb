@@ -374,12 +374,14 @@ module ElastomerClient
 
           next if key == "type" && client.version_support.es_version_8_plus?
 
-          if document.key?(key)
-            opts[converted_key.to_sym] = document.delete(key)
-          end
+          if client.version_support.es_version_8_plus?
+            if document.key?(key)
+              opts[converted_key.to_sym] = document.delete(key)
+            end
 
-          if document.key?(key.to_sym)
-            opts[converted_key.to_sym] = document.delete(key.to_sym)
+            if document.key?(key.to_sym)
+              opts[converted_key.to_sym] = document.delete(key.to_sym)
+            end
           end
         end
 

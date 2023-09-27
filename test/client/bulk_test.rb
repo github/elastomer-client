@@ -356,25 +356,18 @@ describe ElastomerClient::Client::Bulk do
     assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
   end
 
-  it "supports the routing parameter within documents with underscore" do
-    document = { _id: 1,  _type: "book", _routing: "custom", title: "Book 1" }
+  it "supports the routing parameter within params in ES5 and ES8" do
+    document = { _type: "book", title: "Book 1" }
 
-    response = @index.bulk do |b|
-      b.index document
+    params = { _id: 1}
+    if $client.version_support.es_version_7_plus?
+      params[:routing] = "custom"
+    else
+      params[:_routing] = "custom"
     end
 
-    items = response["items"]
-
-    assert_kind_of Integer, response["took"]
-    assert_bulk_index(items[0])
-    assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
-  end
-
-  it "supports the routing parameter within documents without underscore" do
-    document = { _id: 1,  _type: "book", routing: "custom", title: "Book 1" }
-
     response = @index.bulk do |b|
-      b.index document
+      b.index document, params
     end
 
     items = response["items"]

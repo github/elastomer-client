@@ -552,7 +552,7 @@ describe ElastomerClient::Client::Docs do
 
   it "supports bulk operations with the same parameters as docs" do
     response = @docs.bulk do |b|
-      populate!(b)
+      populate_with_params!(b)
     end
 
     assert_kind_of Integer, response["took"]
@@ -820,6 +820,20 @@ describe ElastomerClient::Client::Docs do
         title: "Book2 by author 2",
         author: "Author2"
       })
+
+    @index.refresh
+  end
+
+  def populate_with_params!(docs = @docs)
+    docs.index({
+        title: "Book1 by author 1",
+        author: "Author1"
+      }, { _id: 1, _type: "book" })
+
+    docs.index({
+        title: "Book2 by author 2",
+        author: "Author2"
+      }, { _id: 2, _type: "book" })
 
     @index.refresh
   end

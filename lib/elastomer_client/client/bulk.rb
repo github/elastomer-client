@@ -329,7 +329,7 @@ module ElastomerClient
       # and apply any override document parameters.
       def prepare_params(document, params)
         params = convert_special_keys(params)
-        
+
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
         params.delete("_id") if params["_id"].nil? || params["_id"].to_s.empty?
 

@@ -1,3 +1,6 @@
+## 5.1.0 (2023-09-29)
+- Remove logic extracting parameters from document in bulk requests. Parameters now must be sent separately from the document to be parsed correctly.
+
 ## 5.0.5 (2023-08-08)
 - Replace usage of "found" field by "result" in tests for the delete API (#275)
 - Reduce the noise of the client during an inspect call by hiding connection info (#276)

@@ -78,8 +78,8 @@ describe ElastomerClient::Client::Bulk do
 
   it "supports a nice block syntax" do
     h = @index.bulk do |b|
-      b.index ({_id: 1, _type: "book", author: "Author 1", title: "Book 1"})
-      b.index ({_id: nil, _type: "book", author: "Author 2", title: "Book 2"})
+      b.index({ author: "Author 1", title: "Book 1" }, { _id: 1, _type: "book" })
+      b.index({ author: "Author 2", title: "Book 2" }, { _id: nil, _type: "book" })
     end
     items = h["items"]
 
@@ -104,7 +104,7 @@ describe ElastomerClient::Client::Bulk do
     assert_equal "Author 2", h["_source"]["author"]
 
     h = @index.bulk do |b|
-      b.index  ({_id: "", _type: "book", author: "Author 3", title: "Book 3"})
+      b.index({ author: "Author 3", title: "Book 3" }, _id: "", _type: "book")
       b.delete ({_id: book_id, _type: "book"})
     end
     items = h["items"]
@@ -176,23 +176,23 @@ describe ElastomerClient::Client::Bulk do
     book_title = $client.version_support.es_version_7_plus? ? "A"*52 : "A"*34
     ary << @index.bulk(request_size: 300) do |b|
       2.times { |num|
-        document = {_id: num, _type: "book", author: "Author 1", title: book_title}
-        ary << b.index(document)
+        document = { author: "Author 1", title: book_title}
+        ary << b.index(document, { _id: num, _type: "book" })
       }
       ary.compact!
 
       assert_equal 0, ary.length
 
       7.times { |num|
-        document = {_id: num+2,  _type: "book", author: "Author 1", title: book_title}
-        ary << b.index(document)
+        document = { author: "Author 1", title: book_title }
+        ary << b.index(document, { _id: num+2,  _type: "book" })
       }
       ary.compact!
 
       assert_equal 4, ary.length
 
-      document = {_id: 10,  _type: "book", author: "Author 1", title: book_title}
-      ary << b.index(document)
+      document = {author: "Author 1", title: book_title}
+      ary << b.index(document, {_id: 10,  _type: "book"})
     end
     ary.compact!
 
@@ -213,23 +213,23 @@ describe ElastomerClient::Client::Bulk do
     ary = []
     ary << @index.bulk(action_count: 3) do |b|
       2.times { |num|
-        document = {_id: num,  _type: "book", author: "Author 1", title: "This is book number #{num}"}
-        ary << b.index(document)
+        document = {author: "Author 1", title: "This is book number #{num}"}
+        ary << b.index(document, {_id: num,  _type: "book"})
       }
       ary.compact!
 
       assert_equal 0, ary.length
 
       7.times { |num|
-        document = {_id: num+2, _type: "book", author: "Author 1", title: "This is book number #{num+2}"}
-        ary << b.index(document)
+        document = {author: "Author 1", title: "This is book number #{num+2}"}
+        ary << b.index(document, {_id: num+2, _type: "book"})
       }
       ary.compact!
 
       assert_equal 2, ary.length
 
-      document = {_id: 10,  _type: "book", author: "Author 1", title: "This is book number 10"}
-      ary << b.index(document)
+      document = {author: "Author 1", title: "This is book number 10"}
+      ary << b.index(document, {_id: 10,  _type: "book"})
     end
     ary.compact!
 
@@ -246,7 +246,7 @@ describe ElastomerClient::Client::Bulk do
     end
   end
 
-  it "rejects documents that excceed the maximum request size" do
+  it "rejects documents that exceed the maximum request size" do
     client = ElastomerClient::Client.new(**$client_params.merge(max_request_size: 300))
     index  = client.index(@name)
 
@@ -254,15 +254,15 @@ describe ElastomerClient::Client::Bulk do
     book_title = $client.version_support.es_version_7_plus? ? "A"*52 : "A"*34
     ary << index.bulk(request_size: 300) do |b|
       2.times { |num|
-        document = document_wrapper("book", {_id: num, author: "Author 1", title: book_title})
-        ary << b.index(document)
+        document = {author: "Author 1", title: book_title}
+        ary << b.index(document, document_wrapper("book", { _id: num }))
       }
       ary.compact!
 
       assert_equal 0, ary.length
 
-      document = document_wrapper("book", {_id: 342, author: "Author 1", message: "A"*290})
-      assert_raises(ElastomerClient::Client::RequestSizeError) { b.index(document) }
+      document = { author: "Author 1", message: "A"*290 }
+      assert_raises(ElastomerClient::Client::RequestSizeError) { b.index(document, document_wrapper("book", { _id: 342 })) }
     end
     ary.compact!
 
@@ -324,57 +324,32 @@ describe ElastomerClient::Client::Bulk do
     assert_equal "Book 2", @index.docs("book").get(id: id2)["_source"]["title"]
   end
 
-  it "doesn't override parameters with properties from the document" do
-    document = { _id: 1,  _type: "book", author: "Author 1", title: "Book 1" }
-    params = { id: 2 }
+  it "supports the routing parameter on index actions" do
+    document = { title: "Book 1" }
+
+    response = @index.bulk do |b|
+      b.index document, { routing: "custom", _id: 1,  _type: "book" }
+    end
+
+    items = response["items"]
+
+    assert_kind_of Integer, response["took"]
+    assert_bulk_index(items[0])
+    assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
+  end
+
+  it "supports the routing parameter within params in ES5 and ES8" do
+    document = { title: "Book 1" }
+
+    params = { _id: 1, _type: "book" }
+    if $client.version_support.es_version_7_plus?
+      params[:routing] = "custom"
+    else
+      params[:_routing] = "custom"
+    end
 
     response = @index.bulk do |b|
       b.index document, params
-    end
-
-    assert_kind_of Integer, response["took"]
-
-    items = response["items"]
-
-    assert_bulk_index(items[0])
-
-    refute_found @index.docs("book").get(id: 1)
-    assert_equal "Book 1", @index.docs("book").get(id: 2)["_source"]["title"]
-  end
-
-  it "supports the routing parameter on index actions" do
-    document = { _id: 1,  _type: "book", title: "Book 1" }
-
-    response = @index.bulk do |b|
-      b.index document, { routing: "custom" }
-    end
-
-    items = response["items"]
-
-    assert_kind_of Integer, response["took"]
-    assert_bulk_index(items[0])
-    assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
-  end
-
-  it "supports the routing parameter within documents with underscore" do
-    document = { _id: 1,  _type: "book", _routing: "custom", title: "Book 1" }
-
-    response = @index.bulk do |b|
-      b.index document
-    end
-
-    items = response["items"]
-
-    assert_kind_of Integer, response["took"]
-    assert_bulk_index(items[0])
-    assert_equal "custom", @index.docs("book").get(id: 1)["_routing"]
-  end
-
-  it "supports the routing parameter within documents without underscore" do
-    document = { _id: 1,  _type: "book", routing: "custom", title: "Book 1" }
-
-    response = @index.bulk do |b|
-      b.index document
     end
 
     items = response["items"]
@@ -386,9 +361,9 @@ describe ElastomerClient::Client::Bulk do
 
   it "streams bulk responses" do
     ops = [
-      [:index, document_wrapper("book", { title: "Book 1" }), { _id: 1, _index: @index.name }],
-      [:index, document_wrapper("book", { title: "Book 2" }), { _id: 2, _index: @index.name }],
-      [:index, document_wrapper("book", { title: "Book 3" }), { _id: 3, _index: @index.name }]
+      [:index, { title: "Book 1" }, document_wrapper("book", { _id: 1, _index: @index.name })],
+      [:index, { title: "Book 2" }, document_wrapper("book", { _id: 2, _index: @index.name })],
+      [:index, { title: "Book 3" }, document_wrapper("book", { _id: 3, _index: @index.name })],
     ]
     responses = $client.bulk_stream_responses(ops, { action_count: 2 }).to_a
 
@@ -400,9 +375,9 @@ describe ElastomerClient::Client::Bulk do
 
   it "streams bulk items" do
     ops = [
-      [:index, document_wrapper("book", { title: "Book 1" }), { _id: 1, _index: @index.name }],
-      [:index, document_wrapper("book", { title: "Book 2" }), { _id: 2, _index: @index.name }],
-      [:index, document_wrapper("book", { title: "Book 3" }), { _id: 3, _index: @index.name }]
+      [:index, { title: "Book 1" }, document_wrapper("book", { _id: 1, _index: @index.name })],
+      [:index, { title: "Book 2" }, document_wrapper("book", { _id: 2, _index: @index.name })],
+      [:index, { title: "Book 3" }, document_wrapper("book", { _id: 3, _index: @index.name })],
     ]
     items = []
     $client.bulk_stream_items(ops, { action_count: 2 }) { |item| items << item }

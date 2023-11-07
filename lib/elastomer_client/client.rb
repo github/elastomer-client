@@ -157,7 +157,7 @@ module ElastomerClient
         end
 
         @connection_block&.call(conn)
-        
+
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)
         else

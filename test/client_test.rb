@@ -11,6 +11,18 @@ describe ElastomerClient::Client do
     assert_includes c.connection.builder.handlers, Faraday::Adapter::Test
   end
 
+  it "allows configuring the Faraday when a block is given" do
+    assert ElastomerClient::Client.new.connection.builder.handlers.none? { |handler| handler.klass == FaradayMiddleware::Instrumentation }
+
+    c = ElastomerClient::Client.new do |connection|
+      assert_kind_of(Faraday::Connection, connection)
+
+      connection.use :instrumentation
+    end
+
+    assert c.connection.builder.handlers.any? { |handler| handler.klass == FaradayMiddleware::Instrumentation }
+  end
+
   it "use Faraday's default adapter if none is specified" do
     c = ElastomerClient::Client.new
     adapter = Faraday::Adapter.lookup_middleware(Faraday.default_adapter)

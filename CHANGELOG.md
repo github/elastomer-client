@@ -1,3 +1,6 @@
+## 5.2.0 (2023-11-07)
+- Allow passing a Faraday connection configuration block to the client.
+
 ## 5.1.0 (2023-09-29)
 - Remove logic extracting parameters from document in bulk requests. Parameters now must be sent separately from the document to be parsed correctly.
 

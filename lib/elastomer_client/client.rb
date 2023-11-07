@@ -49,7 +49,7 @@ module ElastomerClient
                    read_timeout: 5, open_timeout: 2, max_retries: 0, retry_delay: 0.075,
                    opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE,
                    strict_params: false, es_version: nil, compress_body: false, compression: Zlib::DEFAULT_COMPRESSION,
-                   basic_auth: nil, token_auth: nil)
+                   basic_auth: nil, token_auth: nil, &block)
 
       @url = url || "http://#{host}:#{port}"
 
@@ -70,6 +70,7 @@ module ElastomerClient
       @compression      = compression
       @basic_auth       = basic_auth
       @token_auth       = token_auth
+      @connection_block = block
     end
 
     attr_reader :host, :port, :url
@@ -154,6 +155,8 @@ module ElastomerClient
         elsif basic_auth?
           conn.basic_auth(@basic_auth[:username], @basic_auth[:password])
         end
+
+        @connection_block&.call(conn)
 
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)

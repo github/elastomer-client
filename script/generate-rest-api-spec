@@ -12,9 +12,9 @@
 require "erb"
 require "rubygems"
 require "bundler/setup"
+require "json"
 
 $LOAD_PATH.unshift "lib"
-require "elastomer_client/client"
 require "elastomer_client/version_support"
 
 class RestApiSpecGenerator
@@ -36,9 +36,8 @@ class RestApiSpecGenerator
   # elasticsearch version.
   def run
     setup
-    File.open(ruby_spec_filename, "w") do |fd|
-      fd.puts ERB.new(DATA.read, trim_mode: "-").result(binding)
-    end
+    ruby = ERB.new(DATA.read, trim_mode: "-").result(binding)
+    File.write(ruby_spec_filename, ruby)
   ensure
     reset
   end
@@ -59,7 +58,7 @@ class RestApiSpecGenerator
     Dir.glob("#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/*.json").sort.each do |filename|
       next if filename =~ /\/_common\.json\Z/
 
-      hash = MultiJson.load(File.read(filename))
+      hash = JSON.parse(File.read(filename))
       key = hash.keys.first
       value = hash.values.first
       yield(key, value)
@@ -71,7 +70,7 @@ class RestApiSpecGenerator
   def each_common
     filename = "#{WORKING_DIR}/rest-api-spec/src/main/resources/rest-api-spec/api/_common.json"
     if File.exist? filename
-      hash = MultiJson.load(File.read(filename))
+      hash = JSON.parse(File.read(filename))
       hash["params"].each { |k, v| yield(k, v) }
     end
   end

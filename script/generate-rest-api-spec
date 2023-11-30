@@ -159,6 +159,7 @@ end
 puts RestApiSpecGenerator.new(*ARGV).run
 
 __END__
+# frozen_string_literal: true
 # Generated REST API spec file - DO NOT EDIT!
 # Date: <%= Time.now.strftime("%Y-%m-%d") %>
 # ES version: <%= version %>

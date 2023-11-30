@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Generated REST API spec file - DO NOT EDIT!
 # Date: 2023-05-30
 # ES version: 8.7

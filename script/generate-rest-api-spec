@@ -178,29 +178,29 @@ module ElastomerClient::Client::RestApiSpec
             path: "<%= generate_path(url) %>",
             paths: <%= generate_paths(url) %>,
 <% if (parts = generate_parts(url)) && !parts.empty? -%>
-            parts: {
+            parts: [
 <% parts.each do |k,v| -%>
-              "<%= k %>" => <%= v.to_s %>,
+              "<%= k %>",
 <% end -%>
-            },
+            ],
 <% end -%>
 <% params = generate_params(data) -%>
 <% if !params.nil? && !params.empty? -%>
-            params: {
+            params: [
 <% params.each do |k,v| -%>
-              "<%= k %>" => <%= v.to_s %>,
+              "<%= k %>",
 <% end -%>
-            }
+            ]
 <% end -%>
           }
         ),
 <% end -%>
       }
-      @common_params = {
+      @common_params = [
 <% each_common do |k,v| -%>
-        "<%= k %>" => <%= v.to_s %>,
+        "<%= k %>",
 <% end -%>
-      }
+      ]
       super
     end
   end

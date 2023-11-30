@@ -31,11 +31,11 @@ module ElastomerClient::Client::RestApiSpec
       attr_reader :parts_keys
       attr_reader :params_keys
 
-      def initialize(path:, paths: [], parts: {}, params: {})
+      def initialize(path:, paths: [], parts: [], params: [])
         @path = path
         @paths = Array(paths)
-        @parts_keys = parts.keys
-        @params_keys = params.keys
+        @parts_keys = parts
+        @params_keys = params
 
         @parts_set  = Set.new(@parts_keys)
         @params_set = Set.new(@params_keys)

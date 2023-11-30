@@ -88,11 +88,11 @@ describe ElastomerClient::Client::RestApiSpec::RestApi do
     end
 
     it "accesses the path parts" do
-      assert_equal %w[index metric], @rest_api.url.parts.keys
+      assert_equal %w[index metric], @rest_api.url.parts_keys
     end
 
     it "accesses the request params" do
-      assert_equal %w[local master_timeout flat_settings ignore_unavailable allow_no_indices expand_wildcards], @rest_api.url.params.keys
+      assert_equal %w[local master_timeout flat_settings ignore_unavailable allow_no_indices expand_wildcards], @rest_api.url.params_keys
     end
   end
 end

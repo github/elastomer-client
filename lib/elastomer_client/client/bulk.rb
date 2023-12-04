@@ -280,9 +280,9 @@ module ElastomerClient
       # params   - Parameters for the update action (as a Hash) (optional)
       #
       # Examples
-      #   update({"doc" => {"foo" => "bar"}}, {:_id => 1}
-      #   update({"doc" => {"foo" => "bar"}}, {:id => 1}
-      #   update({"doc" => {foo" => "bar"}}, "_id" => 1)
+      #   update({"doc" => {"foo" => "bar"}}, {:_id => 1})
+      #   update({"doc" => {"foo" => "bar"}}, {:id => 1})
+      #   update({"doc" => {"foo" => "bar"}}, "_id" => 1)
       #
       # Returns the response from the bulk call if one was made or nil.
       def update(document, params)

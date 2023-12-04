@@ -138,6 +138,18 @@ module ElastomerClient
     #
     # Returns a Faraday::Connection
     def connection
+      retry_options = {
+        max: 2,
+        interval: 0.05,
+        interval_randomness: 0.5,
+        backoff_factor: 2,
+        methods: RETRYABLE_METHODS,
+        exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [ElastomerClient::Client::ServerError, ElastomerClient::Client::TimeoutError, ElastomerClient::Client::ConnectionFailed, ElastomerClient::Client::RejectedExecutionError, Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::RetriableResponse],
+        retry_block: proc { |env, options, retries, exc|
+          @retries = retries
+        }
+      }
+
       @connection ||= Faraday.new(url) do |conn|
         conn.response(:parse_json)
         # Request compressed responses from ES and decompress them
@@ -146,6 +158,7 @@ module ElastomerClient
         conn.request(:opaque_id) if @opaque_id
         conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
         conn.request(:elastomer_compress, compression: compression) if compress_body
+        conn.request(:retry, retry_options)
 
         conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout
@@ -283,11 +296,6 @@ module ElastomerClient
         # wrap Faraday errors with appropriate ElastomerClient::Client error classes
         rescue Faraday::Error::ClientError => boom
           error = wrap_faraday_error(boom, method, path)
-          if error.retry? && RETRYABLE_METHODS.include?(method) && (retries += 1) <= request_max_retries
-            params[:retries] = retries
-            sleep retry_delay
-            retry
-          end
           raise error
         rescue OpaqueIdError => boom
           reset!

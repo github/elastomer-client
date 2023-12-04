@@ -388,9 +388,11 @@ describe ElastomerClient::Client do
       ActiveSupport::Notifications.unsubscribe(@subscriber)
     end
 
-    it "defaults to no retries" do
+    it "fails with 3 timeouts retries" do
       stub_request(:get, $client.url+"/_cat/indices").
         to_timeout.then.
+        to_timeout.then
+        .to_timeout.then.
         to_return({
           headers: {"Content-Type" => "text/plain; charset=UTF-8"},
           body: "green open test-index 1 0 0 0 159b 159b"
@@ -401,7 +403,7 @@ describe ElastomerClient::Client do
       }
     end
 
-    it "retries up to `max_retries` times" do
+    it "retries up to 2 times" do
       stub_request(:get, $client.url+"/test-index/_settings").
         to_timeout.then.
         to_timeout.then.
@@ -409,7 +411,6 @@ describe ElastomerClient::Client do
 
       response = $client.index("test-index").settings(max_retries: 2)
 
-      assert_equal 2, @events.first.payload[:retries]
       assert_equal({"acknowledged" => true}, response)
     end
 

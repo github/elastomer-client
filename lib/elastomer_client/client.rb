@@ -138,17 +138,14 @@ module ElastomerClient
     #
     # Returns a Faraday::Connection
     def connection
-      retry_options = {
-        max: 2,
-        interval: 0.05,
-        interval_randomness: 0.5,
-        backoff_factor: 2,
-        methods: RETRYABLE_METHODS,
-        exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [ElastomerClient::Client::ServerError, ElastomerClient::Client::TimeoutError, ElastomerClient::Client::ConnectionFailed, ElastomerClient::Client::RejectedExecutionError, Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::RetriableResponse],
-        retry_block: proc { |env, options, retries, exc|
-          @retries = retries
-        }
-      }
+      # retry_options = {
+      #   max: 2,
+      #   interval: 0.05,
+      #   interval_randomness: 0.5,
+      #   backoff_factor: 2,
+      #   methods: RETRYABLE_METHODS,
+      #   exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [ElastomerClient::Client::ServerError, ElastomerClient::Client::TimeoutError, ElastomerClient::Client::ConnectionFailed, ElastomerClient::Client::RejectedExecutionError, Faraday::ConnectionFailed],
+      # }
 
       @connection ||= Faraday.new(url) do |conn|
         conn.response(:parse_json)
@@ -158,7 +155,7 @@ module ElastomerClient
         conn.request(:opaque_id) if @opaque_id
         conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
         conn.request(:elastomer_compress, compression: compression) if compress_body
-        conn.request(:retry, retry_options)
+        #conn.request(:retry, retry_options)
 
         conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout

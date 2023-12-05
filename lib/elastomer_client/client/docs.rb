@@ -603,7 +603,7 @@ module ElastomerClient
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h[:routing] = h[:routing].join(",") if h[:routing].is_a?(Array)
-        h[:type] = "_doc" if client.version_support.es_version_7_plus? && !delete_type
+        h[:type] = "_doc" if client.version_support.es_version_8_plus? && !delete_type
         h.delete(:type) if delete_type
         h
       end

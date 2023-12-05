@@ -388,11 +388,10 @@ describe ElastomerClient::Client do
       ActiveSupport::Notifications.unsubscribe(@subscriber)
     end
 
-    it "fails with 3 timeouts retries" do
+
+    it "does not retry GET requests" do
       stub_request(:get, $client.url+"/_cat/indices").
         to_timeout.then.
-        to_timeout.then
-        .to_timeout.then.
         to_return({
           headers: {"Content-Type" => "text/plain; charset=UTF-8"},
           body: "green open test-index 1 0 0 0 159b 159b"
@@ -401,17 +400,6 @@ describe ElastomerClient::Client do
       assert_raises(ElastomerClient::Client::ConnectionFailed) {
         $client.get("/_cat/indices")
       }
-    end
-
-    it "retries up to 2 times" do
-      stub_request(:get, $client.url+"/test-index/_settings").
-        to_timeout.then.
-        to_timeout.then.
-        to_return({body: %q/{"acknowledged": true}/})
-
-      response = $client.index("test-index").settings(max_retries: 2)
-
-      assert_equal({"acknowledged" => true}, response)
     end
 
     it "does not retry on PUT requests" do

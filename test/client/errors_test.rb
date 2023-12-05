@@ -39,7 +39,7 @@ describe ElastomerClient::Client::Error do
       },
      "status" => 404
     }
-    response = Faraday::Response.new(body:))
+    response = Faraday::Response.new(body:)
     err = ElastomerClient::Client::Error.new(response)
 
     assert_equal body["error"].to_s, err.message

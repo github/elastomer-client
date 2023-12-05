@@ -4,7 +4,7 @@ require_relative "./test_helper"
 
 describe ElastomerClient::VersionSupport do
   describe "supported versions" do
-    it "allows 5.0.0 to 8.6.0" do
+    it "allows 5.0.0 to 8.x" do
       five_series = ["5.0.0", "5.0.9", "5.2.0", "5.6.9", "5.6.100"]
       seven_series = ["7.0.0", "7.0.9", "7.2.0", "7.17.7", "7.17.100"]
       eight_series = ["8.0.0", "8.6.0"]

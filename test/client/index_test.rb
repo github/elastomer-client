@@ -103,7 +103,7 @@ describe ElastomerClient::Client::Index do
 
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       @index.update_mapping "_doc", { properties: {
         author: { type: "keyword" }
       }}
@@ -116,8 +116,8 @@ describe ElastomerClient::Client::Index do
     assert_property_exists @index.mapping[@name], "book", "author"
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    # ES7 removes mapping types so test adding a new mapping type only for versions < 7
-    if !$client.version_support.es_version_7_plus?
+    # ES8 removes mapping types so test adding a new mapping type only for versions < 8
+    if !$client.version_support.es_version_8_plus?
       @index.update_mapping "mux_mool", { mux_mool: { properties: {
         song: { type: "keyword" }
       }}}
@@ -136,7 +136,7 @@ describe ElastomerClient::Client::Index do
 
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       @index.put_mapping "_doc", { properties: {
         author: { type: "keyword" }
       }}
@@ -149,8 +149,8 @@ describe ElastomerClient::Client::Index do
     assert_property_exists @index.mapping[@name], "book", "author"
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    # ES7 removes mapping types so test adding a new mapping type only for versions < 7
-    if !$client.version_support.es_version_7_plus?
+    # ES8 removes mapping types so test adding a new mapping type only for versions < 8
+    if !$client.version_support.es_version_8_plus?
       @index.put_mapping "mux_mool", { mux_mool: { properties: {
         song: { type: "keyword" }
       }}}
@@ -179,8 +179,8 @@ describe ElastomerClient::Client::Index do
     assert_equal("alias [not-there] missing", exception.message)
     assert_equal(404, exception.status)
 
-    # In ES 7, when you use wildcards, an error is not raised if no match is found
-    if $client.version_support.es_version_7_plus?
+    # In ES8, when you use wildcards, an error is not raised if no match is found
+    if $client.version_support.es_version_8_plus?
       assert_empty(@index.get_alias("not*"))
     else
       exception = assert_raises(ElastomerClient::Client::RequestError) do
@@ -240,9 +240,9 @@ describe ElastomerClient::Client::Index do
     assert_equal %w[just few words analyze], tokens
   end
 
-  it "accepts a type param and does not throw an error for ES7" do
-    if !$client.version_support.es_version_7_plus?
-      skip "This test is only needed for ES 7 onwards"
+  it "accepts a type param and does not throw an error for ES8" do
+    if !$client.version_support.es_version_8_plus?
+      skip "This test is only needed for ES8 onwards"
     end
 
     @index.create(
@@ -401,8 +401,8 @@ describe ElastomerClient::Client::Index do
     end
 
     it "performs multi percolate queries" do
-      # The _percolate endpoint is removed from ES 7, and replaced with percolate queries via _search and _msearch
-      if !$client.version_support.es_version_7_plus?
+      # The _percolate endpoint is removed from ES8, and replaced with percolate queries via _search and _msearch
+      if !$client.version_support.es_version_8_plus?
         @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
 
         @index.docs.index \
@@ -438,8 +438,8 @@ describe ElastomerClient::Client::Index do
     end
 
     it "performs suggestion queries" do
-      # The _suggest endpoint is removed from ES 7, suggest functionality is now via _search
-      if !$client.version_support.es_version_7_plus?
+      # The _suggest endpoint is removed from ES8, suggest functionality is now via _search
+      if !$client.version_support.es_version_8_plus?
         @index.docs.index \
           document_wrapper("book", {
             _id: 1,

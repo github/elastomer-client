@@ -333,7 +333,7 @@ module ElastomerClient
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
         params.delete("_id") if params["_id"].nil? || params["_id"].to_s.empty?
 
-        if client.version_support.es_version_7_plus?
+        if client.version_support.es_version_8_plus?
           params.delete(:_type)
           params.delete("_type")
         end
@@ -356,7 +356,7 @@ module ElastomerClient
 
         SPECIAL_KEYS.each do |key|
           omit_prefix = (
-            client.version_support.es_version_7_plus? &&
+            client.version_support.es_version_8_plus? &&
             UNPREFIXED_SPECIAL_KEYS.include?(key)
           )
 

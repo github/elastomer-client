@@ -98,11 +98,10 @@ Get started by cloning and running a few scripts:
 2. Run ES in Docker (see below)
 3. Run tests
     - for ES 8: `ES_PORT=9208 rake test`
-    - for ES 7: `ES_PORT=9207 rake test`
     - for ES 5: `ES_PORT=9205 rake test`
 
 
-Run ES 5, ES 7, and ES 8:
+Run ES 5 and ES 8:
 ```
 cd docker
 docker compose --profile all up
@@ -112,12 +111,6 @@ Run only ES 8:
 ```
 cd docker
 docker compose --profile es8 up
-```
-
-Run only ES 7:
-```
-cd docker
-docker compose --profile es7 up
 ```
 
 Run only ES 5:

@@ -5,7 +5,7 @@ require_relative "../test_helper"
 describe ElastomerClient::Client::Percolator do
 
   before do
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       skip "Percolate not supported in ES version #{$client.version}"
     end
 

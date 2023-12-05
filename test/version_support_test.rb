@@ -6,19 +6,13 @@ describe ElastomerClient::VersionSupport do
   describe "supported versions" do
     it "allows 5.0.0 to 8.x" do
       five_series = ["5.0.0", "5.0.9", "5.1.0", "5.9.0", "5.99.100"]
-      seven_series = ["7.0.0", "7.0.9", "7.2.0", "7.17.7", "7.17.100"]
       eight_series = ["8.0.0", "8.0.9", "8.1.0", "8.9.0", "8.99.100"]
 
       five_series.each do |version|
         assert ElastomerClient::VersionSupport.new(version)
       end
 
-      seven_series.each do |version|
-        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_7_plus?
-      end
-
       eight_series.each do |version|
-        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_7_plus?
         assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_8_plus?
       end
     end

@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::NativeDeleteByQuery do
+describe ElastomerClient::Client::NativeDeleteByQuery do
   before do
     @index = $client.index "elastomer-delete-by-query-test"
     @index.delete if @index.exists?
@@ -50,7 +50,7 @@ describe Elastomer::Client::NativeDeleteByQuery do
     end
 
     it "fails when internal version is 0" do
-      if $client.version_support.es_version_7_plus?
+      if $client.version_support.es_version_8_plus?
         skip "Concurrency control with internal version is not supported in ES #{$client.version}"
       end
       @docs.index({_id: 0, name: "mittens"})
@@ -67,13 +67,13 @@ describe Elastomer::Client::NativeDeleteByQuery do
         }
       }
 
-      assert_raises(Elastomer::Client::RequestError) do
+      assert_raises(ElastomerClient::Client::RequestError) do
         @index.native_delete_by_query(query)
       end
     end
 
     it "fails when an unknown parameter is provided" do
-      assert_raises(Elastomer::Client::IllegalArgument) do
+      assert_raises(ElastomerClient::Client::IllegalArgument) do
         @index.native_delete_by_query({}, foo: "bar")
       end
     end
@@ -82,8 +82,8 @@ describe Elastomer::Client::NativeDeleteByQuery do
       index = $client.index "elastomer-delete-by-query-routing-test"
       index.delete if index.exists?
       type = "docs"
-      # default number of shards in ES 7 is 1, so set it to 2 shards so routing to different shards can be tested
-      settings = $client.version_support.es_version_7_plus? ? { number_of_shards: 2 } : {}
+      # default number of shards in ES8 is 1, so set it to 2 shards so routing to different shards can be tested
+      settings = $client.version_support.es_version_8_plus? ? { number_of_shards: 2 } : {}
       index.create({
         settings: settings,
         mappings: mappings_wrapper(type, {

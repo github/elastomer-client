@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require File.expand_path("../../test_helper", __FILE__)
-require "elastomer/core_ext/time"
+require "elastomer_client/core_ext/time"
 
 describe "JSON conversions for Time" do
   before do
@@ -17,7 +17,7 @@ describe "JSON conversions for Time" do
             title: { type: "keyword" },
             created_at: { type: "date" }
           }
-        }, !$client.version_support.es_version_7_plus?)
+        }, !$client.version_support.es_version_8_plus?)
 
       wait_for_index(@name)
     end
@@ -41,7 +41,7 @@ describe "JSON conversions for Time" do
 
     assert_created(h)
 
-    doc = $client.version_support.es_version_7_plus? ? @docs.get(id: h["_id"]) : @docs.get(type: "book", id: h["_id"])
+    doc = $client.version_support.es_version_8_plus? ? @docs.get(id: h["_id"]) : @docs.get(type: "book", id: h["_id"])
 
     assert_equal "2013-05-03T10:01:31.000Z", doc["_source"]["created_at"]
   end

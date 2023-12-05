@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Index do
+describe ElastomerClient::Client::Index do
 
   before do
     @name  = "elastomer-index-test"
@@ -103,7 +103,7 @@ describe Elastomer::Client::Index do
 
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       @index.update_mapping "_doc", { properties: {
         author: { type: "keyword" }
       }}
@@ -116,8 +116,8 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "book", "author"
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    # ES7 removes mapping types so test adding a new mapping type only for versions < 7
-    if !$client.version_support.es_version_7_plus?
+    # ES8 removes mapping types so test adding a new mapping type only for versions < 8
+    if !$client.version_support.es_version_8_plus?
       @index.update_mapping "mux_mool", { mux_mool: { properties: {
         song: { type: "keyword" }
       }}}
@@ -136,7 +136,7 @@ describe Elastomer::Client::Index do
 
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       @index.put_mapping "_doc", { properties: {
         author: { type: "keyword" }
       }}
@@ -149,8 +149,8 @@ describe Elastomer::Client::Index do
     assert_property_exists @index.mapping[@name], "book", "author"
     assert_property_exists @index.mapping[@name], "book", "title"
 
-    # ES7 removes mapping types so test adding a new mapping type only for versions < 7
-    if !$client.version_support.es_version_7_plus?
+    # ES8 removes mapping types so test adding a new mapping type only for versions < 8
+    if !$client.version_support.es_version_8_plus?
       @index.put_mapping "mux_mool", { mux_mool: { properties: {
         song: { type: "keyword" }
       }}}
@@ -172,18 +172,18 @@ describe Elastomer::Client::Index do
     assert_equal({@name => {"aliases" => {"foofaloo" => {}}}}, @index.get_alias("f*"))
     assert_equal({@name => {"aliases" => {"foofaloo" => {}, "bar" => {}}}}, @index.get_alias("*"))
 
-    exception = assert_raises(Elastomer::Client::RequestError) do
+    exception = assert_raises(ElastomerClient::Client::RequestError) do
       @index.get_alias("not-there")
     end
 
     assert_equal("alias [not-there] missing", exception.message)
     assert_equal(404, exception.status)
 
-    # In ES 7, when you use wildcards, an error is not raised if no match is found
-    if $client.version_support.es_version_7_plus?
+    # In ES8, when you use wildcards, an error is not raised if no match is found
+    if $client.version_support.es_version_8_plus?
       assert_empty(@index.get_alias("not*"))
     else
-      exception = assert_raises(Elastomer::Client::RequestError) do
+      exception = assert_raises(ElastomerClient::Client::RequestError) do
         @index.get_alias("not*")
       end
 
@@ -240,9 +240,9 @@ describe Elastomer::Client::Index do
     assert_equal %w[just few words analyze], tokens
   end
 
-  it "accepts a type param and does not throw an error for ES7" do
-    if !$client.version_support.es_version_7_plus?
-      skip "This test is only needed for ES 7 onwards"
+  it "accepts a type param and does not throw an error for ES8" do
+    if !$client.version_support.es_version_8_plus?
+      skip "This test is only needed for ES8 onwards"
     end
 
     @index.create(
@@ -265,7 +265,7 @@ describe Elastomer::Client::Index do
   describe "when an index does not exist" do
     it "raises an IndexNotFoundError on delete" do
       index = $client.index("index-that-does-not-exist")
-      assert_raises(Elastomer::Client::IndexNotFoundError) { index.delete }
+      assert_raises(ElastomerClient::Client::IndexNotFoundError) { index.delete }
     end
   end
 
@@ -280,7 +280,7 @@ describe Elastomer::Client::Index do
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },
         mappings: mappings_wrapper("book", {
-          _source: { enabled: false },
+          _source: { enabled: true },
           properties: {
             title: { type: "text", analyzer: "standard" },
             author: { type: "keyword" },
@@ -367,6 +367,32 @@ describe Elastomer::Client::Index do
       assert_equal(1, r["deleted"])
     end
 
+    it "updates by query" do
+      @index.docs.index(document_wrapper("book", { _id: 1, title: "Book 1" }))
+      @index.refresh
+      r = @index.update_by_query(
+        query: { match_all: {}},
+        script: { source: "ctx._source.title = 'Book 2'" }
+      )
+
+      @index.refresh
+      updated = @index.docs.get(id: 1, type: "book")
+
+      assert_equal(1, r["updated"])
+      assert_equal("Book 2", updated["_source"]["title"])
+
+      r = @index.update_by_query({
+        query: { match_all: {}},
+        script: { source: "ctx._source.title = 'Book 3'" }
+      }, conflicts: "proceed")
+
+      @index.refresh
+      updated = @index.docs.get(id: 1, type: "book")
+
+      assert_equal(1, r["updated"])
+      assert_equal("Book 3", updated["_source"]["title"])
+    end
+
     it "creates a Percolator" do
       id = "1"
       percolator = @index.percolator id
@@ -375,8 +401,8 @@ describe Elastomer::Client::Index do
     end
 
     it "performs multi percolate queries" do
-      # The _percolate endpoint is removed from ES 7, and replaced with percolate queries via _search and _msearch
-      if !$client.version_support.es_version_7_plus?
+      # The _percolate endpoint is removed from ES8, and replaced with percolate queries via _search and _msearch
+      if !$client.version_support.es_version_8_plus?
         @index.update_mapping("percolator", { properties: { query: { type: "percolator" } } })
 
         @index.docs.index \
@@ -412,8 +438,8 @@ describe Elastomer::Client::Index do
     end
 
     it "performs suggestion queries" do
-      # The _suggest endpoint is removed from ES 7, suggest functionality is now via _search
-      if !$client.version_support.es_version_7_plus?
+      # The _suggest endpoint is removed from ES8, suggest functionality is now via _search
+      if !$client.version_support.es_version_8_plus?
         @index.docs.index \
           document_wrapper("book", {
             _id: 1,
@@ -454,7 +480,7 @@ describe Elastomer::Client::Index do
       })
 
       # Indexing the document fails when `output` is provided
-      exception = assert_raises(Elastomer::Client::RequestError) do
+      exception = assert_raises(ElastomerClient::Client::RequestError) do
         @index.docs.index(document)
       end
 

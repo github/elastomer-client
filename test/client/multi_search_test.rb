@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::MultiSearch do
+describe ElastomerClient::Client::MultiSearch do
 
   before do
     @name  = "elastomer-msearch-test"
@@ -17,7 +17,7 @@ describe Elastomer::Client::MultiSearch do
             title: { type: "text", analyzer: "standard" },
             author: { type: "keyword" }
           }
-        }, !$client.version_support.es_version_7_plus?)
+        }, !$client.version_support.es_version_8_plus?)
       wait_for_index(@name)
     end
 
@@ -42,7 +42,7 @@ describe Elastomer::Client::MultiSearch do
     h = $client.multi_search body
     response1, response2 = h["responses"]
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, response1["hits"]["total"]["value"]
       assert_equal 1, response2["hits"]["total"]["value"]
     else
@@ -61,7 +61,7 @@ describe Elastomer::Client::MultiSearch do
     h = $client.multi_search body, index: @name
     response1 = h["responses"].first
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 1, response1["hits"]["total"]["value"]
     else
       assert_equal 1, response1["hits"]["total"]
@@ -84,7 +84,7 @@ describe Elastomer::Client::MultiSearch do
     h = $client.msearch body
     response1, response2 = h["responses"]
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, response1["hits"]["total"]["value"]
       assert_equal 1, response2["hits"]["total"]["value"]
     else
@@ -103,7 +103,7 @@ describe Elastomer::Client::MultiSearch do
     h = $client.msearch body, index: @name
     response1 = h["responses"].first
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 1, response1["hits"]["total"]["value"]
     else
       assert_equal 1, response1["hits"]["total"]
@@ -122,7 +122,7 @@ describe Elastomer::Client::MultiSearch do
 
     response1, response2 = h["responses"]
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, response1["hits"]["total"]["value"]
       assert_equal 2, response2["hits"]["total"]["value"]
     else
@@ -137,7 +137,7 @@ describe Elastomer::Client::MultiSearch do
 
     response1, response2 = h["responses"]
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, response1["hits"]["total"]["value"]
       assert_equal 2, response2["hits"]["total"]["value"]
     else
@@ -145,7 +145,7 @@ describe Elastomer::Client::MultiSearch do
       assert_equal 2, response2["hits"]["total"]
     end
 
-    type = $client.version_support.es_version_7_plus? ? "" : "book"
+    type = $client.version_support.es_version_8_plus? ? "" : "book"
     h = @index.docs(type).multi_search do |m|
       m.search({query: { match_all: {}}})
       m.search({query: { match: { "title" => "2" }}})
@@ -153,7 +153,7 @@ describe Elastomer::Client::MultiSearch do
 
     response1, response2 = h["responses"]
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, response1["hits"]["total"]["value"]
       assert_equal 1, response2["hits"]["total"]["value"]
     else
@@ -185,7 +185,7 @@ describe Elastomer::Client::MultiSearch do
 
     response = h["responses"][0]
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, response["hits"]["total"]["value"]
     else
       assert_equal 2, response["hits"]["total"]

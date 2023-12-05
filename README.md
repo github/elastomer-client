@@ -1,4 +1,4 @@
-# Elastomer Client [![CI build Workflow](https://github.com/github/elastomer-client/actions/workflows/main.yml/badge.svg)](https://github.com/github/elastomer-client/actions/workflows/main.yml)
+# ElastomerClient [![CI build Workflow](https://github.com/github/elastomer-client/actions/workflows/main.yml/badge.svg)](https://github.com/github/elastomer-client/actions/workflows/main.yml)
 
 Making a stupid simple Elasticsearch client so your project can be smarter!
 
@@ -8,16 +8,16 @@ The client provides a one-to-one mapping to the Elasticsearch [API
 endpoints](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html).
 The API is decomposed into logical sections and accessed according to what you
 are trying to accomplish. Each logical section is represented as a [client
-class](lib/elastomer/client) and a top-level accessor is provided for each.
+class](lib/elastomer_client/client) and a top-level accessor is provided for each.
 
 #### Cluster
 
 API endpoints dealing with cluster level information and settings are found in
-the [Cluster](lib/elastomer/client/cluster.rb) class.
+the [Cluster](lib/elastomer_client/client/cluster.rb) class.
 
 ```ruby
-require 'elastomer/client'
-client = Elastomer::Client.new
+require 'elastomer_client/client'
+client = ElastomerClient::Client.new
 
 # the current health summary
 client.cluster.health
@@ -31,14 +31,14 @@ client.cluster.templates
 
 #### Index
 
-The methods in the [Index](lib/elastomer/client/index.rb) class deal with the
+The methods in the [Index](lib/elastomer_client/client/index.rb) class deal with the
 management of indexes in the cluster. This includes setting up type mappings
 and adjusting settings. The actual indexing and search of documents are
 handled by the Docs class (discussed next).
 
 ```ruby
-require 'elastomer/client'
-client = Elastomer::Client.new
+require 'elastomer_client/client'
+client = ElastomerClient::Client.new
 
 index = client.index('books')
 index.create(
@@ -59,13 +59,13 @@ index.delete
 
 #### Docs
 
-The [Docs](lib/elastomer/client/docs.rb) class handles the indexing and
+The [Docs](lib/elastomer_client/client/docs.rb) class handles the indexing and
 searching of documents. Each instance is scoped to an index and optionally a
 document type.
 
 ```ruby
-require 'elastomer/client'
-client = Elastomer::Client.new
+require 'elastomer_client/client'
+client = ElastomerClient::Client.new
 
 docs = client.docs('books')
 
@@ -80,13 +80,13 @@ docs.search({:query => {:match_all => {}}})
 
 #### Performance
 
-By default Elastomer uses Net::HTTP (via Faraday) to communicate with
+By default ElastomerClient uses Net::HTTP (via Faraday) to communicate with
 Elasticsearch. You may find that Excon performs better for your use. To enable
-Excon, add it to your bundle and then change your Elastomer initialization
+Excon, add it to your bundle and then change your ElastomerClient initialization
 thusly:
 
 ```ruby
-Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
+ElastomerClient::Client.new(url: YOUR_ES_URL, adapter: :excon)
 ```
 
 ## Compatibility
@@ -94,15 +94,24 @@ Elastomer::Client.new(url: YOUR_ES_URL, adapter: :excon)
 This client is tested against:
 
 - Ruby versions 3.0 through 3.2
-- Elasticsearch versions 5.16, 7.17, and 8.6.
+- Elasticsearch versions 5.6 and 8.7.
 
 ## Development
 
 Get started by cloning and running a few scripts:
 
-- [Bootstrap the project](#bootstrap-the-project)
-- [Start an Elasticsearch server in Docker](#start-an-elasticsearch-server-in-docker)
-- [Run the tests](#run-tests-against-a-version-of-elasticsearch)
+- [ElastomerClient ](#elastomerclient-)
+  - [Client](#client)
+      - [Cluster](#cluster)
+      - [Index](#index)
+      - [Docs](#docs)
+      - [Performance](#performance)
+  - [Compatibility](#compatibility)
+  - [Development](#development)
+    - [Bootstrap the project](#bootstrap-the-project)
+    - [Start an Elasticsearch server in Docker](#start-an-elasticsearch-server-in-docker)
+    - [Run tests against a version of Elasticsearch](#run-tests-against-a-version-of-elasticsearch)
+  - [Releasing](#releasing)
 
 ### Bootstrap the project
 
@@ -112,19 +121,15 @@ script/bootstrap
 
 ### Start an Elasticsearch server in Docker
 
-To run ES 5, ES 7, and ES 8:
+To run ES 5 and ES 8:
 ```
 docker compose --project-directory docker --profile all up
 ```
 
+<<<<<<< HEAD
 To run only ES 8:
 ```
 docker compose --project-directory docker --profile es8 up
-```
-
-To run only ES 7:
-```
-docker compose --project-directory docker --profile es7 up
 ```
 
 To run only ES 5:
@@ -137,11 +142,6 @@ docker compose --project-directory docker --profile es5 up
 ES 8
 ```
 ES_PORT=9208 rake test
-```
-
-ES 7
-```
-ES_PORT=9207 rake test`
 ```
 
 ES 5

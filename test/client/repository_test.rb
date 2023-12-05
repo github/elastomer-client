@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Repository do
+describe ElastomerClient::Client::Repository do
   before do
     if !run_snapshot_tests?
       skip "To enable snapshot tests, add a path.repo setting to your elasticsearch.yml file."

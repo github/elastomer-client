@@ -5,11 +5,11 @@ require_relative "../test_helper"
 describe "stubbed client tests" do
   before do
     @stubs  = Faraday::Adapter.lookup_middleware(:test)::Stubs.new
-    @client = Elastomer::Client.new adapter: [:test, @stubs]
+    @client = ElastomerClient::Client.new adapter: [:test, @stubs]
     @client.instance_variable_set(:@version, "5.6.4")
   end
 
-  describe Elastomer::Client::Cluster do
+  describe ElastomerClient::Client::Cluster do
     it "reroutes shards" do
       @stubs.post "/_cluster/reroute?dry_run=true" do |env|
         assert_match %r/^\{"commands":\[\{"move":\{[^\{\}]+\}\}\]\}$/, env[:body]

@@ -3,15 +3,15 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "elastomer/version"
+require "elastomer_client/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "elastomer-client"
-  spec.version       = Elastomer::VERSION
+  spec.version       = ElastomerClient::VERSION
   spec.authors       = ["Tim Pease", "Grant Rodgers"]
   spec.email         = ["tim.pease@github.com", "grant.rodgers@github.com"]
   spec.summary       = %q{A library for interacting with Elasticsearch}
-  spec.description   = %q{Elastomer is a low level API client for the
+  spec.description   = %q{ElastomerClient is a low level API client for the
                           Elasticsearch HTTP interface.}
   spec.homepage      = "https://github.com/github/elastomer-client"
   spec.license       = "MIT"

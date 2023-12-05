@@ -6,6 +6,6 @@ require "rubygems"
 require "bundler/setup"
 
 $LOAD_PATH.unshift "lib"
-require "elastomer/client"
+require "elastomer_client/client"
 
 IRB.start

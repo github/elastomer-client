@@ -1,10 +1,10 @@
-# Elastomer Client Component
+# ElastomerClient Client Component
 
-All methods in the Elastomer Client gem eventually make an HTTP request to
-Elasticsearch. The [`Elastomer::Client`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client.rb)
+All methods in the ElastomerClient gem eventually make an HTTP request to
+Elasticsearch. The [`ElastomerClient::Client`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client.rb)
 class is responsible for connecting to an Elasticsearch instance, making HTTP
 requests, processing the response, and handling errors. Let's look at the
-details of how `Elastomer::Client` handles HTTP communication.
+details of how `ElastomerClient::Client` handles HTTP communication.
 
 ### Connecting
 
@@ -15,12 +15,12 @@ the concept of *middlewares* that operate on the HTTP request and response. We
 use Faraday middleware to encode and decode JSON messages exchanged with
 Elasticsearch.
 
-Without any options the `Elastomer::Client` will connect to the default
+Without any options the `ElastomerClient::Client` will connect to the default
 Elasticsearch URL `http://localhost:9200`. The `Net:HTTP` client from the Ruby
 standard library will be used.
 
 ```ruby
-client = Elastomer::Client.new
+client = ElastomerClient::Client.new
 client.host  #=> 'localhost'
 client.port  #=> 9200
 client.url   #=> 'http://localhost:9200'
@@ -30,7 +30,7 @@ Elasticsearch works best with persistent connections. We can use the
 `Net::HTTP::Persistent` adapter with Faraday.
 
 ```ruby
-client = Elastomer::Client.new \
+client = ElastomerClient::Client.new \
   :port    => 9200,
   :adapter => :net_http_persistent
 ```
@@ -45,7 +45,7 @@ The open timeout is configured once when the client is first created. The read
 timeout can be set for each request.
 
 ```ruby
-client = Elastomer::Client.new \
+client = ElastomerClient::Client.new \
   :url          => "http://localhost:9200",
   :adapter      => :net_http_persistent,
   :open_timeout => 1,
@@ -64,13 +64,13 @@ Elasticsearch provides an `X-Opaque-Id` request header. Any value set in this
 request header will be returned in the corresponding response header. This
 allows the client to correlate the response from Elasticsearch with the request
 that was submitted. We have written an
-[OpaqueId](https://github.com/github/elastomer-client/blob/main/lib/elastomer/middleware/opaque_id.rb)
+[OpaqueId](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/middleware/opaque_id.rb)
 middleware that will abort any request if the `X-Opaque-Id` headers disagree
 between the request and the response. You can use this feature by setting
 the `:opaque_id` flag.
 
 ```ruby
-client = Elastomer::Client.new \
+client = ElastomerClient::Client.new \
   :url       => "http://localhost:9200",
   :adapter   => :net_http_persistent,
   :opaque_id => true
@@ -82,7 +82,7 @@ If you are not using persistent connections, then you do not need to worry about
 ### HTTP Methods
 
 The standard HTTP verbs - `head`, `get`, `put`, `post`, `delete` - are exposed
-as methods on the `Elastomer::Client` class. Each method accepts a path and a
+as methods on the `ElastomerClient::Client` class. Each method accepts a path and a
 Hash of parameters. Some parameters are applied as path expansions, some are
 reserved, and the remainder are used as URL parameters. We'll look at the
 reserved parameters first.
@@ -127,11 +127,11 @@ Elasticsearch has responded.
 
 **:action** and **:context**
 
-Each method in the Elastomer client gem has its own `:action` value that is
+Each method in the ElastomerClient gem has its own `:action` value that is
 used in conjunction with the [notifications](notifications.md) layer. The
 `:action` parameter cannot be changed by the user. Instead you can provide a
 `:context` value to each method call. This will be passed unchanged to the
-notifications layer, and it is useful for tracking where an Elastomer client
+notifications layer, and it is useful for tracking where an ElastomerClient
 method is called from within your application.
 
 #### URL Handling
@@ -144,7 +144,7 @@ With the [`Addressable::Template`](https://github.com/sporkmonger/addressable#ur
 a typical search URL takes the form `{/index}{/type}/_search`. The `:index` and
 `:type` values are taken from the parameters Hash and combined with the template
 to generate the URL. The internal
-[`expand_path`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client.rb#L245)
+[`expand_path`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client.rb#L245)
 method handles the URL generation.
 
 Here are a few examples to better illustrate the concept.
@@ -199,17 +199,17 @@ client.expand_path("/{index}/{type}/_search", {
 ```
 
 And that is the basic concept of the `expand_path` method. The URL template
-pattern is used extensively in the Elastomer client code, so it is definitely
+pattern is used extensively in the ElastomerClient code, so it is definitely
 worth knowing about.
 
 ### Errors
 
 Invariably things will go wrong where computers and networks are involved. The
-Elastomer client code makes no attempt to retry an operation in the face of an
+ElastomerClient code makes no attempt to retry an operation in the face of an
 error. However, it does classify errors into *fatal* and *retryable* exceptions.
 
 Each class that inherits from
-[`Elastomer::Client::Error`](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/errors.rb)
+[`ElastomerClient::Client::Error`](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client/errors.rb)
 has a `fatal?` method (and the inverse `retry?` method). If an exception is
 fatal, then the request is fundamentally flawed and should not be retried.
 Passing a malformed search query or trying to search an index that does not

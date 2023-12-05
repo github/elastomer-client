@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Cluster do
+describe ElastomerClient::Client::Cluster do
 
   before do
     @name = "elastomer-template-test"
@@ -14,7 +14,7 @@ describe Elastomer::Client::Cluster do
   end
 
   it "lists templates in the cluster" do
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       @template.create({index_patterns: ["test-elastomer*"]})
     else
       @template.create({template: "test-elastomer*"})
@@ -27,7 +27,7 @@ describe Elastomer::Client::Cluster do
   it "creates a template" do
     refute_predicate @template, :exists?, "the template should not exist"
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       template_config = {index_patterns: ["test-elastomer*"]}
     else
       template_config = {template: "test-elastomer*"}
@@ -48,7 +48,7 @@ describe Elastomer::Client::Cluster do
 
     assert_equal [@name], template.keys
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal "test-elastomer*", template[@name]["index_patterns"][0]
     else
       assert_equal "test-elastomer*", template[@name]["template"]

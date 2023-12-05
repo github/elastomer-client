@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Docs do
+describe ElastomerClient::Client::Docs do
 
   before do
     @name  = "elastomer-docs-test"
@@ -20,7 +20,7 @@ describe Elastomer::Client::Docs do
         }, true)
 
       # COMPATIBILITY
-      if !$client.version_support.es_version_7_plus?
+      if !$client.version_support.es_version_8_plus?
         @index.update_mapping("percolator", { properties: { query: { type: "percolator"}}})
       end
 
@@ -35,8 +35,9 @@ describe Elastomer::Client::Docs do
   end
 
   it "raises error when writing same document twice" do
-    document = document_wrapper("book", {
+    document = ({
       _id: "documentid",
+      _type: "book",
       _op_type: "create",
       title: "Book by Author1",
       author: "Author1"
@@ -45,27 +46,29 @@ describe Elastomer::Client::Docs do
 
     assert_created h
 
-    assert_raises(Elastomer::Client::DocumentAlreadyExistsError) do
+    assert_raises(ElastomerClient::Client::DocumentAlreadyExistsError) do
       @docs.index document.dup
     end
   end
 
   it "autogenerates IDs for documents" do
-    h = @docs.index \
-      document_wrapper("book", {
+    h = @docs.index(
+      {
         _id: nil,
         title: "Book1 by author 1",
-        author: "Author1"
+        author: "Author1",
+        _type: "book"
       })
 
     assert_created h
     assert_match %r/^\S{20,22}$/, h["_id"]
 
-    h = @docs.index \
-      document_wrapper("book", {
+    h = @docs.index(
+      {
         _id: nil,
         title: "Book2 by author 2",
-        author: "Author2"
+        author: "Author2",
+        _type: "book"
       })
 
     assert_created h
@@ -73,9 +76,10 @@ describe Elastomer::Client::Docs do
   end
 
   it "uses the provided document ID" do
-    h = @docs.index \
-      document_wrapper("book", {
+    h = @docs.index (
+      {
         _id: 42,
+        _type: "book",
         title: "Book1 by author 1",
         author: "Author1"
       })
@@ -85,16 +89,10 @@ describe Elastomer::Client::Docs do
   end
 
   it "accepts JSON encoded document strings" do
-    if $client.version_support.es_version_7_plus?
-      h = @docs.index \
-        '{"author":"Author1", "title":"Book1 by author 1"}',
-        id: 42
-    else
-      h = @docs.index \
-        '{"author":"Author1", "title":"Book1 by author 1"}',
-        id: 42,
-        type: "book"
-    end
+    h = @docs.index \
+      '{"author":"Author1", "title":"Book1 by author 1"}',
+      id: 42,
+      type: "book"
 
     assert_created h
     assert_equal "42", h["_id"]
@@ -103,21 +101,22 @@ describe Elastomer::Client::Docs do
   describe "indexing directive fields" do
     before do
       # Since we set dynamic: strict, adding the above doc to the index throws an error, so update the index to allow dynamic mapping
-      if !$client.version_support.es_version_7_plus?
+      if !$client.version_support.es_version_8_plus?
         @index.update_mapping "book", { book: { dynamic: "true" } }
       end
     end
 
     after do
       # Since we set dynamic: strict, adding the above doc to the index throws an error, so update the index to allow dynamic mapping
-      if !$client.version_support.es_version_7_plus?
+      if !$client.version_support.es_version_8_plus?
         @index.update_mapping "book", { book: { dynamic: "strict" } }
       end
     end
 
     it "indexes fields that are not recognized as indexing directives" do
-      doc = document_wrapper("book", {
+      doc = ({
         _id: "12",
+        _type: "book",
         title: "Book1",
         author: "Author1",
         _unknown_1: "unknown attribute 1",
@@ -129,7 +128,7 @@ describe Elastomer::Client::Docs do
       assert_created h
       assert_equal "12", h["_id"]
 
-      indexed_doc = $client.version_support.es_version_7_plus? ? @docs.get(id: "12") : @docs.get(type: "book", id: "12")
+      indexed_doc = $client.version_support.es_version_8_plus? ? @docs.get(id: "12") : @docs.get(type: "book", id: "12")
       expected = {
         "title" => "Book1",
         "author" => "Author1",
@@ -141,12 +140,13 @@ describe Elastomer::Client::Docs do
     end
 
     it "extracts indexing directives from the document" do
-      doc = document_wrapper("book", {
+      doc = {
         _id: "12",
+        _type: "book",
         _routing: "author",
         title: "Book1",
         author: "Author1"
-      })
+      }
 
       h = @docs.index(doc)
 
@@ -158,7 +158,7 @@ describe Elastomer::Client::Docs do
       refute doc.key?("_type")
       refute doc.key?(:_routing)
 
-      indexed_doc = $client.version_support.es_version_7_plus? ? @docs.get(id: "12") : @docs.get(type: "book", id: "12")
+      indexed_doc = $client.version_support.es_version_8_plus? ? @docs.get(id: "12") : @docs.get(type: "book", id: "12")
       expected = {
         "title" => "Book1",
         "author" => "Author1"
@@ -169,52 +169,56 @@ describe Elastomer::Client::Docs do
 
     it "raises an exception when a known indexing directive from an unsupported version is used" do
       # Symbol keys
-      doc = document_wrapper("book", {
+      doc = ({
         _id: "12",
-        title: "Book1"
-      }).merge({_consistency: "all"})
+        _type: "book",
+        title: "Book1",
+       _consistency: "all"
+      })
 
-      assert_raises(Elastomer::Client::IllegalArgument) do
+      assert_raises(ElastomerClient::Client::IllegalArgument) do
         @docs.index(doc)
       end
 
       # String keys
-      doc = document_wrapper("book", {
+      doc = ({
         "_id" => "12",
-        "title" => "Book1"
-      }).merge({"_consistency": "all"})
+        "_type" => "book",
+        "title" => "Book1",
+        "_consistency" => "all"
+      })
 
-      assert_raises(Elastomer::Client::IllegalArgument) do
+      assert_raises(ElastomerClient::Client::IllegalArgument) do
         @docs.index(doc)
       end
     end
   end
 
   it "gets documents from the search index" do
-    h = $client.version_support.es_version_7_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
+    h = $client.version_support.es_version_8_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
 
     refute_found h
 
     populate!
 
-    h = $client.version_support.es_version_7_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
+    h = $client.version_support.es_version_8_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
 
     assert_found h
     assert_equal "Author1", h["_source"]["author"]
   end
 
   it "checks if documents exist in the search index" do
-    refute $client.version_support.es_version_7_plus? ? @docs.exists?(id: "1") : @docs.exists?(id: "1", type: "book")
+    refute $client.version_support.es_version_8_plus? ? @docs.exists?(id: "1") : @docs.exists?(id: "1", type: "book")
     populate!
 
-    assert $client.version_support.es_version_7_plus? ? @docs.exists?(id: "1") : @docs.exists?(id: "1", type: "book")
+    assert $client.version_support.es_version_8_plus? ? @docs.exists?(id: "1") : @docs.exists?(id: "1", type: "book")
   end
 
   it "checks if documents exist in the search index with .exist?" do
-    refute $client.version_support.es_version_7_plus? ? @docs.exist?(id: "1") : @docs.exist?(id: "1", type: "book")
+    refute $client.version_support.es_version_8_plus? ? @docs.exist?(id: "1") : @docs.exist?(id: "1", type: "book")
     populate!
 
-    assert $client.version_support.es_version_7_plus? ? @docs.exist?(id: "1") : @docs.exist?(id: "1", type: "book")
+    assert $client.version_support.es_version_8_plus? ? @docs.exist?(id: "1") : @docs.exist?(id: "1", type: "book")
   end
 
   it "gets multiple documents from the search index" do
@@ -228,7 +232,7 @@ describe Elastomer::Client::Docs do
 
     assert_equal %w[Author1 Author2], authors
 
-    h = $client.version_support.es_version_7_plus? ? @docs.multi_get({ids: [2, 1]}) : @docs.multi_get({ids: [2, 1]}, type: "book")
+    h = $client.version_support.es_version_8_plus? ? @docs.multi_get({ids: [2, 1]}) : @docs.multi_get({ids: [2, 1]}, type: "book")
     authors = h["docs"].map { |d| d["_source"]["author"] }
 
     assert_equal %w[Author2 Author1], authors
@@ -276,8 +280,8 @@ describe Elastomer::Client::Docs do
 
     h = @docs.delete id: 1
 
-    if $client.version_support.es_version_7_plus?
-      assert h["result"], "deleted"
+    if $client.version_support.es_version_8_plus?
+      assert_equal "deleted", h["result"], "expected document to be found"
     else
       assert h["found"], "expected document to be found"
     end
@@ -296,7 +300,11 @@ describe Elastomer::Client::Docs do
     @docs = @index.docs("book")
     h = @docs.delete id: 42
 
-    refute h["found"], "expected document to not be found"
+    if $client.version_support.es_version_8_plus?
+      refute_equal "deleted", h["result"], "expected document to not be found"
+    else
+      refute h["found"], "expected document to not be found"
+    end
   end
 
   it "deletes documents by query" do
@@ -332,10 +340,45 @@ describe Elastomer::Client::Docs do
     refute_found h["docs"][1]
   end
 
+  it "updates documents by query" do
+    populate!
+
+    r = @docs.update_by_query(query: {
+      bool: {
+        filter: {term: {author: "Author1"}}
+      }
+    }, script: {
+      source: "ctx._source.author = 'Author1 Updated'"
+    })
+
+    assert_equal 1, r["updated"]
+
+    r = @docs.update_by_query({
+      query: {
+        bool: {
+          filter: {term: {author: "Author2"}}
+        }
+      },
+      script: {
+        source: "ctx._source.author = 'Author2 Updated'"
+      }
+    }, conflicts: "proceed")
+
+    assert_equal 1, r["updated"]
+
+    @index.refresh
+
+    h = @docs.multi_get ids: [1, 2]
+
+    assert_equal "Author1 Updated", h["docs"][0]["_source"]["author"]
+    assert_equal "Author2 Updated", h["docs"][1]["_source"]["author"]
+
+  end
+
   it "searches for documents" do
     h = @docs.search q: "*:*"
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 0, h["hits"]["total"]["value"]
     else
       assert_equal 0, h["hits"]["total"]
@@ -345,13 +388,13 @@ describe Elastomer::Client::Docs do
 
     h = @docs.search q: "*:*"
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 2, h["hits"]["total"]["value"]
     else
       assert_equal 2, h["hits"]["total"]
     end
 
-    if !$client.version_support.es_version_7_plus?
+    if !$client.version_support.es_version_8_plus?
       h = @docs.search q: "*:*", type: "book"
 
       assert_equal 2, h["hits"]["total"]
@@ -362,7 +405,7 @@ describe Elastomer::Client::Docs do
       post_filter: {term: {author: "Author1"}}
     })
 
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       assert_equal 1, h["hits"]["total"]["value"]
     else
       assert_equal 1, h["hits"]["total"]
@@ -374,9 +417,7 @@ describe Elastomer::Client::Docs do
   end
 
   it "supports the shards search API" do
-    # We add the type param to all requests (type is _doc for ES 7)
-    # But the shards endpoint has to be used without the type param to return the shard data for ES 7
-    h = @docs.search_shards(params={}, remove_type_param = $client.version_support.es_version_7_plus?)
+    h = @docs.search_shards(params={})
 
     assert h.key?("nodes"), "response contains \"nodes\" information"
     assert h.key?("shards"), "response contains \"shards\" information"
@@ -385,10 +426,10 @@ describe Elastomer::Client::Docs do
 
   it "generates QueryParsingError exceptions on bad input when searching" do
     query = {query: {query_string: {query: "OR should fail"}}}
-    assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query) }
+    assert_raises(ElastomerClient::Client::QueryParsingError) { @docs.search(query) }
 
     query = {query: {foo_is_not_valid: {}}}
-    assert_raises(Elastomer::Client::QueryParsingError) { @docs.search(query) }
+    assert_raises(ElastomerClient::Client::QueryParsingError) { @docs.search(query) }
   end
 
   it "counts documents" do
@@ -402,7 +443,7 @@ describe Elastomer::Client::Docs do
 
     assert_equal 2, h["count"]
 
-    if !$client.version_support.es_version_7_plus?
+    if !$client.version_support.es_version_8_plus?
       h = @docs.count(q: "*:*", type: "book")
 
       assert_equal 2, h["count"]
@@ -422,7 +463,7 @@ describe Elastomer::Client::Docs do
   it "explains scoring" do
     populate!
 
-    h = $client.version_support.es_version_7_plus? ?
+    h = $client.version_support.es_version_8_plus? ?
       @docs.explain({
         query: {
           match: {
@@ -440,7 +481,7 @@ describe Elastomer::Client::Docs do
 
     assert h["matched"]
 
-    h = $client.version_support.es_version_7_plus? ? @docs.explain(id: 2, q: "Author1") : @docs.explain(type: "book", id: 2, q: "Author1")
+    h = $client.version_support.es_version_8_plus? ? @docs.explain(id: 2, q: "Author1") : @docs.explain(type: "book", id: 2, q: "Author1")
 
     refute h["matched"]
   end
@@ -477,7 +518,7 @@ describe Elastomer::Client::Docs do
   it "updates documents" do
     populate!
 
-    h = $client.version_support.es_version_7_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
+    h = $client.version_support.es_version_8_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
 
     assert_found h
     assert_equal "Author1", h["_source"]["author"]
@@ -486,7 +527,7 @@ describe Elastomer::Client::Docs do
       _id: "1",
       doc: {author: "Author1.1"}
     }))
-    h = $client.version_support.es_version_7_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
+    h = $client.version_support.es_version_8_plus? ? @docs.get(id: "1") : @docs.get(id: "1", type: "book")
 
     assert_found h
     assert_equal "Author1.1", h["_source"]["author"]
@@ -501,7 +542,7 @@ describe Elastomer::Client::Docs do
         doc_as_upsert: true
       }))
 
-      h = $client.version_support.es_version_7_plus? ? @docs.get(id: "42") : @docs.get(id: "42", type: "book")
+      h = $client.version_support.es_version_8_plus? ? @docs.get(id: "42") : @docs.get(id: "42", type: "book")
 
       assert_found h
       assert_equal "Author42", h["_source"]["author"]
@@ -511,12 +552,12 @@ describe Elastomer::Client::Docs do
 
   it "supports bulk operations with the same parameters as docs" do
     response = @docs.bulk do |b|
-      populate!(b)
+      populate_with_params!(b)
     end
 
     assert_kind_of Integer, response["took"]
 
-    response = $client.version_support.es_version_7_plus? ? @docs.get(id: 1) : @docs.get(id: 1, type: "book")
+    response = $client.version_support.es_version_8_plus? ? @docs.get(id: 1) : @docs.get(id: 1, type: "book")
 
     assert_found response
     assert_equal "Author1", response["_source"]["author"]
@@ -525,7 +566,7 @@ describe Elastomer::Client::Docs do
   it "provides access to term vector statistics" do
     populate!
 
-    response = $client.version_support.es_version_7_plus? ? @docs.termvector(id: 1, fields: "title") : @docs.termvector(type: "book", id: 1, fields: "title")
+    response = $client.version_support.es_version_8_plus? ? @docs.termvector(id: 1, fields: "title") : @docs.termvector(type: "book", id: 1, fields: "title")
 
     assert response["term_vectors"]["title"]
     assert response["term_vectors"]["title"]["field_statistics"]
@@ -536,7 +577,7 @@ describe Elastomer::Client::Docs do
   it "provides access to term vector statistics with .termvectors" do
     populate!
 
-    response = $client.version_support.es_version_7_plus? ? @docs.termvectors(id: 1, fields: "title") : @docs.termvectors(type: "book", id: 1, fields: "title")
+    response = $client.version_support.es_version_8_plus? ? @docs.termvectors(id: 1, fields: "title") : @docs.termvectors(type: "book", id: 1, fields: "title")
 
     assert response["term_vectors"]["title"]
     assert response["term_vectors"]["title"]["field_statistics"]
@@ -547,7 +588,7 @@ describe Elastomer::Client::Docs do
   it "provides access to term vector statistics with .term_vector" do
     populate!
 
-    response = $client.version_support.es_version_7_plus? ? @docs.term_vector(id: 1, fields: "title") : @docs.term_vector(type: "book", id: 1, fields: "title")
+    response = $client.version_support.es_version_8_plus? ? @docs.term_vector(id: 1, fields: "title") : @docs.term_vector(type: "book", id: 1, fields: "title")
 
     assert response["term_vectors"]["title"]
     assert response["term_vectors"]["title"]["field_statistics"]
@@ -558,7 +599,7 @@ describe Elastomer::Client::Docs do
   it "provides access to term vector statistics with .term_vectors" do
     populate!
 
-    response = $client.version_support.es_version_7_plus? ? @docs.term_vectors(id: 1, fields: "title") : @docs.term_vectors(type: "book", id: 1, fields: "title")
+    response = $client.version_support.es_version_8_plus? ? @docs.term_vectors(id: 1, fields: "title") : @docs.term_vectors(type: "book", id: 1, fields: "title")
 
     assert response["term_vectors"]["title"]
     assert response["term_vectors"]["title"]["field_statistics"]
@@ -569,7 +610,7 @@ describe Elastomer::Client::Docs do
   it "provides access to multi term vector statistics" do
     populate!
 
-    response = $client.version_support.es_version_7_plus? ? @docs.multi_termvectors({ids: [1, 2]}, fields: "title", term_statistics: true) : @docs.multi_termvectors({ids: [1, 2]}, type: "book", fields: "title", term_statistics: true)
+    response = $client.version_support.es_version_8_plus? ? @docs.multi_termvectors({ids: [1, 2]}, fields: "title", term_statistics: true) : @docs.multi_termvectors({ids: [1, 2]}, type: "book", fields: "title", term_statistics: true)
     docs = response["docs"]
 
     assert docs
@@ -579,7 +620,7 @@ describe Elastomer::Client::Docs do
   it "provides access to multi term vector statistics with .multi_term_vectors" do
     populate!
 
-    response = $client.version_support.es_version_7_plus? ? @docs.multi_term_vectors({ids: [1, 2]}, fields: "title", term_statistics: true) : @docs.multi_term_vectors({ids: [1, 2]}, type: "book", fields: "title", term_statistics: true)
+    response = $client.version_support.es_version_8_plus? ? @docs.multi_term_vectors({ids: [1, 2]}, fields: "title", term_statistics: true) : @docs.multi_term_vectors({ids: [1, 2]}, type: "book", fields: "title", term_statistics: true)
     docs = response["docs"]
 
     assert docs
@@ -587,7 +628,7 @@ describe Elastomer::Client::Docs do
   end
 
   it "percolates a given document" do
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       skip "Percolate not supported in ES version #{$client.version}"
     end
 
@@ -610,7 +651,7 @@ describe Elastomer::Client::Docs do
   end
 
   it "percolates an existing document" do
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       skip "Percolate not supported in ES version #{$client.version}"
     end
 
@@ -633,7 +674,7 @@ describe Elastomer::Client::Docs do
   end
 
   it "counts the matches for percolating a given document" do
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       skip "Percolate not supported in ES version #{$client.version}"
     end
 
@@ -655,7 +696,7 @@ describe Elastomer::Client::Docs do
   end
 
   it "counts the matches for percolating an existing document" do
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       skip "Percolate not supported in ES version #{$client.version}"
     end
 
@@ -677,7 +718,7 @@ describe Elastomer::Client::Docs do
   end
 
   it "performs multi percolate queries" do
-    if $client.version_support.es_version_7_plus?
+    if $client.version_support.es_version_8_plus?
       skip "Multi percolate not supported in ES version #{$client.version}"
     end
 
@@ -698,87 +739,38 @@ describe Elastomer::Client::Docs do
     assert_equal 1, response3["total"]
   end
 
-  it "accepts a type param and does not throw an error for ES7" do
-    if !$client.version_support.es_version_7_plus? || $client.version_support.es_version_8_plus?
-      skip "This test is only needed for ES 7"
-    end
-
-    h = @docs.index \
-      _id: 1,
-      _type: "book",
-      title: "Book 1 by author 1",
-      author: "Author1"
-
-    assert_created h
-    assert_equal "1", h["_id"]
-
-    response1 = @docs.get(id: 1, type: "book")
-
-    assert_equal "1", response1["_id"]
-
-    @docs.update(document_wrapper("book", {
-      _id: "1",
-      doc: { author: "Author1.1" }
-    }))
-    response2 = @docs.get(id: "1", type: "book")
-
-    assert_equal "Author1.1", response2["_source"]["author"]
-
-    h = @docs.index \
-    _id: 2,
-    _type: "book",
-    title: "Book 2 by author 2",
-    author: "Author2"
-
-    assert_created h
-    assert_equal "2", h["_id"]
-
-    h = @docs.multi_get({ids: [2, 1]}, type: "book")
-    authors = h["docs"].map { |d| d["_source"]["author"] }
-
-    assert_equal %w[Author2 Author1.1], authors
-
-    h = @docs.index \
-    _id: 3,
-    _type: "book",
-    title: "Book 3 by author 3",
-    author: "Author3"
-
-    assert_created h
-    assert_equal "3", h["_id"]
-
-    h = @docs.delete id: 3, type: "book"
-
-    refute @docs.exists?(id: "3", type: "book")
-
-    @index.refresh
-    h = @docs.count q: "*:*", type: "book"
-
-    assert_equal 2, h["count"]
-
-    h = @docs.search q: "*:*", type: "book"
-
-    assert_equal 2, h["hits"]["total"]["value"]
-  end
-
   # Create/index multiple documents.
   #
-  # docs - An instance of Elastomer::Client::Docs or Elastomer::Client::Bulk. If
+  # docs - An instance of ElastomerClient::Client::Docs or ElastomerClient::Client::Bulk. If
   #        nil uses the @docs instance variable.
   def populate!(docs = @docs)
-    docs.index \
-      document_wrapper("book", {
+    docs.index ({
         _id: 1,
+        _type: "book",
         title: "Book1 by author 1",
         author: "Author1"
       })
 
-    docs.index \
-      document_wrapper("book", {
+    docs.index ({
         _id: 2,
+        _type: "book",
         title: "Book2 by author 2",
         author: "Author2"
       })
+
+    @index.refresh
+  end
+
+  def populate_with_params!(docs = @docs)
+    docs.index({
+        title: "Book1 by author 1",
+        author: "Author1"
+      }, { _id: 1, _type: "book" })
+
+    docs.index({
+        title: "Book2 by author 2",
+        author: "Author2"
+      }, { _id: 2, _type: "book" })
 
     @index.refresh
   end

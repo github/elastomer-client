@@ -1,7 +1,7 @@
 # Notifications Support
 
-Requiring `elastomer/notifications` enables support for broadcasting
-elastomer events through ActiveSupport::Notifications.
+Requiring `elastomer_client/notifications` enables support for broadcasting
+ElastomerClient events through ActiveSupport::Notifications.
 
 The event namespace is `request.client.elastomer`.
 

@@ -1,4 +1,4 @@
-# Elastomer Documents Component
+# ElastomerClient Documents Component
 
 The documents components handles all API calls related to
 [indexing documents](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
@@ -11,8 +11,8 @@ that is the only difference between the two. In the example below, the resulting
 documents components are equivalent.
 
 ```ruby
-require 'elastomer/client'
-client = Elastomer::Client.new :port => 9200
+require 'elastomer_client/client'
+client = ElastomerClient::Client.new :port => 9200
 
 docs1 = client.index("blog").docs("post")
 docs2 = client.docs("blog", "post")
@@ -94,7 +94,7 @@ locations enables you to reconcile documents between the two.
 The `:_id` field is only one of several special fields that control document
 indexing in Elasticsearch. The full list of supported fields are enumerated in
 the `index`
-[method documentation](https://github.com/github/elastomer-client/blob/main/lib/elastomer/client/docs.rb#L45-56).
+[method documentation](https://github.com/github/elastomer-client/blob/main/lib/elastomer_client/client/docs.rb#L45-56).
 
 As a parting note, you can also provide the index name and document type as part
 of the document itself. These fields will be extracted from the document before
@@ -163,7 +163,7 @@ client.docs.search \
 The `search` method returns the query response from Elasticsearch as a ruby
 Hash. All the keys are represented as Strings. The [hashie](https://github.com/intridea/hashie)
 project has some useful transforms and wrappers for working with these result
-sets, but that is left to the user to implement if they so desire. Elastomer
+sets, but that is left to the user to implement if they so desire. ElastomerClient
 client returns only ruby Hashes.
 
 Searches can be executed against multiple indices and multiple types. Again,

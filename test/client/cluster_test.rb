@@ -2,7 +2,7 @@
 
 require_relative "../test_helper"
 
-describe Elastomer::Client::Cluster do
+describe ElastomerClient::Client::Cluster do
 
   before do
     @name = "elastomer-cluster-test"
@@ -79,7 +79,7 @@ describe Elastomer::Client::Cluster do
 
   it "returns cluster stats" do
     h = @cluster.stats
-    expected = $client.version_support.es_version_7_plus? ? %w[cluster_name cluster_uuid indices nodes status timestamp] : %w[cluster_name indices nodes status timestamp]
+    expected = $client.version_support.es_version_8_plus? ? %w[cluster_name cluster_uuid indices nodes status timestamp] : %w[cluster_name indices nodes status timestamp]
     expected.unshift("_nodes")
 
     assert_equal expected, h.keys.sort

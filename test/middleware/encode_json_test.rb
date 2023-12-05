@@ -6,7 +6,7 @@ describe ElastomerClient::Middleware::EncodeJson do
   let(:middleware) { ElastomerClient::Middleware::EncodeJson.new(lambda { |env| env }) }
 
   def process(body, content_type: nil, method: :post)
-    env = { body: body, request_headers: Faraday::Utils::Headers.new, method: method }
+    env = { body:, request_headers: Faraday::Utils::Headers.new, method: }
     env[:request_headers]["content-type"] = content_type if content_type
     middleware.call(env)
   end

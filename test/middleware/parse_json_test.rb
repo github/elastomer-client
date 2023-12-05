@@ -7,7 +7,7 @@ describe ElastomerClient::Middleware::ParseJson do
   let(:headers) { Hash.new }
 
   def process(body, content_type = nil)
-    env = { body: body, response_headers: Faraday::Utils::Headers.new(headers) }
+    env = { body:, response_headers: Faraday::Utils::Headers.new(headers) }
     env[:response_headers]["content-type"] = content_type if content_type
     middleware.call(env)
   end

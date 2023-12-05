@@ -88,7 +88,7 @@ describe ElastomerClient::Client::UpdateByQuery do
       # default number of shards in ES8 is 1, so set it to 2 shards so routing to different shards can be tested
       settings = $client.version_support.es_version_8_plus? ? { number_of_shards: 2 } : {}
       index.create({
-        settings: settings,
+        settings:,
         mappings: mappings_wrapper(type, {
           properties: {
             name: { type: "text", analyzer: "standard" },

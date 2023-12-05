@@ -56,7 +56,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def create(body = {}, params = {})
-        response = client.put "/_snapshot/{repository}/{snapshot}", update_params(params, body: body, action: "snapshot.create", rest_api: "snapshot.create")
+        response = client.put "/_snapshot/{repository}/{snapshot}", update_params(params, body:, action: "snapshot.create", rest_api: "snapshot.create")
         response.body
       end
 
@@ -69,7 +69,7 @@ module ElastomerClient
       def get(params = {})
         # Set snapshot name or we'll get the repository instead
         snapshot = name || "_all"
-        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, snapshot: snapshot, action: "snapshot.get", rest_api: "snapshot.get")
+        response = client.get "/_snapshot/{repository}/{snapshot}", update_params(params, snapshot:, action: "snapshot.get", rest_api: "snapshot.get")
         response.body
       end
 
@@ -92,7 +92,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def restore(body = {}, params = {})
-        response = client.post "/_snapshot/{repository}/{snapshot}/_restore", update_params(params, body: body, action: "snapshot.restore", rest_api: "snapshot.restore")
+        response = client.post "/_snapshot/{repository}/{snapshot}/_restore", update_params(params, body:, action: "snapshot.restore", rest_api: "snapshot.restore")
         response.body
       end
 
@@ -122,7 +122,7 @@ module ElastomerClient
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        { repository: repository, snapshot: name }
+        { repository:, snapshot: name }
       end
     end
   end

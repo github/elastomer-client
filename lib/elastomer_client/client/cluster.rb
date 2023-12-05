@@ -119,7 +119,7 @@ module ElastomerClient
       #
       # Returns the response as a Hash
       def update_settings(body, params = {})
-        response = client.put "/_cluster/settings", params.merge(body: body, action: "cluster.update_settings", rest_api: "cluster.put_settings")
+        response = client.put "/_cluster/settings", params.merge(body:, action: "cluster.update_settings", rest_api: "cluster.put_settings")
         response.body
       end
 
@@ -159,7 +159,7 @@ module ElastomerClient
           body = {commands: Array(commands)}
         end
 
-        response = client.post "/_cluster/reroute", params.merge(body: body, action: "cluster.reroute", rest_api: "cluster.reroute")
+        response = client.post "/_cluster/reroute", params.merge(body:, action: "cluster.reroute", rest_api: "cluster.reroute")
         response.body
       end
 
@@ -217,7 +217,7 @@ module ElastomerClient
           body = {actions: Array(actions)}
         end
 
-        response = client.post "/_aliases", params.merge(body: body, action: "cluster.update_aliases", rest_api: "indices.update_aliases")
+        response = client.post "/_aliases", params.merge(body:, action: "cluster.update_aliases", rest_api: "indices.update_aliases")
         response.body
       end
 

@@ -354,6 +354,46 @@ describe ElastomerClient::Client do
     end
   end
 
+  describe "retry logic" do
+    it "defaults to no retries" do
+      stub_request(:get, $client.url+"/_cat/indices").
+        to_timeout.then.
+        to_return({
+          headers: {"Content-Type" => "text/plain; charset=UTF-8"},
+          body: "green open test-index 1 0 0 0 159b 159b"
+        })
+
+      assert_raises(ElastomerClient::Client::ConnectionFailed) {
+        $client.get("/_cat/indices")
+      }
+    end
+
+    it "adding retry logic retries up to 2 times" do
+      retry_count = 0
+
+      retry_options = {
+        max: 2,
+        interval: 0.05,
+        methods: [:get],
+        exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed],
+        retry_block: proc { |env, options, retries, exc| retry_count += 1 }
+      }
+      retry_client = ElastomerClient::Client.new(port: 9205) do |connection|
+        connection.request :retry, retry_options
+      end
+
+      stub_request(:get, retry_client.url + "/").
+        to_timeout.then.
+        to_timeout.then.
+        to_return({body: %q/{"acknowledged": true}/})
+
+      response = retry_client.get("/")
+
+      assert_equal 2, retry_count
+      assert_equal({"acknowledged" => true}, response.body)
+    end
+  end
+
   describe "duplicating a client connection" do
     it "is configured the same" do
       client = $client.dup

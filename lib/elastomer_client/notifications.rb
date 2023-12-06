@@ -63,7 +63,7 @@ module ElastomerClient
         action: params[:action],
         context: params[:context],
         request_body: body,
-        body: body   # for backwards compatibility
+        body:   # for backwards compatibility
       }
 
       ::ElastomerClient::Notifications.service.instrument(NAME, payload) do

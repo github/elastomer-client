@@ -77,12 +77,12 @@ module ElastomerClient
     # fashion.
     def dup
       self.class.new \
-          url:              url,
-          read_timeout:     read_timeout,
-          open_timeout:     open_timeout,
+          url:,
+          read_timeout:,
+          open_timeout:,
           adapter:          @adapter,
           opaque_id:        @opaque_id,
-          max_request_size: max_request_size,
+          max_request_size:,
           basic_auth:       @basic_auth,
           token_auth:       @token_auth
     end
@@ -135,8 +135,8 @@ module ElastomerClient
         conn.use(:gzip)
         conn.request(:encode_json)
         conn.request(:opaque_id) if @opaque_id
-        conn.request(:limit_size, max_request_size: max_request_size) if max_request_size
-        conn.request(:elastomer_compress, compression: compression) if compress_body
+        conn.request(:limit_size, max_request_size:) if max_request_size
+        conn.request(:elastomer_compress, compression:) if compress_body
 
         conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout

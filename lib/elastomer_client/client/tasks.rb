@@ -112,7 +112,7 @@ module ElastomerClient
       # Returns the response body as a Hash when timeout expires or target tasks complete
       # COMPATIBILITY WARNING: the response body differs between ES versions for this API
       def wait_for(timeout = "10s", params = {})
-        self.get params.merge(wait_for_completion: true, timeout: timeout)
+        self.get params.merge(wait_for_completion: true, timeout:)
       end
 
       # Wait for the specified amount of time (10 seconds by default) for some task(s) to complete.
@@ -133,7 +133,7 @@ module ElastomerClient
         raise ArgumentError, "invalid node ID provided: #{node_id.inspect}" if node_id.to_s.empty?
         raise ArgumentError, "invalid task ID provided: #{task_id.inspect}" unless task_id.is_a?(Integer)
 
-        self.get_by_id(node_id, task_id, params.merge(wait_for_completion: true, timeout: timeout))
+        self.get_by_id(node_id, task_id, params.merge(wait_for_completion: true, timeout:))
       end
 
       # Cancels a task running on a particular node.

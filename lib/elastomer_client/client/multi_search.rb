@@ -42,7 +42,7 @@ module ElastomerClient
         raise "multi_search request body cannot be nil" if body.nil?
         params ||= {}
 
-        response = self.post "{/index}{/type}/_msearch", params.merge(body: body, action: "msearch", rest_api: "msearch")
+        response = self.post "{/index}{/type}/_msearch", params.merge(body:, action: "msearch", rest_api: "msearch")
         response.body
       end
     end

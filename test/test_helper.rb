@@ -115,7 +115,7 @@ end
 
 def create_repo(name, settings = {})
   location = File.join(*[ENV["SNAPSHOT_DIR"], name].compact)
-  default_settings = {type: "fs", settings: {location: location}}
+  default_settings = {type: "fs", settings: {location:}}
   $client.repository(name).create(default_settings.merge(settings))
 end
 
@@ -203,9 +203,9 @@ end
 # into ElastomerClient::VersionSupport.
 
 # COMPATIBILITY
-# ES 7 drops mapping types, so don't wrap with a mapping type for ES 7+
+# ES8 drops mapping types, so don't wrap with a mapping type for ES8+
 def mappings_wrapper(type, body, disable_all = false)
-  if $client.version_support.es_version_7_plus?
+  if $client.version_support.es_version_8_plus?
     body
   else
     mapping = {
@@ -220,9 +220,9 @@ def mappings_wrapper(type, body, disable_all = false)
 end
 
 # COMPATIBILITY
-# ES 7 drops mapping types, so append type to the document only if ES version < 7
+# ES8 drops mapping types, so append type to the document only if ES version < 8
 def document_wrapper(type, body)
-  if $client.version_support.es_version_7_plus?
+  if $client.version_support.es_version_8_plus?
     body
   else
     body.merge({_type: type})

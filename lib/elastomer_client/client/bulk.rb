@@ -39,7 +39,7 @@ module ElastomerClient
       else
         raise "bulk request body cannot be nil" if body.nil?
         params ||= {}
-        updated_params = params.merge(body: body, action: "bulk", rest_api: "bulk")
+        updated_params = params.merge(body:, action: "bulk", rest_api: "bulk")
         updated_params.delete(:type) if version_support.es_version_8_plus?
 
         response = self.post "{/index}{/type}/_bulk", updated_params
@@ -280,9 +280,9 @@ module ElastomerClient
       # params   - Parameters for the update action (as a Hash) (optional)
       #
       # Examples
-      #   update({"foo" => "bar"}, {:_id => 1}
-      #   update({"foo" => "bar"}, {:id => 1}
-      #   update("foo" => "bar", "_id" => 1)
+      #   update({"doc" => {"foo" => "bar"}}, {:_id => 1})
+      #   update({"doc" => {"foo" => "bar"}}, {:id => 1})
+      #   update({"doc" => {"foo" => "bar"}}, "_id" => 1)
       #
       # Returns the response from the bulk call if one was made or nil.
       def update(document, params)
@@ -333,7 +333,7 @@ module ElastomerClient
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
         params.delete("_id") if params["_id"].nil? || params["_id"].to_s.empty?
 
-        if client.version_support.es_version_7_plus?
+        if client.version_support.es_version_8_plus?
           params.delete(:_type)
           params.delete("_type")
         end
@@ -356,7 +356,7 @@ module ElastomerClient
 
         SPECIAL_KEYS.each do |key|
           omit_prefix = (
-            client.version_support.es_version_7_plus? &&
+            client.version_support.es_version_8_plus? &&
             UNPREFIXED_SPECIAL_KEYS.include?(key)
           )
 

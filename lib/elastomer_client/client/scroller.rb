@@ -98,7 +98,7 @@ module ElastomerClient
     #
     # Returns the response body as a Hash.
     def continue_scroll(scroll_id, scroll = "5m")
-      response = get "/_search/scroll", body: {scroll_id: scroll_id}, scroll: scroll, action: "search.scroll", rest_api: "scroll"
+      response = get "/_search/scroll", body: {scroll_id:}, scroll:, action: "search.scroll", rest_api: "scroll"
       response.body
     rescue RequestError => err
       if err.error && err.error["caused_by"]["type"] == "search_context_missing_exception"

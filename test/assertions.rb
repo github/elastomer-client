@@ -2,9 +2,9 @@
 
 module Minitest::Assertions
   # COMPATIBILITY
-  # ES 7+ response uses "result" instead of "created"
+  # ES8+ response uses "result" instead of "created"
   def assert_created(response)
-    assert $client.version_support.es_version_7_plus? ? response["result"] == "created" : response["created"], "document was not created"
+    assert $client.version_support.es_version_8_plus? ? response["result"] == "created" : response["created"], "document was not created"
   end
 
   def assert_acknowledged(response)
@@ -38,10 +38,10 @@ module Minitest::Assertions
   end
 
   # COMPATIBILITY
-  # ES 7+ no longer supports types
+  # ES8+ no longer supports types
   def assert_mapping_exists(response, type, message = "mapping expected to exist, but doesn't")
     mapping =
-      if $client.version_support.es_version_7_plus?
+      if $client.version_support.es_version_8_plus?
         response["mappings"]
       else
         response["mappings"][type]
@@ -51,11 +51,11 @@ module Minitest::Assertions
   end
 
   # COMPATIBILITY
-  # ES 7+ no longer supports types
+  # ES8+ no longer supports types
   def assert_property_exists(response, type, property, message = "property expected to exist, but doesn't")
     mapping =
       if response.has_key?("mappings")
-        if $client.version_support.es_version_7_plus?
+        if $client.version_support.es_version_8_plus?
           response["mappings"]
         else
           response["mappings"][type]

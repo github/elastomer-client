@@ -56,7 +56,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def create(body, params = {})
-        response = client.put "/{index}", update_params(params, body: body, action: "index.create", rest_api: "indices.create")
+        response = client.put "/{index}", update_params(params, body:, action: "index.create", rest_api: "indices.create")
         response.body
       end
 
@@ -118,7 +118,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def update_settings(body, params = {})
-        response = client.put "{/index}/_settings", update_params(params, body: body, action: "index.update_settings", rest_api: "indices.put_settings")
+        response = client.put "{/index}/_settings", update_params(params, body:, action: "index.update_settings", rest_api: "indices.put_settings")
         response.body
       end
 
@@ -147,7 +147,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def update_mapping(type, body, params = {})
-        response = client.put "/{index}/_mapping{/type}", update_params(params, body: body, type: type, action: "index.update_mapping", rest_api: "indices.put_mapping")
+        response = client.put "/{index}/_mapping{/type}", update_params(params, body:, type:, action: "index.update_mapping", rest_api: "indices.put_mapping")
         response.body
       end
       alias_method :put_mapping, :update_mapping
@@ -181,7 +181,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def get_alias(name, params = {})
-        response = client.get "/{index}/_alias/{name}", update_params(params, name: name, action: "index.get_alias", rest_api: "indices.get_alias")
+        response = client.get "/{index}/_alias/{name}", update_params(params, name:, action: "index.get_alias", rest_api: "indices.get_alias")
         response.body
       end
 
@@ -200,7 +200,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def add_alias(name, params = {})
-        response = client.put "/{index}/_alias/{name}", update_params(params, name: name, action: "index.add_alias", rest_api: "indices.put_alias")
+        response = client.put "/{index}/_alias/{name}", update_params(params, name:, action: "index.add_alias", rest_api: "indices.put_alias")
         response.body
       end
 
@@ -218,7 +218,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def delete_alias(name, params = {})
-        response = client.delete "/{index}/_alias/{name}", update_params(params, name: name, action: "index.delete_alias", rest_api: "indices.delete_alias")
+        response = client.delete "/{index}/_alias/{name}", update_params(params, name:, action: "index.delete_alias", rest_api: "indices.delete_alias")
         response.body
       end
 
@@ -233,7 +233,7 @@ module ElastomerClient
       # Returns the response body as a Hash
       def analyze(text, params = {})
         body = text.is_a?(Hash) ? text : {text: text.to_s}
-        response = client.get "{/index}/_analyze", update_params(params, body: body, action: "index.analyze", rest_api: "indices.analyze")
+        response = client.get "{/index}/_analyze", update_params(params, body:, action: "index.analyze", rest_api: "indices.analyze")
         response.body
       end
 
@@ -348,7 +348,7 @@ module ElastomerClient
       #
       # Returns a Docs instance.
       def docs(type = nil)
-        type = "_doc" if client.version_support.es_version_7_plus?
+        type = "_doc" if client.version_support.es_version_8_plus?
         client.docs name, type
       end
 
@@ -557,7 +557,7 @@ module ElastomerClient
       def update_params(params, overrides = nil)
         h = defaults.update params
         h.update overrides unless overrides.nil?
-        h.delete(:type) if client.version_support.es_version_7_plus?
+        h.delete(:type) if client.version_support.es_version_8_plus?
         h
       end
 

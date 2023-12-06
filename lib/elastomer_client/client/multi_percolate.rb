@@ -42,7 +42,7 @@ module ElastomerClient
         raise "multi_percolate request body cannot be nil" if body.nil?
         params ||= {}
 
-        response = self.post "{/index}{/type}/_mpercolate", params.merge(body: body, action: "mpercolate", rest_api: "mpercolate")
+        response = self.post "{/index}{/type}/_mpercolate", params.merge(body:, action: "mpercolate", rest_api: "mpercolate")
         response.body
       end
     end
@@ -83,7 +83,7 @@ module ElastomerClient
       # Returns this MultiPercolate instance.
       def percolate(doc, header = {})
         add_to_actions(percolate: @params.merge(header))
-        add_to_actions(doc: doc)
+        add_to_actions(doc:)
       end
 
       # Add a percolate acount action to the multi percolate request. This
@@ -96,7 +96,7 @@ module ElastomerClient
       # Returns this MultiPercolate instance.
       def count(doc, header = {})
         add_to_actions(count: @params.merge(header))
-        add_to_actions(doc: doc)
+        add_to_actions(doc:)
       end
 
       # Execute the multi_percolate call with the accumulated percolate actions.

@@ -100,7 +100,7 @@ module ElastomerClient
       #
       # Returns a new params Hash.
       def update_params(params, overrides = nil)
-        h = { node_id: node_id }.update params
+        h = { node_id: }.update params
         h.update overrides unless overrides.nil?
         h
       end

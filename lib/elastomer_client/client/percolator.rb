@@ -27,7 +27,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def create(body, params = {})
-        response = client.put("/{index}/percolator/{id}", defaults.merge(params.merge(body: body, action: "percolator.create")))
+        response = client.put("/{index}/percolator/{id}", defaults.merge(params.merge(body:, action: "percolator.create")))
         response.body
       end
 
@@ -71,7 +71,7 @@ module ElastomerClient
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        {index: index_name, id: id}
+        {index: index_name, id:}
       end
 
     end  # Percolator

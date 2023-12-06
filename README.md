@@ -93,7 +93,7 @@ ElastomerClient::Client.new(url: YOUR_ES_URL, adapter: :excon)
 
 This client is tested against:
 
-- Ruby versions 3.0 through 3.2
+- Ruby version 3.2
 - Elasticsearch versions 5.6 and 8.7.
 
 ## Development
@@ -126,7 +126,6 @@ To run ES 5 and ES 8:
 docker compose --project-directory docker --profile all up
 ```
 
-<<<<<<< HEAD
 To run only ES 8:
 ```
 docker compose --project-directory docker --profile es8 up

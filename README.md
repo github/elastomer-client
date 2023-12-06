@@ -89,47 +89,77 @@ thusly:
 ElastomerClient::Client.new(url: YOUR_ES_URL, adapter: :excon)
 ```
 
+## Compatibility
+
+This client is tested against:
+
+- Ruby versions 3.0 through 3.2
+- Elasticsearch versions 5.6 and 8.7.
+
 ## Development
 
 Get started by cloning and running a few scripts:
 
-1. Bootstrap the project
-    - `script/bootstrap`
-2. Run ES in Docker (see below)
-3. Run tests
-    - for ES 8: `ES_PORT=9208 rake test`
-    - for ES 5: `ES_PORT=9205 rake test`
+- [ElastomerClient ](#elastomerclient-)
+  - [Client](#client)
+      - [Cluster](#cluster)
+      - [Index](#index)
+      - [Docs](#docs)
+      - [Performance](#performance)
+  - [Compatibility](#compatibility)
+  - [Development](#development)
+    - [Bootstrap the project](#bootstrap-the-project)
+    - [Start an Elasticsearch server in Docker](#start-an-elasticsearch-server-in-docker)
+    - [Run tests against a version of Elasticsearch](#run-tests-against-a-version-of-elasticsearch)
+  - [Releasing](#releasing)
 
+### Bootstrap the project
 
-Run ES 5 and ES 8:
 ```
-cd docker
-docker compose --profile all up
-```
-
-Run only ES 8:
-```
-cd docker
-docker compose --profile es8 up
-```
-
-Run only ES 5:
-```
-cd docker
-docker compose --profile es5 up
+script/bootstrap
 ```
 
+### Start an Elasticsearch server in Docker
+
+To run ES 5 and ES 8:
+```
+docker compose --project-directory docker --profile all up
+```
+
+<<<<<<< HEAD
+To run only ES 8:
+```
+docker compose --project-directory docker --profile es8 up
+```
+
+To run only ES 5:
+```
+docker compose --project-directory docker --profile es5 up
+```
+
+### Run tests against a version of Elasticsearch
+
+ES 8
+```
+ES_PORT=9208 rake test
+```
+
+ES 5
+```
+ES_PORT=9205 rake test
+```
 
 ## Releasing
 
 1. Create a new branch from `main`
-2. Bump the version number in `lib/elastomer_client/version.rb`
-3. Update `CHANGELOG.md` with info about the new version
-4. Execute `bin/rake build`. This will place a new gem file in the `pkg/` folder.
-5. Run `gem install pkg/elastomer-client-{VERSION}.gem` to install the new gem locally
-6. Start an `irb` session, `require "elastomer_client/client"` and make sure things work as you expect
-7. Once everything is working as you expect, commit the version bump and open a PR
-8. Once you get approval and merge it to master, pull down a fresh copy of master and then...
-9. Run `rake release`
-10. If necessary, manually push the new version to rubygems.org
-11. 🕺 💃 🎉
+1. Bump the version number in `lib/elastomer/version.rb`
+1. Update `CHANGELOG.md` with info about the new version
+1. Commit your changes and tag the commit with a version number starting with the prefix "v" e.g. `v4.0.2`
+1. Execute `rake build`. This will place a new gem file in the `pkg/` folder.
+1. Run `gem install pkg/elastomer-client-{VERSION}.gem` to install the new gem locally
+1. Start an `irb` session, `require "elastomer/client"` and make sure things work as you expect
+1. Once everything is working as you expect, push both your commit and your tag, and open a pull request
+1. Request review from a maintainer and wait for the pull request to be approved. Once it is approved, you can merge it to `main` yourself. After that, pull down a fresh copy of `main` and then...
+1. [Optional] If you intend to release a new version to Rubygems, run `rake release`
+1. [Optional] If necessary, manually push the new version to rubygems.org
+1. 🕺 💃 🎉

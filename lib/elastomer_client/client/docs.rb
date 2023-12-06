@@ -310,7 +310,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def percolate(body, params = {})
-        response = client.get "/{index}/{type}{/id}/_percolate", update_params(params, body: body, action: "percolator.percolate", rest_api: "percolate")
+        response = client.get "/{index}/{type}{/id}/_percolate", update_params(params, body:, action: "percolator.percolate", rest_api: "percolate")
         response.body
       end
 
@@ -326,7 +326,7 @@ module ElastomerClient
       #
       # Returns the count
       def percolate_count(body, params = {})
-        response = client.get "/{index}/{type}{/id}/_percolate/count", update_params(params, body: body, action: "percolator.percolate_count", rest_api: "count_percolate")
+        response = client.get "/{index}/{type}{/id}/_percolate/count", update_params(params, body:, action: "percolator.percolate_count", rest_api: "count_percolate")
         response.body["total"]
       end
 
@@ -363,7 +363,7 @@ module ElastomerClient
       #
       # Returns the response body as a hash
       def multi_termvectors(body, params = {})
-        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, {body: body, action: "docs.multi_termvectors", rest_api: "mtermvectors"}, client.version_support.es_version_8_plus?)
+        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, {body:, action: "docs.multi_termvectors", rest_api: "mtermvectors"}, client.version_support.es_version_8_plus?)
         response.body
       end
       alias_method :multi_term_vectors, :multi_termvectors
@@ -473,7 +473,7 @@ module ElastomerClient
       #
       # Returns a new Scroller instance
       def scroll(query, opts = {})
-        opts = {index: name, type: type}.merge opts
+        opts = {index: name, type:}.merge opts
         client.scroll query, opts
       end
 
@@ -500,7 +500,7 @@ module ElastomerClient
       #
       # Returns a new Scroller instance
       def scan(query, opts = {})
-        opts = {index: name, type: type}.merge opts
+        opts = {index: name, type:}.merge opts
         client.scan query, opts
       end
 
@@ -610,7 +610,7 @@ module ElastomerClient
 
       # Internal: Returns a Hash containing default parameters.
       def defaults
-        { index: name, type: type }
+        { index: name, type: }
       end
 
       # Internal: Allow params to be passed as the first argument to

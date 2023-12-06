@@ -27,7 +27,7 @@ module ElastomerClient::Client::RestApiSpec
     def select_params(api:, from:)
       rest_api = get(api)
       return from if rest_api.nil?
-      rest_api.select_params(from: from)
+      rest_api.select_params(from:)
     end
 
     # Given an API descriptor name and a single request parameter, returns
@@ -54,7 +54,7 @@ module ElastomerClient::Client::RestApiSpec
     def select_parts(api:, from:)
       rest_api = get(api)
       return from if rest_api.nil?
-      rest_api.select_parts(from: from)
+      rest_api.select_parts(from:)
     end
 
     # Given an API descriptor name and a single path part, returns `true` if the

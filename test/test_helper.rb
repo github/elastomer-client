@@ -115,7 +115,7 @@ end
 
 def create_repo(name, settings = {})
   location = File.join(*[ENV["SNAPSHOT_DIR"], name].compact)
-  default_settings = {type: "fs", settings: {location: location}}
+  default_settings = {type: "fs", settings: {location:}}
   $client.repository(name).create(default_settings.merge(settings))
 end
 

@@ -47,7 +47,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def create(body, params = {})
-        response = client.put "/_snapshot/{repository}", update_params(params, body: body, action: "repository.create", rest_api: "snapshot.create_repository")
+        response = client.put "/_snapshot/{repository}", update_params(params, body:, action: "repository.create", rest_api: "snapshot.create_repository")
         response.body
       end
 
@@ -81,7 +81,7 @@ module ElastomerClient
       #
       # Returns the response body as a Hash
       def update(body, params = {})
-        response = client.put "/_snapshot/{repository}", update_params(params, body: body, action: "repository.update", rest_api: "snapshot.create_repository")
+        response = client.put "/_snapshot/{repository}", update_params(params, body:, action: "repository.update", rest_api: "snapshot.create_repository")
         response.body
       end
 

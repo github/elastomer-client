@@ -284,7 +284,7 @@ describe ElastomerClient::Client::Index do
           properties: {
             title: { type: "text", analyzer: "standard" },
             author: { type: "keyword" },
-            suggest: suggest
+            suggest:
           }
         }, true)
       )

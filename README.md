@@ -89,6 +89,22 @@ thusly:
 ElastomerClient::Client.new(url: YOUR_ES_URL, adapter: :excon)
 ```
 
+#### Retries
+
+You can add retry logic to your Elastomer client connection using Faraday's Retry middleware. The `ElastomerClient::Client.new` method can accept a block, which you can use to customize the Faraday connection. Here's an example:
+
+```ruby
+retry_options = {
+  max: 2,
+  interval: 0.05,
+  methods: [:get]
+}
+
+ElastomerClient::Client.new do |connection|
+  connection.request :retry, retry_options
+end
+```
+
 ## Compatibility
 
 This client is tested against:

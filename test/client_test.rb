@@ -354,6 +354,46 @@ describe ElastomerClient::Client do
     end
   end
 
+  describe "retry logic" do
+    it "defaults to no retries" do
+      stub_request(:get, $client.url+"/_cat/indices").
+        to_timeout.then.
+        to_return({
+          headers: {"Content-Type" => "text/plain; charset=UTF-8"},
+          body: "green open test-index 1 0 0 0 159b 159b"
+        })
+
+      assert_raises(ElastomerClient::Client::ConnectionFailed) {
+        $client.get("/_cat/indices")
+      }
+    end
+
+    it "adding retry logic retries up to 2 times" do
+      retry_count = 0
+
+      retry_options = {
+        max: 2,
+        interval: 0.05,
+        methods: [:get],
+        exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed],
+        retry_block: proc { |env, options, retries, exc| retry_count += 1 }
+      }
+      retry_client = ElastomerClient::Client.new(port: 9205) do |connection|
+        connection.request :retry, retry_options
+      end
+
+      stub_request(:get, retry_client.url + "/").
+        to_timeout.then.
+        to_timeout.then.
+        to_return({body: %q/{"acknowledged": true}/})
+
+      response = retry_client.get("/")
+
+      assert_equal 2, retry_count
+      assert_equal({"acknowledged" => true}, response.body)
+    end
+  end
+
   describe "duplicating a client connection" do
     it "is configured the same" do
       client = $client.dup
@@ -372,75 +412,6 @@ describe ElastomerClient::Client do
       client = $client.dup
 
       refute_same $client.connection, client.connection
-    end
-  end
-
-  describe "automatic retry of requests" do
-    before do
-      @events = []
-      @subscriber = ActiveSupport::Notifications.subscribe do |*args|
-        @events << ActiveSupport::Notifications::Event.new(*args)
-      end
-    end
-
-    after do
-      @events.clear
-      ActiveSupport::Notifications.unsubscribe(@subscriber)
-    end
-
-    it "defaults to no retries" do
-      stub_request(:get, $client.url+"/_cat/indices").
-        to_timeout.then.
-        to_return({
-          headers: {"Content-Type" => "text/plain; charset=UTF-8"},
-          body: "green open test-index 1 0 0 0 159b 159b"
-        })
-
-      assert_raises(ElastomerClient::Client::ConnectionFailed) {
-        $client.get("/_cat/indices")
-      }
-    end
-
-    it "retries up to `max_retries` times" do
-      stub_request(:get, $client.url+"/test-index/_settings").
-        to_timeout.then.
-        to_timeout.then.
-        to_return({body: %q/{"acknowledged": true}/})
-
-      response = $client.index("test-index").settings(max_retries: 2)
-
-      assert_equal 2, @events.first.payload[:retries]
-      assert_equal({"acknowledged" => true}, response)
-    end
-
-    it "does not retry on PUT requests" do
-      stub_request(:put, $client.url+"/test-index").
-        to_timeout.then.
-        to_return({body: %q/{"acknowledged": true}/})
-
-      assert_raises(ElastomerClient::Client::ConnectionFailed) {
-        $client.index("test-index").create({}, max_retries: 1)
-      }
-    end
-
-    it "does not retry on POST requests" do
-      stub_request(:post, $client.url+"/test-index/_flush").
-        to_timeout.then.
-        to_return({body: %q/{"acknowledged": true}/})
-
-      assert_raises(ElastomerClient::Client::ConnectionFailed) {
-        $client.index("test-index").flush(max_retries: 1)
-      }
-    end
-
-    it "does not retry on DELETE requests" do
-      stub_request(:delete, $client.url+"/test-index").
-        to_timeout.then.
-        to_return({body: %q/{"acknowledged": true}/})
-
-      assert_raises(ElastomerClient::Client::ConnectionFailed) {
-        $client.index("test-index").delete(max_retries: 1)
-      }
     end
   end
 end

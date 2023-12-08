@@ -18,12 +18,8 @@ module ElastomerClient
 
     MAX_REQUEST_SIZE = 2**20 * 250  # 250 MB
 
-    RETRYABLE_METHODS = %i[get head].freeze
-
     # Create a new client that can be used to make HTTP requests to the
-    # Elasticsearch server. If you use `:max_retries`, then any GET or HEAD
-    # request will be retried up to this many times with a 75ms delay between
-    # the retry attempts. Only non-fatal exceptions will retried automatically.
+    # Elasticsearch server.
     #
     # see lib/elastomer_client/client/errors.rb#L92-L94
     #
@@ -36,8 +32,6 @@ module ElastomerClient
     #   :adapter      - the Faraday adapter to use (defaults to :excon)
     #   :opaque_id    - set to `true` to use the 'X-Opaque-Id' request header
     #   :max_request_size - the maximum allowed request size in bytes (defaults to 250 MB)
-    #   :max_retries      - the maximum number of request retires (defaults to 0)
-    #   :retry_delay      - delay in seconds between retries (defaults to 0.075)
     #   :strict_params    - set to `true` to raise exceptions when invalid request params are used
     #   :es_version       - set to the Elasticsearch version (example: "5.6.6") to avoid an HTTP request to get the version.
     #   :compress_body    - set to true to enable request body compression (default: false)
@@ -46,8 +40,7 @@ module ElastomerClient
     #   :token_auth       - an authentication token as a String to use on connections (overrides :basic_auth)
     #
     def initialize(host: "localhost", port: 9200, url: nil,
-                   read_timeout: 5, open_timeout: 2, max_retries: 0, retry_delay: 0.075,
-                   opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE,
+                   read_timeout: 5, open_timeout: 2, opaque_id: false, adapter: Faraday.default_adapter, max_request_size: MAX_REQUEST_SIZE,
                    strict_params: false, es_version: nil, compress_body: false, compression: Zlib::DEFAULT_COMPRESSION,
                    basic_auth: nil, token_auth: nil, &block)
 
@@ -59,8 +52,6 @@ module ElastomerClient
 
       @read_timeout     = read_timeout
       @open_timeout     = open_timeout
-      @max_retries      = max_retries
-      @retry_delay      = retry_delay
       @adapter          = adapter
       @opaque_id        = opaque_id
       @max_request_size = max_request_size
@@ -75,7 +66,7 @@ module ElastomerClient
 
     attr_reader :host, :port, :url
     attr_reader :read_timeout, :open_timeout
-    attr_reader :max_retries, :retry_delay, :max_request_size
+    attr_reader :max_request_size
     attr_reader :strict_params
     attr_reader :es_version
     attr_reader :compress_body
@@ -238,17 +229,14 @@ module ElastomerClient
     # params - Parameters Hash
     #   :body         - Will be used as the request body
     #   :read_timeout - Optional read timeout (in seconds) for the request
-    #   :max_retires  - Optional retry number for the request
     #
     # Returns a Faraday::Response
     # Raises an ElastomerClient::Client::Error on 4XX and 5XX responses
     def request(method, path, params)
       read_timeout = params.delete(:read_timeout)
-      request_max_retries = params.delete(:max_retries) || max_retries
       body = extract_body(params)
       path = expand_path(path, params)
 
-      params[:retries] = retries = 0
       instrument(path, body, params) do
         begin
           response =
@@ -283,11 +271,6 @@ module ElastomerClient
         # wrap Faraday errors with appropriate ElastomerClient::Client error classes
         rescue Faraday::Error::ClientError => boom
           error = wrap_faraday_error(boom, method, path)
-          if error.retry? && RETRYABLE_METHODS.include?(method) && (retries += 1) <= request_max_retries
-            params[:retries] = retries
-            sleep retry_delay
-            retry
-          end
           raise error
         rescue OpaqueIdError => boom
           reset!
@@ -371,7 +354,6 @@ module ElastomerClient
       query_values = params.dup
       query_values.delete :action
       query_values.delete :context
-      query_values.delete :retries
 
       rest_api = query_values.delete :rest_api
 

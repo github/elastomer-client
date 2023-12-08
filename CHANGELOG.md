@@ -1,3 +1,8 @@
+## 6.0.0 (2023-12-08)
+- Remove default retry logic, requiring consumers to implement their own
+- Remove support for ES 7
+- Move to support only the latest Ruby version
+
 ## 5.2.0 (2023-11-07)
 - Allow passing a Faraday connection configuration block to the client.
 

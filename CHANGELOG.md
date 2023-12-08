@@ -1,4 +1,4 @@
-## 5.3.0 (2023-12-08)
+## 6.0.0 (2023-12-08)
 - Remove default retry logic, requiring consumers to implement their own
 - Remove support for ES 7
 - Move to support only the latest Ruby version

@@ -134,7 +134,6 @@ module ElastomerClient
         # Request compressed responses from ES and decompress them
         conn.use(:gzip)
         conn.request(:encode_json)
-        conn.request(:opaque_id) if @opaque_id
         conn.request(:limit_size, max_request_size:) if max_request_size
         conn.request(:elastomer_compress, compression:) if compress_body
 
@@ -148,6 +147,8 @@ module ElastomerClient
         end
 
         @connection_block&.call(conn)
+        
+        conn.request(:opaque_id) if @opaque_id
 
         if @adapter.is_a?(Array)
           conn.adapter(*@adapter)

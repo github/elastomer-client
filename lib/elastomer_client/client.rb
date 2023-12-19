@@ -147,7 +147,7 @@ module ElastomerClient
         end
 
         @connection_block&.call(conn)
-        
+
         conn.request(:opaque_id) if @opaque_id
 
         if @adapter.is_a?(Array)

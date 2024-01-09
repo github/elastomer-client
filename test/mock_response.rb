@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ElastomerClient
   module Middleware
     class MockResponse < Faraday::Middleware

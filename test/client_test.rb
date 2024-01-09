@@ -424,6 +424,7 @@ describe ElastomerClient::Client do
     end
 
     response = client.get("/")
-    assert_equal response.headers["Fake"], "yes"
+
+    assert_equal "yes", response.headers["Fake"]
   end
 end

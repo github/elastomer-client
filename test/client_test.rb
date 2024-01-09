@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require File.expand_path("../test_helper", __FILE__)
+require File.expand_path("../mock_response", __FILE__)
 require "elastomer_client/notifications"
 
 describe ElastomerClient::Client do
@@ -413,5 +414,17 @@ describe ElastomerClient::Client do
 
       refute_same $client.connection, client.connection
     end
+  end
+
+  it "does not throw OpaqueIdError for mocked response with empty opaque id" do
+    opts = $client_params.merge \
+      opaque_id: true
+    client = ElastomerClient::Client.new(**opts) do |connection|
+      connection.request(:mock_response) { |env| env.body = "{}" }
+    end
+
+    response = client.get("/")
+
+    assert_equal "yes", response.headers["Fake"]
   end
 end

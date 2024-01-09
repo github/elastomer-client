@@ -1,3 +1,6 @@
+## 6.0.1 (2024-01-09)
+- Move Opaque ID middleware to the end of the Faraday middleware chain
+
 ## 6.0.0 (2023-12-08)
 - Remove default retry logic, requiring consumers to implement their own
 - Remove support for ES 7

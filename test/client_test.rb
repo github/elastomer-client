@@ -427,4 +427,15 @@ describe ElastomerClient::Client do
 
     assert_equal "yes", response.headers["Fake"]
   end
+
+  it "throws ServerError and not OpaqueIdError on 5xx response" do
+    client_params = $client_params.merge \
+      opaque_id: true
+    client = ElastomerClient::Client.new(**client_params)
+
+    test_url = "#{client.url}/"
+    stub_request(:get, test_url).and_return(status: 503, headers: { "Content-Type" => "application/json" })
+
+    assert_raises(ElastomerClient::Client::ServerError) { client.request :get, test_url, {} }
+  end
 end

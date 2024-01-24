@@ -416,15 +416,50 @@ describe ElastomerClient::Client do
     end
   end
 
-  it "does not throw OpaqueIdError for mocked response with empty opaque id" do
-    opts = $client_params.merge \
-      opaque_id: true
-    client = ElastomerClient::Client.new(**opts) do |connection|
-      connection.request(:mock_response) { |env| env.body = "{}" }
+  describe "OpaqueIDError conditionals" do
+    it "does not throw OpaqueIdError for mocked response with empty opaque id" do
+      opts = $client_params.merge \
+        opaque_id: true
+      client = ElastomerClient::Client.new(**opts) do |connection|
+        connection.request(:mock_response) { |env| env.body = "{}" }
+      end
+
+      response = client.get("/")
+
+      assert_equal "yes", response.headers["Fake"]
     end
 
-    response = client.get("/")
+    it "throws OpaqueIdError on mismatched ID" do
+      client_params = $client_params.merge \
+        opaque_id: true
+      client = ElastomerClient::Client.new(**client_params)
 
-    assert_equal "yes", response.headers["Fake"]
+      test_url = "#{client.url}/"
+      stub_request(:get, test_url).and_return(status: 200, headers: { "Content-Type" => "application/json", "X-Opaque-Id" => "foo" })
+
+      assert_raises(ElastomerClient::Client::OpaqueIdError) { client.request :get, test_url, {} }
+    end
+
+    it "throws OpaqueIdError on empty string ID" do
+      client_params = $client_params.merge \
+        opaque_id: true
+      client = ElastomerClient::Client.new(**client_params)
+
+      test_url = "#{client.url}/"
+      stub_request(:get, test_url).and_return(status: 200, headers: { "Content-Type" => "application/json", "X-Opaque-Id" => "" })
+
+      assert_raises(ElastomerClient::Client::OpaqueIdError) { client.request :get, test_url, {} }
+    end
+
+    it "throws ServerError and not OpaqueIdError on 5xx response and nil ID" do
+      client_params = $client_params.merge \
+        opaque_id: true
+      client = ElastomerClient::Client.new(**client_params)
+
+      test_url = "#{client.url}/"
+      stub_request(:get, test_url).and_return(status: 503, headers: { "Content-Type" => "application/json" })
+
+      assert_raises(ElastomerClient::Client::ServerError) { client.request :get, test_url, {} }
+    end
   end
 end

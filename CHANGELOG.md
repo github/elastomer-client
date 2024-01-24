@@ -1,3 +1,6 @@
+## 6.0.2 (2024-01-24)
+- Change Opaque ID error handling to not throw OpaqueIDError for 5xx responses
+
 ## 6.0.1 (2024-01-09)
 - Move Opaque ID middleware to the end of the Faraday middleware chain
 

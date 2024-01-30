@@ -134,20 +134,6 @@ module ElastomerClient
       end
       alias_method :exist?, :exists?
 
-      # Retrieve the document source from the index based on the ID and type.
-      # The :id is provided as part of the params hash.
-      #
-      # params - Parameters Hash
-      #   :id - the ID of the document
-      #
-      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html#_source
-      #
-      # Returns the response body as a Hash
-      def source(params = {})
-        response = client.get "/{index}/{type}/{id}/_source", update_params(params, action: "docs.source", rest_api: "get_source")
-        response.body
-      end
-
       # Allows you to get multiple documents based on an index, type, and id (and possibly routing).
       #
       # body   - The request body as a Hash or a JSON encoded String
@@ -160,7 +146,7 @@ module ElastomerClient
         overrides = from_document body
         overrides.merge!(action: "docs.multi_get", rest_api: "mget")
 
-        response = client.get "{/index}{/type}/_mget", update_params(params, overrides, client.version_support.es_version_8_plus?)
+        response = client.get "{/index}{/type}/_mget", update_params(params, overrides, true)
         response.body
       end
       alias_method :mget, :multi_get
@@ -177,7 +163,7 @@ module ElastomerClient
         overrides = from_document script
         overrides.merge!(action: "docs.update", rest_api: "update")
 
-        if client.version_support.es_version_8_plus?
+        if client.version_support.es_version_7_plus?
           response = client.post "/{index}/_update/{id}", update_params(params, overrides, true)
         else
           response = client.post "/{index}/{type}/{id}/_update", update_params(params, overrides)
@@ -210,7 +196,7 @@ module ElastomerClient
       def search(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_search", update_params(params, {body: query, action: "docs.search", rest_api: "search"}, client.version_support.es_version_8_plus?)
+        response = client.get "/{index}{/type}/_search", update_params(params, {body: query, action: "docs.search", rest_api: "search"}, true)
         response.body
       end
 
@@ -257,7 +243,7 @@ module ElastomerClient
       def count(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        if client.version_support.es_version_8_plus?
+        if client.version_support.es_version_7_plus?
           response = client.get "/{index}/_count", update_params(params, {body: query, action: "docs.count", rest_api: "count"}, true)
         else
           response = client.get "/{index}{/type}/_count", update_params(params, body: query, action: "docs.count", rest_api: "count")
@@ -390,7 +376,7 @@ module ElastomerClient
       def explain(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        if client.version_support.es_version_8_plus?
+        if client.version_support.es_version_7_plus?
           response = client.get "/{index}/_explain/{id}", update_params(params, {body: query, action: "docs.explain", rest_api: "explain"}, true)
         else
           response = client.get "/{index}/{type}/{id}/_explain", update_params(params, body: query, action: "docs.explain", rest_api: "explain")
@@ -419,7 +405,7 @@ module ElastomerClient
       def validate(query, params = nil)
         query, params = extract_params(query) if params.nil?
 
-        response = client.get "/{index}{/type}/_validate/query", update_params(params, {body: query, action: "docs.validate", rest_api: "indices.validate_query"}, client.version_support.es_version_8_plus?)
+        response = client.get "/{index}{/type}/_validate/query", update_params(params, {body: query, action: "docs.validate", rest_api: "indices.validate_query"}, true)
         response.body
       end
 
@@ -603,8 +589,12 @@ module ElastomerClient
         h = defaults.update params
         h.update overrides unless overrides.nil?
         h[:routing] = h[:routing].join(",") if h[:routing].is_a?(Array)
-        h[:type] = "_doc" if client.version_support.es_version_8_plus? && !delete_type
-        h.delete(:type) if delete_type
+        if delete_type
+          h.delete(:type)
+        else
+          h[:type] = "_doc" if client.version_support.es_version_7_plus?
+        end
+
         h
       end
 

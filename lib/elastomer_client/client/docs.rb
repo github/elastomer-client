@@ -327,7 +327,7 @@ module ElastomerClient
       #
       # Returns the response body as a hash
       def termvector(params = {})
-        if client.version_support.es_version_8_plus?
+        if client.version_support.es_version_7_plus?
           response = client.get "/{index}/_termvectors/{id}", update_params(params, {action: "docs.termvector", rest_api: "termvectors"}, true)
         else
           response = client.get "/{index}/{type}/{id}/_termvectors", update_params(params, action: "docs.termvector", rest_api: "termvectors")
@@ -349,7 +349,7 @@ module ElastomerClient
       #
       # Returns the response body as a hash
       def multi_termvectors(body, params = {})
-        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, {body:, action: "docs.multi_termvectors", rest_api: "mtermvectors"}, client.version_support.es_version_8_plus?)
+        response = client.get "{/index}{/type}/_mtermvectors", update_params(params, {body:, action: "docs.multi_termvectors", rest_api: "mtermvectors"}, client.version_support.es_version_7_plus?)
         response.body
       end
       alias_method :multi_term_vectors, :multi_termvectors
@@ -518,7 +518,7 @@ module ElastomerClient
         raise "a block is required" if block.nil?
 
         params = {index: self.name, type: self.type}.merge params
-        params.delete(:type) if client.version_support.es_version_8_plus?
+        params.delete(:type) if client.version_support.es_version_7_plus?
         client.multi_search params, &block
       end
 

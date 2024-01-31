@@ -19,7 +19,7 @@ jobs:
               https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.15.tar.gz
           - ES_VERSION: '7.10.0'
             ES_DOWNLOAD_URL: >-
-              https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.10.0-linux-x86_64.tar.gz
+              https://artifacts.opensearch.org/releases/bundle/opensearch/2.11.1/opensearch-2.11.1-linux-x64.tar.gz
           - ES_VERSION: '8.7.0'
             ES_DOWNLOAD_URL: >-
               https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.7.0-linux-x86_64.tar.gz

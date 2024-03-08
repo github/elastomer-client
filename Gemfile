@@ -11,7 +11,7 @@ group :development do
   gem "minitest", "~> 5.17"
   gem "minitest-focus", "~> 1.3"
   gem "rake"
-  gem "rubocop", "~> 1.45.1"
+  gem "rubocop", "~> 1.62.0"
   gem "rubocop-github", "~> 0.20.0"
   gem "rubocop-minitest", "~> 0.34.5"
   gem "rubocop-performance", "~> 1.19.1"

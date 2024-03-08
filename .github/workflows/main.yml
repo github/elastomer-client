@@ -25,7 +25,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache Elasticsearch
         id: cache-elasticsearch
         uses: actions/cache@v4

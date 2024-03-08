@@ -89,7 +89,7 @@ describe ElastomerClient::Client::Cluster do
     h = @cluster.pending_tasks
 
     assert_equal %w[tasks], h.keys.sort
-    assert h["tasks"].is_a?(Array), "the tasks lists is always an Array even if empty"
+    assert_kind_of Array, h["tasks"], "the tasks lists is always an Array even if empty"
   end
 
   it "returns the list of indices in the cluster" do

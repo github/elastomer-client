@@ -421,7 +421,7 @@ describe ElastomerClient::Client::Docs do
 
     assert h.key?("nodes"), "response contains \"nodes\" information"
     assert h.key?("shards"), "response contains \"shards\" information"
-    assert h["shards"].is_a?(Array), "\"shards\" is an array"
+    assert_kind_of Array, h["shards"], "\"shards\" is an array"
   end
 
   it "generates QueryParsingError exceptions on bad input when searching" do

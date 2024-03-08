@@ -18,11 +18,11 @@ describe ElastomerClient::Client::Tasks do
   it "list all in-flight tasks" do
     h = @tasks.get
 
-    assert h["nodes"].keys.size > 0
+    assert_operator h["nodes"].keys.size, :>, 0
 
     total_tasks = h["nodes"].map { |k, v| v["tasks"].keys.count }.sum
 
-    assert total_tasks > 0
+    assert_operator total_tasks, :>, 0
   end
 
   it "groups by parent->child relationships when get-all tasks API is grouped by 'parents'" do

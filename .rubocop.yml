@@ -26,3 +26,6 @@ AllCops:
   Exclude:
     - 'lib/elastomer_client/client/rest_api_spec/api_spec_*.rb' # Exclude generated ApiSpec files
     - 'vendor/**/*'
+
+Metrics/MethodLength:
+  Max: 25

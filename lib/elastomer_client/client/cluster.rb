@@ -91,7 +91,7 @@ module ElastomerClient
       # does not contain the "tasks" field.
       def pending_tasks?
         hash = pending_tasks
-        return nil unless hash.key? "tasks"
+        return nil unless hash.key? "tasks" # rubocop:disable Style/ReturnNilInPredicateMethodDefinition
         hash["tasks"].length > 0
       end
 

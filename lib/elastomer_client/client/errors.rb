@@ -34,10 +34,10 @@ module ElastomerClient
           @error = body["error"] if body.is_a?(Hash) && body.key?("error")
 
           message = @error || body.to_s
-          super message
+          super(message)
 
         else
-          super args.join(" ")
+          super(args.join(" "))
         end
       end
 

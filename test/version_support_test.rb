@@ -13,7 +13,7 @@ describe ElastomerClient::VersionSupport do
       end
 
       eight_series.each do |version|
-        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_8_plus?
+        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_7_plus?
       end
     end
   end

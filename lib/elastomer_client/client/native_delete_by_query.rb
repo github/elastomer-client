@@ -31,7 +31,7 @@ module ElastomerClient
       def execute
         # TODO: Require index parameter. type is optional.
         updated_params = parameters.merge(body: query, action: "delete_by_query", rest_api: "delete_by_query")
-        updated_params.delete(:type) if client.version_support.es_version_8_plus?
+        updated_params.delete(:type) if client.version_support.es_version_7_plus?
         response = client.post("/{index}{/type}/_delete_by_query", updated_params)
         response.body
       end

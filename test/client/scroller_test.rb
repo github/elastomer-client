@@ -7,7 +7,7 @@ describe ElastomerClient::Client::Scroller do
   before do
     @name  = "elastomer-scroller-test"
     @index = $client.index(@name)
-    @type =  $client.version_support.es_version_8_plus? ? "_doc" : "book"
+    @type =  $client.version_support.es_version_7_plus? ? "_doc" : "book"
 
     unless @index.exists?
       @index.create \
@@ -96,7 +96,7 @@ describe ElastomerClient::Client::Scroller do
   def populate!
     h = @index.bulk do |b|
       25.times { |num|
-        if $client.version_support.es_version_8_plus?
+        if $client.version_support.es_version_7_plus?
           b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num
         else
           b.index %Q({"author":"Pratchett","title":"DiscWorld Book #{num}","sorter":#{25-num}}), _id: num, _type: "book"

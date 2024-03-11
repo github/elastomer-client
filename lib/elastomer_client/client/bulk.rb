@@ -40,7 +40,7 @@ module ElastomerClient
         raise "bulk request body cannot be nil" if body.nil?
         params ||= {}
         updated_params = params.merge(body:, action: "bulk", rest_api: "bulk")
-        updated_params.delete(:type) if version_support.es_version_8_plus?
+        updated_params.delete(:type) if version_support.es_version_7_plus?
 
         response = self.post "{/index}{/type}/_bulk", updated_params
         response.body
@@ -333,7 +333,7 @@ module ElastomerClient
         params.delete(:_id) if params[:_id].nil? || params[:_id].to_s.empty?
         params.delete("_id") if params["_id"].nil? || params["_id"].to_s.empty?
 
-        if client.version_support.es_version_8_plus?
+        if client.version_support.es_version_7_plus?
           params.delete(:_type)
           params.delete("_type")
         end
@@ -356,7 +356,7 @@ module ElastomerClient
 
         SPECIAL_KEYS.each do |key|
           omit_prefix = (
-            client.version_support.es_version_8_plus? &&
+            client.version_support.es_version_7_plus? &&
             UNPREFIXED_SPECIAL_KEYS.include?(key)
           )
 

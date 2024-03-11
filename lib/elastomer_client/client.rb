@@ -102,7 +102,7 @@ module ElastomerClient
 
       @version ||= begin
         response = get "/"
-        response.body.dig("version", "number")
+        response.body.dig("version", "distribution") ? response.body.dig("version", "minimum_wire_compatibility_version") : response.body.dig("version", "number")
       end
     end
 

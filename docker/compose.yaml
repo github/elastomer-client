@@ -27,6 +27,34 @@ services:
       - ./elasticsearch8plus.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - 127.0.0.1:${ES_8_PORT:-9208}:9200
+
+  opensearch-node1: # This is also the hostname of the container within the Docker network (i.e. https://opensearch-node1/)
+    image: opensearchproject/opensearch:latest # Specifying the latest available image - modify if you want a specific version
+    container_name: opensearch-node1
+    environment:
+      - cluster.name=opensearch-cluster # Name the cluster
+      - node.name=opensearch-node1 # Name the node that will run in this container
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true # Disable JVM heap memory swapping
+      - plugins.security.disabled=true
+      - 'OPENSEARCH_JAVA_OPTS=-Xms2G -Xmx2G' # Set min and max JVM heap sizes to at least 50% of system RAM
+      # - discovery.seed_hosts=opensearch-node1 # Nodes to look for when discovering the cluster
+      # - cluster.initial_cluster_manager_nodes=opensearch-node1 # Nodes eligible to serve as cluster manager
+    ulimits:
+      memlock:
+        soft: -1 # Set memlock to unlimited (no soft or hard limit)
+        hard: -1
+      nofile:
+        soft: 65536 # Maximum number of open files for the opensearch user - set to at least 65536
+        hard: 65536
+    mem_limit: 4g
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data # Creates volume called opensearch-data1 and mounts it to the container
+    ports:
+      - 19200:9200 # REST API
+      - 9600:9600 # Performance Analyzer
+    networks:
+      - opensearch-net # All of the containers will join the same Docker bridge network
   
   elasticsearch5.6:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
@@ -69,3 +97,8 @@ volumes:
       device: tmpfs
       type: tmpfs
       o: size=100m,uid=102,gid=102
+  opensearch-data1:
+
+networks:
+  opensearch-net:
+

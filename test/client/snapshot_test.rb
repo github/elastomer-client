@@ -14,7 +14,7 @@ describe ElastomerClient::Client::Snapshot do
     @index_name = "elastomer-snapshot-test-index"
     @index = $client.index(@index_name)
     @name = "elastomer-test"
-    if $client.version_support.es_version_8_plus?
+    if $client.version_support.es_version_7_plus?
       $client.cluster.update_settings persistent: { "ingest.geoip.downloader.enabled" => "false" }
     end
   end

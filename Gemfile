@@ -14,7 +14,7 @@ group :development do
   gem "rubocop", "~> 1.62.0"
   gem "rubocop-github", "~> 0.20.0"
   gem "rubocop-minitest", "~> 0.35.0"
-  gem "rubocop-performance", "~> 1.19.1"
+  gem "rubocop-performance", "~> 1.20.2"
   gem "rubocop-rake", "~> 0.6.0"
   gem "simplecov", require: false
   gem "spy", "~> 1.0"

@@ -28,17 +28,17 @@ module ElastomerClient::Client::RestApiSpec
     class Url
       attr_reader :path
       attr_reader :paths
-      attr_reader :parts
-      attr_reader :params
+      attr_reader :parts_keys
+      attr_reader :params_keys
 
-      def initialize(path:, paths: [], parts: {}, params: {})
+      def initialize(path:, paths: [], parts: [], params: [])
         @path = path
         @paths = Array(paths)
-        @parts = parts
-        @params = params
+        @parts_keys = parts
+        @params_keys = params
 
-        @parts_set  = Set.new(@parts.keys)
-        @params_set = Set.new(@params.keys)
+        @parts_set  = Set.new(@parts_keys)
+        @params_set = Set.new(@params_keys)
       end
 
       def select_parts(from:)

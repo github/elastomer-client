@@ -1,3 +1,7 @@
+## 6.0.3 (2024-04-05)
+- Add ES 8.13 REST API spec
+- Update CI and development versions from 8.7.0 to 8.13.0
+
 ## 6.0.2 (2024-01-24)
 - Change Opaque ID error handling to not throw OpaqueIDError for 5xx responses
 

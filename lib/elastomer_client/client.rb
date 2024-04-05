@@ -270,7 +270,7 @@ module ElastomerClient
           handle_errors response
 
         # wrap Faraday errors with appropriate ElastomerClient::Client error classes
-        rescue Faraday::Error::ClientError => boom
+        rescue Faraday::Error => boom
           error = wrap_faraday_error(boom, method, path)
           raise error
         rescue OpaqueIdError => boom

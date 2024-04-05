@@ -20,7 +20,7 @@ describe ElastomerClient::Notifications do
   end
 
   it "instruments timeouts" do
-    $client.stub :connection, lambda { raise Faraday::Error::TimeoutError } do
+    $client.stub :connection, lambda { raise Faraday::TimeoutError } do
       assert_raises(ElastomerClient::Client::TimeoutError) { $client.info }
       event = @events.detect { |e| e.payload[:action] == "cluster.info" }
       exception = event.payload[:exception]

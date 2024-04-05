@@ -49,14 +49,14 @@ describe ElastomerClient::Middleware::ParseJson do
   end
 
   it "chokes on invalid json" do
-    assert_raises(Faraday::Error::ParsingError) { process "{!"      }
-    assert_raises(Faraday::Error::ParsingError) { process "invalid" }
+    assert_raises(Faraday::ParsingError) { process "{!"      }
+    assert_raises(Faraday::ParsingError) { process "invalid" }
 
     # surprisingly these are all valid according to MultiJson
     #
-    # assert_raises(Faraday::Error::ParsingError) { process '"a"'  }
-    # assert_raises(Faraday::Error::ParsingError) { process 'true' }
-    # assert_raises(Faraday::Error::ParsingError) { process 'null' }
-    # assert_raises(Faraday::Error::ParsingError) { process '1'    }
+    # assert_raises(Faraday::ParsingError) { process '"a"'  }
+    # assert_raises(Faraday::ParsingError) { process 'true' }
+    # assert_raises(Faraday::ParsingError) { process 'null' }
+    # assert_raises(Faraday::ParsingError) { process '1'    }
   end
 end

@@ -20,7 +20,7 @@ module ElastomerClient
       def parse(body)
         MultiJson.load(body) if body.respond_to?(:to_str) && !body.strip.empty?
       rescue StandardError, SyntaxError => e
-        raise Faraday::Error::ParsingError, e
+        raise Faraday::ParsingError, e
       end
 
       def process_response?(env)

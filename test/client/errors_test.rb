@@ -47,7 +47,7 @@ describe ElastomerClient::Client::Error do
   end
 
   it "is instantiated from another exception" do
-    err = Faraday::Error::ConnectionFailed.new "could not connect to host"
+    err = Faraday::ConnectionFailed.new "could not connect to host"
     err.set_backtrace %w[one two three four]
 
     err = ElastomerClient::Client::Error.new(err, "POST", "/index/doc")

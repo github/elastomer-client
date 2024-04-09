@@ -1,4 +1,4 @@
-## 6.0.4 (2024-04-05)
+## 6.1.0 (2024-04-09)
 - Replace `Faraday::Error::*` with `Faraday::*` error classes
 - Handle all `Faraday::Error` instead of `Faraday::Error::ClientError`
 - Unlock faraday version to allow 1.0.0

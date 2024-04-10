@@ -97,17 +97,6 @@ module ElastomerClient
     ConnectionFailed.fatal       = false
     RejectedExecutionError.fatal = false
 
-    # Define an ElastomerClient::Client exception class on the fly for
-    # Faraday exception classes that we don't specifically wrap.
-    Faraday::Error.constants.each do |error_name|
-      next if ::ElastomerClient::Client.const_get(error_name) rescue nil
-
-      error_class = Faraday::Error.const_get(error_name)
-      next unless error_class < Faraday::Error::ClientError
-
-      ::ElastomerClient::Client.const_set(error_name, Class.new(Error))
-    end
-
     # Exception for operations that are unsupported with the version of
     # Elasticsearch being used.
     IncompatibleVersionException = Class.new Error

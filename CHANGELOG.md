@@ -1,3 +1,9 @@
+## 6.1.0 (2024-04-09)
+- Replace `Faraday::Error::*` with `Faraday::*` error classes
+- Handle all `Faraday::Error` instead of `Faraday::Error::ClientError`
+- Unlock faraday version to allow 1.0.0
+- Bump the minimum version of faraday and faraday middleware
+
 ## 6.0.3 (2024-04-05)
 - Add ES 8.13 REST API spec
 - Update CI and development versions from 8.7.0 to 8.13.0

@@ -9,7 +9,7 @@ describe ElastomerClient::Client do
   it "uses the adapter specified at creation" do
     c = ElastomerClient::Client.new(adapter: :test)
 
-    assert_includes c.connection.builder.handlers, Faraday::Adapter::Test
+    assert_equal c.connection.builder.adapter, Faraday::Adapter::Test
   end
 
   it "allows configuring the Faraday when a block is given" do
@@ -28,7 +28,7 @@ describe ElastomerClient::Client do
     c = ElastomerClient::Client.new
     adapter = Faraday::Adapter.lookup_middleware(Faraday.default_adapter)
 
-    assert_includes c.connection.builder.handlers, adapter
+    assert_equal c.connection.builder.adapter, adapter
   end
 
   it "uses the same connection for all requests" do

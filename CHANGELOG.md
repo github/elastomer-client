@@ -1,3 +1,6 @@
+## 6.1.1 (2024-06-05)
+- Unlock faraday_middleware version to allow 1.x
+
 ## 6.1.0 (2024-04-09)
 - Replace `Faraday::Error::*` with `Faraday::*` error classes
 - Handle all `Faraday::Error` instead of `Faraday::Error::ClientError`

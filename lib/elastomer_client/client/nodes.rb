@@ -31,7 +31,7 @@ module ElastomerClient
       attr_reader :client, :node_id
 
       # Retrieve one or more (or all) of the cluster nodes information. By
-      # default all information is returned from all ndoes. You can select the
+      # default all information is returned from all nodes. You can select the
       # information to be returned by passing in the `:info` from the list of
       # "settings", "os", "process", "jvm", "thread_pool", "network",
       # "transport", "http" and "plugins".

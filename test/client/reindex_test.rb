@@ -40,7 +40,7 @@ describe ElastomerClient::Client::Reindex do
     @dest_index.refresh
 
     # Verify that the document has been reindexed
-    doc = @dest_index.docs.get(id: 1, type: "title")
+    doc = @dest_index.docs.get(id: 1, type: "book")
     puts "Document in Destination Index: #{doc}"
 
     assert_equal "Book 1", doc["_source"]["title"]

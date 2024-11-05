@@ -34,15 +34,37 @@ describe ElastomerClient::Client::Reindex do
       dest: { index: @dest_index.name }
     }
     response = reindex.reindex(body)
-    puts "Reindex Response: #{response}"
 
     # Refresh the destination index to make sure the document is searchable
     @dest_index.refresh
 
     # Verify that the document has been reindexed
     doc = @dest_index.docs.get(id: 1, type: "book")
-    puts "Document in Destination Index: #{doc}"
 
     assert_equal "Book 1", doc["_source"]["title"]
+  end
+
+  it "creates a new index when the destination index does not exist" do
+    reindex = $client.reindex
+    body = {
+      source: { index: @source_index.name },
+      dest: { index: "non_existent_index" }
+    }
+    response = reindex.reindex(body)
+    puts response
+    new_index = $client.index("non_existent_index")
+    assert new_index.exists?
+  end
+
+  it "fails when the source index does not exist" do
+    reindex = $client.reindex
+    body = {
+      source: { index: "non_existent_index" },
+      dest: { index: @dest_index.name }
+    }
+    
+    exception = assert_raises(ElastomerClient::Client::RequestError) do
+      response = reindex.reindex(body)
+    end
   end
 end

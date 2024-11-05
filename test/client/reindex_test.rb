@@ -57,6 +57,7 @@ describe ElastomerClient::Client::Reindex do
     }
     reindex.reindex(body)
     new_index = $client.index("non_existent_index")
+
     assert_predicate(new_index, :exists?)
   end
 

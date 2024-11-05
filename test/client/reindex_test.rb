@@ -6,11 +6,15 @@ describe ElastomerClient::Client::Reindex do
   before do
     @source_index = $client.index("source_index")
     @dest_index = $client.index("dest_index")
+    @non_existent_index = $client.index("non_existent_index")
     if @source_index.exists?
       @source_index.delete
     end
     if @dest_index.exists?
       @dest_index.delete
+    end
+    if @non_existent_index.exists?
+      @non_existent_index.delete
     end
     @source_index.create(default_index_settings)
     @dest_index.create(default_index_settings)
@@ -25,6 +29,7 @@ describe ElastomerClient::Client::Reindex do
   after do
     @source_index.delete if @source_index.exists?
     @dest_index.delete if @dest_index.exists?
+    @non_existent_index.delete if @non_existent_index.exists?
   end
 
   it "reindexes documents from one index to another" do
@@ -33,7 +38,7 @@ describe ElastomerClient::Client::Reindex do
       source: { index: @source_index.name },
       dest: { index: @dest_index.name }
     }
-    response = reindex.reindex(body)
+    reindex.reindex(body)
 
     # Refresh the destination index to make sure the document is searchable
     @dest_index.refresh
@@ -50,8 +55,7 @@ describe ElastomerClient::Client::Reindex do
       source: { index: @source_index.name },
       dest: { index: "non_existent_index" }
     }
-    response = reindex.reindex(body)
-    puts response
+    reindex.reindex(body)
     new_index = $client.index("non_existent_index")
     assert new_index.exists?
   end
@@ -66,5 +70,6 @@ describe ElastomerClient::Client::Reindex do
     exception = assert_raises(ElastomerClient::Client::RequestError) do
       response = reindex.reindex(body)
     end
+    assert_equal(404, exception.status)
   end
 end

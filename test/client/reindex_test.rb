@@ -57,7 +57,7 @@ describe ElastomerClient::Client::Reindex do
     }
     reindex.reindex(body)
     new_index = $client.index("non_existent_index")
-    assert new_index.exists?
+    assert_predicate(new_index, :exists?)
   end
 
   it "fails when the source index does not exist" do
@@ -66,7 +66,7 @@ describe ElastomerClient::Client::Reindex do
       source: { index: "non_existent_index" },
       dest: { index: @dest_index.name }
     }
-    
+
     exception = assert_raises(ElastomerClient::Client::RequestError) do
       response = reindex.reindex(body)
     end

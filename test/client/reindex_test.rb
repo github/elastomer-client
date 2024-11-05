@@ -14,12 +14,12 @@ describe ElastomerClient::Client::Reindex do
     end
     @source_index.create(default_index_settings)
     @dest_index.create(default_index_settings)
-    wait_for_index(@source_index.name)
-    wait_for_index(@dest_index.name)
+    wait_for_index(@source_index.name, "green")
+    wait_for_index(@dest_index.name, "green")
 
     # Index a document in the source index
     @source_index.docs.index(document_wrapper("book", { _id: 1, title: "Book 1" }))
-    wait_for_index(@source_index.name)
+    @source_index.refresh
   end
 
   after do

@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         ruby-version: ['3.2']
-        ES_VERSION: ['5.6.15', '8.13.2']
+        ES_VERSION: ['8.13.2']
         include:
           - ES_VERSION: '5.6.15'
             ES_DOWNLOAD_URL: >-

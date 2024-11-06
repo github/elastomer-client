@@ -1,3 +1,7 @@
+## 6.2.0 (2024-11-06)
+- Added support for reindex API
+- Removed CI checks for ES 5.6.15
+
 ## 6.1.1 (2024-06-05)
 - Unlock faraday_middleware version to allow 1.x
 

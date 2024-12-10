@@ -24,6 +24,11 @@ module ElastomerClient
         response.body
       end
 
+      def rethrottle(task_id, params = {})
+        response = client.post "/_reindex/#{task_id}/_rethrottle", params.merge(params, action: "rethrottle", rest_api: "reindex")
+        response.body
+      end
+
     end
   end
 end

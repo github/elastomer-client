@@ -1,6 +1,9 @@
+## 6.2.1 (2024-12-10)
+- Add support for rethrottling reindex tasks
+
 ## 6.2.0 (2024-11-06)
-- Added support for reindex API
-- Removed CI checks for ES 5.6.15
+- Add support for reindex API
+- Remove CI checks for ES 5.6.15
 
 ## 6.1.1 (2024-06-05)
 - Unlock faraday_middleware version to allow 1.x

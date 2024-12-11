@@ -49,6 +49,30 @@ describe ElastomerClient::Client::Reindex do
     assert_equal "Book 1", doc["_source"]["title"]
   end
 
+  it "successfully rethrottles a reindex task" do
+    reindex = $client.reindex
+    body = {
+      source: { index: @source_index.name },
+      dest: { index: @dest_index.name }
+    }
+    response = reindex.reindex(body, requests_per_second: 0.01, wait_for_completion: false)
+    task_id = response["task"]
+
+    reindex.rethrottle(task_id, requests_per_second: 1)
+
+    tasks = $client.tasks
+    node_id = task_id.split(":").first
+    task_id = task_id.split(":").last.to_i
+
+    # wait for the task to complete
+    tasks.wait_by_id(node_id, task_id, "30s")
+
+    # Verify that the document has been reindexed
+    doc = @dest_index.docs.get(id: 1, type: "book")
+
+    assert_equal "Book 1", doc["_source"]["title"]
+  end
+
   it "creates a new index when the destination index does not exist" do
     reindex = $client.reindex
     body = {
@@ -69,7 +93,7 @@ describe ElastomerClient::Client::Reindex do
     }
 
     exception = assert_raises(ElastomerClient::Client::RequestError) do
-      response = reindex.reindex(body)
+      reindex.reindex(body)
     end
     assert_equal(404, exception.status)
   end

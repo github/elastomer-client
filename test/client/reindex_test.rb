@@ -57,15 +57,16 @@ describe ElastomerClient::Client::Reindex do
     }
     response = reindex.reindex(body, requests_per_second: 0.01, wait_for_completion: false)
     task_id = response["task"]
-
-    reindex.rethrottle(task_id, requests_per_second: 1)
-
-    tasks = $client.tasks
     node_id = task_id.split(":").first
-    task_id = task_id.split(":").last.to_i
+    task_number = task_id.split(":").last.to_i
+
+    response = reindex.rethrottle(task_id, requests_per_second: 1)
+
+    assert_equal 1, response["nodes"][node_id]["tasks"][task_id]["status"]["requests_per_second"]
 
     # wait for the task to complete
-    tasks.wait_by_id(node_id, task_id, "30s")
+    tasks = $client.tasks
+    tasks.wait_by_id(node_id, task_number, "30s")
 
     # Verify that the document has been reindexed
     doc = @dest_index.docs.get(id: 1, type: "book")

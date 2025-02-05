@@ -4,7 +4,7 @@ services:
   elasticsearch8.13:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
     container_name: es8.13
-    profiles: ["es8", "all"]
+    profiles: ["es8", "ccr", "all"]
     environment:
       - cluster.name=elastomer8.13
       - bootstrap.memory_lock=true
@@ -12,6 +12,7 @@ services:
       - xpack.security.enabled=false
       - xpack.watcher.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.roles=[master,data,remote_cluster_client]
     ulimits:
       memlock:
         soft: -1
@@ -28,6 +29,33 @@ services:
     ports:
       - 127.0.0.1:${ES_8_PORT:-9208}:9200
   
+  elasticsearchFollower:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+    container_name: es-follow
+    profiles: ["ccr"]
+    environment:
+      - cluster.name=es-follow
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.watcher.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.roles=[master,data,remote_cluster_client]
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 2g
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./elasticsearch-follow.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 127.0.0.1:${ES_8_PORT:-9209}:9201
+
   elasticsearch5.6:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
     container_name: es5.6

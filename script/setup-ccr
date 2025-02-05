@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# Function to display help
+show_help() {
+  echo "Usage: $0 [option] [license]"
+  echo "Options:"
+  echo "  up      - Start the clusters and apply the license"
+  echo "  down    - Shut down the clusters"
+  echo "  help    - Display this help message"
+}
+
+# Function to apply the license to a cluster
+apply_license() {
+  local port=$1
+  local license=$2
+  curl -X PUT "http://localhost:$port/_license" -H "Content-Type: application/json" -d '{
+    "licenses": [
+      '"$license"'
+    ]
+  }'
+}
+
+# Function to shut down the clusters
+shutdown_clusters() {
+  docker compose --project-directory docker --profile ccr down
+  echo "Clusters shut down."
+}
+
+# Check for options
+case "$1" in
+  up)
+
+    # Get the directory of the current script
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    # Start the clusters
+    docker compose --project-directory docker --profile ccr up -d
+
+    # Wait for both clusters to be online
+    export ES_PORT=9208
+    "$SCRIPT_DIR/poll-for-es"
+    export ES_PORT=9209
+    "$SCRIPT_DIR/poll-for-es"
+
+    # Apply the license to both clusters
+    LICENSE=$2
+    if [ -z "$LICENSE" ]; then
+      echo "License key is required as the second argument."
+      exit 1
+    fi
+
+    apply_license 9208 "$LICENSE"
+    apply_license 9209 "$LICENSE"
+
+    # Set up the remote connection between the clusters
+    curl -X PUT "http://localhost:9209/_cluster/settings" -H "Content-Type: application/json" -d '{
+      "persistent": {
+        "cluster": {
+          "remote": {
+            "cluster_one": {
+              "seeds": ["es8.13:9300"]
+            }
+          }
+        }
+      }
+    }'
+
+    echo "Clusters setup completed."
+    ;;
+  down)
+    shutdown_clusters
+    ;;
+  help)
+    show_help
+    ;;
+  *)
+    echo "Invalid option: $1"
+    show_help
+    exit 1
+    ;;
+esac

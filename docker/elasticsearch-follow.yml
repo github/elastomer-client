@@ -1,4 +1,4 @@
-cluster.name: "docker-cluster"
+cluster.name: "es-follow"
 
 network.host: 0.0.0.0
 
@@ -7,8 +7,8 @@ path:
   logs: /usr/share/elasticsearch/logs
   repo: /usr/share/elasticsearch/repos
 
-transport.port: 9300
-http.port: 9200
-remote_cluster.port: 9443
+transport.port: 9301
+http.port: 9201
+remote_cluster.port: 9444
 http.max_content_length: 50mb
 ingest.geoip.downloader.enabled: false

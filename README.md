@@ -142,6 +142,11 @@ To run ES 5 and ES 8:
 docker compose --project-directory docker --profile all up
 ```
 
+To run in ES8 cross cluster replication mode:
+```
+script/setup-ccr up "{non-production license}"
+```
+
 To run only ES 8:
 ```
 docker compose --project-directory docker --profile es8 up

@@ -65,7 +65,7 @@ case "$1" in
       "persistent": {
         "cluster": {
           "remote": {
-            "cluster_one": {
+            "leader": {
               "seeds": ["es8.13:9300"]
             }
           }

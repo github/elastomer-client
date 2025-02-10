@@ -20,12 +20,12 @@ module ElastomerClient
       attr_reader :client
 
       def reindex(body, params = {})
-        response = client.post "/_reindex", params.merge(params, body:, action: "reindex", rest_api: "reindex")
+        response = client.post "/_reindex", params.merge(body:, action: "reindex", rest_api: "reindex")
         response.body
       end
 
       def rethrottle(task_id, params = {})
-        response = client.post "/_reindex/#{task_id}/_rethrottle", params.merge(params, action: "rethrottle", rest_api: "reindex")
+        response = client.post "/_reindex/#{task_id}/_rethrottle", params.merge(action: "rethrottle", rest_api: "reindex")
         response.body
       end
 

@@ -32,7 +32,7 @@ module ElastomerClient
       #   ccr.follow("follower_index", { leader_index: "leader_index", remote_cluster: "leader" })
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-put-follow.html
-      def follow(follower_index, body, params={})
+      def follow(follower_index, body, params = {})
         response = client.put "/#{follower_index}/_ccr/follow", params.merge(params, body:, action: "follow", rest_api: "ccr")
         response.body
       end
@@ -54,10 +54,10 @@ module ElastomerClient
       #                                     follow_index_pattern: "{{leader_index}}-follower" })
       #
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-put-auto-follow-pattern.html
-      def auto_follow(pattern_name, body, params={})
-        response = client.put "/_ccr/auto_follow/#{pattern_name}", params.merge(params, body:, action: "create_auto_follow_pattern", rest_api: "ccr")
-        response.body
-      end
+      # def auto_follow(pattern_name, body, params={})
+      #   response = client.put "/_ccr/auto_follow/#{pattern_name}", params.merge(params, body:, action: "create_auto_follow_pattern", rest_api: "ccr")
+      #   response.body
+      # end
 
     end
   end

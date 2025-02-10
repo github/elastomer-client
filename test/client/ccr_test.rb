@@ -36,19 +36,4 @@ describe ElastomerClient::Client::Ccr do
     assert_equal "Book 1", doc["_source"]["title"]
   end
 
-  # it "successfully implements an auto-follow policy" do
-  #   ccr = $replica_client.ccr
-
-  #   ccr.auto_follow("follower_pattern", { remote_cluster: "leader", leader_index_patterns: ["*"], follow_index_pattern: "{{leader_index}}-follower" })
-
-  #   index = $client.index("followed_index")
-  #   index.create(default_index_settings)
-  #   wait_for_index(index.name, "green")
-  #   follower_index = $replica_client.index("followed_index-follower")
-  #   wait_for_index(follower_index.name, "green")
-  #   assert follower_index.exists?
-
-  #   index.delete
-  #   follower_index.delete
-  # end
 end

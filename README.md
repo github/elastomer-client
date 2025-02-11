@@ -164,6 +164,11 @@ ES 8
 ES_PORT=9208 rake test
 ```
 
+CCR tests:
+```
+ES_PORT=9208 ES_REPLICA_PORT=9209 rake test
+```
+
 ES 5
 ```
 ES_PORT=9205 rake test

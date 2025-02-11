@@ -46,6 +46,19 @@ raise "No server available at #{$client.url}" unless $client.available?
 
 puts "Elasticsearch version is #{$client.version}"
 
+# Create client instance for replica cluster
+$replica_client_params = {
+  port: ENV.fetch("ES_REPLICA_PORT", 9201),
+  read_timeout: 10,
+  open_timeout: 1,
+  opaque_id: false,
+  strict_params: true,
+  compress_body: true
+}
+$replica_client = ElastomerClient::Client.new(**$replica_client_params)
+
+puts "Replica server is unavailable at #{$replica_client.url}" unless $replica_client.available?
+
 # remove any lingering test indices from the cluster
 Minitest.after_run do
   $client.cluster.indices.keys.each do |name|

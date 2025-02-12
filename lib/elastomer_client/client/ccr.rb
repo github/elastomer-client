@@ -36,6 +36,11 @@ module ElastomerClient
         response = client.put "/#{follower_index}/_ccr/follow", params.merge(body:, action: "follow", rest_api: "ccr")
         response.body
       end
+
+      def pause_follow(follower_index, params = {})
+        response = client.post "/#{follower_index}/_ccr/pause_follow", params.merge(body:, action: "pause_follow", rest_api: "ccr")
+        response.body
+      end
     end
   end
 end

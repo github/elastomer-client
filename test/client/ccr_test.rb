@@ -23,24 +23,24 @@ describe ElastomerClient::Client::Ccr do
     @follower_index.delete if @follower_index.exists?
   end
 
-  def follow_index(follower_index, leader_index)
+  def follow_index(follower_index_name, leader_index_name)
     ccr = $replica_client.ccr
-    response = ccr.follow(follower_index.name, { leader_index: leader_index.name, remote_cluster: "leader" })
-    wait_for_index(follower_index.name, "green")
+    response = ccr.follow(follower_index_name, { leader_index: leader_index_name, remote_cluster: "leader" })
+    wait_for_index(follower_index_name, "green")
     response
   end
 
-  def pause_follow(follower_index)
+  def pause_follow(follower_index_name)
     ccr = $replica_client.ccr
-    response = ccr.pause_follow(follower_index.name)
-    wait_for_index(follower_index.name, "green")
+    response = ccr.pause_follow(follower_index_name)
+    wait_for_index(follower_index_name, "green")
     response
   end
 
-  def unfollow_index(follower_index)
+  def unfollow_index(follower_index_name)
     ccr = $replica_client.ccr
-    response = ccr.unfollow(follower_index.name)
-    wait_for_index(follower_index.name, "green")
+    response = ccr.unfollow(follower_index_name)
+    wait_for_index(follower_index_name, "green")
     response
   end
 

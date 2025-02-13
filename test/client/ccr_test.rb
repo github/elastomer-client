@@ -73,7 +73,7 @@ describe ElastomerClient::Client::Ccr do
 
     resp = ccr.get_auto_follow(pattern_name: "follower_pattern")
 
-    assert_equal "follower_pattern", resp["patterns"].first()["name"]
+    assert_equal "follower_pattern", resp["patterns"].first["name"]
 
     assert_predicate @auto_follower_index, :exists?
   end

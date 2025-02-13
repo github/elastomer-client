@@ -74,7 +74,7 @@ describe ElastomerClient::Client::Ccr do
     refute doc["found"]
   end
 
-  it "should successfully unfollows a leader index" do
+  it "successfully unfollow a leader index" do
     follow_index(@follower_index, @leader_index)
 
     pause_follow(@follower_index)

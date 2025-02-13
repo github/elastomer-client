@@ -53,7 +53,7 @@ module ElastomerClient
 
       # Unfollows a leader index given a follower index.
       # The follower index must be paused and closed before unfollowing.
-      # 
+      #
       # follower_index - String name of the follower index to create
       # params         - Hash of the request body
       #

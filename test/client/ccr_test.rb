@@ -60,7 +60,7 @@ describe ElastomerClient::Client::Ccr do
     assert_equal "Book 1", doc["_source"]["title"]
   end
 
-  it "should successfully pauses a follower index" do
+  it "successfully pauses a follower index" do
     follow_index(@follower_index, @leader_index)
 
     response = pause_follow(@follower_index)

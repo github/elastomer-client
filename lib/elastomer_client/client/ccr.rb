@@ -90,6 +90,34 @@ module ElastomerClient
         response = client.get "/_ccr/auto_follow{/pattern_name}", params.merge(action: "get_auto_follow_pattern", rest_api: "ccr")
         response.body
       end
+
+      # Pauses a follower index.
+      #
+      # follower_index - String name of the follower index to pause
+      # params         - Hash of the request body
+      #
+      # Examples
+      #   ccr.pause_follow("follower_index")
+      #
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-post-pause-follow.html
+      def pause_follow(follower_index, params = {})
+        response = client.post "/#{follower_index}/_ccr/pause_follow", params.merge(action: "pause_follow", rest_api: "ccr")
+        response.body
+      end
+
+      # Unfollows a leader index given a follower index.
+      # The follower index must be paused and closed before unfollowing.
+      #
+      # follower_index - String name of the follower index to unfollow
+      # params         - Hash of the request body
+      #
+      # Examples
+      #   ccr.unfollow("follower_index")
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-post-unfollow.html
+      def unfollow(follower_index, params = {})
+        response = client.post "/#{follower_index}/_ccr/unfollow", params.merge(action: "unfollow", rest_api: "ccr")
+        response.body
+      end
     end
   end
 end

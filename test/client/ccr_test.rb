@@ -3,7 +3,7 @@
 require_relative "../test_helper"
 
 describe ElastomerClient::Client::Ccr do
-  before do
+  before :each do
     skip "Cannot test Ccr API without a replica cluster" unless $replica_client.available?
 
     @leader_index = $client.index("leader_index")
@@ -27,9 +27,6 @@ describe ElastomerClient::Client::Ccr do
     @leader_index.create(default_index_settings)
     wait_for_index(@leader_index.name, "green")
 
-    @leader_index.docs.index(document_wrapper("book", { _id: 1, title: "Book 1" }))
-    @leader_index.refresh
-
     begin
       ccr.delete_auto_follow("follower_pattern")
     rescue StandardError
@@ -37,7 +34,7 @@ describe ElastomerClient::Client::Ccr do
     end
   end
 
-  after do
+  after :each do
     @leader_index.delete if @leader_index.exists?
     @follower_index.delete if @follower_index.exists?
     @auto_followed_index.delete if @auto_followed_index.exists?
@@ -50,14 +47,77 @@ describe ElastomerClient::Client::Ccr do
     end
   end
 
-  it "successfully follows a leader index" do
+  def follow_index(follower_index_name, leader_index_name)
     ccr = $replica_client.ccr
+    response = ccr.follow(follower_index_name, { leader_index: leader_index_name, remote_cluster: "leader" })
+    wait_for_index(follower_index_name, "green")
+    response
+  end
 
-    ccr.follow(@follower_index.name, { leader_index: @leader_index.name, remote_cluster: "leader" })
-    wait_for_index(@follower_index.name, "green")
+  def pause_follow(follower_index_name)
+    ccr = $replica_client.ccr
+    response = ccr.pause_follow(follower_index_name)
+    wait_for_index(follower_index_name, "green")
+    response
+  end
+
+  def unfollow_index(follower_index_name)
+    ccr = $replica_client.ccr
+    response = ccr.unfollow(follower_index_name)
+    wait_for_index(follower_index_name, "green")
+    response
+  end
+
+  def create_document(index, type, document)
+    response = index.docs.index(document_wrapper(type, document))
+    index.refresh
+    response
+  end
+
+  it "successfully follows a leader index" do
+    create_document(@leader_index, "book", { _id: 1, title: "Book 1" })
+
+    follow_index(@follower_index, @leader_index)
+
     doc = @follower_index.docs.get(id: 1, type: "book")
 
     assert_equal "Book 1", doc["_source"]["title"]
+  end
+
+  it "successfully pauses a follower index" do
+    follow_index(@follower_index, @leader_index)
+
+    response = pause_follow(@follower_index)
+
+    assert response["acknowledged"]
+
+    create_document(@leader_index, "book", { _id: 2, title: "Book 2" })
+
+    doc = @follower_index.docs.get(id: 2, type: "book")
+
+    refute doc["found"]
+  end
+
+  it "successfully unfollow a leader index" do
+    follow_index(@follower_index, @leader_index)
+
+    pause_follow(@follower_index)
+
+    @follower_index.close
+
+    response = unfollow_index(@follower_index)
+
+    assert response["acknowledged"]
+
+    @follower_index.open
+
+    wait_for_index(@follower_index.name, "green")
+
+    create_document(@leader_index, "book", { _id: 2, title: "Book 2" })
+
+    doc = @follower_index.docs.get(id: 2, type: "book")
+
+    refute doc["found"]
   end
 
   it "successfully implements an auto-follow policy" do

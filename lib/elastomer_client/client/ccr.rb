@@ -39,7 +39,7 @@ module ElastomerClient
 
       # Pauses a follower index.
       #
-      # follower_index - String name of the follower index pause
+      # follower_index - String name of the follower index to pause
       # params         - Hash of the request body
       #
       # Examples

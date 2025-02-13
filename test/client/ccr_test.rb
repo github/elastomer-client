@@ -37,6 +37,13 @@ describe ElastomerClient::Client::Ccr do
     response
   end
 
+  def unfollow_index(follower_index)
+    ccr = $replica_client.ccr
+    response = ccr.unfollow(follower_index.name)
+    wait_for_index(follower_index.name, "green")
+    response
+  end
+
   def create_document(index, type, document)
     response = index.docs.index(document_wrapper(type, document))
     index.refresh
@@ -53,7 +60,7 @@ describe ElastomerClient::Client::Ccr do
     assert_equal "Book 1", doc["_source"]["title"]
   end
 
-  it "successfully pauses a follower index" do
+  it "should successfully pauses a follower index" do
     follow_index(@follower_index, @leader_index)
 
     response = pause_follow(@follower_index)
@@ -65,7 +72,28 @@ describe ElastomerClient::Client::Ccr do
     doc = @follower_index.docs.get(id: 2, type: "book")
 
     refute doc["found"]
+  end
 
+  it "should successfully unfollows a leader index" do
+    follow_index(@follower_index, @leader_index)
+
+    pause_follow(@follower_index)
+
+    @follower_index.close
+
+    response = unfollow_index(@follower_index)
+
+    assert response["acknowledged"]
+
+    @follower_index.open
+
+    wait_for_index(@follower_index.name, "green")
+
+    create_document(@leader_index, "book", { _id: 2, title: "Book 2" })
+
+    doc = @follower_index.docs.get(id: 2, type: "book")
+
+    refute doc["found"]
   end
 
 end

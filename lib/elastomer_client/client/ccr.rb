@@ -56,7 +56,7 @@ module ElastomerClient
       # See https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-put-auto-follow-pattern.html
 
       def auto_follow(pattern_name, body, params = {})
-        response = client.put "/_ccr/auto_follow/#{pattern_name}", params.merge(params, body:, action: "create_auto_follow_pattern", rest_api: "ccr")
+        response = client.put "/_ccr/auto_follow/#{pattern_name}", params.merge(body: body, action: "create_auto_follow_pattern", rest_api: "ccr")
         response.body
       end
 

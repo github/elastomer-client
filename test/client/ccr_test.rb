@@ -3,8 +3,14 @@
 require_relative "../test_helper"
 
 describe ElastomerClient::Client::Ccr do
-  before :each do
+  before do
     skip "Cannot test Ccr API without a replica cluster" unless $replica_client.available?
+
+    begin
+      ccr.delete_auto_follow("follower_pattern")
+    rescue StandardError
+      puts "No auto-follow pattern to delete"
+    end
 
     @leader_index = $client.index("leader_index")
     @follower_index = $replica_client.index("follower_index")
@@ -26,15 +32,9 @@ describe ElastomerClient::Client::Ccr do
 
     @leader_index.create(default_index_settings)
     wait_for_index(@leader_index.name, "green")
-
-    begin
-      ccr.delete_auto_follow("follower_pattern")
-    rescue StandardError
-      puts "No auto-follow pattern to delete"
-    end
   end
 
-  after :each do
+  after do
     @leader_index.delete if @leader_index.exists?
     @follower_index.delete if @follower_index.exists?
     @auto_followed_index.delete if @auto_followed_index.exists?
@@ -76,18 +76,27 @@ describe ElastomerClient::Client::Ccr do
 
   it "successfully follows a leader index" do
     create_document(@leader_index, "book", { _id: 1, title: "Book 1" })
-
-    follow_index(@follower_index, @leader_index)
+    follow_index(@follower_index.name, @leader_index.name)
 
     doc = @follower_index.docs.get(id: 1, type: "book")
 
     assert_equal "Book 1", doc["_source"]["title"]
   end
 
-  it "successfully pauses a follower index" do
-    follow_index(@follower_index, @leader_index)
+  it "successfully gets info for all follower indices" do
+    follow_index(@follower_index.name, @leader_index.name)
 
-    response = pause_follow(@follower_index)
+    response = $replica_client.ccr.get_follower_info("*")
+    puts response
+
+    assert_equal response["follower_indices"][0]["follower_index"], @follower_index.name
+    assert_equal response["follower_indices"][0]["leader_index"], @leader_index.name
+  end
+
+  it "successfully pauses a follower index" do
+    follow_index(@follower_index.name, @leader_index.name)
+
+    response = pause_follow(@follower_index.name)
 
     assert response["acknowledged"]
 
@@ -99,13 +108,13 @@ describe ElastomerClient::Client::Ccr do
   end
 
   it "successfully unfollow a leader index" do
-    follow_index(@follower_index, @leader_index)
+    follow_index(@follower_index.name, @leader_index.name)
 
-    pause_follow(@follower_index)
+    pause_follow(@follower_index.name)
 
     @follower_index.close
 
-    response = unfollow_index(@follower_index)
+    response = unfollow_index(@follower_index.name)
 
     assert response["acknowledged"]
 

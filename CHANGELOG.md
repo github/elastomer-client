@@ -1,3 +1,6 @@
+## 6.2.2 (2025-02-19)
+- Add support for manually and automatically following indices for cross-cluster replication
+
 ## 6.2.1 (2024-12-10)
 - Add support for rethrottling reindex tasks
 

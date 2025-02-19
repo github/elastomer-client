@@ -19,6 +19,22 @@ module ElastomerClient
 
       attr_reader :client
 
+      # Gets the parameters and status for each follower index.
+      #
+      # index_pattern - String name of the index pattern to get follower info for
+      # params        - Hash of query parameters
+      #
+      # Examples
+      #
+      #   ccr.get_follower_info("follower_index")
+      #   ccr.get_follower_info("*")
+      #
+      # See https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-put-follow.html
+      def get_follower_info(index_pattern, params = {})
+        response = client.get "/#{index_pattern}/_ccr/info", params.merge(action: "get_follower_info", rest_api: "ccr")
+        response.body
+      end
+
       # Creates a new follower index for the provided leader index on the remote cluster.
       #
       # follower_index - String name of the follower index to create

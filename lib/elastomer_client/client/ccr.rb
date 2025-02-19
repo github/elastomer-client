@@ -19,7 +19,7 @@ module ElastomerClient
 
       attr_reader :client
 
-      # Gets the parameters and status fo reach follower index.
+      # Gets the parameters and status for each follower index.
       #
       # index_pattern - String name of the index pattern to get follower info for
       # params        - Hash of query parameters

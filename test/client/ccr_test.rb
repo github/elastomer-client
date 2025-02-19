@@ -87,7 +87,6 @@ describe ElastomerClient::Client::Ccr do
     follow_index(@follower_index.name, @leader_index.name)
 
     response = $replica_client.ccr.get_follower_info("*")
-    puts response
 
     assert_equal response["follower_indices"][0]["follower_index"], @follower_index.name
     assert_equal response["follower_indices"][0]["leader_index"], @leader_index.name

@@ -110,7 +110,10 @@ end
 This client is tested against:
 
 - Ruby version 3.2
-- Elasticsearch versions 5.6 and 8.13
+- Elasticsearch versions: 
+  - 5.6
+  - 8.13
+  - 8.18
 
 ## Development
 

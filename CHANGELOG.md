@@ -1,3 +1,7 @@
+## 6.2.3 (2025-06-06)
+- Added support for ES 8.17.2
+- Added support for ES 8.18.0
+
 ## 6.2.2 (2025-02-19)
 - Add support for manually and automatically following indices for cross-cluster replication
 

@@ -12,9 +12,7 @@ module ElastomerClient::Client::RestApiSpec
     attr_reader :common_params
 
     def initialize
-      @rest_apis ||= {}
-      @common_params ||= {}
-      @common_params_set = Set.new(@common_params.keys)
+      @common_params_set = Set.new(@common_params)
     end
 
     # Given an API descriptor name and a set of request parameters, select those

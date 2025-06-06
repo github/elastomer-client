@@ -79,7 +79,8 @@ describe ElastomerClient::Client::Cluster do
 
   it "returns cluster stats" do
     h = @cluster.stats
-    expected = $client.version_support.es_version_8_plus? ? %w[cluster_name cluster_uuid indices nodes snapshots status timestamp] : %w[cluster_name indices nodes status timestamp]
+    expected = $client.version_support.es_version_8_plus? ? %w[ccs cluster_name cluster_uuid indices nodes repositories snapshots status timestamp] : %w[cluster_name indices nodes status timestamp]
+
     expected.unshift("_nodes")
 
     assert_equal expected, h.keys.sort

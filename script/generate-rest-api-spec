@@ -22,7 +22,7 @@ class RestApiSpecGenerator
 
   attr_reader :version, :short_version, :class_version
 
-  def initialize(version = "8.13")
+  def initialize(version = "8.18")
     @version = version
 
     sliced = @version.split(".").slice(0, 2)

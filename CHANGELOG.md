@@ -1,3 +1,6 @@
+## 6.2.4 (2025-10-10)
+- Added support for ES 8.19.3
+
 ## 6.2.3 (2025-06-06)
 - Added support for ES 8.17.2
 - Added support for ES 8.18.0

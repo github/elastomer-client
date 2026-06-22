@@ -12,17 +12,20 @@ jobs:
     strategy:
       matrix:
         ruby-version: ['3.2']
+        gemfile: ['faraday_1', 'faraday_2']
         ES_VERSION: ['8.18.0']
         include:
           - ES_VERSION: '8.18.0'
             ES_DOWNLOAD_URL: >-
               https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.18.0-linux-x86_64.tar.gz
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - uses: actions/checkout@v4
       - name: Cache Elasticsearch
         id: cache-elasticsearch
         uses: actions/cache@v4

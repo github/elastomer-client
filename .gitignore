@@ -6,6 +6,7 @@
 /vendor/cache/*.gem
 /coverage
 Gemfile.lock
+gemfiles/*.lock
 *.gem
 tags
 .byebug_history

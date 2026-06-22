@@ -8,6 +8,9 @@ group :development do
   gem "activesupport", ">= 7.0"
   gem "bundler", "~> 2.0"
   gem "debug", "~> 1.7"
+  # The default bundle resolves Faraday 2.x, where the :retry middleware lives in the
+  # faraday-retry gem (it is in core on 1.x). Needed for the retry test; consumers opt in.
+  gem "faraday-retry", require: "faraday/retry"
   gem "minitest", "~> 5.17"
   gem "minitest-focus", "~> 1.3"
   gem "rake"
@@ -17,6 +20,5 @@ group :development do
   gem "rubocop-performance", "~> 1.21.0"
   gem "rubocop-rake", "~> 0.6.0"
   gem "simplecov", require: false
-  gem "spy", "~> 1.0"
   gem "webmock", "~> 3.5"
 end

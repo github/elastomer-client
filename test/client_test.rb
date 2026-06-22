@@ -13,15 +13,15 @@ describe ElastomerClient::Client do
   end
 
   it "allows configuring the Faraday when a block is given" do
-    assert ElastomerClient::Client.new.connection.builder.handlers.none? { |handler| handler.klass == FaradayMiddleware::Instrumentation }
+    assert ElastomerClient::Client.new.connection.builder.handlers.none? { |handler| handler.klass == ElastomerClient::Middleware::OpaqueId }
 
     c = ElastomerClient::Client.new do |connection|
       assert_kind_of(Faraday::Connection, connection)
 
-      connection.use :instrumentation
+      connection.request :opaque_id
     end
 
-    assert c.connection.builder.handlers.any? { |handler| handler.klass == FaradayMiddleware::Instrumentation }
+    assert c.connection.builder.handlers.any? { |handler| handler.klass == ElastomerClient::Middleware::OpaqueId }
   end
 
   it "use Faraday's default adapter if none is specified" do
@@ -145,14 +145,9 @@ describe ElastomerClient::Client do
       })
       client = ElastomerClient::Client.new(**client_params)
 
-      connection = Faraday::Connection.new
-      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
+      expected = "Basic #{["my_user:my_secret_password"].pack("m0")}"
 
-      Faraday.stub(:new, $client_params[:url], connection) do
-        client.ping
-      end
-
-      assert basic_auth_spy.has_been_called_with?("my_user", "my_secret_password")
+      assert_equal expected, client.connection.headers["Authorization"]
     end
 
     it "ignores basic authentication if password is missing" do
@@ -161,14 +156,7 @@ describe ElastomerClient::Client do
       })
       client = ElastomerClient::Client.new(**client_params)
 
-      connection = Faraday::Connection.new
-      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
-
-      Faraday.stub(:new, $client_params[:url], connection) do
-        client.ping
-      end
-
-      refute_predicate basic_auth_spy, :has_been_called?
+      refute client.connection.headers.key?("Authorization")
     end
 
     it "ignores basic authentication if username is missing" do
@@ -177,28 +165,14 @@ describe ElastomerClient::Client do
       })
       client = ElastomerClient::Client.new(**client_params)
 
-      connection = Faraday::Connection.new
-      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
-
-      Faraday.stub(:new, $client_params[:url], connection) do
-        client.ping
-      end
-
-      refute_predicate basic_auth_spy, :has_been_called?
+      refute client.connection.headers.key?("Authorization")
     end
 
     it "can use token authentication" do
       client_params = $client_params.merge(token_auth: "my_secret_token")
       client = ElastomerClient::Client.new(**client_params)
 
-      connection = Faraday::Connection.new
-      token_auth_spy = Spy.on(connection, :token_auth).and_return(nil)
-
-      Faraday.stub(:new, $client_params[:url], connection) do
-        client.ping
-      end
-
-      assert token_auth_spy.has_been_called_with?("my_secret_token")
+      assert_equal %(Token token="my_secret_token"), client.connection.headers["Authorization"]
     end
 
     it "prefers token authentication over basic" do
@@ -208,16 +182,7 @@ describe ElastomerClient::Client do
       }, token_auth: "my_secret_token")
       client = ElastomerClient::Client.new(**client_params)
 
-      connection = Faraday::Connection.new
-      basic_auth_spy = Spy.on(connection, :basic_auth).and_return(nil)
-      token_auth_spy = Spy.on(connection, :token_auth).and_return(nil)
-
-      Faraday.stub(:new, $client_params[:url], connection) do
-        client.ping
-      end
-
-      refute_predicate basic_auth_spy, :has_been_called?
-      assert token_auth_spy.has_been_called_with?("my_secret_token")
+      assert_equal %(Token token="my_secret_token"), client.connection.headers["Authorization"]
     end
   end
 
@@ -372,11 +337,15 @@ describe ElastomerClient::Client do
     it "adding retry logic retries up to 2 times" do
       retry_count = 0
 
+      # :retry maps to Faraday::Request::Retry on Faraday 1.x and Faraday::Retry::Middleware
+      # on Faraday 2.x (via faraday-retry). Look up whichever the running Faraday registers.
+      retry_klass = Faraday::Request.lookup_middleware(:retry)
+
       retry_options = {
         max: 2,
         interval: 0.05,
         methods: [:get],
-        exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed],
+        exceptions: retry_klass::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed],
         retry_block: proc { |env, options, retries, exc| retry_count += 1 }
       }
       retry_client = ElastomerClient::Client.new(port: 9205) do |connection|

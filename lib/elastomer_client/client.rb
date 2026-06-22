@@ -2,7 +2,7 @@
 
 require "addressable/template"
 require "faraday"
-require "faraday_middleware"
+require "faraday/gzip"
 require "multi_json"
 require "semantic"
 require "zlib"
@@ -132,7 +132,7 @@ module ElastomerClient
       @connection ||= Faraday.new(url) do |conn|
         conn.response(:parse_json)
         # Request compressed responses from ES and decompress them
-        conn.use(:gzip)
+        conn.request(:gzip)
         conn.request(:encode_json)
         conn.request(:limit_size, max_request_size:) if max_request_size
         conn.request(:elastomer_compress, compression:) if compress_body
@@ -140,10 +140,14 @@ module ElastomerClient
         conn.options[:timeout]      = read_timeout
         conn.options[:open_timeout] = open_timeout
 
+        # Faraday 2 removed the Connection#token_auth and #basic_auth helpers, and the
+        # :authorization middleware emits different header formats across Faraday majors.
+        # Set the Authorization header directly so the output is identical on 1.x and 2.x.
         if token_auth?
-          conn.token_auth(@token_auth)
+          conn.headers["Authorization"] = %(Token token="#{@token_auth}")
         elsif basic_auth?
-          conn.basic_auth(@basic_auth[:username], @basic_auth[:password])
+          credentials = ["#{@basic_auth[:username]}:#{@basic_auth[:password]}"].pack("m0")
+          conn.headers["Authorization"] = "Basic #{credentials}"
         end
 
         @connection_block&.call(conn)

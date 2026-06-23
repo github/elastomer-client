@@ -1,3 +1,7 @@
+## 6.3.0 (2026-06-22)
+- Add support for Faraday 2 (now compatible with both Faraday 1.x and 2.x)
+- Drop the deprecated `faraday_middleware` dependency in favor of `faraday-gzip`
+
 ## 6.2.4 (2025-10-10)
 - Added support for ES 8.19.3
 

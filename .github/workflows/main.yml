@@ -28,7 +28,7 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Cache Elasticsearch
         id: cache-elasticsearch
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         env:
           cache-name: cache-elasticsearch
         with:

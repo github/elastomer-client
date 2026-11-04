@@ -116,18 +116,6 @@ This client is tested against:
   - 8.18
   - 9.5.6
 
-Elasticsearch 9.5.6 is the supported 9.x target in CI and Docker, using a REST API spec generated from that release.
-Spec selection matches the server's major and minor version; other 9.x minors require their own generated specs.
-The existing 8.x specs and request handling remain supported.
-Elasticsearch 9 timeout responses with status 429 remain retryable when their error type identifies a timeout.
-Other 429 responses retain their existing classification.
-
-Request bodies and response hashes are passed through, not translated between server versions.
-For Elasticsearch 9, migrate legacy range-query keys to `gt`, `gte`, `lt`, or `lte`, remove highlighting `force_source`,
-and use `knn` in `_search` instead of `_knn_search`. Alias and field-mapping `local` parameters and the unfreeze endpoint are absent
-from the 9.5 spec. Review the [Elasticsearch 9 breaking changes](https://www.elastic.co/docs/release-notes/elasticsearch/breaking-changes)
-for mapping, analysis, aggregation, and response changes, including the removal of cluster state from reroute responses.
-
 ## Development
 
 Get started by cloning and running a few scripts:

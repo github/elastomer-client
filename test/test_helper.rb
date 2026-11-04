@@ -110,6 +110,18 @@ def default_index_settings
   {settings: {index: {number_of_shards: 1, number_of_replicas: 0}}}
 end
 
+def routing_values_for_distinct_shards(docs)
+  routing_by_shard = {}
+  100.times do
+    routing = SecureRandom.uuid
+    shard = docs.search_shards(routing:).fetch("shards").fetch(0).fetch(0).fetch("shard")
+    routing_by_shard[shard] ||= routing
+    return routing_by_shard.values if routing_by_shard.size == 2
+  end
+
+  flunk "Could not find routing values for distinct shards after 100 UUID attempts"
+end
+
 def run_snapshot_tests?
   unless defined? $run_snapshot_tests
     begin

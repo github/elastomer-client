@@ -56,18 +56,18 @@ describe ElastomerClient::Client::RestApiSpec::ApiSpec do
   end
 
   it "selects the REST API spec for each supported Elasticsearch major version" do
-    {"8.18.0" => "8_18", "8.19.3" => "8_19", "9.0.0" => "9_0"}.each do |version, class_version|
+    {"8.18.0" => "8_18", "8.19.3" => "8_19", "9.5.6" => "9_5"}.each do |version, class_version|
       client = ElastomerClient::Client.new(es_version: version)
 
       assert_equal "ElastomerClient::Client::RestApiSpec::ApiSpecV#{class_version}", client.api_spec.class.name
     end
   end
 
-  it "keeps removed alias parameters in ES8 but excludes them from ES9" do
+  it "keeps removed local parameters in ES8 but excludes them from ES9" do
     eight = ElastomerClient::Client::RestApiSpec.api_spec("8.19.3")
-    nine = ElastomerClient::Client::RestApiSpec.api_spec("9.0.0")
+    nine = ElastomerClient::Client::RestApiSpec.api_spec("9.5.6")
 
-    %w[indices.get_alias indices.exists_alias cat.aliases].each do |api|
+    %w[indices.get_alias indices.exists_alias cat.aliases indices.get_field_mapping].each do |api|
       assert eight.valid_param?(api:, param: :local)
       refute nine.valid_param?(api:, param: :local)
       assert_empty(nine.select_params(api:, from: {local: true}))
@@ -79,7 +79,7 @@ describe ElastomerClient::Client::RestApiSpec::ApiSpec do
 
   it "keeps removed endpoints in ES8 but excludes them from ES9" do
     eight = ElastomerClient::Client::RestApiSpec.api_spec("8.19.3")
-    nine = ElastomerClient::Client::RestApiSpec.api_spec("9.0.0")
+    nine = ElastomerClient::Client::RestApiSpec.api_spec("9.5.6")
 
     %w[indices.unfreeze knn_search].each do |api|
       refute_nil eight.get(api)

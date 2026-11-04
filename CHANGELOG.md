@@ -1,5 +1,5 @@
 ## 6.4.0 (2026-11-04)
-- Add Elasticsearch 9.0 support while retaining Elasticsearch 8.x support.
+- Add Elasticsearch 9.5.6 support while retaining Elasticsearch 8.x support.
 - Keep Elasticsearch timeout errors retryable when returned with HTTP status 429.
 
 ## 6.3.0 (2026-06-22)

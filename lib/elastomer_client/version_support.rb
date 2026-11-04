@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "rubygems/version"
+
 module ElastomerClient
   class VersionSupport
 
@@ -9,7 +11,8 @@ module ElastomerClient
     #
     # Raises ArgumentError if version is unsupported.
     def initialize(version)
-      if version < "5.0" || version >= "9.0"
+      semantic_version = Gem::Version.new(version)
+      if semantic_version < Gem::Version.new("5.0") || semantic_version >= Gem::Version.new("10.0")
         raise ArgumentError, "Elasticsearch version #{version} is not supported by elastomer-client"
       end
 
@@ -19,6 +22,10 @@ module ElastomerClient
     # Returns true if Elasticsearch version is 8.x or higher.
     def es_version_8_plus?
       version >= "8.0.0"
+    end
+
+    def es_version_9_plus?
+      Gem::Version.new(version) >= Gem::Version.new("9.0")
     end
   end
 end

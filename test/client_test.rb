@@ -85,6 +85,29 @@ describe ElastomerClient::Client do
     assert_equal "it took too long :: GET /_cat/indices", wrapped.message
   end
 
+  it "keeps Elasticsearch timeout errors retryable when ES9 returns 429" do
+    %w[timeout_exception process_cluster_event_timeout_exception search_timeout_exception].each do |type|
+      error = {"type" => type}
+      [error, {"type" => "search_phase_execution_exception", "root_cause" => [error]}].each do |body|
+        response = Faraday::Response.new(status: 429, body: {"error" => body})
+        exception = assert_raises(ElastomerClient::Client::TimeoutError) { $client.handle_errors(response) }
+        assert_predicate exception, :retry?
+      end
+    end
+  end
+
+  it "does not make other 429 errors retryable" do
+    response = Faraday::Response.new(status: 429, body: {"error" => {"type" => "circuit_breaking_exception"}})
+    exception = assert_raises(ElastomerClient::Client::RequestError) { $client.handle_errors(response) }
+    refute_predicate exception, :retry?
+  end
+
+  it "preserves ES8 server timeout error handling" do
+    response = Faraday::Response.new(status: 503, body: {"error" => {"type" => "timeout_exception"}})
+    exception = assert_raises(ElastomerClient::Client::ServerError) { $client.handle_errors(response) }
+    assert_predicate exception, :retry?
+  end
+
   it "handles path expansions" do
     uri = $client.expand_path "/{foo}/{bar}", foo: "_cluster", bar: "health"
 

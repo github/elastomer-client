@@ -62,6 +62,8 @@ class RestApiSpecGenerator
       hash = MultiJson.load(File.read(filename))
       key = hash.keys.first
       value = hash.values.first
+      next if @version_support.es_version_9_plus? && key == "knn_search"
+
       yield(key, value)
     end
   end

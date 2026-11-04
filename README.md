@@ -114,6 +114,17 @@ This client is tested against:
   - 5.6
   - 8.13
   - 8.18
+  - 9.0
+
+Elasticsearch 9.0 uses its own REST API spec; the existing 8.x specs and request handling remain supported.
+Elasticsearch 9 timeout responses with status 429 remain retryable when their error type identifies a timeout.
+Other 429 responses retain their existing classification.
+
+Request bodies and response hashes are passed through, not translated between server versions.
+For Elasticsearch 9, migrate legacy range-query keys to `gt`, `gte`, `lt`, or `lte`, remove highlighting `force_source`,
+and use `knn` in `_search` instead of `_knn_search`. Alias `local` parameters and the unfreeze endpoint are absent
+from the 9.0 spec. Review the [Elasticsearch 9 breaking changes](https://www.elastic.co/docs/release-notes/elasticsearch/breaking-changes#elasticsearch-900-breaking-changes)
+for mapping, analysis, aggregation, and response changes, including the removal of cluster state from reroute responses.
 
 ## Development
 
@@ -140,7 +151,7 @@ script/bootstrap
 
 ### Start an Elasticsearch server in Docker
 
-To run ES 5 and ES 8:
+To run ES 5, ES 8, and ES 9:
 ```
 docker compose --project-directory docker --profile all up
 ```
@@ -155,12 +166,22 @@ To run only ES 8:
 docker compose --project-directory docker --profile es8 up
 ```
 
+To run only ES 9:
+```
+docker compose --project-directory docker --profile es9 up
+```
+
 To run only ES 5:
 ```
 docker compose --project-directory docker --profile es5 up
 ```
 
 ### Run tests against a version of Elasticsearch
+
+ES 9
+```
+ES_PORT=9210 rake test
+```
 
 ES 8
 ```

@@ -1,3 +1,7 @@
+## 6.4.0 (2026-11-04)
+- Add Elasticsearch 9.0 support while retaining Elasticsearch 8.x support.
+- Keep Elasticsearch timeout errors retryable when returned with HTTP status 429.
+
 ## 6.3.0 (2026-06-22)
 - Add support for Faraday 2 (now compatible with both Faraday 1.x and 2.x)
 - Drop the deprecated `faraday_middleware` dependency in favor of `faraday-gzip`

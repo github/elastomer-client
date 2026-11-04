@@ -114,6 +114,7 @@ This client is tested against:
   - 5.6
   - 8.13
   - 8.18
+  - 9.5.6
 
 ## Development
 
@@ -140,7 +141,7 @@ script/bootstrap
 
 ### Start an Elasticsearch server in Docker
 
-To run ES 5 and ES 8:
+To run ES 5, ES 8, and ES 9:
 ```
 docker compose --project-directory docker --profile all up
 ```
@@ -155,12 +156,22 @@ To run only ES 8:
 docker compose --project-directory docker --profile es8 up
 ```
 
+To run only ES 9:
+```
+docker compose --project-directory docker --profile es9 up
+```
+
 To run only ES 5:
 ```
 docker compose --project-directory docker --profile es5 up
 ```
 
 ### Run tests against a version of Elasticsearch
+
+ES 9
+```
+ES_PORT=9210 rake test
+```
 
 ES 8
 ```

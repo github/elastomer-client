@@ -414,6 +414,13 @@ module ElastomerClient
 
       if response.body.is_a?(Hash) && (error = response.body["error"])
         root_cause = Array(error["root_cause"]).first || error
+        # ES9 returns these timeouts as 429 rather than retryable 5xx ServerError responses.
+        # Retry only these timeout types so unrelated 429s retain their existing handling.
+        if response.status == 429 &&
+            %w[timeout_exception process_cluster_event_timeout_exception search_timeout_exception].include?(root_cause["type"])
+          raise TimeoutError, response
+        end
+
         case root_cause["type"]
         when "index_not_found_exception"; raise IndexNotFoundError, response
         when "illegal_argument_exception"; raise IllegalArgument, response

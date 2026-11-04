@@ -4,9 +4,10 @@ require_relative "test_helper"
 
 describe ElastomerClient::VersionSupport do
   describe "supported versions" do
-    it "allows 5.0.0 to 8.x" do
+    it "allows 5.0.0 to 9.x" do
       five_series = ["5.0.0", "5.0.9", "5.1.0", "5.9.0", "5.99.100"]
       eight_series = ["8.0.0", "8.0.9", "8.1.0", "8.9.0", "8.99.100"]
+      nine_series = ["9.0.0", "9.0.9", "9.1.0", "9.9.0", "9.99.100"]
 
       five_series.each do |version|
         assert ElastomerClient::VersionSupport.new(version)
@@ -14,6 +15,12 @@ describe ElastomerClient::VersionSupport do
 
       eight_series.each do |version|
         assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_8_plus?
+        refute_predicate ElastomerClient::VersionSupport.new(version), :es_version_9_plus?
+      end
+
+      nine_series.each do |version|
+        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_8_plus?
+        assert_predicate ElastomerClient::VersionSupport.new(version), :es_version_9_plus?
       end
     end
   end
@@ -21,7 +28,7 @@ describe ElastomerClient::VersionSupport do
   describe "unsupported versions" do
     it "blow up" do
       too_low = ["0.90", "1.0.1", "2.0.0", "2.2.0"]
-      too_high = ["9.0.0"]
+      too_high = ["10.0.0", "11.0.0", "20.0.0"]
 
       (too_low + too_high).each do |version|
         exception = assert_raises(ArgumentError, "expected #{version} to not be supported") do

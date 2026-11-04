@@ -62,6 +62,9 @@ class RestApiSpecGenerator
       hash = MultiJson.load(File.read(filename))
       key = hash.keys.first
       value = hash.values.first
+      # ES9 exposes legacy knn_search only in ES8 compatibility mode, not native ES9.
+      next if @version_support.es_version_9_plus? && key == "knn_search"
+
       yield(key, value)
     end
   end

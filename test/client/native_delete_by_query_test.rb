@@ -93,12 +93,13 @@ describe ElastomerClient::Client::NativeDeleteByQuery do
           _routing: { required: true }
         })
       })
-      wait_for_index(@index.name)
+      wait_for_index(index.name)
       docs = index.docs(type)
+      routing, other_routing = routing_values_for_distinct_shards(docs)
 
-      docs.index({ _id: 0, _routing: "cat", name: "mittens" })
-      docs.index({ _id: 1, _routing: "cat", name: "luna" })
-      docs.index({ _id: 2, _routing: "dog", name: "mittens" })
+      docs.index({ _id: 0, _routing: routing, name: "mittens" })
+      docs.index({ _id: 1, _routing: routing, name: "luna" })
+      docs.index({ _id: 2, _routing: other_routing, name: "mittens" })
 
       query = {
         query: {
@@ -109,15 +110,15 @@ describe ElastomerClient::Client::NativeDeleteByQuery do
       }
 
       index.refresh
-      response = index.native_delete_by_query(query, routing: "cat")
+      response = index.native_delete_by_query(query, routing:)
 
       assert_equal(1, response["deleted"])
 
       response = docs.multi_get({
         docs: [
-          { _id: 0, routing: "cat" },
-          { _id: 1, routing: "cat" },
-          { _id: 2, routing: "dog" },
+          { _id: 0, routing: },
+          { _id: 1, routing: },
+          { _id: 2, routing: other_routing },
         ]
       })
 

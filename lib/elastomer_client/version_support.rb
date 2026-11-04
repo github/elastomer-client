@@ -11,8 +11,8 @@ module ElastomerClient
     #
     # Raises ArgumentError if version is unsupported.
     def initialize(version)
-      semantic_version = Gem::Version.new(version)
-      if semantic_version < Gem::Version.new("5.0") || semantic_version >= Gem::Version.new("10.0")
+      comparable_version = Gem::Version.new(version)
+      if comparable_version < Gem::Version.new("5.0") || comparable_version >= Gem::Version.new("10.0")
         raise ArgumentError, "Elasticsearch version #{version} is not supported by elastomer-client"
       end
 

@@ -114,6 +114,7 @@ This client is tested against:
   - 5.6
   - 8.13
   - 8.18
+  - 8.19.24
   - 9.5.6
 
 ## Development

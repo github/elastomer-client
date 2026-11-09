@@ -56,7 +56,7 @@ describe ElastomerClient::Client::RestApiSpec::ApiSpec do
   end
 
   it "selects the REST API spec for each supported Elasticsearch major version" do
-    {"8.18.0" => "8_18", "8.19.3" => "8_19", "9.5.6" => "9_5"}.each do |version, class_version|
+    {"8.18.0" => "8_18", "8.19.3" => "8_19", "8.19.24" => "8_19", "9.5.6" => "9_5"}.each do |version, class_version|
       client = ElastomerClient::Client.new(es_version: version)
 
       assert_equal "ElastomerClient::Client::RestApiSpec::ApiSpecV#{class_version}", client.api_spec.class.name

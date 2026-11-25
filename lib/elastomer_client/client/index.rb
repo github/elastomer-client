@@ -71,17 +71,13 @@ module ElastomerClient
         translog.sync_interval
       ].freeze
 
-      # Remove settings that Elasticsearch Serverless rejects from an index
-      # create request body.
-      #
-      # body - The index settings and mappings as a Hash
-      #
-      # Returns a new Hash without unsupported settings
-      def serverless_create_body(body)
-        settings_key = [:settings, "settings"].find { |key| body[key].is_a?(Hash) }
-        return body unless settings_key
+      def filter_params_for_serverless(action, payload)
+        raise ArgumentError, "unknown index action: #{action.inspect}" unless action == :create
 
-        body.merge(settings_key => without_serverless_settings(body[settings_key]))
+        settings_key = [:settings, "settings"].find { |key| payload[key].is_a?(Hash) }
+        return payload unless settings_key
+
+        payload.merge(settings_key => without_serverless_settings(payload[settings_key]))
       end
 
       # Delete the index.

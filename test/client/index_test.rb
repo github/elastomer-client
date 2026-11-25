@@ -63,8 +63,9 @@ describe ElastomerClient::Client::Index do
 
       assert_equal(
         { settings: { index: { refresh_interval: "1s" } }, mappings: { properties: {} } },
-        @index.serverless_create_body(body),
+        @index.filter_params_for_serverless(:create, body),
       )
+      assert_raises(ArgumentError) { @index.filter_params_for_serverless(:update_settings, body) }
     end
 
     it "adds mappings for document types" do

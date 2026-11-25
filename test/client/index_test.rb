@@ -51,6 +51,22 @@ describe ElastomerClient::Client::Index do
       assert_equal "0", settings["index"]["number_of_replicas"]
     end
 
+    it "removes settings unsupported by serverless from the create body" do
+      body = {
+        settings: {
+          number_of_shards: 3,
+          "index.number_of_replicas" => 0,
+          index: { refresh_interval: "1s", "queries.cache.enabled" => false, translog: { durability: "async" } },
+        },
+        mappings: { properties: {} },
+      }
+
+      assert_equal(
+        { settings: { index: { refresh_interval: "1s" } }, mappings: { properties: {} } },
+        @index.serverless_create_body(body),
+      )
+    end
+
     it "adds mappings for document types" do
       @index.create(
         settings: { number_of_shards: 1, number_of_replicas: 0 },

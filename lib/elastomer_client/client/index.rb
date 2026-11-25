@@ -60,6 +60,30 @@ module ElastomerClient
         response.body
       end
 
+      SERVERLESS_UNSUPPORTED_SETTINGS = %w[
+        number_of_shards
+        number_of_replicas
+        auto_expand_replicas
+        number_of_routing_shards
+        max_terms_count
+        queries.cache.enabled
+        translog.durability
+        translog.sync_interval
+      ].freeze
+
+      # Remove settings that Elasticsearch Serverless rejects from an index
+      # create request body.
+      #
+      # body - The index settings and mappings as a Hash
+      #
+      # Returns a new Hash without unsupported settings
+      def serverless_create_body(body)
+        settings_key = [:settings, "settings"].find { |key| body[key].is_a?(Hash) }
+        return body unless settings_key
+
+        body.merge(settings_key => without_serverless_settings(body[settings_key]))
+      end
+
       # Delete the index.
       #
       # params - Parameters Hash
@@ -564,6 +588,21 @@ module ElastomerClient
       # Internal: Returns a Hash containing default parameters.
       def defaults
         { index: name }
+      end
+
+      private
+
+      def without_serverless_settings(settings, prefix = nil)
+        settings.each_with_object({}) do |(key, value), filtered|
+          path = [prefix, key].compact.join(".").delete_prefix("index.")
+          next if SERVERLESS_UNSUPPORTED_SETTINGS.include?(path)
+
+          if value.is_a?(Hash) && !value.empty?
+            value = without_serverless_settings(value, path)
+            next if value.empty?
+          end
+          filtered[key] = value
+        end
       end
 
     end

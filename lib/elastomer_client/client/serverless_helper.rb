@@ -14,7 +14,7 @@ module ElastomerClient
         translog.sync_interval
       ].freeze
 
-      def filter_params_for_serverless(action, payload)
+      def filter_payload_for_serverless(action, payload)
         raise ArgumentError, "unknown index action: #{action.inspect}" unless action == :create
 
         settings_key = [:settings, "settings"].find { |key| payload[key].is_a?(Hash) }

@@ -54,9 +54,9 @@ describe ElastomerClient::Client::Index do
     it "removes settings unsupported by serverless from the create body" do
       body = {
         settings: {
-          number_of_shards: 3,
+          :number_of_shards => 3,
           "index.number_of_replicas" => 0,
-          index: { refresh_interval: "1s", "queries.cache.enabled" => false, translog: { durability: "async" } },
+          :index => { :refresh_interval => "1s", "queries.cache.enabled" => false, :translog => { durability: "async" } },
         },
         mappings: { properties: {} },
       }

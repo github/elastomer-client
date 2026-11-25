@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "serverless_helper"
+
 module ElastomerClient
   class Client
 
@@ -18,6 +20,8 @@ module ElastomerClient
     end
 
     class Index
+      include ServerlessHelper
+
       # Create a new index client for making API requests that pertain to
       # the health and management of individual indexes.
       #

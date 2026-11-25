@@ -2,8 +2,8 @@
 
 module ElastomerClient
   class Client
-    module ServerlessFilter
-      SERVERLESS_UNSUPPORTED_SETTINGS = %w[
+    module ServerlessHelper
+      UNSUPPORTED_INDEX_SETTINGS = %w[
         number_of_shards
         number_of_replicas
         auto_expand_replicas
@@ -20,18 +20,18 @@ module ElastomerClient
         settings_key = [:settings, "settings"].find { |key| payload[key].is_a?(Hash) }
         return payload unless settings_key
 
-        payload.merge(settings_key => without_serverless_settings(payload[settings_key]))
+        payload.merge(settings_key => strip_unsupported_serverless_settings(payload[settings_key]))
       end
 
       private
 
-      def without_serverless_settings(settings, prefix = nil)
+      def strip_unsupported_serverless_settings(settings, prefix = nil)
         settings.each_with_object({}) do |(key, value), filtered|
           path = [prefix, key].compact.join(".").delete_prefix("index.")
-          next if SERVERLESS_UNSUPPORTED_SETTINGS.include?(path)
+          next if UNSUPPORTED_INDEX_SETTINGS.include?(path)
 
           if value.is_a?(Hash) && !value.empty?
-            value = without_serverless_settings(value, path)
+            value = strip_unsupported_serverless_settings(value, path)
             next if value.empty?
           end
           filtered[key] = value
